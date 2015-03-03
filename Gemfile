@@ -4,8 +4,8 @@ source 'https://rubygems.org'
 gem 'rails', '4.2.0'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
-# Use omniauth for CAS authentication
-gem 'omniauth-cas'
+# Use Devise for user accounts
+gem 'devise'
 
 # Use Grape as a framework for the REST API 
 gem 'grape'

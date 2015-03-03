@@ -3,12 +3,14 @@
 <head>
   <title>Shuttle Tracking</title>
   <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js"></script>
-  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
-  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= stylesheet_link_tag    'application', media: 'all' %>
+  <%= javascript_include_tag 'application' %>
+  <%= html_import_tag "application" %>
   <%= csrf_meta_tags %>
 </head>
 <body>
 
+<%= render partial: "layouts/messages" %>
 <%= yield %>
 
 </body>

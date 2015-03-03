@@ -15,3 +15,6 @@
 /log/*
 !/log/.keep
 /tmp
+
+# Ignore external Polymer components
+/vendor/assets/components/*
