@@ -1,0 +1,5 @@
+# Number of seconds to sleep between backend updates
+BACKEND_UPDATE = 15 
+
+# Shuttle tracking data feed
+DATA_FEED = 'http://localhost/datafeed'

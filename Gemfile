@@ -10,6 +10,9 @@ gem 'devise'
 # Use Grape as a framework for the REST API 
 gem 'grape'
 
+# Use God to monitor background processes (shuttle updates)
+gem 'god'
+
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Polymer Web Components

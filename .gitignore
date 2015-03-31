@@ -18,3 +18,6 @@
 
 # Ignore external Polymer components
 /vendor/assets/components/*
+
+# Ignore vehicle tracking initializer
+/config/initializers/vehicle_tracking.rb

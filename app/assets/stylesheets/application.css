@@ -19,3 +19,19 @@ html, body {
   margin: 0; 
   padding: 0;
 }
+
+core-header-panel {
+  height: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+core-toolbar {
+  background-color: #202020;
+  color: white;
+}
+
+.navbar-header {
+  text-decoration: none;
+  color: white;
+}

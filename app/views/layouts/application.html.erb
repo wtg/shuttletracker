@@ -8,10 +8,13 @@
   <%= html_import_tag "application" %>
   <%= csrf_meta_tags %>
 </head>
-<body>
-
-<%= render partial: "layouts/messages" %>
-<%= yield %>
-
+<body unresolved>
+  <core-header-panel>
+    <core-toolbar>
+      <%= render partial: "layouts/header" %>
+    </core-toolbar>
+    <%= render partial: "layouts/messages" %>
+    <%= yield %>
+  </core-header-panel>
 </body>
 </html>
