@@ -12,7 +12,7 @@
     "components"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#~0.8.0",
+    "polymer": "Polymer/polymer#~0.5.0",
     "core-ajax": "Polymer/core-ajax#~0.4.2",
     "core-transition": "Polymer/core-transition#~0.4.2",
     "angular": "1.3.x",
@@ -23,6 +23,11 @@
     "paper-elements": "Polymer/paper-elements#~0.5.5"
   },
   "resolutions": {
-    "angular": "1.3.x"
+    "angular": "1.3.x",
+    "polymer": "~0.5.0",
+    "core-ajax": "^0.5",
+    "core-transition": "^0.5",
+    "core-meta": "^0.5",
+    "core-component-page": "^0.5"
   }
 }
