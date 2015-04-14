@@ -1,0 +1,6 @@
+{
+  "DataFeed": "",
+  "UpdateInterval": 15,
+  "MongoURL": "localhost",
+  "MongoPort": "27017"
+}
