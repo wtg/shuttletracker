@@ -10,6 +10,7 @@ import (
   "regexp"
   "encoding/json"
   "gopkg.in/mgo.v2"
+  "gopkg.in/mgo.v2/bson"
   "github.com/gorilla/mux"
 )
 
@@ -21,15 +22,17 @@ import (
  */
 
 type VehicleUpdate struct {
-  vehicleId   string  `json:"vehicleId"   bson:"vehicleId,omitempty"`
-  lat         string  `json:"lat"         bson:"lat"`
-  lng         string  `json:"lng"         bson:"lng"`
-  heading     string  `json:"heading"     bson:"heading"`
-  speed       string  `json:"speed"       bson:"speed"`
-  lock        string  `json:"lock"        bson:"lock"`
-  time        string  `json:"time"        bson:"time"`
-  date        string  `json:"date"        bson:"date"`
-  status      string  `json:"status"      bson:"status"`
+  Id          bson.ObjectId                 `bson:"_id,omitempty"`
+  VehicleId   string     `json:"vehicleId"   bson:"vehicleId,omitempty"`
+  Lat         string     `json:"lat"         bson:"lat"`
+  Lng         string     `json:"lng"         bson:"lng"`
+  Heading     string     `json:"heading"     bson:"heading"`
+  Speed       string     `json:"speed"       bson:"speed"`
+  Lock        string     `json:"lock"        bson:"lock"`
+  Time        string     `json:"time"        bson:"time"`
+  Date        string     `json:"date"        bson:"date"`
+  Status      string     `json:"status"      bson:"status"`
+  Created     time.Time  `json:"created"     bson:"created"`
 }
 
 func UpdateShuttles(dataFeed string, updateInterval int, session *mgo.Session) {
@@ -69,20 +72,21 @@ func UpdateShuttles(dataFeed string, updateInterval int, session *mgo.Session) {
         result[n[i]] = item
       }
 
-      // Create new vehicle update
-      update := VehicleUpdate {
-        strings.Replace(result["id"], "Vehicle ID:", "", -1),
-        strings.Replace(result["lat"], "lat:", "", -1),
-        strings.Replace(result["lng"], "lon:", "", -1),
-        strings.Replace(result["heading"], "dir:", "", -1),
-        strings.Replace(result["speed"], "spd:", "", -1),
-        strings.Replace(result["lock"], "lck:", "", -1),
-        strings.Replace(result["time"], "time:", "", -1),
-        strings.Replace(result["date"], "date:", "", -1),
-        strings.Replace(result["status"], "trig:", "", -1) }
+      // Create new vehicle update & insert update into database
+      update := VehicleUpdate { 
+        Id:        bson.NewObjectId(),
+        VehicleId: strings.Replace(result["id"], "Vehicle ID:", "", -1),
+        Lat:       strings.Replace(result["lat"], "lat:", "", -1),
+        Lng:       strings.Replace(result["lng"], "lon:", "", -1),
+        Heading:   strings.Replace(result["heading"], "dir:", "", -1),
+        Speed:     strings.Replace(result["speed"], "spd:", "", -1),
+        Lock:      strings.Replace(result["lock"], "lck:", "", -1),
+        Time:      strings.Replace(result["time"], "time:", "", -1),
+        Date:      strings.Replace(result["date"], "date:", "", -1),
+        Status:    strings.Replace(result["status"], "trig:", "", -1),
+        Created:   time.Now()}
 
-      // Insert update into database
-      err := UpdatesCollection.Insert(update)
+      err := UpdatesCollection.Insert(&update)
 
       if err != nil {
         fmt.Println(err)
