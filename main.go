@@ -35,11 +35,10 @@ type VehicleUpdate struct {
   Created     time.Time  `json:"created"     bson:"created"`
 }
 
-func UpdateShuttles(dataFeed string, updateInterval int, session *mgo.Session) {
+func (Shuttles *Shuttles) UpdateShuttles(dataFeed string, updateInterval int) {
   for {
     // Reference updates collection and close db session upon exit
-    UpdatesCollection := session.DB("shuttle_tracking").C("updates")
-    defer session.Close()
+    UpdatesCollection := Shuttles.Session.DB("shuttle_tracking").C("updates")
 
     // Make request to our tracking data feed
     resp, err := http.Get(dataFeed)
@@ -113,6 +112,10 @@ func VehiclesHandler(w http.ResponseWriter, r *http.Request) {
   fmt.Fprintf(w, "Vehicles")
 }
 
+func UpdatesHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
 /**
  *  Main - connect to database, 
  *         handle routing,
@@ -125,6 +128,10 @@ type Configuration struct {
   UpdateInterval  int
   MongoUrl        string
   MongoPort       string
+}
+
+type Shuttles struct {
+  Session *mgo.Session
 }
 
 func ReadConfiguration(fileName string) Configuration { 
@@ -152,14 +159,17 @@ func main() {
   // close Mongo session when server terminates
   defer session.Close()
 
+  Shuttles := &Shuttles{session}
+
   // Start auto updater 
-  go UpdateShuttles(config.DataFeed, config.UpdateInterval, session.Copy())
+  go Shuttles.UpdateShuttles(config.DataFeed, config.UpdateInterval)
 
   // Routing 
   r := mux.NewRouter()
   r.HandleFunc("/", IndexHandler).Methods("GET")
   r.HandleFunc("/admin", IndexHandler).Methods("GET")
   r.HandleFunc("/vehicles", VehiclesHandler).Methods("GET")
+  r.HandleFunc("/updates", UpdatesHandler).Methods("GET")
   // Static files
   r.PathPrefix("/bower_components/").Handler(http.StripPrefix("/bower_components/", http.FileServer(http.Dir("bower_components/"))))
   r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
