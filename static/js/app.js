@@ -6,12 +6,20 @@ config(['$routeProvider', '$locationProvider',
   function($routeProvider, $locationProvider) {
     $routeProvider.
       when('/', {
-        templateUrl: 'static/partials/map.html',
+        templateUrl: 'static/partials/fullscreen_map.html',
         controller: 'indexCtrl'
       }).
       when('/admin', {
-        templateUrl: 'static/partials/dashboard.html',
-        controller: 'adminCtrl'
+        templateUrl: 'static/partials/vehicles.html',
+        controller: 'vehiclesCtrl'
+      }).
+      when('/admin/vehicles', {
+        templateUrl: 'static/partials/vehicles.html',
+        controller: 'vehiclesCtrl'
+      }).
+      when('/admin/tracking', {
+        templateUrl: 'static/partials/updates.html',
+        controller: 'updatesCtrl'
       }).
       otherwise({
         redirectTo: '/'

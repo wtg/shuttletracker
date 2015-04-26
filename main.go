@@ -105,6 +105,10 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
   http.ServeFile(w, r, "index.html")
 }
 
+func AdminHandler(w http.ResponseWriter, r *http.Request) {
+  http.ServeFile(w, r, "dashboard.html")
+}
+
 type Vehicle struct {
   Id          bson.ObjectId                 `bson:"_id,omitempty"`
   VehicleId   string     `json:"vehicleId"   bson:"vehicleId,omitempty"`
@@ -242,7 +246,9 @@ func main() {
   // Routing 
   r := mux.NewRouter()
   r.HandleFunc("/", IndexHandler).Methods("GET")
-  r.HandleFunc("/admin", IndexHandler).Methods("GET")
+  r.HandleFunc("/admin", AdminHandler).Methods("GET")
+  r.HandleFunc("/admin/vehicles", AdminHandler).Methods("GET")
+  r.HandleFunc("/admin/tracking", AdminHandler).Methods("GET")
   r.HandleFunc("/vehicles", Shuttles.VehiclesHandler).Methods("GET")
   r.HandleFunc("/vehicles/create", Shuttles.VehiclesCreateHandler).Methods("POST")
   r.HandleFunc("/updates", Shuttles.UpdatesHandler).Methods("GET")

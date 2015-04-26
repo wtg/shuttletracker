@@ -4,7 +4,9 @@ controller("indexCtrl", function($scope){
   $scope.heading = "Shuttle Tracker";
 }).
 
-controller("adminCtrl", function($scope, $http){
+controller("vehiclesCtrl", function($scope, $http){
+  $scope.vehicles = {};
+
   $http.get('/vehicles').
     success(function(data, status, headers, config) {
       $scope.vehicles = data;
@@ -21,6 +23,7 @@ controller("adminCtrl", function($scope, $http){
     var res = $http.post('/vehicles/create', vehicleObj);
     res.success(function(data, status, headers, config) {
       $scope.message = data;
+      $scope.vehicles.push(vehicleObj);
     });
     res.error(function(data, status, headers, config) {
       alert( "failure message: " + JSON.stringify({data: data}));
@@ -29,4 +32,8 @@ controller("adminCtrl", function($scope, $http){
     $scope.vehicleId = '';
     $scope.vehicleName = '';
   };
+}).
+
+controller("updatesCtrl", function($scope, $http) {
+  $scope.pageTitle = "Tracking Updates";
 })
