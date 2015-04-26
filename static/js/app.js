@@ -13,10 +13,6 @@ config(['$routeProvider', '$locationProvider',
         templateUrl: 'static/partials/dashboard.html',
         controller: 'adminCtrl'
       }).
-      when('/vehicles', {
-        templateURL: 'static/partials/vehicles',
-        controller: 'vehiclesCtrl'
-      }).
       otherwise({
         redirectTo: '/'
       });
