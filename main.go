@@ -20,7 +20,6 @@ import (
  *                  get updated shuttle info,
  *                  store updated records in db
  */
-
 type VehicleUpdate struct {
   Id          bson.ObjectId                 `bson:"_id,omitempty"`
   VehicleId   string     `json:"vehicleId"   bson:"vehicleId,omitempty"`
@@ -35,11 +34,10 @@ type VehicleUpdate struct {
   Created     time.Time  `json:"created"     bson:"created"`
 }
 
-func UpdateShuttles(dataFeed string, updateInterval int, session *mgo.Session) {
+func (Shuttles *Shuttles) UpdateShuttles(dataFeed string, updateInterval int) {
   for {
     // Reference updates collection and close db session upon exit
-    UpdatesCollection := session.DB("shuttle_tracking").C("updates")
-    defer session.Close()
+    UpdatesCollection := Shuttles.Session.DB("shuttle_tracking").C("updates")
 
     // Make request to our tracking data feed
     resp, err := http.Get(dataFeed)
@@ -89,9 +87,7 @@ func UpdateShuttles(dataFeed string, updateInterval int, session *mgo.Session) {
       err := UpdatesCollection.Insert(&update)
 
       if err != nil {
-        fmt.Println(err)
-      } else {
-        fmt.Println(update)
+        fmt.Println(err.Error())
       }
     }
 
@@ -109,8 +105,88 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
   http.ServeFile(w, r, "index.html")
 }
 
-func VehiclesHandler(w http.ResponseWriter, r *http.Request) {
-  fmt.Fprintf(w, "Vehicles")
+type Vehicle struct {
+  Id          bson.ObjectId                 `bson:"_id,omitempty"`
+  VehicleId   string     `json:"vehicleId"   bson:"vehicleId,omitempty"`
+  VehicleName string     `json:"vehicleName" bson:"vehicleName"`
+  Created     time.Time  `json:"created"     bson:"created"`
+}
+
+/**
+ * Find all vehicles in the database 
+ *
+ */
+func (Shuttles *Shuttles) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
+  // Find all vehicles in database
+  var vehicles []Vehicle
+  VehiclesCollection := Shuttles.Session.DB("shuttle_tracking").C("vehicles")
+  err := VehiclesCollection.Find(bson.M{}).All(&vehicles)
+  // Handle query errors
+  if err != nil {
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+  }
+  // Send each vehicle to client as JSON
+  vehiclesJSON, err := json.MarshalIndent(vehicles, "", " ")
+  fmt.Fprintf(w, string(vehiclesJSON))
+}
+
+/**
+ * Add a new vehicle to the database 
+ *
+ */
+func (Shuttles *Shuttles) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
+  // Create new vehicle object using request fields
+  vehicle := Vehicle{}
+  vehicleData := json.NewDecoder(r.Body)
+  err := vehicleData.Decode(&vehicle)
+  // Error handling
+  if err != nil {
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+  }
+  // Store new vehicle under vehicles collection
+  VehiclesCollection := Shuttles.Session.DB("shuttle_tracking").C("vehicles")
+  err = VehiclesCollection.Insert(&vehicle)
+  // Error handling
+  if err != nil {
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+  }
+}
+
+/**
+ * Vehicle Updates - Get most recent update for each
+ *                   vehicle in the vehicles collection
+ */
+func (Shuttles *Shuttles) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
+  // Access vehicles and updates collections in shuttle tracking database 
+  UpdatesCollection := Shuttles.Session.DB("shuttle_tracking").C("updates")
+  VehiclesCollection := Shuttles.Session.DB("shuttle_tracking").C("vehicles")
+  // Store updates for each vehicle
+  var vehicles []Vehicle
+  var updates []VehicleUpdate
+  var update VehicleUpdate
+  // Query all Vehicles 
+  err := VehiclesCollection.Find(bson.M{}).All(&vehicles)
+  // Handle errors
+  if err != nil {
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+  }
+  // Find recent updates for each vehicle
+  for _,vehicle := range vehicles {
+    err := UpdatesCollection.Find(bson.M{"vehicleId": vehicle.VehicleId}).Sort("-created").Limit(1).One(&update)
+    updates = append(updates, update)
+
+    if err != nil {
+      http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
+  }
+  // Convert updates to JSON
+  u, err := json.MarshalIndent(updates, "", " ")
+  // Handle JSON parsing errors
+  if err != nil {
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+  }
+  // Send updates to client 
+  fmt.Fprint(w, string(u))
 }
 
 /**
@@ -127,6 +203,10 @@ type Configuration struct {
   MongoPort       string
 }
 
+type Shuttles struct {
+  Session *mgo.Session
+}
+
 func ReadConfiguration(fileName string) Configuration { 
   // Open config file and decode JSON to Configuration struct
   file, _ := os.Open(fileName)
@@ -134,8 +214,8 @@ func ReadConfiguration(fileName string) Configuration {
   config := Configuration{}
   err := decoder.Decode(&config)
   if err != nil {
-    fmt.Print("Unable to read config file: ")
-    panic(err)
+    fmt.Println("Unable to read config file: ")
+    os.Exit(1)
   }
   return config
 }
@@ -147,19 +227,25 @@ func main() {
   // Connect to MongoDB
   session, err := mgo.Dial(config.MongoUrl + ":" + config.MongoPort)
   if err != nil {
-    panic(err)
+    fmt.Println("MongoDB connection failed")
+    os.Exit(1)
   }
   // close Mongo session when server terminates
   defer session.Close()
 
+  // Create Shuttles object to store database session information
+  Shuttles := &Shuttles{session}
+
   // Start auto updater 
-  go UpdateShuttles(config.DataFeed, config.UpdateInterval, session.Copy())
+  go Shuttles.UpdateShuttles(config.DataFeed, config.UpdateInterval)
 
   // Routing 
   r := mux.NewRouter()
   r.HandleFunc("/", IndexHandler).Methods("GET")
   r.HandleFunc("/admin", IndexHandler).Methods("GET")
-  r.HandleFunc("/vehicles", VehiclesHandler).Methods("GET")
+  r.HandleFunc("/vehicles", Shuttles.VehiclesHandler).Methods("GET")
+  r.HandleFunc("/vehicles/create", Shuttles.VehiclesCreateHandler).Methods("POST")
+  r.HandleFunc("/updates", Shuttles.UpdatesHandler).Methods("GET")
   // Static files
   r.PathPrefix("/bower_components/").Handler(http.StripPrefix("/bower_components/", http.FileServer(http.Dir("bower_components/"))))
   r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
