@@ -1,9 +1,7 @@
-<p> Vehicles </p>
 <ul ng-repeat="vehicle in vehicles" ng-model="vehicles">
   <li>ID: {{vehicle.vehicleId}} | Name: {{vehicle.vehicleName}}</li>
 </ul>
 
-<p> Add new vehicle </p>
 <form ng-submit="addVehicle()">
   <label>Vehicle ID</label>
   <input type="text" name="employees" ng-model="vehicleId">

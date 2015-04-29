@@ -13,5 +13,16 @@ html, body {
 }
 
 .content {
-  margin: 20px;
+  margin-left: 20px;
+}
+
+#navheader {
+  background-color: #686868;
+  margin: 0px;
+  padding: 0px;
+}
+
+#navheader > span > a {
+  color: white;
+  text-decoration: none;
 }

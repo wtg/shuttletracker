@@ -34,11 +34,8 @@ type VehicleUpdate struct {
   Created     time.Time  `json:"created"     bson:"created"`
 }
 
-func (Shuttles *Shuttles) UpdateShuttles(dataFeed string, updateInterval int) {
+func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
   for {
-    // Reference updates collection and close db session upon exit
-    UpdatesCollection := Shuttles.Session.DB("shuttle_tracking").C("updates")
-
     // Make request to our tracking data feed
     resp, err := http.Get(dataFeed)
     if err != nil {
@@ -84,7 +81,7 @@ func (Shuttles *Shuttles) UpdateShuttles(dataFeed string, updateInterval int) {
         Status:    strings.Replace(result["status"], "trig:", "", -1),
         Created:   time.Now()}
 
-      err := UpdatesCollection.Insert(&update)
+      err := App.Updates.Insert(&update)
 
       if err != nil {
         fmt.Println(err.Error())
@@ -101,14 +98,6 @@ func (Shuttles *Shuttles) UpdateShuttles(dataFeed string, updateInterval int) {
  *                   serve view files
  */
 
-func IndexHandler(w http.ResponseWriter, r *http.Request) {
-  http.ServeFile(w, r, "index.html")
-}
-
-func AdminHandler(w http.ResponseWriter, r *http.Request) {
-  http.ServeFile(w, r, "dashboard.html")
-}
-
 type Vehicle struct {
   Id          bson.ObjectId                 `bson:"_id,omitempty"`
   VehicleId   string     `json:"vehicleId"   bson:"vehicleId,omitempty"`
@@ -120,11 +109,10 @@ type Vehicle struct {
  * Find all vehicles in the database 
  *
  */
-func (Shuttles *Shuttles) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
+func (App *App) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
   // Find all vehicles in database
   var vehicles []Vehicle
-  VehiclesCollection := Shuttles.Session.DB("shuttle_tracking").C("vehicles")
-  err := VehiclesCollection.Find(bson.M{}).All(&vehicles)
+  err := App.Vehicles.Find(bson.M{}).All(&vehicles)
   // Handle query errors
   if err != nil {
     http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -138,7 +126,7 @@ func (Shuttles *Shuttles) VehiclesHandler(w http.ResponseWriter, r *http.Request
  * Add a new vehicle to the database 
  *
  */
-func (Shuttles *Shuttles) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
+func (App *App) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
   // Create new vehicle object using request fields
   vehicle := Vehicle{}
   vehicleData := json.NewDecoder(r.Body)
@@ -148,8 +136,7 @@ func (Shuttles *Shuttles) VehiclesCreateHandler(w http.ResponseWriter, r *http.R
     http.Error(w, err.Error(), http.StatusInternalServerError)
   }
   // Store new vehicle under vehicles collection
-  VehiclesCollection := Shuttles.Session.DB("shuttle_tracking").C("vehicles")
-  err = VehiclesCollection.Insert(&vehicle)
+  err = App.Vehicles.Insert(&vehicle)
   // Error handling
   if err != nil {
     http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -160,23 +147,20 @@ func (Shuttles *Shuttles) VehiclesCreateHandler(w http.ResponseWriter, r *http.R
  * Vehicle Updates - Get most recent update for each
  *                   vehicle in the vehicles collection
  */
-func (Shuttles *Shuttles) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
-  // Access vehicles and updates collections in shuttle tracking database 
-  UpdatesCollection := Shuttles.Session.DB("shuttle_tracking").C("updates")
-  VehiclesCollection := Shuttles.Session.DB("shuttle_tracking").C("vehicles")
+func (App *App) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
   // Store updates for each vehicle
   var vehicles []Vehicle
   var updates []VehicleUpdate
   var update VehicleUpdate
   // Query all Vehicles 
-  err := VehiclesCollection.Find(bson.M{}).All(&vehicles)
+  err := App.Vehicles.Find(bson.M{}).All(&vehicles)
   // Handle errors
   if err != nil {
     http.Error(w, err.Error(), http.StatusInternalServerError)
   }
   // Find recent updates for each vehicle
   for _,vehicle := range vehicles {
-    err := UpdatesCollection.Find(bson.M{"vehicleId": vehicle.VehicleId}).Sort("-created").Limit(1).One(&update)
+    err := App.Updates.Find(bson.M{"vehicleId": vehicle.VehicleId}).Sort("-created").Limit(1).One(&update)
     updates = append(updates, update)
 
     if err != nil {
@@ -193,6 +177,14 @@ func (Shuttles *Shuttles) UpdatesHandler(w http.ResponseWriter, r *http.Request)
   fmt.Fprint(w, string(u))
 }
 
+func IndexHandler(w http.ResponseWriter, r *http.Request) {
+  http.ServeFile(w, r, "index.html")
+}
+
+func AdminHandler(w http.ResponseWriter, r *http.Request) {
+  http.ServeFile(w, r, "admin.html")
+}
+
 /**
  *  Main - connect to database, 
  *         handle routing,
@@ -207,8 +199,10 @@ type Configuration struct {
   MongoPort       string
 }
 
-type Shuttles struct {
-  Session *mgo.Session
+type App struct {
+  Session    *mgo.Session
+  Updates    *mgo.Collection
+  Vehicles   *mgo.Collection
 }
 
 func ReadConfiguration(fileName string) Configuration { 
@@ -237,11 +231,15 @@ func main() {
   // close Mongo session when server terminates
   defer session.Close()
 
-  // Create Shuttles object to store database session information
-  Shuttles := &Shuttles{session}
+  // Create Shuttles object to store database session and collections
+  App := &App{
+    session, 
+    session.DB("shuttle_tracking").C("updates"),
+    session.DB("shuttle_tracking").C("vehicles"),
+  }
 
   // Start auto updater 
-  go Shuttles.UpdateShuttles(config.DataFeed, config.UpdateInterval)
+  go App.UpdateShuttles(config.DataFeed, config.UpdateInterval)
 
   // Routing 
   r := mux.NewRouter()
@@ -249,9 +247,10 @@ func main() {
   r.HandleFunc("/admin", AdminHandler).Methods("GET")
   r.HandleFunc("/admin/vehicles", AdminHandler).Methods("GET")
   r.HandleFunc("/admin/tracking", AdminHandler).Methods("GET")
-  r.HandleFunc("/vehicles", Shuttles.VehiclesHandler).Methods("GET")
-  r.HandleFunc("/vehicles/create", Shuttles.VehiclesCreateHandler).Methods("POST")
-  r.HandleFunc("/updates", Shuttles.UpdatesHandler).Methods("GET")
+  r.HandleFunc("/admin/stops", AdminHandler).Methods("GET")
+  r.HandleFunc("/vehicles", App.VehiclesHandler).Methods("GET")
+  r.HandleFunc("/vehicles/create", App.VehiclesCreateHandler).Methods("POST")
+  r.HandleFunc("/updates", App.UpdatesHandler).Methods("GET")
   // Static files
   r.PathPrefix("/bower_components/").Handler(http.StripPrefix("/bower_components/", http.FileServer(http.Dir("bower_components/"))))
   r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))

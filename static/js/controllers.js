@@ -1,17 +1,16 @@
 angular.module('ShuttleTracking.controllers',[]).
 
-controller("indexCtrl", function($scope){
-  $scope.heading = "Shuttle Tracker";
+controller("indexCtrl", function($scope, $http){
 }).
 
 controller("vehiclesCtrl", function($scope, $http){
   $scope.vehicles = {};
 
   $http.get('/vehicles').
-    success(function(data, status, headers, config) {
+    success(function(data) {
       $scope.vehicles = data;
     }).
-    error(function(data, status, headers, config) {
+    error(function(data) {
       // handle error
     });
 
@@ -21,11 +20,11 @@ controller("vehiclesCtrl", function($scope, $http){
       vehicleName: $scope.vehicleName
     };
     var res = $http.post('/vehicles/create', vehicleObj);
-    res.success(function(data, status, headers, config) {
+    res.success(function(data) {
       $scope.message = data;
       $scope.vehicles.push(vehicleObj);
     });
-    res.error(function(data, status, headers, config) {
+    res.error(function(data) {
       alert( "failure message: " + JSON.stringify({data: data}));
     });   
     // Clear input fields
@@ -34,6 +33,28 @@ controller("vehiclesCtrl", function($scope, $http){
   };
 }).
 
+controller("routesCtrl", function($scope) {
+
+}).
+
+controller("stopsCtrl", function($scope) {
+
+}).
+
+controller("updatesCtrl", function($scope) {
+
+}).
+
+controller("scheduleCtrl", function($scope) {
+
+}).
+
+controller("usersCtrl", function($scope) {
+
+}).
+
 controller("updatesCtrl", function($scope, $http) {
-  $scope.pageTitle = "Tracking Updates";
+}).
+
+controller("stopsCtrl", function($scope, $http) {
 })
