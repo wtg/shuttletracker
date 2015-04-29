@@ -11,8 +11,11 @@
       }
     </style>
     <div id="mapCanvas"> </div>
+    <core-ajax id="fetchUpdates"
+      url="/updates" handleAs="json" auto
+      on-core-response="{{placeMarkers}}">
+    </core-ajax>
   </template>
-
   <script>
     Polymer({
       /**
@@ -26,11 +29,20 @@
       /**
        * Map Options
        *
-       * @attribute mapSettings
+       * @attribute options
        * @type Object
        * @default {}
        */
       options: {},
+      /** 
+       * Shuttle Markers
+       *
+       * @attribute shuttleMarkers
+       * @type Array
+       * @default []
+       */
+      markers: [],
+
       ready: function() {
         this.initializeMap();
       },
@@ -44,6 +56,37 @@
           zoom: Number(this.zoom)
         };
         this.map = new google.maps.Map(this.$.mapCanvas, this.options);
+        this.periodicUpdates();
+      },
+      checkForUpdates: function(ajax) {
+        ajax.go();
+      },
+      periodicUpdates: function() {
+        // periodically check screen setup for changes
+        setInterval(this.checkForUpdates, 15000, this.$.fetchUpdates);
+      },
+      placeMarkers: function(event, response) {
+        // Clear previous markers from map
+        this.clearMarkers();
+        var updates = response.response;
+        // Iterate through each vehicle update
+        for (i = 0; i < updates.length; i++) {
+          console.log(updates[i]);
+          // Create position from vehicle coordinates
+          var pos = new google.maps.LatLng(updates[i]["lat"], updates[i]["lng"]);
+          // Place shuttle marker on map
+          var marker = new google.maps.Marker({
+            position: pos,
+            map: this.map,
+            title: "placeholder"
+          });
+          this.markers.push(marker);
+        }
+      },
+      clearMarkers: function() {
+        for (i = 0; i < this.markers.length; i++) {
+          this.markers[i].setMap(null);
+        }
       }
     });
   </script>
