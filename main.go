@@ -161,10 +161,9 @@ func (App *App) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
   // Find recent updates for each vehicle
   for _,vehicle := range vehicles {
     err := App.Updates.Find(bson.M{"vehicleId": vehicle.VehicleId}).Sort("-created").Limit(1).One(&update)
-    updates = append(updates, update)
 
-    if err != nil {
-      http.Error(w, err.Error(), http.StatusInternalServerError)
+    if err == nil {
+      updates = append(updates, update)
     }
   }
   // Convert updates to JSON
