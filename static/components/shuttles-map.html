@@ -1,51 +1,62 @@
-<polymer-element name="shuttles-map" attributes="lat lng zoom">
-  <template>
-    <style>
-      :host {
-        width: 100%;
-        height: 100%;
-      }
-      #mapCanvas {
-        width: 100%;
-        height: 100%;
-      }
-    </style>
-    <div id="mapCanvas"> </div>
-    <core-ajax id="fetchUpdates"
-      url="/updates" handleAs="json" auto
-      on-core-response="{{placeMarkers}}">
-    </core-ajax>
-  </template>
-  <script>
-    Polymer({
-      /**
-       * Google Map
-       *
-       * @attribute map
-       * @type Object
-       * @default {}
-       */
-      map: {},
-      /**
-       * Map Options
-       *
-       * @attribute options
-       * @type Object
-       * @default {}
-       */
-      options: {},
-      /** 
-       * Shuttle Markers
-       *
-       * @attribute shuttleMarkers
-       * @type Array
-       * @default []
-       */
-      markers: [],
+<dom-module id="shuttles-map"> 
+  <style> 
+    :host {
+      width: 100%;
+      height: 100%;
+    }
+    #mapCanvas {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
 
-      ready: function() {
-        this.initializeMap();
+  <template> 
+    <div id="mapCanvas"></div>
+    <iron-ajax
+      id="fetchUpdates"
+      url="/updates"
+      handle-as="json" auto
+      on-response="placeMarkers">
+    </iron-ajax>
+
+  </template>
+
+  <script>
+    Polymer({ 
+
+      is: "shuttles-map",
+
+      properties: {
+        lat: {
+          type: String,
+          reflectToAttribute: true
+        },
+        lng : {
+          type: String, 
+          reflectToAttribute: true
+        },
+        zoom: {
+          type: String,
+          reflectToAttribute: true
+        },
+        map: {
+          type: Object,
+          value: {}
+        },
+        options: {
+          type: Object,
+          value: {}
+        },
+        markers: {
+          type: Array,
+          value: []
+        }
       },
+
+      attached: function() {
+        this.initializeMap(); 
+      },
+
       initializeMap: function() {
         // Set options and insert google map
         this.options = {
@@ -58,13 +69,16 @@
         this.map = new google.maps.Map(this.$.mapCanvas, this.options);
         this.periodicUpdates();
       },
+
       checkForUpdates: function(ajax) {
-        ajax.go();
+        ajax.generateRequest();
       },
+
       periodicUpdates: function() {
         // periodically check screen setup for changes
         setInterval(this.checkForUpdates, 15000, this.$.fetchUpdates);
       },
+
       placeMarkers: function(event, response) {
         // Clear previous markers from map
         this.clearMarkers();
@@ -83,11 +97,13 @@
           this.markers.push(marker);
         }
       },
+
       clearMarkers: function() {
         for (i = 0; i < this.markers.length; i++) {
           this.markers[i].setMap(null);
+          delete this.markers[i]
         }
       }
     });
   </script>
-</polymer-element>
+</dom-module>
