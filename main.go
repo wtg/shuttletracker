@@ -1,7 +1,6 @@
 package main
 
 import (
-  "log"
   "os"
   "fmt"
   "time"
@@ -13,6 +12,8 @@ import (
   "gopkg.in/mgo.v2"
   "gopkg.in/mgo.v2/bson"
   "github.com/gorilla/mux"
+
+  log "github.com/Sirupsen/logrus"
 )
 
 /**
@@ -46,8 +47,8 @@ var (
 func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
   var st time.Duration
   for {
-
     // Sleep for n seconds before updating again
+    log.Debugf("sleeping for %v", st)
     time.Sleep(st)
     if st == 0 {
       // Initialize the sleep timer after the first sleep.  This lets us sleep during errors
@@ -59,7 +60,7 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
     // Make request to our tracking data feed
     resp, err := http.Get(dataFeed)
     if err != nil {
-      log.Printf("error getting data feed: %v", err)
+      log.Errorf("error getting data feed: %v", err)
       continue;
     }
     defer resp.Body.Close()
@@ -67,7 +68,7 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
     // Read response body content
     body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
-      log.Printf("error reading data feed: %v", err)
+      log.Errorf("error reading data feed: %v", err)
       continue;
     }
 
@@ -76,7 +77,7 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
     vehicles_data := strings.Split(string(body), delim)
     // TODO: Figure out if this handles == 1 vehicle correctly or always assumes > 1.
     if len(vehicles_data) <= 1 {
-      log.Printf("found no vehicles delineated by '%s'", delim)
+      log.Warnf("found no vehicles delineated by '%s'", delim)
     }
 
     updated := 0
@@ -104,12 +105,12 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
         Created:   time.Now()}
 
       if err := App.Updates.Insert(&update); err != nil {
-        log.Printf("error inserting vehicle update(%v): %v", update, err)
+        log.Errorf("error inserting vehicle update(%v): %v", update, err)
       } else {
         updated++
       }
     }
-    log.Printf("sucessfully updated %d/%d vehicles", updated, len(vehicles_data)-1)
+    log.Infof("sucessfully updated %d/%d vehicles", updated, len(vehicles_data)-1)
   }
 }
 
