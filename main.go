@@ -35,6 +35,14 @@ type VehicleUpdate struct {
   Created     time.Time  `json:"created"     bson:"created"`
 }
 
+var (
+  // Match each API field with any number (+)
+  //   of the previous expressions (\d digit, \. escaped period, - negative number)
+  //   Specify named capturing groups to store each field from data feed
+  dataRe = regexp.MustCompile(`(?P<id>Vehicle ID:([\d\.]+)) (?P<lat>lat:([\d\.-]+)) (?P<lng>lon:([\d\.-]+)) (?P<heading>dir:([\d\.-]+)) (?P<speed>spd:([\d\.-]+)) (?P<lock>lck:([\d\.-]+)) (?P<time>time:([\d]+)) (?P<date>date:([\d]+)) (?P<status>trig:([\d]+))`)
+  dataNames = dataRe.SubexpNames()
+)
+
 func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
   var st time.Duration
   for {
@@ -66,19 +74,19 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
     delim := "eof"
     // Iterate through all vehicles returned by data feed
     vehicles_data := strings.Split(string(body), delim)
-    for i := 1; i < len(vehicles_data)-1; i++ {
+    // TODO: Figure out if this handles == 1 vehicle correctly or always assumes > 1.
+    if len(vehicles_data) <= 1 {
+      log.Printf("found no vehicles delineated by '%s'", delim)
+    }
 
-      // Match eatch API field with any number (+)
-      //   of the previous expressions (\d digit, \. escaped period, - negative number)
-      //   Specify named capturing groups to store each field from data feed
-      re := regexp.MustCompile(`(?P<id>Vehicle ID:([\d\.]+)) (?P<lat>lat:([\d\.-]+)) (?P<lng>lon:([\d\.-]+)) (?P<heading>dir:([\d\.-]+)) (?P<speed>spd:([\d\.-]+)) (?P<lock>lck:([\d\.-]+)) (?P<time>time:([\d]+)) (?P<date>date:([\d]+)) (?P<status>trig:([\d]+))`)
-      n := re.SubexpNames()
-      match := re.FindAllStringSubmatch(vehicles_data[i], -1)[0]
+    updated := 0
+    for i := 1; i < len(vehicles_data)-1; i++ {
+      match := dataRe.FindAllStringSubmatch(vehicles_data[i], -1)[0]
 
       // Store named capturing group and matching expression as a key value pair
       result := map[string]string{}
       for i, item := range match {
-        result[n[i]] = item
+        result[dataNames[i]] = item
       }
 
       // Create new vehicle update & insert update into database
@@ -95,12 +103,13 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
         Status:    strings.Replace(result["status"], "trig:", "", -1),
         Created:   time.Now()}
 
-      err := App.Updates.Insert(&update)
-
-      if err != nil {
-        fmt.Println(err.Error())
+      if err := App.Updates.Insert(&update); err != nil {
+        log.Printf("error inserting vehicle update(%v): %v", update, err)
+      } else {
+        updated++
       }
     }
+    log.Printf("sucessfully updated %d/%d vehicles", updated, len(vehicles_data)-1)
   }
 }
 
