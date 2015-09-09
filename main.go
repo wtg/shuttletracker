@@ -229,8 +229,7 @@ func main() {
   // Connect to MongoDB
   session, err := mgo.Dial(config.MongoUrl + ":" + config.MongoPort)
   if err != nil {
-    fmt.Println("MongoDB connection failed")
-    os.Exit(1)
+    log.Fatalf("mongoDB connection failed: %v", err)
   }
   // close Mongo session when server terminates
   defer session.Close()
@@ -260,5 +259,7 @@ func main() {
   r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
   // Serve requests
   http.Handle("/", r)
-  http.ListenAndServe(":8080", r)
+  if err := http.ListenAndServe(":8080", r); err != nil {
+    log.Fatalf("Unable to ListenAndServe: %v", err)
+  }
 }
