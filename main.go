@@ -36,10 +36,22 @@ type VehicleUpdate struct {
 }
 
 func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
+  var st time.Duration
   for {
+
+    // Sleep for n seconds before updating again
+    time.Sleep(st)
+    if st == 0 {
+      // Initialize the sleep timer after the first sleep.  This lets us sleep during errors
+      // when we 'continue' back to the top of the loop without waiting to sleep for the first
+      // update run.
+      st = time.Duration(updateInterval) * time.Second
+    }
+
     // Make request to our tracking data feed
     resp, err := http.Get(dataFeed)
     if err != nil {
+      log.Printf("error getting data feed: %v", err)
       continue;
     }
     defer resp.Body.Close()
@@ -47,6 +59,7 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
     // Read response body content
     body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
+      log.Printf("error reading data feed: %v", err)
       continue;
     }
 
@@ -88,9 +101,6 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
         fmt.Println(err.Error())
       }
     }
-
-    // Sleep for n seconds before updating again
-    time.Sleep(time.Duration(updateInterval) * time.Second)
   }
 }
 
