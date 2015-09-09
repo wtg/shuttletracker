@@ -12,6 +12,8 @@ import (
   "gopkg.in/mgo.v2"
   "gopkg.in/mgo.v2/bson"
   "github.com/gorilla/mux"
+
+  log "github.com/Sirupsen/logrus"
 )
 
 /**
@@ -34,11 +36,31 @@ type VehicleUpdate struct {
   Created     time.Time  `json:"created"     bson:"created"`
 }
 
+var (
+  // Match each API field with any number (+)
+  //   of the previous expressions (\d digit, \. escaped period, - negative number)
+  //   Specify named capturing groups to store each field from data feed
+  dataRe = regexp.MustCompile(`(?P<id>Vehicle ID:([\d\.]+)) (?P<lat>lat:([\d\.-]+)) (?P<lng>lon:([\d\.-]+)) (?P<heading>dir:([\d\.-]+)) (?P<speed>spd:([\d\.-]+)) (?P<lock>lck:([\d\.-]+)) (?P<time>time:([\d]+)) (?P<date>date:([\d]+)) (?P<status>trig:([\d]+))`)
+  dataNames = dataRe.SubexpNames()
+)
+
 func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
+  var st time.Duration
   for {
+    // Sleep for n seconds before updating again
+    log.Debugf("sleeping for %v", st)
+    time.Sleep(st)
+    if st == 0 {
+      // Initialize the sleep timer after the first sleep.  This lets us sleep during errors
+      // when we 'continue' back to the top of the loop without waiting to sleep for the first
+      // update run.
+      st = time.Duration(updateInterval) * time.Second
+    }
+
     // Make request to our tracking data feed
     resp, err := http.Get(dataFeed)
     if err != nil {
+      log.Errorf("error getting data feed: %v", err)
       continue;
     }
     defer resp.Body.Close()
@@ -46,25 +68,26 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
     // Read response body content
     body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
+      log.Errorf("error reading data feed: %v", err)
       continue;
     }
 
     delim := "eof"
     // Iterate through all vehicles returned by data feed
     vehicles_data := strings.Split(string(body), delim)
-    for i := 1; i < len(vehicles_data)-1; i++ {
+    // TODO: Figure out if this handles == 1 vehicle correctly or always assumes > 1.
+    if len(vehicles_data) <= 1 {
+      log.Warnf("found no vehicles delineated by '%s'", delim)
+    }
 
-      // Match eatch API field with any number (+)
-      //   of the previous expressions (\d digit, \. escaped period, - negative number)
-      //   Specify named capturing groups to store each field from data feed
-      re := regexp.MustCompile(`(?P<id>Vehicle ID:([\d\.]+)) (?P<lat>lat:([\d\.-]+)) (?P<lng>lon:([\d\.-]+)) (?P<heading>dir:([\d\.-]+)) (?P<speed>spd:([\d\.-]+)) (?P<lock>lck:([\d\.-]+)) (?P<time>time:([\d]+)) (?P<date>date:([\d]+)) (?P<status>trig:([\d]+))`)
-      n := re.SubexpNames()
-      match := re.FindAllStringSubmatch(vehicles_data[i], -1)[0]
+    updated := 0
+    for i := 1; i < len(vehicles_data)-1; i++ {
+      match := dataRe.FindAllStringSubmatch(vehicles_data[i], -1)[0]
 
       // Store named capturing group and matching expression as a key value pair
       result := map[string]string{}
       for i, item := range match {
-        result[n[i]] = item
+        result[dataNames[i]] = item
       }
 
       // Create new vehicle update & insert update into database
@@ -81,15 +104,13 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
         Status:    strings.Replace(result["status"], "trig:", "", -1),
         Created:   time.Now()}
 
-      err := App.Updates.Insert(&update)
-
-      if err != nil {
-        fmt.Println(err.Error())
+      if err := App.Updates.Insert(&update); err != nil {
+        log.Errorf("error inserting vehicle update(%v): %v", update, err)
+      } else {
+        updated++
       }
     }
-
-    // Sleep for n seconds before updating again
-    time.Sleep(time.Duration(updateInterval) * time.Second)
+    log.Infof("sucessfully updated %d/%d vehicles", updated, len(vehicles_data)-1)
   }
 }
 
@@ -204,28 +225,31 @@ type App struct {
   Vehicles   *mgo.Collection
 }
 
-func ReadConfiguration(fileName string) Configuration { 
+func ReadConfiguration(fileName string) (*Configuration, error) {
   // Open config file and decode JSON to Configuration struct
-  file, _ := os.Open(fileName)
+  file, err := os.Open(fileName)
+  if err != nil {
+    return nil, err
+  }
   decoder := json.NewDecoder(file)
   config := Configuration{}
-  err := decoder.Decode(&config)
-  if err != nil {
-    fmt.Println("Unable to read config file: ")
-    os.Exit(1)
+  if err := decoder.Decode(&config); err != nil {
+    return nil, err
   }
-  return config
+  return &config, nil
 }
 
 func main() {
   // Read app configuration file 
-  config := ReadConfiguration("conf.json")
+  config, err := ReadConfiguration("conf.json")
+  if err != nil {
+    log.Fatalf("error reading configuration file: %v", err)
+  }
 
   // Connect to MongoDB
   session, err := mgo.Dial(config.MongoUrl + ":" + config.MongoPort)
   if err != nil {
-    fmt.Println("MongoDB connection failed")
-    os.Exit(1)
+    log.Fatalf("mongoDB connection failed: %v", err)
   }
   // close Mongo session when server terminates
   defer session.Close()
@@ -255,5 +279,7 @@ func main() {
   r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
   // Serve requests
   http.Handle("/", r)
-  http.ListenAndServe(":8080", r)
+  if err := http.ListenAndServe(":8080", r); err != nil {
+    log.Fatalf("Unable to ListenAndServe: %v", err)
+  }
 }
