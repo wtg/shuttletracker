@@ -1,6 +1,7 @@
 package main
 
 import (
+  "log"
   "os"
   "fmt"
   "time"
@@ -204,22 +205,26 @@ type App struct {
   Vehicles   *mgo.Collection
 }
 
-func ReadConfiguration(fileName string) Configuration { 
+func ReadConfiguration(fileName string) (*Configuration, error) {
   // Open config file and decode JSON to Configuration struct
-  file, _ := os.Open(fileName)
+  file, err := os.Open(fileName)
+  if err != nil {
+    return nil, err
+  }
   decoder := json.NewDecoder(file)
   config := Configuration{}
-  err := decoder.Decode(&config)
-  if err != nil {
-    fmt.Println("Unable to read config file: ")
-    os.Exit(1)
+  if err := decoder.Decode(&config); err != nil {
+    return nil, err
   }
-  return config
+  return &config, nil
 }
 
 func main() {
   // Read app configuration file 
-  config := ReadConfiguration("conf.json")
+  config, err := ReadConfiguration("conf.json")
+  if err != nil {
+    log.Fatalf("error reading configuration file: %v", err)
+  }
 
   // Connect to MongoDB
   session, err := mgo.Dial(config.MongoUrl + ":" + config.MongoPort)
