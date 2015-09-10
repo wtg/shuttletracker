@@ -17,12 +17,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-/**
- *  Shuttle Tracker
- *   Auto Updater - send request to iTrak API,
- *                  get updated shuttle info,
- *                  store updated records in db
- */
+// VehicleUpdate represents a single position observed for a Vehicle from the data feed.
 type VehicleUpdate struct {
 	ID        bson.ObjectId `bson:"_id,omitempty"`
 	VehicleID string        `json:"vehicleId"   bson:"vehicleId,omitempty"`
@@ -37,6 +32,14 @@ type VehicleUpdate struct {
 	Created   time.Time     `json:"created"     bson:"created"`
 }
 
+// Vehicle represents an object being tracked.
+type Vehicle struct {
+	ID          bson.ObjectId `bson:"_id,omitempty"`
+	VehicleID   string        `json:"vehicleId"   bson:"vehicleId,omitempty"`
+	VehicleName string        `json:"vehicleName" bson:"vehicleName"`
+	Created     time.Time     `json:"created"     bson:"created"`
+}
+
 var (
 	// Match each API field with any number (+)
 	//   of the previous expressions (\d digit, \. escaped period, - negative number)
@@ -45,6 +48,8 @@ var (
 	dataNames = dataRe.SubexpNames()
 )
 
+// UpdateShuttles send a request to iTrak API, gets updated shuttle info, and
+// finally store updated records in db.
 func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 	var st time.Duration
 	for {
@@ -115,22 +120,7 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 	}
 }
 
-/**
- *  Route handlers - API requests,
- *                   serve view files
- */
-
-type Vehicle struct {
-	ID          bson.ObjectId `bson:"_id,omitempty"`
-	VehicleID   string        `json:"vehicleId"   bson:"vehicleId,omitempty"`
-	VehicleName string        `json:"vehicleName" bson:"vehicleName"`
-	Created     time.Time     `json:"created"     bson:"created"`
-}
-
-/**
- * Find all vehicles in the database
- *
- */
+// VehiclesHandler finds all the vehicles in the database.
 func (App *App) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all vehicles in database
 	var vehicles []Vehicle
@@ -144,10 +134,7 @@ func (App *App) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(vehiclesJSON))
 }
 
-/**
- * Add a new vehicle to the database
- *
- */
+// VehiclesCreateHandler adds a new vehicle to the database.
 func (App *App) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Create new vehicle object using request fields
 	vehicle := Vehicle{}
@@ -165,10 +152,7 @@ func (App *App) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-/**
- * Vehicle Updates - Get most recent update for each
- *                   vehicle in the vehicles collection
- */
+// UpdatesHandler get the most recent update for each vehicle in the vehicles collection.
 func (App *App) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 	// Store updates for each vehicle
 	var vehicles []Vehicle
@@ -198,21 +182,17 @@ func (App *App) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(u))
 }
 
+// IndexHandler serves the index page.
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "index.html")
 }
 
+// AdminHandler serves the admin page.
 func AdminHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "admin.html")
 }
 
-/**
- *  Main - connect to database,
- *         handle routing,
- *         start tracker go routine,
- *         serve requests
- */
-
+// Configuration holds the settings for connecting to outside resources.
 type Configuration struct {
 	DataFeed       string
 	UpdateInterval int
@@ -220,13 +200,14 @@ type Configuration struct {
 	MongoPort      string
 }
 
+// App holds references to Mongo resources.
 type App struct {
 	Session  *mgo.Session
 	Updates  *mgo.Collection
 	Vehicles *mgo.Collection
 }
 
-func ReadConfiguration(fileName string) (*Configuration, error) {
+func readConfiguration(fileName string) (*Configuration, error) {
 	// Open config file and decode JSON to Configuration struct
 	file, err := os.Open(fileName)
 	if err != nil {
@@ -242,7 +223,7 @@ func ReadConfiguration(fileName string) (*Configuration, error) {
 
 func main() {
 	// Read app configuration file
-	config, err := ReadConfiguration("conf.json")
+	config, err := readConfiguration("conf.json")
 	if err != nil {
 		log.Fatalf("error reading configuration file: %v", err)
 	}
