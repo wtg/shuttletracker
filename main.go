@@ -24,8 +24,8 @@ import (
  *                  store updated records in db
  */
 type VehicleUpdate struct {
-	Id        bson.ObjectId `bson:"_id,omitempty"`
-	VehicleId string        `json:"vehicleId"   bson:"vehicleId,omitempty"`
+	ID        bson.ObjectId `bson:"_id,omitempty"`
+	VehicleID string        `json:"vehicleId"   bson:"vehicleId,omitempty"`
 	Lat       string        `json:"lat"         bson:"lat"`
 	Lng       string        `json:"lng"         bson:"lng"`
 	Heading   string        `json:"heading"     bson:"heading"`
@@ -75,15 +75,15 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 
 		delim := "eof"
 		// Iterate through all vehicles returned by data feed
-		vehicles_data := strings.Split(string(body), delim)
+		vehiclesData := strings.Split(string(body), delim)
 		// TODO: Figure out if this handles == 1 vehicle correctly or always assumes > 1.
-		if len(vehicles_data) <= 1 {
+		if len(vehiclesData) <= 1 {
 			log.Warnf("found no vehicles delineated by '%s'", delim)
 		}
 
 		updated := 0
-		for i := 1; i < len(vehicles_data)-1; i++ {
-			match := dataRe.FindAllStringSubmatch(vehicles_data[i], -1)[0]
+		for i := 1; i < len(vehiclesData)-1; i++ {
+			match := dataRe.FindAllStringSubmatch(vehiclesData[i], -1)[0]
 
 			// Store named capturing group and matching expression as a key value pair
 			result := map[string]string{}
@@ -93,8 +93,8 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 
 			// Create new vehicle update & insert update into database
 			update := VehicleUpdate{
-				Id:        bson.NewObjectId(),
-				VehicleId: strings.Replace(result["id"], "Vehicle ID:", "", -1),
+				ID:        bson.NewObjectId(),
+				VehicleID: strings.Replace(result["id"], "Vehicle ID:", "", -1),
 				Lat:       strings.Replace(result["lat"], "lat:", "", -1),
 				Lng:       strings.Replace(result["lng"], "lon:", "", -1),
 				Heading:   strings.Replace(result["heading"], "dir:", "", -1),
@@ -111,7 +111,7 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 				updated++
 			}
 		}
-		log.Infof("sucessfully updated %d/%d vehicles", updated, len(vehicles_data)-1)
+		log.Infof("sucessfully updated %d/%d vehicles", updated, len(vehiclesData)-1)
 	}
 }
 
@@ -121,8 +121,8 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
  */
 
 type Vehicle struct {
-	Id          bson.ObjectId `bson:"_id,omitempty"`
-	VehicleId   string        `json:"vehicleId"   bson:"vehicleId,omitempty"`
+	ID          bson.ObjectId `bson:"_id,omitempty"`
+	VehicleID   string        `json:"vehicleId"   bson:"vehicleId,omitempty"`
 	VehicleName string        `json:"vehicleName" bson:"vehicleName"`
 	Created     time.Time     `json:"created"     bson:"created"`
 }
@@ -182,7 +182,7 @@ func (App *App) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Find recent updates for each vehicle
 	for _, vehicle := range vehicles {
-		err := App.Updates.Find(bson.M{"vehicleId": vehicle.VehicleId}).Sort("-created").Limit(1).One(&update)
+		err := App.Updates.Find(bson.M{"vehicleId": vehicle.VehicleID}).Sort("-created").Limit(1).One(&update)
 
 		if err == nil {
 			updates = append(updates, update)
@@ -216,7 +216,7 @@ func AdminHandler(w http.ResponseWriter, r *http.Request) {
 type Configuration struct {
 	DataFeed       string
 	UpdateInterval int
-	MongoUrl       string
+	MongoURL       string
 	MongoPort      string
 }
 
@@ -248,7 +248,7 @@ func main() {
 	}
 
 	// Connect to MongoDB
-	session, err := mgo.Dial(config.MongoUrl + ":" + config.MongoPort)
+	session, err := mgo.Dial(config.MongoURL + ":" + config.MongoPort)
 	if err != nil {
 		log.Fatalf("mongoDB connection failed: %v", err)
 	}
