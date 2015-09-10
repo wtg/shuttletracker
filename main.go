@@ -17,15 +17,10 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-/**
- *  Shuttle Tracker
- *   Auto Updater - send request to iTrak API,
- *                  get updated shuttle info,
- *                  store updated records in db
- */
+// VehicleUpdate represents a single position observed for a Vehicle from the data feed.
 type VehicleUpdate struct {
-	Id        bson.ObjectId `bson:"_id,omitempty"`
-	VehicleId string        `json:"vehicleId"   bson:"vehicleId,omitempty"`
+	ID        bson.ObjectId `bson:"_id,omitempty"`
+	VehicleID string        `json:"vehicleId"   bson:"vehicleId,omitempty"`
 	Lat       string        `json:"lat"         bson:"lat"`
 	Lng       string        `json:"lng"         bson:"lng"`
 	Heading   string        `json:"heading"     bson:"heading"`
@@ -37,6 +32,14 @@ type VehicleUpdate struct {
 	Created   time.Time     `json:"created"     bson:"created"`
 }
 
+// Vehicle represents an object being tracked.
+type Vehicle struct {
+	ID          bson.ObjectId `bson:"_id,omitempty"`
+	VehicleID   string        `json:"vehicleId"   bson:"vehicleId,omitempty"`
+	VehicleName string        `json:"vehicleName" bson:"vehicleName"`
+	Created     time.Time     `json:"created"     bson:"created"`
+}
+
 var (
 	// Match each API field with any number (+)
 	//   of the previous expressions (\d digit, \. escaped period, - negative number)
@@ -45,6 +48,8 @@ var (
 	dataNames = dataRe.SubexpNames()
 )
 
+// UpdateShuttles send a request to iTrak API, gets updated shuttle info, and
+// finally store updated records in db.
 func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 	var st time.Duration
 	for {
@@ -75,15 +80,15 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 
 		delim := "eof"
 		// Iterate through all vehicles returned by data feed
-		vehicles_data := strings.Split(string(body), delim)
+		vehiclesData := strings.Split(string(body), delim)
 		// TODO: Figure out if this handles == 1 vehicle correctly or always assumes > 1.
-		if len(vehicles_data) <= 1 {
+		if len(vehiclesData) <= 1 {
 			log.Warnf("found no vehicles delineated by '%s'", delim)
 		}
 
 		updated := 0
-		for i := 1; i < len(vehicles_data)-1; i++ {
-			match := dataRe.FindAllStringSubmatch(vehicles_data[i], -1)[0]
+		for i := 1; i < len(vehiclesData)-1; i++ {
+			match := dataRe.FindAllStringSubmatch(vehiclesData[i], -1)[0]
 
 			// Store named capturing group and matching expression as a key value pair
 			result := map[string]string{}
@@ -93,8 +98,8 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 
 			// Create new vehicle update & insert update into database
 			update := VehicleUpdate{
-				Id:        bson.NewObjectId(),
-				VehicleId: strings.Replace(result["id"], "Vehicle ID:", "", -1),
+				ID:        bson.NewObjectId(),
+				VehicleID: strings.Replace(result["id"], "Vehicle ID:", "", -1),
 				Lat:       strings.Replace(result["lat"], "lat:", "", -1),
 				Lng:       strings.Replace(result["lng"], "lon:", "", -1),
 				Heading:   strings.Replace(result["heading"], "dir:", "", -1),
@@ -111,26 +116,11 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 				updated++
 			}
 		}
-		log.Infof("sucessfully updated %d/%d vehicles", updated, len(vehicles_data)-1)
+		log.Infof("sucessfully updated %d/%d vehicles", updated, len(vehiclesData)-1)
 	}
 }
 
-/**
- *  Route handlers - API requests,
- *                   serve view files
- */
-
-type Vehicle struct {
-	Id          bson.ObjectId `bson:"_id,omitempty"`
-	VehicleId   string        `json:"vehicleId"   bson:"vehicleId,omitempty"`
-	VehicleName string        `json:"vehicleName" bson:"vehicleName"`
-	Created     time.Time     `json:"created"     bson:"created"`
-}
-
-/**
- * Find all vehicles in the database
- *
- */
+// VehiclesHandler finds all the vehicles in the database.
 func (App *App) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all vehicles in database
 	var vehicles []Vehicle
@@ -144,10 +134,7 @@ func (App *App) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(vehiclesJSON))
 }
 
-/**
- * Add a new vehicle to the database
- *
- */
+// VehiclesCreateHandler adds a new vehicle to the database.
 func (App *App) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Create new vehicle object using request fields
 	vehicle := Vehicle{}
@@ -165,10 +152,7 @@ func (App *App) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-/**
- * Vehicle Updates - Get most recent update for each
- *                   vehicle in the vehicles collection
- */
+// UpdatesHandler get the most recent update for each vehicle in the vehicles collection.
 func (App *App) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 	// Store updates for each vehicle
 	var vehicles []Vehicle
@@ -182,7 +166,7 @@ func (App *App) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Find recent updates for each vehicle
 	for _, vehicle := range vehicles {
-		err := App.Updates.Find(bson.M{"vehicleId": vehicle.VehicleId}).Sort("-created").Limit(1).One(&update)
+		err := App.Updates.Find(bson.M{"vehicleId": vehicle.VehicleID}).Sort("-created").Limit(1).One(&update)
 
 		if err == nil {
 			updates = append(updates, update)
@@ -198,35 +182,32 @@ func (App *App) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(u))
 }
 
+// IndexHandler serves the index page.
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "index.html")
 }
 
+// AdminHandler serves the admin page.
 func AdminHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "admin.html")
 }
 
-/**
- *  Main - connect to database,
- *         handle routing,
- *         start tracker go routine,
- *         serve requests
- */
-
+// Configuration holds the settings for connecting to outside resources.
 type Configuration struct {
 	DataFeed       string
 	UpdateInterval int
-	MongoUrl       string
+	MongoURL       string
 	MongoPort      string
 }
 
+// App holds references to Mongo resources.
 type App struct {
 	Session  *mgo.Session
 	Updates  *mgo.Collection
 	Vehicles *mgo.Collection
 }
 
-func ReadConfiguration(fileName string) (*Configuration, error) {
+func readConfiguration(fileName string) (*Configuration, error) {
 	// Open config file and decode JSON to Configuration struct
 	file, err := os.Open(fileName)
 	if err != nil {
@@ -242,13 +223,13 @@ func ReadConfiguration(fileName string) (*Configuration, error) {
 
 func main() {
 	// Read app configuration file
-	config, err := ReadConfiguration("conf.json")
+	config, err := readConfiguration("conf.json")
 	if err != nil {
 		log.Fatalf("error reading configuration file: %v", err)
 	}
 
 	// Connect to MongoDB
-	session, err := mgo.Dial(config.MongoUrl + ":" + config.MongoPort)
+	session, err := mgo.Dial(config.MongoURL + ":" + config.MongoPort)
 	if err != nil {
 		log.Fatalf("mongoDB connection failed: %v", err)
 	}
