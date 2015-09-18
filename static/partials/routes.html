@@ -1,0 +1,18 @@
+<ul ng-repeat="route in routes" ng-model="routes">
+  <li>  Name: {{route.name}} </li>
+</ul>
+
+<form ng-submit="addRoute()">
+  <label>Name</label>
+  <input type="text" name="name" ng-model="name">
+  <label>Description</label>
+  <input type="text" name="description" ng-model="description">
+  <!--
+  <label>Start Time</label>
+  <label>End Time</label>
+  <label>Enabled</label>
+  <label>Color</label>
+  <label>Width</label> 
+  -->
+  <input type="submit" value="Submit"> 
+</form>

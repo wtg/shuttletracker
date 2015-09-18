@@ -3,7 +3,7 @@ angular.module('ShuttleTracking.controllers',[]).
 controller("indexCtrl", function($scope, $http){
 }).
 
-controller("vehiclesCtrl", function($scope, $http){
+controller("vehiclesCtrl", function($scope, $http) {
   $scope.vehicles = {};
 
   $http.get('/vehicles').
@@ -25,7 +25,7 @@ controller("vehiclesCtrl", function($scope, $http){
       $scope.vehicles.push(vehicleObj);
     });
     res.error(function(data) {
-      alert( "failure message: " + JSON.stringify({data: data}));
+      console.log("failure message: " + JSON.stringify({data: data}));
     });   
     // Clear input fields
     $scope.vehicleId = '';
@@ -33,12 +33,38 @@ controller("vehiclesCtrl", function($scope, $http){
   };
 }).
 
-controller("routesCtrl", function($scope) {
+controller("routesCtrl", function($scope, $http) {
+  $scope.routes = {};
 
+  $http.get('/routes').
+    success(function(data) {
+      $scope.routes = data;
+    }).
+    error(function(data) {
+      // handle error
+    });
+
+  $scope.addRoute = function() {
+    var routeObj = {
+      name: $scope.name,
+      description: $scope.description
+    };
+    var res = $http.post('/routes/create', routeObj);
+    res.success(function(data) { 
+      $scope.message = data;
+      $scope.routes.push(routeObj);
+    });
+    res.error(function(data) {
+      console.log("failure message: " + JSON.stringify({data: data}));
+    });
+    // Clear input fields
+    $scope.name = '';
+    $scope.description = '';
+  };
 }).
 
 controller("stopsCtrl", function($scope) {
-
+  
 }).
 
 controller("updatesCtrl", function($scope) {
