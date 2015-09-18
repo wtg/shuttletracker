@@ -16,7 +16,7 @@ controller("vehiclesCtrl", function($scope, $http) {
 
   $scope.addVehicle = function() {
     var vehicleObj = {
-      vehicleId: $scope.vehicleId,
+      vehicleID: $scope.vehicleID,
       vehicleName: $scope.vehicleName
     };
     var res = $http.post('/vehicles/create', vehicleObj);
@@ -27,7 +27,7 @@ controller("vehiclesCtrl", function($scope, $http) {
     res.error(function(data) {
       console.log("failure message: " + JSON.stringify({data: data}));
     });   
-    $scope.vehicleId = '';
+    $scope.vehicleID = '';
     $scope.vehicleName = '';
   };
 }).

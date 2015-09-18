@@ -1,10 +1,10 @@
 <ul ng-repeat="vehicle in vehicles" ng-model="vehicles">
-  <li>ID: {{vehicle.vehicleId}} | Name: {{vehicle.vehicleName}}</li>
+  <li>ID: {{vehicle.vehicleID}} | Name: {{vehicle.vehicleName}}</li>
 </ul>
 
 <form ng-submit="addVehicle()">
   <label>Vehicle ID</label>
-  <input type="text" ng-model="vehicleId">
+  <input type="text" ng-model="vehicleID">
   <label>Vehicle Name</label>
   <input type="text" ng-model="vehicleName">
   <input type="submit" value="Submit">  

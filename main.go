@@ -19,7 +19,7 @@ import (
 
 // VehicleUpdate represents a single position observed for a Vehicle from the data feed.
 type VehicleUpdate struct {
-	VehicleID string    `json:"vehicleId"   bson:"vehicleId,omitempty"`
+	VehicleID string    `json:"vehicleID"   bson:"vehicleID,omitempty"`
 	Lat       string    `json:"lat"         bson:"lat"`
 	Lng       string    `json:"lng"         bson:"lng"`
 	Heading   string    `json:"heading"     bson:"heading"`
@@ -28,12 +28,12 @@ type VehicleUpdate struct {
 	Time      string    `json:"time"        bson:"time"`
 	Date      string    `json:"date"        bson:"date"`
 	Status    string    `json:"status"      bson:"status"`
-	Created   time.Time `bson:"created"`
+	Created   time.Time `json:"created"     bson:"created"`
 }
 
 // Vehicle represents an object being tracked.
 type Vehicle struct {
-	VehicleID   string    `json:"vehicleId"   bson:"vehicleId,omitempty"`
+	VehicleID   string    `json:"vehicleID"   bson:"vehicleID,omitempty"`
 	VehicleName string    `json:"vehicleName" bson:"vehicleName"`
 	Created     time.Time `bson:"created"`
 	Updated     time.Time `bson:"updated"`
@@ -172,7 +172,7 @@ func (App *App) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Find recent updates for each vehicle
 	for _, vehicle := range vehicles {
-		err := App.Updates.Find(bson.M{"vehicleId": vehicle.VehicleID}).Sort("-created").Limit(1).One(&update)
+		err := App.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(1).One(&update)
 
 		if err == nil {
 			updates = append(updates, update)
@@ -192,7 +192,7 @@ func (App *App) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 type Coord struct {
 	Lat     float64       `bson:"lat"`
 	Lng     float64       `bson:"lng"`
-	RouteID bson.ObjectId `bson:routeId"`
+	RouteID bson.ObjectId `bson:routeID"`
 	Created time.Time     `bson:created"`
 	Updated time.Time     `bson:updated"`
 }
@@ -226,8 +226,8 @@ type Stop struct {
 
 // RouteStop allows stops to be placed on one or more routes
 type RouteStop struct {
-	StopID  bson.ObjectId `bson:"stopId",omitempty"`
-	RouteID bson.ObjectId `bson:"routeId",omitempty"`
+	StopID  bson.ObjectId `bson:"stopID",omitempty"`
+	RouteID bson.ObjectId `bson:"routeID",omitempty"`
 }
 
 // RoutesHandler finds all of the routes in the database

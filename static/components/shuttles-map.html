@@ -18,7 +18,11 @@
       handle-as="json" auto
       on-response="placeMarkers">
     </iron-ajax>
-
+    <iron-ajax
+      id="fetchRoutes"
+      url="/routes"
+      handle-as="json" auto
+      on-response="drawRoutes">
   </template>
 
   <script>
@@ -76,33 +80,41 @@
 
       periodicUpdates: function() {
         // periodically check screen setup for changes
-        setInterval(this.checkForUpdates, 15000, this.$.fetchUpdates);
+        setInterval(this.checkForUpdates, 8000, this.$.fetchUpdates);
       },
 
       placeMarkers: function(event, response) {
         // Clear previous markers from map
         this.clearMarkers();
         var updates = response.response;
-        // Iterate through each vehicle update
-        for (i = 0; i < updates.length; i++) {
-          console.log(updates[i]);
-          // Create position from vehicle coordinates
-          var pos = new google.maps.LatLng(updates[i]["lat"], updates[i]["lng"]);
-          // Place shuttle marker on map
-          var marker = new google.maps.Marker({
-            position: pos,
-            map: this.map,
-            title: "placeholder"
-          });
-          this.markers.push(marker);
+        if (updates) {
+          // Iterate through each vehicle update
+          for (i = 0; i < updates.length; i++) {
+            console.log(updates[i]);
+            // Create position from vehicle coordinates
+            var pos = new google.maps.LatLng(updates[i]["lat"], updates[i]["lng"]);
+            // Place shuttle marker on map
+            var marker = new google.maps.Marker({
+              position: pos,
+              map: this.map,
+              title: "placeholder"
+            });
+            this.markers.push(marker);
+          }
+        } else {
+          console.log("no vehicle updates found");
         }
       },
 
       clearMarkers: function() {
         for (i = 0; i < this.markers.length; i++) {
-          this.markers[i].setMap(null);
-          delete this.markers[i]
+          //this.markers[i].setMap(null);
+          //delete this.markers[i]
         }
+      },
+
+      drawRoutes: function(event, response) {
+        console.log(response.response);
       }
     });
   </script>
