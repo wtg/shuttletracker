@@ -11,7 +11,7 @@ controller("vehiclesCtrl", function($scope, $http) {
       $scope.vehicles = data;
     }).
     error(function(data) {
-      // handle error
+      console.log(data);
     });
 
   $scope.addVehicle = function() {
@@ -27,7 +27,6 @@ controller("vehiclesCtrl", function($scope, $http) {
     res.error(function(data) {
       console.log("failure message: " + JSON.stringify({data: data}));
     });   
-    // Clear input fields
     $scope.vehicleId = '';
     $scope.vehicleName = '';
   };
@@ -41,13 +40,18 @@ controller("routesCtrl", function($scope, $http) {
       $scope.routes = data;
     }).
     error(function(data) {
-      // handle error
+      console.log(data);
     });
 
   $scope.addRoute = function() {
     var routeObj = {
       name: $scope.name,
-      description: $scope.description
+      description: $scope.description,
+      startTime: $scope.startTime,
+      endTime: $scope.endTime,
+      enabled: $scope.enabled,
+      color: $scope.color,
+      width: $scope.width
     };
     var res = $http.post('/routes/create', routeObj);
     res.success(function(data) { 
@@ -57,9 +61,13 @@ controller("routesCtrl", function($scope, $http) {
     res.error(function(data) {
       console.log("failure message: " + JSON.stringify({data: data}));
     });
-    // Clear input fields
     $scope.name = '';
     $scope.description = '';
+    $scope.startTime = '';
+    $scope.endTime = '';
+    $scope.enabled = '';
+    $scope.color = '';
+    $scope.width = '';
   };
 }).
 

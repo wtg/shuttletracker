@@ -19,35 +19,32 @@ import (
 
 // VehicleUpdate represents a single position observed for a Vehicle from the data feed.
 type VehicleUpdate struct {
-	ID        bson.ObjectId `bson:"_id,omitempty"`
-	VehicleID string        `json:"vehicleId"   bson:"vehicleId,omitempty"`
-	Lat       string        `json:"lat"         bson:"lat"`
-	Lng       string        `json:"lng"         bson:"lng"`
-	Heading   string        `json:"heading"     bson:"heading"`
-	Speed     string        `json:"speed"       bson:"speed"`
-	Lock      string        `json:"lock"        bson:"lock"`
-	Time      string        `json:"time"        bson:"time"`
-	Date      string        `json:"date"        bson:"date"`
-	Status    string        `json:"status"      bson:"status"`
-	Created   time.Time     `bson:"created"`
+	VehicleID string    `json:"vehicleId"   bson:"vehicleId,omitempty"`
+	Lat       string    `json:"lat"         bson:"lat"`
+	Lng       string    `json:"lng"         bson:"lng"`
+	Heading   string    `json:"heading"     bson:"heading"`
+	Speed     string    `json:"speed"       bson:"speed"`
+	Lock      string    `json:"lock"        bson:"lock"`
+	Time      string    `json:"time"        bson:"time"`
+	Date      string    `json:"date"        bson:"date"`
+	Status    string    `json:"status"      bson:"status"`
+	Created   time.Time `bson:"created"`
 }
 
 // Vehicle represents an object being tracked.
 type Vehicle struct {
-	ID          bson.ObjectId `bson:"_id,omitempty"`
-	VehicleID   string        `json:"vehicleId"   bson:"vehicleId,omitempty"`
-	VehicleName string        `json:"vehicleName" bson:"vehicleName"`
-	Created     time.Time     `bson:"created"`
-	Updated     time.Time     `bson:"updated"`
+	VehicleID   string    `json:"vehicleId"   bson:"vehicleId,omitempty"`
+	VehicleName string    `json:"vehicleName" bson:"vehicleName"`
+	Created     time.Time `bson:"created"`
+	Updated     time.Time `bson:"updated"`
 }
 
 // Status contains a detailed message on the tracked object's status
 type Status struct {
-	ID      bson.ObjectId `bson:"_id",omitempty"`
-	Public  bool          `bson:"public"`
-	Message string        `json:"message" bson:"message"`
-	Created time.Time     `bson:"created"`
-	Updated time.Time     `bson:"updated"`
+	Public  bool      `bson:"public"`
+	Message string    `json:"message" bson:"message"`
+	Created time.Time `bson:"created"`
+	Updated time.Time `bson:"updated"`
 }
 
 var (
@@ -108,7 +105,6 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 
 			// Create new vehicle update & insert update into database
 			update := VehicleUpdate{
-				ID:        bson.NewObjectId(),
 				VehicleID: strings.Replace(result["id"], "Vehicle ID:", "", -1),
 				Lat:       strings.Replace(result["lat"], "lat:", "", -1),
 				Lng:       strings.Replace(result["lng"], "lon:", "", -1),
@@ -194,7 +190,6 @@ func (App *App) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 
 // Coord objects contain the lat/long coordinates to draw routes
 type Coord struct {
-	ID      bson.ObjectId `bson:"_id,omitempty"`
 	Lat     float64       `bson:"lat"`
 	Lng     float64       `bson:"lng"`
 	RouteID bson.ObjectId `bson:routeId"`
@@ -204,36 +199,33 @@ type Coord struct {
 
 // Route represents a set of coordinates to draw a path on our tracking map
 type Route struct {
-	ID          bson.ObjectId `bson:"_id",omitempty`
-	Name        string        `json:"name"        bson:"name"`
-	Description string        `json:"description" bson:"description"`
-	StartTime   time.Time     `json:"startTime"   bson:"startTime"`
-	EndTime     time.Time     `json:"endTime" 		bson:"endTime"`
-	Enabled     bool          `json:"enabled" 		bson:"enabled"`
-	Color       string        `json:"color"       bson:"color"`
-	Width       int           `json:"width"       bson:"width"`
-	Created     time.Time     `json:"created"			bson:"created"`
-	Updated     time.Time     `json:"updated"     bson:"updated"`
+	Name        string    `json:"name"        bson:"name"`
+	Description string    `json:"description" bson:"description"`
+	StartTime   string    `json:"startTime"   bson:"startTime"`
+	EndTime     string    `json:"endTime" 		bson:"endTime"`
+	Enabled     bool      `json:"enabled" 		bson:"enabled"`
+	Color       string    `json:"color"       bson:"color"`
+	Width       int       `json:"width"       bson:"width"`
+	Created     time.Time `json:"created"			bson:"created"`
+	Updated     time.Time `json:"updated"     bson:"updated"`
 }
 
 // Stop indicates where a tracked object is scheduled to arrive
 type Stop struct {
-	ID          bson.ObjectId `bson:"_id",omitempty`
-	Name        string        `json:"name"        bson:"name"`
-	Phonetic    string        `json:"phonetic"    bson:"phonetic"`
-	Description string        `json:"description" bson:"description"`
-	Address     string        `json:"address" 	  bson:"address"`
-	TimeServed  string        `json:"timeServed"  bson:"timeServed"`
-	Lat         float64       `json:"lat"   			bson:"lat"`
-	Lng         float64       `json:"lng" 				bson:"lng"`
-	Enabled     bool          `json:"enabled"			bson:"enabled"`
-	Created     time.Time     `json:"created" 		bson:"created"`
-	Updated     time.Time     `json:"updated" 		bson:"updated"`
+	Name        string    `json:"name"        bson:"name"`
+	Phonetic    string    `json:"phonetic"    bson:"phonetic"`
+	Description string    `json:"description" bson:"description"`
+	Address     string    `json:"address" 	  bson:"address"`
+	TimeServed  string    `json:"timeServed"  bson:"timeServed"`
+	Lat         float64   `json:"lat"   			bson:"lat"`
+	Lng         float64   `json:"lng" 				bson:"lng"`
+	Enabled     bool      `json:"enabled"			bson:"enabled"`
+	Created     time.Time `json:"created" 		bson:"created"`
+	Updated     time.Time `json:"updated" 		bson:"updated"`
 }
 
 // RouteStop allows stops to be placed on one or more routes
 type RouteStop struct {
-	ID      bson.ObjectId `bson:"_id",omitempty"`
 	StopID  bson.ObjectId `bson:"stopId",omitempty"`
 	RouteID bson.ObjectId `bson:"routeId",omitempty"`
 }
