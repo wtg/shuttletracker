@@ -1,19 +1,12 @@
 <!doctype html>
-<html lang="en" ng-app="ShuttleTracking">
+<html>
   <head>
-    <base href="/">
     <title> Shuttle Tracking </title>
     <link rel="icon" href="/static/images/favicon.ico">
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/static/css/application.css">
     <!-- Google Maps API -->
     <script src="https://maps.googleapis.com/maps/api/js"></script>
-    <!-- Angular dependencies --> 
-    <script src="/bower_components/angular/angular.js"></script>
-    <script src="/bower_components/angular-route/angular-route.js"></script>
-    <!-- Angular files -->
-    <script src="/static/js/controllers.js"></script>
-    <script src="/static/js/app.js"></script>
     <!-- Polymer dependencies -->
     <script src="/bower_components/webcomponentsjs/webcomponents.min.js"></script>
     <link rel="import" href="/bower_components/polymer/polymer.html">
@@ -22,7 +15,6 @@
     <link rel="import" href="/static/components/shuttles-map.html">
   </head>
   <body>
-    <div class="page-container" ng-view>
-    </div>
+    <shuttles-map lat="42.730172" lng="-73.678803" zoom="15"></shuttles-map>
   </body>
 </html>

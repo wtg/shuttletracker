@@ -1,0 +1,49 @@
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-validatable-behavior/iron-validatable-behavior.html">
+
+<dom-module id="tracking-vehicles">
+  <template>
+    <iron-ajax
+      auto
+      id="updateVehicles"
+      url="/vehicles"
+      handle-as="json"
+      last-response="{{vehicles}}">
+    </iron-ajax>
+
+    <h1> Vehicles </h1>
+    <template is="dom-if" if="{{vehicles}}">
+      <template is="dom-repeat" items="{{vehicles}}" as="vehicle">
+        <b> Name: </b> <span>{{vehicle.vehicleName}}</span>
+        <b> ID: </b> <span>{{vehicle.vehicleID}}</span> 
+        <br />
+      </template>
+    </template>
+
+    <form is='iron-form' id="vehicleForm" content-type="application/json" method="post" action="/vehicles/create">
+      <paper-input name="vehicleName" label="vehicleName"></paper-input>
+      <paper-input name="vehicleID" label="vehicleID"></paper-input>
+      <paper-button raisedButton onclick="submitVehicle()">Submit</paper-button>
+    </form>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'tracking-vehicles',
+      listeners: {
+        'iron-form-response': 'formResponse'
+      },
+      formResponse: function(e) {
+        this.$.updateVehicles.generateRequest();
+      }
+    });
+
+    function submitVehicle() {
+      var form = document.getElementById("vehicleForm")
+      form.submit();
+      form.reset();
+    }
+  </script>
+</dom-module>

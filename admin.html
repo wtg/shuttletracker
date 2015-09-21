@@ -1,28 +1,56 @@
 <!doctype html>
-<html lang="en" ng-app="ShuttleTracking">
+<html>
   <head>
-    <base href="/">
     <title> Shuttle Tracking - Fleet Management </title>
     <link rel="icon" href="/static/images/favicon.ico">
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="/static/css/application.css">
-    <!-- Angular dependencies --> 
-    <script src="/bower_components/angular/angular.js"></script>
-    <script src="/bower_components/angular-route/angular-route.js"></script>
-    <!-- Angular files -->
-    <script src="/static/js/controllers.js"></script>
-    <script src="/static/js/app.js"></script>
+    <!-- Polymer dependencies -->
+    <script src="/bower_components/webcomponentsjs/webcomponents.min.js"></script>
+    <link rel="import" href="/bower_components/polymer/polymer.html">
+    <!-- Iron Elements -->
+    <link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+    <link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+    <!-- Paper Elements -->
+    <link rel="import" href="/bower_components/paper-header-panel/paper-header-panel.html">
+    <link rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html">
+    <link rel='import' href='/bower_components/paper-tabs/paper-tabs.html'>
+    <link rel='import' href='/bower_components/paper-item/paper-item.html'>
+    <!-- Custom Polymer elements -->
+    <link rel="import" href="/static/components/shuttles-map.html">
+    <link rel="import" href="/static/components/tracking-vehicles.html">
+    <link rel="import" href="/static/components/tracking-routes.html">
   </head>
-  <body>
-    <ul>
-      <li> <a href="/admin/vehicles">Vehicles</a> </li>
-      <li> <a href="/admin/routes">Routes</a> </li>
-      <li> <a href="/admin/stops">Stops</a></core-item> </li>
-      <li> <a href="/admin/tracking">Tracking</a> </li>
-      <li> <a href="/admin/schedule">Schedule</a> </li>
-      <li> <a href="/admin/users">Users</a> </li>
-    </ul>
-    <div class="page-container" ng-view>
-    </div>
+
+  <body unresolved class="fullbleed layout vertical">
+    <template is="dom-bind">
+      <paper-header-panel class="flex">
+        <paper-toolbar>
+          <paper-tabs class="flex" selected="{{selected}}">
+            <paper-tab> Vehicles </paper-tab>
+            <paper-tab> Routes </paper-tab>
+            <paper-tab> Stops </paper-tab>
+          </paper-tabs>
+        </paper-toolbar>
+        <iron-pages selected="{{selected}}">
+          <section>
+            <!-- Vehicles -->
+            <tracking-vehicles><tracking-vehicles>
+          </section>
+          <section>
+            <!-- Routes -->
+            <tracking-routes></tracking-routes>
+          </section>
+          <section>
+            <!-- Stops -->
+          </section>
+        </iron-pages>
+      </paper-header-panel>
+    </template>
+    <script>
+      // select the first page when site is loaded
+      document.addEventListener('WebComponentsReady', function () {
+        var template = document.querySelector('template[is="dom-bind"]');
+        template.selected = 0;
+      });
+    </script>
   </body>
 </html>

@@ -1,0 +1,19 @@
+{
+  "name": "shuttle_tracking",
+  "version": "0.0.1",
+  "homepage": "https://github.com/wtg/shuttle_tracking_2",
+  "authors": [
+    "gbprz <perez283@gmail.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "bower_components",
+    "components"
+  ],
+  "dependencies": {
+    "iron-elements": "PolymerElements/iron-elements#~1.0.3",
+    "paper-elements": "PolymerElements/paper-elements#~1.0.5",
+    "polymer": "Polymer/polymer#^1.1.0"
+  }
+}
