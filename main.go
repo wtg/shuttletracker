@@ -19,25 +19,32 @@ import (
 
 // VehicleUpdate represents a single position observed for a Vehicle from the data feed.
 type VehicleUpdate struct {
-	ID        bson.ObjectId `bson:"_id,omitempty"`
-	VehicleID string        `json:"vehicleId"   bson:"vehicleId,omitempty"`
-	Lat       string        `json:"lat"         bson:"lat"`
-	Lng       string        `json:"lng"         bson:"lng"`
-	Heading   string        `json:"heading"     bson:"heading"`
-	Speed     string        `json:"speed"       bson:"speed"`
-	Lock      string        `json:"lock"        bson:"lock"`
-	Time      string        `json:"time"        bson:"time"`
-	Date      string        `json:"date"        bson:"date"`
-	Status    string        `json:"status"      bson:"status"`
-	Created   time.Time     `json:"created"     bson:"created"`
+	VehicleID string    `json:"vehicleID"   bson:"vehicleID,omitempty"`
+	Lat       string    `json:"lat"         bson:"lat"`
+	Lng       string    `json:"lng"         bson:"lng"`
+	Heading   string    `json:"heading"     bson:"heading"`
+	Speed     string    `json:"speed"       bson:"speed"`
+	Lock      string    `json:"lock"        bson:"lock"`
+	Time      string    `json:"time"        bson:"time"`
+	Date      string    `json:"date"        bson:"date"`
+	Status    string    `json:"status"      bson:"status"`
+	Created   time.Time `json:"created"     bson:"created"`
 }
 
 // Vehicle represents an object being tracked.
 type Vehicle struct {
-	ID          bson.ObjectId `bson:"_id,omitempty"`
-	VehicleID   string        `json:"vehicleId"   bson:"vehicleId,omitempty"`
-	VehicleName string        `json:"vehicleName" bson:"vehicleName"`
-	Created     time.Time     `json:"created"     bson:"created"`
+	VehicleID   string    `json:"vehicleID"   bson:"vehicleID,omitempty"`
+	VehicleName string    `json:"vehicleName" bson:"vehicleName"`
+	Created     time.Time `bson:"created"`
+	Updated     time.Time `bson:"updated"`
+}
+
+// Status contains a detailed message on the tracked object's status
+type Status struct {
+	Public  bool      `bson:"public"`
+	Message string    `json:"message" bson:"message"`
+	Created time.Time `bson:"created"`
+	Updated time.Time `bson:"updated"`
 }
 
 var (
@@ -98,7 +105,6 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 
 			// Create new vehicle update & insert update into database
 			update := VehicleUpdate{
-				ID:        bson.NewObjectId(),
 				VehicleID: strings.Replace(result["id"], "Vehicle ID:", "", -1),
 				Lat:       strings.Replace(result["lat"], "lat:", "", -1),
 				Lng:       strings.Replace(result["lng"], "lon:", "", -1),
@@ -166,7 +172,7 @@ func (App *App) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Find recent updates for each vehicle
 	for _, vehicle := range vehicles {
-		err := App.Updates.Find(bson.M{"vehicleId": vehicle.VehicleID}).Sort("-created").Limit(1).One(&update)
+		err := App.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(1).One(&update)
 
 		if err == nil {
 			updates = append(updates, update)
@@ -180,6 +186,80 @@ func (App *App) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Send updates to client
 	fmt.Fprint(w, string(u))
+}
+
+// Coord objects contain the lat/long coordinates to draw routes
+type Coord struct {
+	Lat     float64       `bson:"lat"`
+	Lng     float64       `bson:"lng"`
+	RouteID bson.ObjectId `bson:routeID"`
+	Created time.Time     `bson:created"`
+	Updated time.Time     `bson:updated"`
+}
+
+// Route represents a set of coordinates to draw a path on our tracking map
+type Route struct {
+	Name        string    `json:"name"           bson:"name"`
+	Description string    `json:"description"    bson:"description"`
+	StartTime   string    `json:"startTime"      bson:"startTime"`
+	EndTime     string    `json:"endTime"        bson:"endTime"`
+	Enabled     bool      `json:"enabled,string" bson:"enabled"`
+	Color       string    `json:"color"          bson:"color"`
+	Width       int       `json:"width,string"   bson:"width"`
+	Created     time.Time `json:"created"        bson:"created"`
+	Updated     time.Time `json:"updated"        bson:"updated"`
+}
+
+// Stop indicates where a tracked object is scheduled to arrive
+type Stop struct {
+	Name        string    `json:"name"        bson:"name"`
+	Phonetic    string    `json:"phonetic"    bson:"phonetic"`
+	Description string    `json:"description" bson:"description"`
+	Address     string    `json:"address"     bson:"address"`
+	TimeServed  string    `json:"timeServed"  bson:"timeServed"`
+	Lat         float64   `json:"lat"         bson:"lat"`
+	Lng         float64   `json:"lng"         bson:"lng"`
+	Enabled     bool      `json:"enabled"     bson:"enabled"`
+	Created     time.Time `json:"created"     bson:"created"`
+	Updated     time.Time `json:"updated"     bson:"updated"`
+}
+
+// RouteStop allows stops to be placed on one or more routes
+type RouteStop struct {
+	StopID  bson.ObjectId `bson:"stopID",omitempty"`
+	RouteID bson.ObjectId `bson:"routeID",omitempty"`
+}
+
+// RoutesHandler finds all of the routes in the database
+func (App *App) RoutesHandler(w http.ResponseWriter, r *http.Request) {
+	// Find all routes in database
+	var routes []Route
+	err := App.Routes.Find(bson.M{}).All(&routes)
+	// Handle query errors
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	// Send each route to client as JSON
+	routesJSON, err := json.MarshalIndent(routes, "", " ")
+	fmt.Fprintf(w, string(routesJSON))
+}
+
+// RoutesCreateHandler adds a new route to the database
+func (App *App) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
+	// Create a new route object using request fields
+	route := Route{}
+	routeData := json.NewDecoder(r.Body)
+	err := routeData.Decode(&route)
+	// Error handling
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	// Store new route under routes collection
+	err = App.Routes.Insert(&route)
+	// Error handling
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 // IndexHandler serves the index page.
@@ -205,6 +285,7 @@ type App struct {
 	Session  *mgo.Session
 	Updates  *mgo.Collection
 	Vehicles *mgo.Collection
+	Routes   *mgo.Collection
 }
 
 func readConfiguration(fileName string) (*Configuration, error) {
@@ -241,6 +322,7 @@ func main() {
 		session,
 		session.DB("shuttle_tracking").C("updates"),
 		session.DB("shuttle_tracking").C("vehicles"),
+		session.DB("shuttle_tracking").C("routes"),
 	}
 
 	// Start auto updater
@@ -250,12 +332,12 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", IndexHandler).Methods("GET")
 	r.HandleFunc("/admin", AdminHandler).Methods("GET")
-	r.HandleFunc("/admin/vehicles", AdminHandler).Methods("GET")
-	r.HandleFunc("/admin/tracking", AdminHandler).Methods("GET")
-	r.HandleFunc("/admin/stops", AdminHandler).Methods("GET")
+	r.HandleFunc("/admin/{*}", AdminHandler).Methods("GET")
 	r.HandleFunc("/vehicles", App.VehiclesHandler).Methods("GET")
 	r.HandleFunc("/vehicles/create", App.VehiclesCreateHandler).Methods("POST")
 	r.HandleFunc("/updates", App.UpdatesHandler).Methods("GET")
+	r.HandleFunc("/routes", App.RoutesHandler).Methods("GET")
+	r.HandleFunc("/routes/create", App.RoutesCreateHandler).Methods("POST")
 	// Static files
 	r.PathPrefix("/bower_components/").Handler(http.StripPrefix("/bower_components/", http.FileServer(http.Dir("bower_components/"))))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))

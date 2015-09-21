@@ -1,7 +1,7 @@
 {
   "name": "shuttle_tracking",
-  "version": "0.0.0",
-  "homepage": "https://github.com/wtg/shuttle_tracking_rails4",
+  "version": "0.0.1",
+  "homepage": "https://github.com/wtg/shuttle_tracking_2",
   "authors": [
     "gbprz <perez283@gmail.com>"
   ],
@@ -12,39 +12,8 @@
     "components"
   ],
   "dependencies": {
-    "angular": "1.4.x",
-    "angular-resource": "~1.4.x",
-    "angular-route": "~1.4.x",
-    "angular-sanitize": "~1.4.x",
     "iron-elements": "PolymerElements/iron-elements#~1.0.3",
     "paper-elements": "PolymerElements/paper-elements#~1.0.5",
-    "polymer": "Polymer/polymer#^1.0.0"
-  },
-  "resolutions": {
-    "angular": "1.4.x",
-    "polymer": "^1.0.0",
-    "webcomponentsjs": "^0.7.2",
-    "web-animations-js": "2.1.2",
-    "marked-element": "^1.0.0",
-    "font-roboto": "^1.0.1",
-    "paper-button": "^1.0.0",
-    "paper-ripple": "^1.0.0",
-    "paper-checkbox": "^1.0.0",
-    "paper-radio-button": "^1.0.0",
-    "paper-dialog": "^1.0.0",
-    "paper-dropdown-menu": "^1.0.0",
-    "paper-icon-button": "^1.0.0",
-    "paper-item": "^1.0.0",
-    "paper-elements": "~1.0.5",
-    "paper-fab": "^1.0.0",
-    "paper-input": "^1.0.9",
-    "paper-menu-button": "^1.0.0",
-    "paper-progress": "^1.0.0",
-    "paper-radio-group": "^1.0.0",
-    "paper-slider": "^1.0.0",
-    "paper-spinner": "^1.0.0",
-    "paper-tabs": "^1.0.0",
-    "paper-toast": "^1.0.0",
-    "paper-toggle-button": "^1.0.0"
+    "polymer": "Polymer/polymer#^1.1.0"
   }
 }
