@@ -199,15 +199,15 @@ type Coord struct {
 
 // Route represents a set of coordinates to draw a path on our tracking map
 type Route struct {
-	Name        string    `json:"name"        	 bson:"name"`
-	Description string    `json:"description" 	 bson:"description"`
-	StartTime   string    `json:"startTime"   	 bson:"startTime"`
-	EndTime     string    `json:"endTime" 			 bson:"endTime"`
+	Name        string    `json:"name"           bson:"name"`
+	Description string    `json:"description"    bson:"description"`
+	StartTime   string    `json:"startTime"      bson:"startTime"`
+	EndTime     string    `json:"endTime"        bson:"endTime"`
 	Enabled     bool      `json:"enabled,string" bson:"enabled"`
-	Color       string    `json:"color"       	 bson:"color"`
+	Color       string    `json:"color"          bson:"color"`
 	Width       int       `json:"width,string"   bson:"width"`
-	Created     time.Time `json:"created"				 bson:"created"`
-	Updated     time.Time `json:"updated"     	 bson:"updated"`
+	Created     time.Time `json:"created"        bson:"created"`
+	Updated     time.Time `json:"updated"        bson:"updated"`
 }
 
 // Stop indicates where a tracked object is scheduled to arrive
@@ -215,13 +215,13 @@ type Stop struct {
 	Name        string    `json:"name"        bson:"name"`
 	Phonetic    string    `json:"phonetic"    bson:"phonetic"`
 	Description string    `json:"description" bson:"description"`
-	Address     string    `json:"address" 	  bson:"address"`
+	Address     string    `json:"address"     bson:"address"`
 	TimeServed  string    `json:"timeServed"  bson:"timeServed"`
-	Lat         float64   `json:"lat"   			bson:"lat"`
-	Lng         float64   `json:"lng" 				bson:"lng"`
-	Enabled     bool      `json:"enabled"			bson:"enabled"`
-	Created     time.Time `json:"created" 		bson:"created"`
-	Updated     time.Time `json:"updated" 		bson:"updated"`
+	Lat         float64   `json:"lat"         bson:"lat"`
+	Lng         float64   `json:"lng"         bson:"lng"`
+	Enabled     bool      `json:"enabled"     bson:"enabled"`
+	Created     time.Time `json:"created"     bson:"created"`
+	Updated     time.Time `json:"updated"     bson:"updated"`
 }
 
 // RouteStop allows stops to be placed on one or more routes
