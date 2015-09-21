@@ -22,9 +22,10 @@
       </template>
     </template>
 
-    <form is='iron-form' id="vehicleForm" content-type="application/json" method="post" action="/vehicles/create">
-      <paper-input name="vehicleName" label="vehicleName"></paper-input>
-      <paper-input name="vehicleID" label="vehicleID"></paper-input>
+    <h1> New Vehicle </h1>
+    <form is="iron-form" id="vehicleForm" content-type="application/json" method="post" action="/vehicles/create">
+      <paper-input name="vehicleName" label="Vehicle Name"></paper-input>
+      <paper-input name="vehicleID" label="Vehicle ID"></paper-input>
       <paper-button raisedButton onclick="submitVehicle()">Submit</paper-button>
     </form>
   </template>
@@ -33,15 +34,15 @@
     Polymer({
       is: 'tracking-vehicles',
       listeners: {
-        'iron-form-response': 'formResponse'
+        'iron-form-response': 'addVehicleResponse'
       },
-      formResponse: function(e) {
+      addVehicleResponse: function() {
         this.$.updateVehicles.generateRequest();
       }
     });
 
     function submitVehicle() {
-      var form = document.getElementById("vehicleForm")
+      var form = document.getElementById("vehicleForm");
       form.submit();
       form.reset();
     }

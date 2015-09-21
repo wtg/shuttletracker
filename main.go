@@ -199,15 +199,15 @@ type Coord struct {
 
 // Route represents a set of coordinates to draw a path on our tracking map
 type Route struct {
-	Name        string    `json:"name"        bson:"name"`
-	Description string    `json:"description" bson:"description"`
-	StartTime   string    `json:"startTime"   bson:"startTime"`
-	EndTime     string    `json:"endTime" 		bson:"endTime"`
-	Enabled     bool      `json:"enabled" 		bson:"enabled"`
-	Color       string    `json:"color"       bson:"color"`
-	Width       int       `json:"width"       bson:"width"`
-	Created     time.Time `json:"created"			bson:"created"`
-	Updated     time.Time `json:"updated"     bson:"updated"`
+	Name        string    `json:"name"        	 bson:"name"`
+	Description string    `json:"description" 	 bson:"description"`
+	StartTime   string    `json:"startTime"   	 bson:"startTime"`
+	EndTime     string    `json:"endTime" 			 bson:"endTime"`
+	Enabled     bool      `json:"enabled,string" bson:"enabled"`
+	Color       string    `json:"color"       	 bson:"color"`
+	Width       int       `json:"width,string"   bson:"width"`
+	Created     time.Time `json:"created"				 bson:"created"`
+	Updated     time.Time `json:"updated"     	 bson:"updated"`
 }
 
 // Stop indicates where a tracked object is scheduled to arrive
