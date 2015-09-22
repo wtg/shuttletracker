@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -136,8 +135,7 @@ func (App *App) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	// Send each vehicle to client as JSON
-	vehiclesJSON, err := json.MarshalIndent(vehicles, "", " ")
-	fmt.Fprintf(w, string(vehiclesJSON))
+	writeJSON(w, vehicles)
 }
 
 // VehiclesCreateHandler adds a new vehicle to the database.
@@ -179,13 +177,7 @@ func (App *App) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	// Convert updates to JSON
-	u, err := json.MarshalIndent(updates, "", " ")
-	// Handle JSON parsing errors
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-	// Send updates to client
-	fmt.Fprint(w, string(u))
+	writeJSON(w, updates)
 }
 
 // Coord objects contain the lat/long coordinates to draw routes
@@ -240,8 +232,7 @@ func (App *App) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	// Send each route to client as JSON
-	routesJSON, err := json.MarshalIndent(routes, "", " ")
-	fmt.Fprintf(w, string(routesJSON))
+	writeJSON(w, routes)
 }
 
 // RoutesCreateHandler adds a new route to the database
@@ -300,6 +291,17 @@ func readConfiguration(fileName string) (*Configuration, error) {
 		return nil, err
 	}
 	return &config, nil
+}
+
+func writeJSON(w http.ResponseWriter, data interface{}) error {
+	w.Header().Set("Content-Type", "application/json")
+	b, err := json.MarshalIndent(data, "", " ")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
+	}
+	w.Write(b)
+	return nil
 }
 
 func main() {
