@@ -2,8 +2,22 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../bower_components/google-map/google-map.html">
 
 <dom-module id="tracking-routes">
+  <style>
+    .route-list {
+      margin-left: 25px;
+    }
+    .route-form {
+      margin: 25px;
+    }
+    .route-map {
+      width: 750px;
+      height: 500px;
+    }
+  </style>
+
   <template>
     <iron-ajax
       auto
@@ -13,38 +27,65 @@
       last-response="{{routes}}">
     </iron-ajax>
 
-    <h1> Routes </h1>
-    <template is="dom-if" if="{{routes}}">
-      <template is="dom-repeat" items="{{routes}}" as="route">
-        <b> Name: </b> <span>{{route.name}}</span>
-        <b> StartTime: </b> <span>{{route.startTime}}</span>
-        <b> EndTime: </b> <span>{{route.endTime}}</span>
-        <b> Enabled: </b> <span>{{route.Enabled}}</span>
-        <b> Color: </b> <span>{{route.color}}</span>
-        <b> Width: </b> <span>{{route.Width}}</span>
-        <br />
+    <div class="route-list">
+      <h1> Routes </h1>
+      <template is="dom-if" if="{{routes}}">
+        <template is="dom-repeat" items="{{routes}}" as="route">
+          <b> Name: </b> <span>{{route.name}}</span>
+          <b> StartTime: </b> <span>{{route.startTime}}</span>
+          <b> EndTime: </b> <span>{{route.endTime}}</span>
+          <b> Enabled: </b> <span>{{route.Enabled}}</span>
+          <b> Color: </b> <span>{{route.color}}</span>
+          <b> Width: </b> <span>{{route.Width}}</span>
+          <br />
+        </template>
       </template>
-    </template>
+    </div>
 
-    <h1> New Route </h1>
-    <form is="iron-form" id="routeForm" content-type="application/json" method="post" action="/routes/create">
-      <paper-input name="name" label="Route Name"></paper-input>
-      <paper-input name="startTime" label="Start Time"></paper-input>
-      <paper-input name="endTime" label="End Time"></paper-input>
-      <paper-input name="color" label="Color"></paper-input>
-      <paper-input name="width" label="Width"></paper-input>
-      <div> 
-        Route Enabled?
-        <paper-toggle-button checked="{{isEnabled}}"></paper-toggle-button> 
-        <input type="hidden" name="enabled" value="{{isEnabled}}">
-      </div>
-      <paper-button raisedButton onclick="submitRoute()">Submit</paper-button>
-    </form>
+    <div class="route-form">
+      <h1> New Route </h1>
+      <google-map class="route-map" zoom="{{zoom}}" latitude="{{lat}}" longitude="{{lng}}"></google-map>
+      <form class="new-route" is="iron-form" id="routeForm" content-type="application/json" method="post" action="/routes/create">
+        <paper-input name="name" label="Route Name"></paper-input>
+        <paper-input name="startTime" label="Start Time"></paper-input>
+        <paper-input name="endTime" label="End Time"></paper-input>
+        <paper-input name="color" label="Color"></paper-input>
+        <paper-input name="width" label="Width"></paper-input>
+        <div> 
+          Route Enabled?
+          <paper-toggle-button checked="{{isEnabled}}"></paper-toggle-button> 
+          <input type="hidden" name="enabled" value="{{isEnabled}}">
+        </div>
+        <paper-button raisedButton onclick="submitRoute()">Submit</paper-button>
+      </form>
+    </div>
   </template>
 
   <script>
     Polymer({ 
       is: 'tracking-routes',
+      properties: {
+        lat: {
+          type: String,
+          reflectToAttribute: true
+        },
+        lng: {
+          type: String,
+          reflectToAttribute: true
+        },
+        zoom: {
+          type: Number,
+          reflectToAttribute: true
+        },
+        map: {
+          type: Object,
+          value: {}
+        },
+        options: {
+          type: Object,
+          value: {}
+        }
+      },
       listeners: {
         'iron-form-response': 'addRouteResponse'
       },

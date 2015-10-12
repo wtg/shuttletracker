@@ -128,7 +128,8 @@
             var marker = new google.maps.Marker({
               position: pos,
               map: this.map,
-              title: "placeholder"
+              icon: "static/images/shuttle_icon.png",
+              title: updates[i]["vehicleID"]
             });
             this.markers.push(marker);
           }
