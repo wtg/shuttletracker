@@ -3,8 +3,8 @@ package main
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	log "github.com/Sirupsen/logrus"
+	"github.com/gorilla/mux"
 	"shuttle_tracking_2/tracking"
 )
 
@@ -23,7 +23,7 @@ func AdminHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	// close Mongo session when server terminates
-  defer App.Session.Close()
+	defer App.Session.Close()
 
 	// Start auto updater
 	go App.UpdateShuttles(Config.DataFeed, Config.UpdateInterval)
