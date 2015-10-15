@@ -3,11 +3,18 @@
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
 
 <dom-module id="tracking-vehicles">
   <style>
     .vehicle-form {
       margin: 25px;
+      padding: 20px;
+      background: #ffffff;
+    }
+    .vehicle-form paper-button {
+      background: #3f51b5;
+      color: white;
     }
     .vehicle-card {
       margin: 5px;
@@ -22,6 +29,11 @@
       --iron-icon-height: 20px;
       --iron-icon-width: 20px;
     }
+    .vehicles-container {
+      margin: 25px;
+      padding: 10px;
+      background: #ffffff;
+    }
   </style>
 
   <template>
@@ -34,37 +46,40 @@
     </iron-ajax>
 
     <div class="vehicle-list">
-      <h1> Vehicles </h1>
       <template is="dom-if" if="{{vehicles}}">
-        <template is="dom-repeat" items="{{vehicles}}" as="vehicle">
-          <paper-card class="vehicle-card" heading="{{vehicle.vehicleName}}">
-            <div class="card-content">
-              <b> ID: </b> <span>{{vehicle.vehicleID}}</span>
-            </div>
-            <div class="card-actions">
-              <paper-button>
-                <iron-icon class="vehicle-action" icon="history"></iron-icon>
-              </paper-button>
-              <paper-button> 
-                <iron-icon class="vehicle-action" icon="create"></iron-icon>
-              </paper-button>
-              <paper-button>
-                <iron-icon class="vehicle-action" icon="delete"></iron-icon>
-              </paper-button>
-            </div>
-          </paper-card>
-        </template>
+        <paper-material class="vehicles-container">
+          <h1> Vehicles </h1>
+          <template is="dom-repeat" items="{{vehicles}}" as="vehicle">
+            <paper-card class="vehicle-card" heading="{{vehicle.vehicleName}}">
+              <div class="card-content">
+                <b> ID: </b> <span>{{vehicle.vehicleID}}</span>
+              </div>
+              <div class="card-actions">
+                <paper-button class="history">
+                  <iron-icon class="vehicle-action" icon="history"></iron-icon>
+                </paper-button>
+                <paper-button class="create"> 
+                  <iron-icon class="vehicle-action" icon="create"></iron-icon>
+                </paper-button>
+                <paper-button class="delete">
+                  <iron-icon class="vehicle-action" icon="delete"></iron-icon>
+                </paper-button>
+              </div>
+            </paper-card>
+          </template>
+        </paper-material>
       </template>
     </div>
 
-    <div class="vehicle-form">
+    <paper-material class="vehicle-form">
       <h1> New Vehicle </h1>
       <form is="iron-form" id="vehicleForm" content-type="application/json" method="post" action="/vehicles/create">
         <paper-input name="vehicleName" label="Vehicle Name"></paper-input>
         <paper-input name="vehicleID" label="Vehicle ID"></paper-input>
+        <br />
         <paper-button raisedButton onclick="submitVehicle()">Submit</paper-button>
       </form>
-    </div>
+    </paper-material>
   </template>
 
   <script>

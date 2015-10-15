@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/google-map/google-map.html">
 
 <dom-module id="tracking-routes">
@@ -10,11 +11,22 @@
       margin-left: 25px;
     }
     .route-form {
+      background: #ffffff;
       margin: 25px;
+      padding: 25px;
     }
     .route-map {
       width: 750px;
       height: 500px;
+    }
+    .routes-container {
+      background: white;
+      margin: 25px;
+      padding: 10px;
+    }
+    .submit-route {
+      background: #3f51b5;
+      color: white;
     }
   </style>
 
@@ -28,37 +40,42 @@
     </iron-ajax>
 
     <div class="route-list">
-      <h1> Routes </h1>
       <template is="dom-if" if="{{routes}}">
-        <template is="dom-repeat" items="{{routes}}" as="route">
-          <b> Name: </b> <span>{{route.name}}</span>
-          <b> StartTime: </b> <span>{{route.startTime}}</span>
-          <b> EndTime: </b> <span>{{route.endTime}}</span>
-          <b> Enabled: </b> <span>{{route.Enabled}}</span>
-          <b> Color: </b> <span>{{route.color}}</span>
-          <b> Width: </b> <span>{{route.Width}}</span>
-          <br />
-        </template>
+        <paper-material class="routes-container">
+          <h1> All Routes </h1>
+          <template is="dom-repeat" items="{{routes}}" as="route">
+            <b> Name: </b> <span>{{route.name}}</span>
+            <b> StartTime: </b> <span>{{route.startTime}}</span>
+            <b> EndTime: </b> <span>{{route.endTime}}</span>
+            <b> Enabled: </b> <span>{{route.Enabled}}</span>
+            <b> Color: </b> <span>{{route.color}}</span>
+            <b> Width: </b> <span>{{route.Width}}</span>
+            <br />
+          </template>
+        </paper-material>
       </template>
     </div>
 
-    <div class="route-form">
+    <paper-material class="route-form">
       <h1> New Route </h1>
       <google-map class="route-map" zoom="{{zoom}}" latitude="{{lat}}" longitude="{{lng}}"></google-map>
+      <br />
       <form class="new-route" is="iron-form" id="routeForm" content-type="application/json" method="post" action="/routes/create">
         <paper-input name="name" label="Route Name"></paper-input>
         <paper-input name="startTime" label="Start Time"></paper-input>
         <paper-input name="endTime" label="End Time"></paper-input>
         <paper-input name="color" label="Color"></paper-input>
         <paper-input name="width" label="Width"></paper-input>
+        <br />
         <div> 
           Route Enabled?
           <paper-toggle-button checked="{{isEnabled}}"></paper-toggle-button> 
           <input type="hidden" name="enabled" value="{{isEnabled}}">
         </div>
-        <paper-button raisedButton onclick="submitRoute()">Submit</paper-button>
+        <br />
+        <paper-button class="submit-route" raisedButton onclick="submitRoute()">Submit</paper-button>
       </form>
-    </div>
+    </paper-material>
   </template>
 
   <script>
