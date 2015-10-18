@@ -17,21 +17,21 @@ type Route struct {
 	Enabled     bool      `json:"enabled,string" bson:"enabled"`
 	Color       string    `json:"color"          bson:"color"`
 	Width       int       `json:"width,string"   bson:"width"`
-	Coords 		  string    `json:"coords"         bson:"coords"`
+	Coords      string    `json:"coords"         bson:"coords"`
 	Created     time.Time `json:"created"        bson:"created"`
 	Updated     time.Time `json:"updated"        bson:"updated"`
 }
 
 // Stop indicates where a tracked object is scheduled to arrive
 type Stop struct {
-	Name        string    `json:"name"        bson:"name"`
-	Phonetic    string    `json:"phonetic"    bson:"phonetic"`
-	Description string    `json:"description" bson:"description"`
-	Address     string    `json:"address"     bson:"address"`
-	TimeServed  string    `json:"timeServed"  bson:"timeServed"`
-	Lat         float64   `json:"lat"         bson:"lat"`
-	Lng         float64   `json:"lng"         bson:"lng"`
-	Enabled     bool      `json:"enabled"     bson:"enabled"`
+	Name        string  `json:"name"        bson:"name"`
+	Phonetic    string  `json:"phonetic"    bson:"phonetic"`
+	Description string  `json:"description" bson:"description"`
+	Address     string  `json:"address"     bson:"address"`
+	TimeServed  string  `json:"timeServed"  bson:"timeServed"`
+	Lat         float64 `json:"lat"         bson:"lat"`
+	Lng         float64 `json:"lng"         bson:"lng"`
+	Enabled     bool    `json:"enabled"     bson:"enabled"`
 }
 
 // RoutesHandler finds all of the routes in the database
