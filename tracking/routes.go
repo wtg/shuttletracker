@@ -8,15 +8,6 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// Coord objects contain the lat/long coordinates to draw routes
-type Coord struct {
-	Lat     float64       `bson:"lat"`
-	Lng     float64       `bson:"lng"`
-	RouteID bson.ObjectId `bson:routeID"`
-	Created time.Time     `bson:created"`
-	Updated time.Time     `bson:updated"`
-}
-
 // Route represents a set of coordinates to draw a path on our tracking map
 type Route struct {
 	Name        string    `json:"name"           bson:"name"`
@@ -26,6 +17,7 @@ type Route struct {
 	Enabled     bool      `json:"enabled,string" bson:"enabled"`
 	Color       string    `json:"color"          bson:"color"`
 	Width       int       `json:"width,string"   bson:"width"`
+	Coords 		  string    `json:"coords"         bson:"coords"`
 	Created     time.Time `json:"created"        bson:"created"`
 	Updated     time.Time `json:"updated"        bson:"updated"`
 }
@@ -40,14 +32,6 @@ type Stop struct {
 	Lat         float64   `json:"lat"         bson:"lat"`
 	Lng         float64   `json:"lng"         bson:"lng"`
 	Enabled     bool      `json:"enabled"     bson:"enabled"`
-	Created     time.Time `json:"created"     bson:"created"`
-	Updated     time.Time `json:"updated"     bson:"updated"`
-}
-
-// RouteStop allows stops to be placed on one or more routes
-type RouteStop struct {
-	StopID  bson.ObjectId `bson:"stopID",omitempty"`
-	RouteID bson.ObjectId `bson:"routeID",omitempty"`
 }
 
 // RoutesHandler finds all of the routes in the database
@@ -67,8 +51,8 @@ func (App *App) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 func (App *App) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Create a new route object using request fields
 	route := Route{}
-	routeData := json.NewDecoder(r.Body)
-	err := routeData.Decode(&route)
+	err := json.NewDecoder(r.Body).Decode(&route)
+
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

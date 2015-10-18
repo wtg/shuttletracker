@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/iron-input/iron-input.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
@@ -7,9 +8,6 @@
 
 <dom-module id="tracking-routes">
   <style>
-    .route-list {
-      margin-left: 25px;
-    }
     .route-form {
       background: #ffffff;
       margin: 25px;
@@ -58,10 +56,11 @@
 
     <paper-material class="route-form">
       <h1> New Route </h1>
-      <google-map class="route-map" zoom="{{zoom}}" latitude="{{lat}}" longitude="{{lng}}"></google-map>
+      <google-map id="routeMap" class="route-map" click-events="true" zoom="{{zoom}}" latitude="{{lat}}" longitude="{{lng}}"></google-map>
       <br />
       <form class="new-route" is="iron-form" id="routeForm" content-type="application/json" method="post" action="/routes/create">
         <paper-input name="name" label="Route Name"></paper-input>
+        <paper-input name="description" label="Description"></paper-input>
         <paper-input name="startTime" label="Start Time"></paper-input>
         <paper-input name="endTime" label="End Time"></paper-input>
         <paper-input name="color" label="Color"></paper-input>
@@ -70,9 +69,10 @@
         <div> 
           Route Enabled?
           <paper-toggle-button checked="{{isEnabled}}"></paper-toggle-button> 
-          <input type="hidden" name="enabled" value="{{isEnabled}}">
+          <input is="iron-input" type="hidden" name="enabled" value="{{isEnabled}}">
         </div>
         <br />
+        <input type="hidden" name="coords" id="formRouteCoords">
         <paper-button class="submit-route" raisedButton onclick="submitRoute()">Submit</paper-button>
       </form>
     </paper-material>
@@ -101,13 +101,50 @@
         options: {
           type: Object,
           value: {}
+        },
+        routeCoords: {
+          type: Array,
+          value: []
         }
       },
       listeners: {
-        'iron-form-response': 'addRouteResponse'
+        'iron-form-response': 'addRouteResponse',
+        'google-map-click': 'newRouteCoord'
+      },
+      observers: [
+        "updateFormRoutes(routeCoords.splices)"
+      ],
+      ready: function() {
+        this.routeCoords = [];
       },
       addRouteResponse: function() {
         this.$.updateRoutes.generateRequest();
+      },
+      newRouteCoord: function(e) {
+        var coord = {
+          lat: e.detail.latLng.lat(),
+          lng: e.detail.latLng.lng()
+        };
+        this.push('routeCoords', coord);
+        this.drawRoute();
+      },
+      drawRoute: function() {
+        this.$.routeMap.clear();
+        var newRoutePath = new google.maps.Polyline({
+          path: this.routeCoords,
+          geodesic: true,
+          strokeOpacity: 1.0,
+          strokeColor: '#FF0000',
+          strokeWeight: 2
+        });
+        newRoutePath.setMap(this.$.routeMap.map);
+      },
+      clearRoutes: function() {
+        this.routeCoords = [];
+        this.$.routeMap.clear();
+      },
+      updateFormRoutes: function(cr) {
+        this.$.formRouteCoords.value = JSON.stringify(this.routeCoords);
       }
     });
 
