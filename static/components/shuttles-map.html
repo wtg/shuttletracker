@@ -93,8 +93,9 @@
       },
 
       periodicUpdates: function() {
-        // periodically check screen setup for changes
+        // periodically check for vehicle & route updates
         setInterval(this.checkForUpdates, 15000, this.$.fetchUpdates);
+        setInterval(this.checkForUpdates, 15000, this.$.routeUpdates);
       },
 
       checkForUpdates: function(ajax) {
