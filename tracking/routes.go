@@ -10,29 +10,30 @@ import (
 
 // Route represents a set of coordinates to draw a path on our tracking map
 type Route struct {
-	Name        string    `json:"name"           bson:"name"`
-	Description string    `json:"description"    bson:"description"`
-	StartTime   string    `json:"startTime"      bson:"startTime"`
-	EndTime     string    `json:"endTime"        bson:"endTime"`
-	Enabled     bool      `json:"enabled,string" bson:"enabled"`
-	Color       string    `json:"color"          bson:"color"`
-	Width       int       `json:"width,string"   bson:"width"`
-	Coords      string    `json:"coords"         bson:"coords"`
-	Created     time.Time `json:"created"        bson:"created"`
-	Updated     time.Time `json:"updated"        bson:"updated"`
+	Id          bson.ObjectId `json:"id"             bson:"_id,omitempty"`
+	Name        string        `json:"name"           bson:"name"`
+	Description string        `json:"description"    bson:"description"`
+	StartTime   string        `json:"startTime"      bson:"startTime"`
+	EndTime     string        `json:"endTime"        bson:"endTime"`
+	Enabled     bool          `json:"enabled,string" bson:"enabled"`
+	Color       string        `json:"color"          bson:"color"`
+	Width       int           `json:"width,string"   bson:"width"`
+	Coords      string        `json:"coords"         bson:"coords"`
+	Created     time.Time     `json:"created"        bson:"created"`
+	Updated     time.Time     `json:"updated"        bson:"updated"`
 }
 
 // Stop indicates where a tracked object is scheduled to arrive
 type Stop struct {
-	Name        string  `json:"name"           bson:"name"`
-	Description string  `json:"description"    bson:"description"`
-	Address     string  `json:"address"        bson:"address"`
-	StartTime   string  `json:"startTime"      bson:"startTime"`
-	EndTime     string  `json:"endTime"        bson:"endTime"`
-	Lat         float64 `json:"lat,string"     bson:"lat"`
-	Lng         float64 `json:"lng,string"     bson:"lng"`
-	Enabled     bool    `json:"enabled,string" bson:"enabled"`
-	//RouteID   bson.ObjectId                 `bson:"routeID"`
+	Name        string        `json:"name"           bson:"name"`
+	Description string        `json:"description"    bson:"description"`
+	Address     string        `json:"address"        bson:"address"`
+	StartTime   string        `json:"startTime"      bson:"startTime"`
+	EndTime     string        `json:"endTime"        bson:"endTime"`
+	Lat         float64       `json:"lat,string"     bson:"lat"`
+	Lng         float64       `json:"lng,string"     bson:"lng"`
+	Enabled     bool          `json:"enabled,string" bson:"enabled"`
+	RouteID     string        `json:"routeId"        bson:"routeId"`
 }
 
 // RoutesHandler finds all of the routes in the database
