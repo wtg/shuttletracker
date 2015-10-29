@@ -25,15 +25,15 @@ type Route struct {
 
 // Stop indicates where a tracked object is scheduled to arrive
 type Stop struct {
-	Name        string        `json:"name"           bson:"name"`
-	Description string        `json:"description"    bson:"description"`
-	Address     string        `json:"address"        bson:"address"`
-	StartTime   string        `json:"startTime"      bson:"startTime"`
-	EndTime     string        `json:"endTime"        bson:"endTime"`
-	Lat         float64       `json:"lat,string"     bson:"lat"`
-	Lng         float64       `json:"lng,string"     bson:"lng"`
-	Enabled     bool          `json:"enabled,string" bson:"enabled"`
-	RouteID     string        `json:"routeId"        bson:"routeId"`
+	Name        string  `json:"name"           bson:"name"`
+	Description string  `json:"description"    bson:"description"`
+	Address     string  `json:"address"        bson:"address"`
+	StartTime   string  `json:"startTime"      bson:"startTime"`
+	EndTime     string  `json:"endTime"        bson:"endTime"`
+	Lat         float64 `json:"lat,string"     bson:"lat"`
+	Lng         float64 `json:"lng,string"     bson:"lng"`
+	Enabled     bool    `json:"enabled,string" bson:"enabled"`
+	RouteID     string  `json:"routeId"        bson:"routeId"`
 }
 
 // RoutesHandler finds all of the routes in the database
@@ -54,7 +54,7 @@ func (App *App) StopsHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all stops in database
 	var stops []Stop
 	err := App.Stops.Find(bson.M{}).All(&stops)
-	// Handle query errors 
+	// Handle query errors
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
