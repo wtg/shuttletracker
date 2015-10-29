@@ -95,7 +95,7 @@
       periodicUpdates: function() {
         // periodically check for vehicle & route updates
         setInterval(this.checkForUpdates, 15000, this.$.fetchUpdates);
-        setInterval(this.checkForUpdates, 15000, this.$.routeUpdates);
+        setInterval(this.checkForUpdates, 15000, this.$.fetchUpdates);
       },
 
       checkForUpdates: function(ajax) {
@@ -134,23 +134,25 @@
 
       drawRoutes: function(event, response) {
         // Draw polylines on map to represent tracking routes
-        this.$.shuttleMap.clear();
-
-        for (var i = 0; i < response.response.length; i++) {
-          // Route details
-          var data = response.response[i];
-          var coords = JSON.parse(data['coords']);
-          var color = data['color'];
-          var width = data['width'];
-          // Add route to map
-          var route = new google.maps.Polyline({
-            path: coords,
-            geodesic: true,
-            strokeOpacity: 1.0,
-            strokeColor: color,
-            strokeWeight: width
-          });
-          route.setMap(this.$.shuttleMap.map);
+        var routes = response.response;
+        if (routes) {
+          this.$.shuttleMap.clear();
+          for (var i = 0; i < routes.length; i++) {
+            // Route details
+            var data = routes[i];
+            var coords = JSON.parse(data['coords']);
+            var color = data['color'];
+            var width = data['width'];
+            // Add route to map
+            var route = new google.maps.Polyline({
+              path: coords,
+              geodesic: true,
+              strokeOpacity: 1.0,
+              strokeColor: color,
+              strokeWeight: width
+            });
+            route.setMap(this.$.shuttleMap.map);
+          }
         }
       }
     });
