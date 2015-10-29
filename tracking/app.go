@@ -23,6 +23,7 @@ type App struct {
 	Updates  *mgo.Collection
 	Vehicles *mgo.Collection
 	Routes   *mgo.Collection
+	Stops    *mgo.Collection
 }
 
 func InitConfig() *Configuration {
@@ -47,6 +48,7 @@ func InitApp(Config *Configuration) *App {
 		session.DB("shuttle_tracking").C("updates"),
 		session.DB("shuttle_tracking").C("vehicles"),
 		session.DB("shuttle_tracking").C("routes"),
+		session.DB("shuttle_tracking").C("stops"),
 	}
 
 	return &app

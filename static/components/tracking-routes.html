@@ -18,13 +18,13 @@
       height: 500px;
     }
     .routes-container {
-      background: white;
+      background: #ffffff;
       margin: 25px;
       padding: 10px;
     }
     .submit-route {
       background: #3f51b5;
-      color: white;
+      color: #ffffff;
     }
   </style>
 
@@ -45,9 +45,9 @@
             <b> Name: </b> <span>{{route.name}}</span>
             <b> StartTime: </b> <span>{{route.startTime}}</span>
             <b> EndTime: </b> <span>{{route.endTime}}</span>
-            <b> Enabled: </b> <span>{{route.Enabled}}</span>
+            <b> Enabled: </b> <span>{{route.enabled}}</span>
             <b> Color: </b> <span>{{route.color}}</span>
-            <b> Width: </b> <span>{{route.Width}}</span>
+            <b> Width: </b> <span>{{route.width}}</span>
             <br />
           </template>
         </paper-material>
@@ -93,14 +93,6 @@
         zoom: {
           type: Number,
           reflectToAttribute: true
-        },
-        map: {
-          type: Object,
-          value: {}
-        },
-        options: {
-          type: Object,
-          value: {}
         },
         routeCoords: {
           type: Array,
