@@ -36,13 +36,19 @@
       id="fetchUpdates"
       url="/updates"
       handle-as="json"
-      on-response="placeMarkers">
+      on-response="placeVehicles">
     </iron-ajax>
     <iron-ajax
       id="fetchRoutes"
       url="/routes"
       handle-as="json"
       on-response="drawRoutes">
+    </iron-ajax>
+    <iron-ajax
+      id="fetchStops"
+      url="/stops"
+      handle-as="json"
+      on-response="placeStops">
     </iron-ajax>
 
     <google-map id="shuttleMap" class="shuttle-map" zoom="{{zoom}}" latitude="{{lat}}" longitude="{{lng}}"></google-map>
@@ -72,7 +78,11 @@
           type: Number,
           reflectToAttribute: true
         },
-        markers: {
+        vehicles: {
+          type: Array,
+          value: []
+        },
+        stops: {
           type: Array,
           value: []
         }
@@ -83,34 +93,38 @@
       },
 
       toggleMenu: function() {
-
+        
       },
 
       initializeTracking: function() {
         this.$.fetchRoutes.generateRequest();
         this.$.fetchUpdates.generateRequest();
+        this.$.fetchStops.generateRequest();
         this.periodicUpdates();
       },
 
       periodicUpdates: function() {
         // periodically check for vehicle & route updates
         setInterval(this.checkForUpdates, 15000, this.$.fetchUpdates);
-        setInterval(this.checkForUpdates, 15000, this.$.fetchUpdates);
+        setInterval(this.checkForUpdates, 15000, this.$.fetchRoutes);
+        setInterval(this.checkForUpdates, 15000, this.$.fetchStops);
       },
 
       checkForUpdates: function(ajax) {
         ajax.generateRequest();
       },
 
-      placeMarkers: function(event, response) {
+      placeVehicles: function(event, response) {
         var updates = response.response;
         if (updates) {
-          // Clear previous markers from map
-          this.clearMarkers();
+          // Clear previous vehicle markers from map
+          this.clearMarkers(this.vehicles);
           // Iterate through each vehicle update
           for (i = 0; i < updates.length; i++) {
             // Create position from vehicle coordinates
-            var pos = new google.maps.LatLng(updates[i]["lat"], updates[i]["lng"]);
+            var pos = new google.maps.LatLng(
+              updates[i]["lat"], 
+              updates[i]["lng"]);
             // Place shuttle marker on map
             var marker = new google.maps.Marker({
               position: pos,
@@ -118,18 +132,18 @@
               icon: "static/images/shuttle_icon.png",
               title: updates[i]["vehicleID"]
             });
-            this.markers.push(marker);
+            this.vehicles.push(marker);
           }
         } else {
           console.log("no vehicle updates found");
         }
       },
 
-      clearMarkers: function() {
-        for (i = 0; i < this.markers.length; i++) {
-          this.markers[i].setMap(null);
+      clearMarkers: function(markers) {
+        for (i = 0; i < markers.length; i++) {
+          markers[i].setMap(null);
         }
-        this.markers = [];
+        markers = [];
       },
 
       drawRoutes: function(event, response) {
@@ -153,6 +167,30 @@
             });
             route.setMap(this.$.shuttleMap.map);
           }
+        }
+      },
+
+      placeStops: function(event, response) {
+        var stops = response.response;
+        if (stops) {
+          // Clear previous stop markers
+          this.clearMarkers(this.stops);
+          for (i = 0; i < stops.length; i++) {
+            // Create position from stop coordinates 
+            var pos = new google.maps.LatLng(
+              stops[i]["lat"],
+              stops[i]["lng"]);
+            // Place stop marker on map
+            var marker = new google.maps.Marker({
+              position: pos,
+              map: this.$.shuttleMap.map,
+              icon: "static/images/stop.png",
+              title: stops[i]["name"]
+            });
+            this.stops.push(marker);
+          }
+        } else {
+          console.log("no vehicle stops found");
         }
       }
     });
