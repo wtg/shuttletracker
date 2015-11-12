@@ -10,13 +10,13 @@
 <dom-module id="tracking-stops">
   <style>
     .stop-map {
-      width: 750px;
-      height: 500px;
+      width: 650px;
+      height: 450px;
     }
     .stops-list {
       background: #ffffff;
       margin: 25px;
-      padding: 25px;
+      padding: 10px;
     }
     .stops-form {
       background: #ffffff;
@@ -43,6 +43,7 @@
       url="/routes"
       handle-as="json"
       last-response="{{routes}}">
+    </iron-ajax>
 
     <template is="dom-if" if="{{stops}}">
       <paper-material class="stops-list">
@@ -56,7 +57,7 @@
           <b> Latitude: </b> <span>{{stop.lat}}</span>
           <b> Longitude: </b> <span>{{stop.lng}}</span>
           <b> Enabled: </b> <span>{{stop.enabled}}</span>
-          <b> RouteID: </b> <span>{{stop.routeID}}</span>
+          <b> RouteID: </b> <span>{{stop.routeId}}</span>
           <br />
         </template>
       </paper-material>
@@ -64,33 +65,38 @@
 
     <paper-material class="stops-form">
       <h1> New Stop </h1>
-      <google-map id="stopMap" class="stop-map" click-events="true" zoom="{{zoom}}" latitude="{{lat}}" longitude="{{lng}}"></google-map>
-      <br />
-      <form class="new-stop" is="iron-form" id="stopForm" content-type="application/json" method="post" action="/stops/create"> 
-        <paper-dropdown-menu label="Route" selected-item="{{selectedRoute}}">
-          <paper-menu class="dropdown-content">
-            <template is="dom-repeat" items="{{routes}}" as="route">
-              <paper-item value="{{route.id}}">{{route.name}}</paper-item>
-            </template>
-          </paper-menu>
-        </paper-dropdown-menu>
-        <paper-input name="name" label="Stop Name"></paper-input>
-        <paper-input name="description" label="Description"></paper-input>
-        <paper-input name="address" label="Address"></paper-input>
-        <paper-input name="startTime" label="Start Time"></paper-input>
-        <paper-input name="endTime" label="End Time"></paper-input>
-        <br />
-        <div> 
-          Stop Enabled? 
-          <paper-toggle-button checked="{{isEnabled}}"></paper-toggle-button>
-          <input is="iron-input" type="hidden" name="enabled" value="{{isEnabled}}">
+      <div class="layout horizontal">
+        <div class="flex">
+          <google-map id="stopMap" class="stop-map" click-events="true" zoom="{{zoom}}" latitude="{{lat}}" longitude="{{lng}}"></google-map>
         </div>
-        <br />
-        <input type="hidden" name="lat" id="stopLat">
-        <input type="hidden" name="lng" id="stopLng">
-        <input type="hidden" name="routeId" value="{{selectedRoute.value}}">
-        <paper-button class="submit-stop" raisedButton onclick="submitStop()">Submit</paper-button>
-      </form>
+        <div class="flex">
+          <form is="iron-form" id="stopForm" content-type="application/json" method="post" action="/stops/create"> 
+            <paper-dropdown-menu class="route-select" label="Route" selected-item="{{selectedRoute}}">
+              <paper-menu class="dropdown-content">
+                <template is="dom-repeat" items="{{routes}}" as="route">
+                  <paper-item value="{{route.id}}">{{route.name}}</paper-item>
+                </template>
+              </paper-menu>
+            </paper-dropdown-menu>
+            <paper-input name="name" label="Stop Name"></paper-input>
+            <paper-input name="description" label="Description"></paper-input>
+            <paper-input name="address" label="Address"></paper-input>
+            <paper-input name="startTime" label="Start Time"></paper-input>
+            <paper-input name="endTime" label="End Time"></paper-input>
+            <br />
+            <div> 
+              Stop Enabled? 
+              <paper-toggle-button checked="{{isEnabled}}"></paper-toggle-button>
+              <input is="iron-input" type="hidden" name="enabled" value="{{isEnabled}}">
+            </div>
+            <br />
+            <input type="hidden" name="lat" id="stopLat">
+            <input type="hidden" name="lng" id="stopLng">
+            <input type="hidden" name="routeId" value="{{selectedRoute.value}}">
+            <paper-button class="submit-stop" raisedButton onclick="submitStop()">Submit</paper-button>
+          </form>
+        </div>
+      </div>
     </paper-material>
 
   </template>
@@ -116,6 +122,7 @@
         }
       },
       listeners: {
+        'iron-form-response': 'addStopResponse',
         'google-map-click': 'addStopMarker'
       },
       ready: function() {
@@ -141,6 +148,9 @@
       updateStopForm: function() {
         this.$.stopLat.value = this.stopMarker.position.lat();
         this.$.stopLng.value = this.stopMarker.position.lng();
+      },
+      addStopResponse: function() {
+        this.$.updateStops.generateRequest();
       }
     });
 
