@@ -43,6 +43,7 @@
       url="/routes"
       handle-as="json"
       last-response="{{routes}}">
+    </iron-ajax>
 
     <template is="dom-if" if="{{stops}}">
       <paper-material class="stops-list">
@@ -121,6 +122,7 @@
         }
       },
       listeners: {
+        'iron-form-response': 'addStopResponse',
         'google-map-click': 'addStopMarker'
       },
       ready: function() {
@@ -146,6 +148,9 @@
       updateStopForm: function() {
         this.$.stopLat.value = this.stopMarker.position.lat();
         this.$.stopLng.value = this.stopMarker.position.lng();
+      },
+      addStopResponse: function() {
+        this.$.updateStops.generateRequest();
       }
     });
 
