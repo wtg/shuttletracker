@@ -1,9 +1,13 @@
 package tracking
 
+
 import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"fmt"
+	"time"
+
 
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/mgo.v2"
@@ -49,6 +53,12 @@ func InitApp(Config *Configuration) *App {
 		session.DB("shuttle_tracking").C("routes"),
 	}
 
+	// Read vehicle configuration file
+	serr := readseedConfiguration("seed/vehicle_seed.json", &app)
+	if serr != nil {
+		log.Fatalf("error reading vehicle configuration file: %v", serr)
+	}	
+
 	return &app
 }
 
@@ -64,6 +74,49 @@ func readConfiguration(fileName string) (*Configuration, error) {
 		return nil, err
 	}
 	return &config, nil
+}
+
+//readseedConfiguration adds a new vehicle to the database from seed.
+func readseedConfiguration(fileName string, app *App) error {
+	
+	// Open seed_vehicle config file and decode JSON to app struct
+	file, err := os.Open(fileName)
+	//error handling
+	if err != nil {
+		return err
+	}
+	//create a decoder for a file
+	fileread := json.NewDecoder(file)
+	//decode file into string
+	
+	//calling vehicles from vehicles.go
+	Vehicles := []Vehicle{}
+	
+	//create map to hold variables
+	var vehicles_map map[string][]map[string]interface{}
+	
+	//call decode on fileread to place items into map
+	if err := fileread.Decode(&vehicles_map); err!= nil{
+		return err
+	}
+	
+	for i := range vehicles_map["Vehicles"]{
+		item := vehicles_map["Vehicles"][i]
+		VehicleID, _ := item["VehicleID"].(string)
+		VehicleName, _ := item["VehicleName"].(string)
+		vehicle := Vehicle{VehicleID, VehicleName, time.Now(), time.Now()}
+		Vehicles = append(Vehicles, vehicle)
+	}
+		
+	for j := range Vehicles{
+		err = app.Vehicles.Insert(&Vehicles[j])
+		if err != nil {
+		return err
+		}
+		fmt.Println("%v", Vehicles[j])
+	}
+
+	return nil
 }
 
 func WriteJSON(w http.ResponseWriter, data interface{}) error {
