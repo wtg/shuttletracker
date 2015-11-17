@@ -11,6 +11,7 @@
     <!-- Iron Elements -->
     <link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
     <link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+    <link rel="import" href="/bower_components/iron-flex-layout/classes/iron-flex-layout.html">
     <!-- Paper Elements -->
     <link rel="import" href="/bower_components/paper-header-panel/paper-header-panel.html">
     <link rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html">
@@ -20,6 +21,7 @@
     <link rel="import" href="/static/components/shuttles-map.html">
     <link rel="import" href="/static/components/tracking-vehicles.html">
     <link rel="import" href="/static/components/tracking-routes.html">
+    <link rel="import" href="/static/components/tracking-stops.html">
   </head>
 
   <body unresolved class="fullbleed layout vertical">
@@ -29,6 +31,7 @@
           <paper-tabs class="flex" selected="{{selected}}">
             <paper-tab> Vehicles </paper-tab>
             <paper-tab> Routes </paper-tab>
+            <paper-tab> Stops </paper-tab>
           </paper-tabs>
         </paper-toolbar>
         <iron-pages selected="{{selected}}">
@@ -39,6 +42,9 @@
           <section>
             <!-- Routes -->
             <tracking-routes lat="42.730172" lng="-73.678803" zoom="15"></tracking-routes>
+          </section>
+          <section> 
+            <tracking-stops lat="42.730172" lng="-73.678803" zoom="15"></tracking-stops>
           </section>
         </iron-pages>
       </paper-header-panel>

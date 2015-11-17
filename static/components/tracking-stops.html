@@ -1,0 +1,163 @@
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/google-map/google-map.html">
+
+<dom-module id="tracking-stops">
+  <style>
+    .stop-map {
+      width: 650px;
+      height: 450px;
+    }
+    .stops-list {
+      background: #ffffff;
+      margin: 25px;
+      padding: 10px;
+    }
+    .stops-form {
+      background: #ffffff;
+      margin: 25px;
+      padding: 25px;
+    }
+    .submit-stop {
+      background: #3f51b5;
+      color: #ffffff;
+    }
+  </style>
+
+  <template>
+    <iron-ajax
+      auto
+      id="updateStops"
+      url="/stops"
+      handle-as="json"
+      last-response="{{stops}}">
+    </iron-ajax>
+    <iron-ajax 
+      auto 
+      id="fetchRoutes"
+      url="/routes"
+      handle-as="json"
+      last-response="{{routes}}">
+    </iron-ajax>
+
+    <template is="dom-if" if="{{stops}}">
+      <paper-material class="stops-list">
+        <h1> Stops </h1>
+        <template is="dom-repeat" items="{{stops}}" as="stop">
+          <b> Name: </b> <span>{{stop.name}}</span>
+          <b> Description: </b> <span>{{stop.description}}</span>
+          <b> Address: </b> <span>{{stop.address}}</span>
+          <b> Start Time: </b> <span>{{stop.startTime}}</span>
+          <b> End Time: </b> <span>{{stop.endTime}}</span>
+          <b> Latitude: </b> <span>{{stop.lat}}</span>
+          <b> Longitude: </b> <span>{{stop.lng}}</span>
+          <b> Enabled: </b> <span>{{stop.enabled}}</span>
+          <b> RouteID: </b> <span>{{stop.routeId}}</span>
+          <br />
+        </template>
+      </paper-material>
+    </template>
+
+    <paper-material class="stops-form">
+      <h1> New Stop </h1>
+      <div class="layout horizontal">
+        <div class="flex">
+          <google-map id="stopMap" class="stop-map" click-events="true" zoom="{{zoom}}" latitude="{{lat}}" longitude="{{lng}}"></google-map>
+        </div>
+        <div class="flex">
+          <form is="iron-form" id="stopForm" content-type="application/json" method="post" action="/stops/create"> 
+            <paper-dropdown-menu class="route-select" label="Route" selected-item="{{selectedRoute}}">
+              <paper-menu class="dropdown-content">
+                <template is="dom-repeat" items="{{routes}}" as="route">
+                  <paper-item value="{{route.id}}">{{route.name}}</paper-item>
+                </template>
+              </paper-menu>
+            </paper-dropdown-menu>
+            <paper-input name="name" label="Stop Name"></paper-input>
+            <paper-input name="description" label="Description"></paper-input>
+            <paper-input name="address" label="Address"></paper-input>
+            <paper-input name="startTime" label="Start Time"></paper-input>
+            <paper-input name="endTime" label="End Time"></paper-input>
+            <br />
+            <div> 
+              Stop Enabled? 
+              <paper-toggle-button checked="{{isEnabled}}"></paper-toggle-button>
+              <input is="iron-input" type="hidden" name="enabled" value="{{isEnabled}}">
+            </div>
+            <br />
+            <input type="hidden" name="lat" id="stopLat">
+            <input type="hidden" name="lng" id="stopLng">
+            <input type="hidden" name="routeId" value="{{selectedRoute.value}}">
+            <paper-button class="submit-stop" raisedButton onclick="submitStop()">Submit</paper-button>
+          </form>
+        </div>
+      </div>
+    </paper-material>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'tracking-stops',
+      properties: {
+        lat: {
+          type: String,
+          reflectToAttribute: true
+        },
+        lng: {
+          type: String,
+          reflectToAttribute: true
+        },
+        zoom: {
+          type: Number,
+          reflectToAttribute: true
+        },
+        stopMarker: {
+          type: Object
+        }
+      },
+      listeners: {
+        'iron-form-response': 'addStopResponse',
+        'google-map-click': 'addStopMarker'
+      },
+      ready: function() {
+        this.stopMarker = null;
+      },
+      clearStopMarker: function() {
+        if (this.stopMarker) {
+          this.stopMarker.setMap(null);
+        }
+        this.stopMarker = null;
+      },
+      addStopMarker: function(e) {
+        this.clearStopMarker();
+        var pos = new google.maps.LatLng(
+          e.detail.latLng.lat(),
+          e.detail.latLng.lng());
+        this.stopMarker = new google.maps.Marker({
+          position: pos,
+          map: this.$.stopMap.map,
+        });
+        this.updateStopForm();
+      },
+      updateStopForm: function() {
+        this.$.stopLat.value = this.stopMarker.position.lat();
+        this.$.stopLng.value = this.stopMarker.position.lng();
+      },
+      addStopResponse: function() {
+        this.$.updateStops.generateRequest();
+      }
+    });
+
+    function submitStop() {
+      var form = document.getElementById("stopForm");
+      form.submit();
+      form.reset();
+    }
+  </script>
+</dom-module>

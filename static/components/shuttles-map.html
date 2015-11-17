@@ -1,5 +1,7 @@
 <link rel="import" href="/bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="/bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="/bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="/bower_components/neon-animation/neon-animations.html">
 <link rel="import" href="../../bower_components/google-map/google-map.html">
 
 <dom-module id="shuttles-map"> 
@@ -36,7 +38,7 @@
       id="fetchUpdates"
       url="/updates"
       handle-as="json"
-      on-response="placeMarkers">
+      on-response="placeVehicles">
     </iron-ajax>
     <iron-ajax
       id="fetchRoutes"
@@ -44,13 +46,22 @@
       handle-as="json"
       on-response="drawRoutes">
     </iron-ajax>
+    <iron-ajax
+      id="fetchStops"
+      url="/stops"
+      handle-as="json"
+      on-response="placeStops">
+    </iron-ajax>
 
     <google-map id="shuttleMap" class="shuttle-map" zoom="{{zoom}}" latitude="{{lat}}" longitude="{{lng}}"></google-map>
     <div id="logo">
       <img src="../images/logo.png" />
     </div>
-    <div id="menu">>
+    <div id="menu">
       <paper-fab on-click="toggleMenu" icon="menu"></paper-fab>
+      <paper-dialog id="menuDialog" entry-animation="slide-from-left-animation" exit-animation="slide-right-animation" with-backdrop>
+        <h2>RPI Shuttle Tracking</h2>
+      </paper-dialog>
     </div>
   </template>
 
@@ -72,7 +83,11 @@
           type: Number,
           reflectToAttribute: true
         },
-        markers: {
+        vehicles: {
+          type: Array,
+          value: []
+        },
+        stops: {
           type: Array,
           value: []
         }
@@ -83,33 +98,38 @@
       },
 
       toggleMenu: function() {
-
+        this.$.menuDialog.open();
       },
 
       initializeTracking: function() {
         this.$.fetchRoutes.generateRequest();
         this.$.fetchUpdates.generateRequest();
+        this.$.fetchStops.generateRequest();
         this.periodicUpdates();
       },
 
       periodicUpdates: function() {
-        // periodically check screen setup for changes
+        // periodically check for vehicle & route updates
         setInterval(this.checkForUpdates, 15000, this.$.fetchUpdates);
+        setInterval(this.checkForUpdates, 15000, this.$.fetchRoutes);
+        setInterval(this.checkForUpdates, 15000, this.$.fetchStops);
       },
 
       checkForUpdates: function(ajax) {
         ajax.generateRequest();
       },
 
-      placeMarkers: function(event, response) {
+      placeVehicles: function(event, response) {
         var updates = response.response;
         if (updates) {
-          // Clear previous markers from map
-          this.clearMarkers();
+          // Clear previous vehicle markers from map
+          this.clearMarkers(this.vehicles);
           // Iterate through each vehicle update
           for (i = 0; i < updates.length; i++) {
             // Create position from vehicle coordinates
-            var pos = new google.maps.LatLng(updates[i]["lat"], updates[i]["lng"]);
+            var pos = new google.maps.LatLng(
+              updates[i]["lat"], 
+              updates[i]["lng"]);
             // Place shuttle marker on map
             var marker = new google.maps.Marker({
               position: pos,
@@ -117,39 +137,65 @@
               icon: "static/images/shuttle_icon.png",
               title: updates[i]["vehicleID"]
             });
-            this.markers.push(marker);
+            this.vehicles.push(marker);
           }
         } else {
           console.log("no vehicle updates found");
         }
       },
 
-      clearMarkers: function() {
-        for (i = 0; i < this.markers.length; i++) {
-          this.markers[i].setMap(null);
+      clearMarkers: function(markers) {
+        for (i = 0; i < markers.length; i++) {
+          markers[i].setMap(null);
         }
-        this.markers = [];
+        markers = [];
       },
 
       drawRoutes: function(event, response) {
         // Draw polylines on map to represent tracking routes
-        this.$.shuttleMap.clear();
+        var routes = response.response;
+        if (routes) {
+          this.$.shuttleMap.clear();
+          for (var i = 0; i < routes.length; i++) {
+            // Route details
+            var data = routes[i];
+            var coords = JSON.parse(data['coords']);
+            var color = data['color'];
+            var width = data['width'];
+            // Add route to map
+            var route = new google.maps.Polyline({
+              path: coords,
+              geodesic: true,
+              strokeOpacity: 1.0,
+              strokeColor: color,
+              strokeWeight: width
+            });
+            route.setMap(this.$.shuttleMap.map);
+          }
+        }
+      },
 
-        for (var i = 0; i < response.response.length; i++) {
-          // Route details
-          var data = response.response[i];
-          var coords = JSON.parse(data['coords']);
-          var color = data['color'];
-          var width = data['width'];
-          // Add route to map
-          var route = new google.maps.Polyline({
-            path: coords,
-            geodesic: true,
-            strokeOpacity: 1.0,
-            strokeColor: color,
-            strokeWeight: width
-          });
-          route.setMap(this.$.shuttleMap.map);
+      placeStops: function(event, response) {
+        var stops = response.response;
+        if (stops) {
+          // Clear previous stop markers
+          this.clearMarkers(this.stops);
+          for (i = 0; i < stops.length; i++) {
+            // Create position from stop coordinates 
+            var pos = new google.maps.LatLng(
+              stops[i]["lat"],
+              stops[i]["lng"]);
+            // Place stop marker on map
+            var marker = new google.maps.Marker({
+              position: pos,
+              map: this.$.shuttleMap.map,
+              icon: "static/images/stop.png",
+              title: stops[i]["name"]
+            });
+            this.stops.push(marker);
+          }
+        } else {
+          console.log("no vehicle stops found");
         }
       }
     });

@@ -14,17 +14,17 @@
       padding: 25px;
     }
     .route-map {
-      width: 750px;
-      height: 500px;
+      width: 650px;
+      height: 450px;
     }
     .routes-container {
-      background: white;
+      background: #ffffff;
       margin: 25px;
       padding: 10px;
     }
     .submit-route {
       background: #3f51b5;
-      color: white;
+      color: #ffffff;
     }
   </style>
 
@@ -40,14 +40,14 @@
     <div class="route-list">
       <template is="dom-if" if="{{routes}}">
         <paper-material class="routes-container">
-          <h1> All Routes </h1>
+          <h1> Routes </h1>
           <template is="dom-repeat" items="{{routes}}" as="route">
             <b> Name: </b> <span>{{route.name}}</span>
             <b> StartTime: </b> <span>{{route.startTime}}</span>
             <b> EndTime: </b> <span>{{route.endTime}}</span>
-            <b> Enabled: </b> <span>{{route.Enabled}}</span>
+            <b> Enabled: </b> <span>{{route.enabled}}</span>
             <b> Color: </b> <span>{{route.color}}</span>
-            <b> Width: </b> <span>{{route.Width}}</span>
+            <b> Width: </b> <span>{{route.width}}</span>
             <br />
           </template>
         </paper-material>
@@ -56,25 +56,30 @@
 
     <paper-material class="route-form">
       <h1> New Route </h1>
-      <google-map id="routeMap" class="route-map" click-events="true" zoom="{{zoom}}" latitude="{{lat}}" longitude="{{lng}}"></google-map>
-      <br />
-      <form class="new-route" is="iron-form" id="routeForm" content-type="application/json" method="post" action="/routes/create">
-        <paper-input name="name" label="Route Name"></paper-input>
-        <paper-input name="description" label="Description"></paper-input>
-        <paper-input name="startTime" label="Start Time"></paper-input>
-        <paper-input name="endTime" label="End Time"></paper-input>
-        <paper-input name="color" label="Color"></paper-input>
-        <paper-input name="width" label="Width"></paper-input>
-        <br />
-        <div> 
-          Route Enabled?
-          <paper-toggle-button checked="{{isEnabled}}"></paper-toggle-button> 
-          <input is="iron-input" type="hidden" name="enabled" value="{{isEnabled}}">
+      <div class="layout horizontal">
+        <div class="flex">
+          <google-map id="routeMap" class="route-map" click-events="true" zoom="{{zoom}}" latitude="{{lat}}" longitude="{{lng}}"></google-map>
         </div>
-        <br />
-        <input type="hidden" name="coords" id="formRouteCoords">
-        <paper-button class="submit-route" raisedButton onclick="submitRoute()">Submit</paper-button>
-      </form>
+        <div class="flex">
+          <form is="iron-form" id="routeForm" content-type="application/json" method="post" action="/routes/create">
+            <paper-input name="name" label="Route Name"></paper-input>
+            <paper-input name="description" label="Description"></paper-input>
+            <paper-input name="startTime" label="Start Time"></paper-input>
+            <paper-input name="endTime" label="End Time"></paper-input>
+            <paper-input name="color" label="Color"></paper-input>
+            <paper-input name="width" label="Width"></paper-input>
+            <br />
+            <div> 
+              Route Enabled?
+              <paper-toggle-button checked="{{isEnabled}}"></paper-toggle-button> 
+              <input is="iron-input" type="hidden" name="enabled" value="{{isEnabled}}">
+            </div>
+            <br />
+            <input type="hidden" name="coords" id="formRouteCoords">
+            <paper-button class="submit-route" raisedButton onclick="submitRoute()">Submit</paper-button>
+          </form>
+        </div>
+      </div>
     </paper-material>
   </template>
 
@@ -93,14 +98,6 @@
         zoom: {
           type: Number,
           reflectToAttribute: true
-        },
-        map: {
-          type: Object,
-          value: {}
-        },
-        options: {
-          type: Object,
-          value: {}
         },
         routeCoords: {
           type: Array,
