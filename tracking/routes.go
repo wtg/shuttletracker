@@ -10,7 +10,7 @@ import (
 
 // Route represents a set of coordinates to draw a path on our tracking map
 type Route struct {
-	Id          bson.ObjectId `json:"id"             bson:"_id,omitempty"`
+	ID          bson.ObjectId `json:"id"             bson:"_id,omitempty"`
 	Name        string        `json:"name"           bson:"name"`
 	Description string        `json:"description"    bson:"description"`
 	StartTime   string        `json:"startTime"      bson:"startTime"`

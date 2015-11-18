@@ -28,6 +28,7 @@ type App struct {
 	Stops    *mgo.Collection
 }
 
+// InitConfig loads and return the app config.
 func InitConfig() *Configuration {
 	// Read app configuration file
 	config, err := readConfiguration("conf.json")
@@ -38,6 +39,8 @@ func InitConfig() *Configuration {
 	return config
 }
 
+// InitApp initializes the application given a config and connects to backends.
+// It also seeds any needed information to the database.
 func InitApp(Config *Configuration) *App {
 	// Connect to MongoDB
 	session, err := mgo.Dial(Config.MongoURL + ":" + Config.MongoPort)
@@ -93,15 +96,15 @@ func readSeedConfiguration(fileName string, app *App) error {
 	Vehicles := []Vehicle{}
 
 	//create map to hold variables
-	var vehicles_map map[string][]map[string]interface{}
+	var vehiclesMap map[string][]map[string]interface{}
 
 	//call decode on fileread to place items into map
-	if err := fileread.Decode(&vehicles_map); err != nil {
+	if err := fileread.Decode(&vehiclesMap); err != nil {
 		return err
 	}
 
-	for i := range vehicles_map["Vehicles"] {
-		item := vehicles_map["Vehicles"][i]
+	for i := range vehiclesMap["Vehicles"] {
+		item := vehiclesMap["Vehicles"][i]
 		VehicleID, _ := item["VehicleID"].(string)
 		VehicleName, _ := item["VehicleName"].(string)
 		vehicle := Vehicle{VehicleID, VehicleName, time.Now(), time.Now()}
@@ -119,6 +122,7 @@ func readSeedConfiguration(fileName string, app *App) error {
 	return nil
 }
 
+// WriteJSON writes the data as JSON.
 func WriteJSON(w http.ResponseWriter, data interface{}) error {
 	w.Header().Set("Content-Type", "application/json")
 	b, err := json.MarshalIndent(data, "", " ")
