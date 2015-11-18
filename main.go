@@ -8,8 +8,12 @@ import (
 	"shuttle_tracking_2/tracking"
 )
 
-var Config *tracking.Configuration = tracking.InitConfig()
-var App *tracking.App = tracking.InitApp(Config)
+var (
+	// Config holds the global app settings.
+	Config = tracking.InitConfig()
+	// App holds the application itself.
+	App = tracking.InitApp(Config)
+)
 
 // IndexHandler serves the index page.
 func IndexHandler(w http.ResponseWriter, r *http.Request) {

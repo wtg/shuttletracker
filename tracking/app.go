@@ -1,13 +1,11 @@
 package tracking
 
-
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
-	"fmt"
 	"time"
-
 
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/mgo.v2"
@@ -30,6 +28,7 @@ type App struct {
 	Stops    *mgo.Collection
 }
 
+// InitConfig loads and return the app config.
 func InitConfig() *Configuration {
 	// Read app configuration file
 	config, err := readConfiguration("conf.json")
@@ -40,6 +39,8 @@ func InitConfig() *Configuration {
 	return config
 }
 
+// InitApp initializes the application given a config and connects to backends.
+// It also seeds any needed information to the database.
 func InitApp(Config *Configuration) *App {
 	// Connect to MongoDB
 	session, err := mgo.Dial(Config.MongoURL + ":" + Config.MongoPort)
@@ -56,10 +57,10 @@ func InitApp(Config *Configuration) *App {
 	}
 
 	// Read vehicle configuration file
-	serr := readseedConfiguration("seed/vehicle_seed.json", &app)
+	serr := readSeedConfiguration("seed/vehicle_seed.json", &app)
 	if serr != nil {
 		log.Fatalf("error reading vehicle configuration file: %v", serr)
-	}	
+	}
 
 	return &app
 }
@@ -78,9 +79,9 @@ func readConfiguration(fileName string) (*Configuration, error) {
 	return &config, nil
 }
 
-//readseedConfiguration adds a new vehicle to the database from seed.
-func readseedConfiguration(fileName string, app *App) error {
-	
+//readSeedConfiguration adds a new vehicle to the database from seed.
+func readSeedConfiguration(fileName string, app *App) error {
+
 	// Open seed_vehicle config file and decode JSON to app struct
 	file, err := os.Open(fileName)
 	//error handling
@@ -90,30 +91,30 @@ func readseedConfiguration(fileName string, app *App) error {
 	//create a decoder for a file
 	fileread := json.NewDecoder(file)
 	//decode file into string
-	
+
 	//calling vehicles from vehicles.go
 	Vehicles := []Vehicle{}
-	
+
 	//create map to hold variables
-	var vehicles_map map[string][]map[string]interface{}
-	
+	var vehiclesMap map[string][]map[string]interface{}
+
 	//call decode on fileread to place items into map
-	if err := fileread.Decode(&vehicles_map); err!= nil{
+	if err := fileread.Decode(&vehiclesMap); err != nil {
 		return err
 	}
-	
-	for i := range vehicles_map["Vehicles"]{
-		item := vehicles_map["Vehicles"][i]
+
+	for i := range vehiclesMap["Vehicles"] {
+		item := vehiclesMap["Vehicles"][i]
 		VehicleID, _ := item["VehicleID"].(string)
 		VehicleName, _ := item["VehicleName"].(string)
 		vehicle := Vehicle{VehicleID, VehicleName, time.Now(), time.Now()}
 		Vehicles = append(Vehicles, vehicle)
 	}
-		
-	for j := range Vehicles{
+
+	for j := range Vehicles {
 		err = app.Vehicles.Insert(&Vehicles[j])
 		if err != nil {
-		return err
+			return err
 		}
 		fmt.Println("%v", Vehicles[j])
 	}
@@ -121,6 +122,7 @@ func readseedConfiguration(fileName string, app *App) error {
 	return nil
 }
 
+// WriteJSON writes the data as JSON.
 func WriteJSON(w http.ResponseWriter, data interface{}) error {
 	w.Header().Set("Content-Type", "application/json")
 	b, err := json.MarshalIndent(data, "", " ")
