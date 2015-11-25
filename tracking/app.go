@@ -3,8 +3,8 @@ package tracking
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 	"os"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/mgo.v2"
@@ -55,12 +55,12 @@ func InitApp(Config *Configuration) *App {
 		session.DB("shuttle_tracking").C("stops"),
 	}
 
-	// Ensure unique vehicle identification 
-  vehicleIndex := mgo.Index{
-      Key: []string{"vehicleID"},
-      Unique: true,
-      DropDups: true}
-  app.Vehicles.EnsureIndex(vehicleIndex)
+	// Ensure unique vehicle identification
+	vehicleIndex := mgo.Index{
+		Key:      []string{"vehicleID"},
+		Unique:   true,
+		DropDups: true}
+	app.Vehicles.EnsureIndex(vehicleIndex)
 
 	// Read vehicle configuration file
 	serr := readSeedConfiguration("seed/vehicle_seed.json", &app)
@@ -89,7 +89,7 @@ func readConfiguration(fileName string) (*Configuration, error) {
 func readSeedConfiguration(fileName string, app *App) error {
 	// Open seed_vehicle config file and decode JSON to app struct
 	file, err := os.Open(fileName)
-	
+
 	// Error handling
 	if err != nil {
 		log.Warn(err)
