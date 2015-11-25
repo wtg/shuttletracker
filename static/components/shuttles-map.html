@@ -1,5 +1,8 @@
 <link rel="import" href="/bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="/bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="/bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html">
 <link rel="import" href="/bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="/bower_components/neon-animation/neon-animations.html">
 <link rel="import" href="../../bower_components/google-map/google-map.html">
@@ -9,6 +12,9 @@
     :host {
       width: 100%;
       height: 100%;
+    }
+    .content {
+      margin: 15px;
     }
     #logo {
       position: absolute;
@@ -27,13 +33,21 @@
       right: 5px;
       top: 5px;
     }
+    .menu-toolbar {
+      margin: none;
+    }
     .shuttle-map {
       width: 100%;
       height: 100%;
     }
+    .menu-dialog {
+      width: 50%;
+      height: 35%;
+      font-size: 16px;
+    }
   </style>
 
-  <template>
+  <template>  
     <iron-ajax
       id="fetchUpdates"
       url="/updates"
@@ -59,8 +73,42 @@
     </div>
     <div id="menu">
       <paper-fab on-click="toggleMenu" icon="menu"></paper-fab>
-      <paper-dialog id="menuDialog" entry-animation="slide-from-left-animation" exit-animation="slide-right-animation" with-backdrop>
-        <h2>RPI Shuttle Tracking</h2>
+      <paper-dialog id="menuDialog" class="menu-dialog" entry-animation="slide-from-left-animation" exit-animation="slide-right-animation" with-backdrop>
+        <template is="dom-bind">
+          <paper-toolbar class="menu-toolbar">
+            <paper-tabs class="flex" selected="{{selected}}">
+              <paper-tab>About</paper-tab>
+              <paper-tab>Schedule</paper-tab>
+              <paper-tab>API</paper-tab>
+            </paper-tabs>
+          </paper-toolbar>
+          <iron-pages selected="{{selected}}">
+            <section>
+              <!-- About -->
+              <div class="content">
+                Shuttle Tracking is designed and maintained by the Student Senate Web Technologies Group.<br/>
+                This service is supported by the Parking and Transportation Office, the Administration Division and dotCIO. <br/>
+                Much of the original code behind Shuttle Tracking comes from Flagship Geo, an open source mapping project sponsored by RCOS. <br/>
+                In 2015, the project returned to RCOS and much of the codebase was updated and rewriten.
+              </div>
+            </section>
+            <section>
+              <!-- Schedule -->
+              <div class="content">
+                Download the RPI Parking and Transportation shuttle schedule.
+              </div>
+            </section>
+            <section> 
+              <!-- API Docs & KML --> 
+              <div class="content">
+                Developers may use our API to enrich their applications, create mobile applications, or implement any other creative ideas!<br/>
+                Visit our wiki to learn more about using our API.
+                <br/><br/>
+                We have also provided KML data for our tracking view. Click to download.
+              </div>
+            </section>
+          </iron-pages>
+        </template>
       </paper-dialog>
     </div>
   </template>
@@ -134,7 +182,7 @@
             var marker = new google.maps.Marker({
               position: pos,
               map: this.$.shuttleMap.map,
-              icon: "static/images/shuttle_icon.png",
+              icon: "static/images/shuttle.png",
               title: updates[i]["vehicleID"]
             });
             this.vehicles.push(marker);
@@ -159,7 +207,7 @@
           for (var i = 0; i < routes.length; i++) {
             // Route details
             var data = routes[i];
-            var coords = JSON.parse(data['coords']);
+            var coords = data['coords'];
             var color = data['color'];
             var width = data['width'];
             // Add route to map
@@ -198,6 +246,13 @@
           console.log("no vehicle stops found");
         }
       }
+    });
+  </script>
+  <script>
+    // select the first page when site is loaded
+    document.addEventListener('WebComponentsReady', function () {
+      var template = document.querySelector('template[is="dom-bind"]');
+      template.selected = 0;
     });
   </script>
 </dom-module>
