@@ -2,10 +2,9 @@ package tracking
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"os"
 	"time"
+	"os"
 
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/mgo.v2"
@@ -56,6 +55,13 @@ func InitApp(Config *Configuration) *App {
 		session.DB("shuttle_tracking").C("stops"),
 	}
 
+	// Ensure unique vehicle identification 
+  vehicleIndex := mgo.Index{
+      Key: []string{"vehicleID"},
+      Unique: true,
+      DropDups: true}
+  app.Vehicles.EnsureIndex(vehicleIndex)
+
 	// Read vehicle configuration file
 	serr := readSeedConfiguration("seed/vehicle_seed.json", &app)
 	if serr != nil {
@@ -81,28 +87,26 @@ func readConfiguration(fileName string) (*Configuration, error) {
 
 //readSeedConfiguration adds a new vehicle to the database from seed.
 func readSeedConfiguration(fileName string, app *App) error {
-
 	// Open seed_vehicle config file and decode JSON to app struct
 	file, err := os.Open(fileName)
-	//error handling
+	
+	// Error handling
 	if err != nil {
-		return err
+		log.Warn(err)
 	}
-	//create a decoder for a file
+	// Create a decoder for a file
 	fileread := json.NewDecoder(file)
-	//decode file into string
 
-	//calling vehicles from vehicles.go
+	// Create map for json data and slice for vehicles
+	var vehiclesMap map[string][]map[string]interface{}
 	Vehicles := []Vehicle{}
 
-	//create map to hold variables
-	var vehiclesMap map[string][]map[string]interface{}
-
-	//call decode on fileread to place items into map
+	// Call decode on fileread to place items into map
 	if err := fileread.Decode(&vehiclesMap); err != nil {
-		return err
+		log.Warn(err)
 	}
 
+	// Initialize our vehicles
 	for i := range vehiclesMap["Vehicles"] {
 		item := vehiclesMap["Vehicles"][i]
 		VehicleID, _ := item["VehicleID"].(string)
@@ -111,12 +115,9 @@ func readSeedConfiguration(fileName string, app *App) error {
 		Vehicles = append(Vehicles, vehicle)
 	}
 
+	// Add vehicles to the database
 	for j := range Vehicles {
-		err = app.Vehicles.Insert(&Vehicles[j])
-		if err != nil {
-			return err
-		}
-		fmt.Println("%v", Vehicles[j])
+		app.Vehicles.Insert(&Vehicles[j])
 	}
 
 	return nil
