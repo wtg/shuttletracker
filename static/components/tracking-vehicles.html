@@ -50,20 +50,13 @@
         <paper-material class="vehicles-container">
           <h1> Vehicles </h1>
           <template is="dom-repeat" items="{{vehicles}}" as="vehicle">
-            <paper-card class="vehicle-card" heading="{{vehicle.vehicleName}}">
+            <paper-card class="vehicle-card" heading="{{vehicle.vehicleName}}" elevation="2">
               <div class="card-content">
                 <b> ID: </b> <span>{{vehicle.vehicleID}}</span>
               </div>
               <div class="card-actions">
-                <paper-button class="history">
-                  <iron-icon class="vehicle-action" icon="history"></iron-icon>
-                </paper-button>
-                <paper-button class="create"> 
-                  <iron-icon class="vehicle-action" icon="create"></iron-icon>
-                </paper-button>
-                <paper-button class="delete">
-                  <iron-icon class="vehicle-action" icon="delete"></iron-icon>
-                </paper-button>
+                <paper-icon-button on-click="editVehicle" icon="create" class="create"></paper-icon-button>
+                <paper-icon-button on-click="deleteVehicle" icon="delete" class="delete"></paper-icon-button>
               </div>
             </paper-card>
           </template>
@@ -90,6 +83,12 @@
       },
       addVehicleResponse: function() {
         this.$.updateVehicles.generateRequest();
+      },
+      editVehicle: function(e) {
+        
+      },
+      deleteVehicle: function(e) {
+        
       }
     });
 

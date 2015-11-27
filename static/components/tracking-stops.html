@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
@@ -9,6 +10,13 @@
 
 <dom-module id="tracking-stops">
   <style>
+    .route-select {
+      margin: -7px;
+    }
+    .stop-card {
+      width: 32%;
+      margin: 5px;
+    }
     .stop-map {
       width: 650px;
       height: 450px;
@@ -49,16 +57,22 @@
       <paper-material class="stops-list">
         <h1> Stops </h1>
         <template is="dom-repeat" items="{{stops}}" as="stop">
-          <b> Name: </b> <span>{{stop.name}}</span>
-          <b> Description: </b> <span>{{stop.description}}</span>
-          <b> Address: </b> <span>{{stop.address}}</span>
-          <b> Start Time: </b> <span>{{stop.startTime}}</span>
-          <b> End Time: </b> <span>{{stop.endTime}}</span>
-          <b> Latitude: </b> <span>{{stop.lat}}</span>
-          <b> Longitude: </b> <span>{{stop.lng}}</span>
-          <b> Enabled: </b> <span>{{stop.enabled}}</span>
-          <b> RouteID: </b> <span>{{stop.routeId}}</span>
-          <br />
+          <paper-card class="stop-card" heading="{{stop.name}}" elevation="2">
+            <div class="card-content">
+              <div class="layout vertical">
+                <div> <b> Description: </b> <span>{{stop.description}}</span> </div>
+                <div> <b> Enabled: </b> <span>{{stop.enabled}}</span> </div>
+                <div> <b> Time: </b> <span>{{stop.startTime}}</span> - <span>{{stop.endTime}}</span> </div>
+                <div> <b> Lat: </b> <span>{{stop.lat}}</span> </div>
+                <div> <b> Lng: </b> <span>{{stop.lng}}</span> </div>
+                <div> <b> RouteID: </b> <span>{{stop.routeId}}</span> </div>
+              </div>
+            </div>
+            <div class="card-actions">
+              <paper-icon-button on-click="editStop" icon="create" class="create"> </paper-icon-button>
+              <paper-icon-button on-click="deleteStop" icon="delete" class="delete"></paper-icon-button>
+            </div>
+          </paper-card>
         </template>
       </paper-material>
     </template>
