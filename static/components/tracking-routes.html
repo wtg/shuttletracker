@@ -8,6 +8,10 @@
 
 <dom-module id="tracking-routes">
   <style>
+    .route-card {
+      width: 49%;
+      margin: 5px;
+    }
     .route-form {
       background: #ffffff;
       margin: 25px;
@@ -37,22 +41,28 @@
       last-response="{{routes}}">
     </iron-ajax>
 
-    <div class="route-list">
-      <template is="dom-if" if="{{routes}}">
-        <paper-material class="routes-container">
-          <h1> Routes </h1>
-          <template is="dom-repeat" items="{{routes}}" as="route">
-            <b> Name: </b> <span>{{route.name}}</span>
-            <b> StartTime: </b> <span>{{route.startTime}}</span>
-            <b> EndTime: </b> <span>{{route.endTime}}</span>
-            <b> Enabled: </b> <span>{{route.enabled}}</span>
-            <b> Color: </b> <span>{{route.color}}</span>
-            <b> Width: </b> <span>{{route.width}}</span>
-            <br />
-          </template>
-        </paper-material>
-      </template>
-    </div>
+    <template is="dom-if" if="{{routes}}">
+      <paper-material class="routes-container">
+        <h1> Routes </h1>
+        <template is="dom-repeat" items="{{routes}}" as="route">
+          <paper-card class="route-card" heading="{{route.name}}" elevation="2">
+            <div class="card-content">
+              <div class="layout vertical">
+                <div> <b> Description: </b> <span>{{route.description}}</span> </div>
+                <div> <b> Enabled: </b> <span>{{route.enabled}}</span> </div>
+                <div> <b> Time: </b> <span>{{route.startTime}}</span> - <span>{{route.endTime}}</span> </div>
+                <div> <b> Color: </b> <span>{{route.color}}</span> </div>
+                <div> <b> Width: </b> <span>{{route.width}}</span> </div>
+              </div>
+            </div>
+            <div class="card-actions">
+              <paper-icon-button on-click="editRoute" icon="create" class="create"> </paper-icon-button>
+              <paper-icon-button on-click="deleteRoute" icon="delete" class="delete"></paper-icon-button>
+            </div>
+          </paper-card>
+        </template>
+      </paper-material>
+    </template>
 
     <paper-material class="route-form">
       <h1> New Route </h1>
@@ -142,6 +152,12 @@
       },
       updateFormRoutes: function(cr) {
         this.$.formRouteCoords.value = JSON.stringify(this.routeCoords);
+      },
+      editRoute: function(e) {
+
+      },
+      deleteRoute: function(e) {
+        
       }
     });
 

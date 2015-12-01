@@ -50,10 +50,33 @@
       </paper-header-panel>
     </template>
     <script>
+      // return to previously selected tab on page reload
+      function prevSelected() {
+        if (document.cookie) {
+          var cookies = document.cookie.split(";");
+          for (i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].split("=");
+            if (cookie[0].replace(/ /g,'') == "selectedTab") {
+              return cookie[1];
+            }
+          }
+        }
+        return 0;
+      }
+      // set current selected tab
+      function setSelected(tab) {
+        document.cookie = "selectedTab=" + tab + ";";
+      }
       // select the first page when site is loaded
       document.addEventListener('WebComponentsReady', function () {
         var template = document.querySelector('template[is="dom-bind"]');
-        template.selected = 0;
+        template.selected = prevSelected();
+        setSelected(template.selected);
+      });
+      // store selected tab when paper tab is selected
+      document.addEventListener('click', function() {
+        var template = document.querySelector('template[is="dom-bind"]');
+        setSelected(template.selected);
       });
     </script>
   </body>
