@@ -18,8 +18,9 @@
       padding: 25px;
     }
     .route-map {
-      width: 650px;
+      width: 98%;
       height: 450px;
+      padding-right: 30%;
     }
     .routes-container {
       background: #ffffff;
@@ -71,7 +72,7 @@
           <google-map id="routeMap" class="route-map" click-events="true" zoom="{{zoom}}" latitude="{{lat}}" longitude="{{lng}}"></google-map>
         </div>
         <div class="flex">
-          <form is="iron-form" id="routeForm" content-type="application/json" method="post" action="/routes/create">
+          <form is="iron-form" id="routeForm" content-type="application/json" method="post" action="/routes/create" style="padding-left:30%">
             <paper-input name="name" label="Route Name"></paper-input>
             <paper-input name="description" label="Description"></paper-input>
             <paper-input name="startTime" label="Start Time"></paper-input>

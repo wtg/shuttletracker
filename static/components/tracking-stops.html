@@ -11,15 +11,16 @@
 <dom-module id="tracking-stops">
   <style>
     .route-select {
-      margin: -7px;
+      margin: 1px;
     }
     .stop-card {
       width: 32%;
       margin: 5px;
     }
     .stop-map {
-      width: 650px;
+      width: 98%;
       height: 450px;
+      padding-right: 30%;
     }
     .stops-list {
       background: #ffffff;
@@ -84,7 +85,7 @@
           <google-map id="stopMap" class="stop-map" click-events="true" zoom="{{zoom}}" latitude="{{lat}}" longitude="{{lng}}"></google-map>
         </div>
         <div class="flex">
-          <form is="iron-form" id="stopForm" content-type="application/json" method="post" action="/stops/create"> 
+          <form is="iron-form" id="stopForm" content-type="application/json" method="post" action="/stops/create" style="padding-left:30%"> 
             <paper-dropdown-menu class="route-select" label="Route" selected-item="{{selectedRoute}}">
               <paper-menu class="dropdown-content">
                 <template is="dom-repeat" items="{{routes}}" as="route">
