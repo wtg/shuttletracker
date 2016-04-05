@@ -20,7 +20,6 @@
     .route-map {
       width: 98%;
       height: 450px;
-      padding-right: 30%;
     }
     .routes-container {
       background: #ffffff;
@@ -68,11 +67,11 @@
     <paper-material class="route-form">
       <h1> New Route </h1>
       <div class="layout horizontal">
-        <div class="flex">
+        <div class="flex" style="flex:3">
           <google-map id="routeMap" class="route-map" click-events="true" zoom="{{zoom}}" latitude="{{lat}}" longitude="{{lng}}"></google-map>
         </div>
-        <div class="flex">
-          <form is="iron-form" id="routeForm" content-type="application/json" method="post" action="/routes/create" style="padding-left:30%">
+        <div class="flex" style="flex:2">
+          <form is="iron-form" id="routeForm" content-type="application/json" method="post" action="/routes/create">
             <paper-input name="name" label="Route Name"></paper-input>
             <paper-input name="description" label="Description"></paper-input>
             <paper-input name="startTime" label="Start Time"></paper-input>
@@ -80,9 +79,9 @@
             <paper-input name="color" label="Color"></paper-input>
             <paper-input name="width" label="Width"></paper-input>
             <br />
-            <div> 
+            <div>
               Route Enabled?
-              <paper-toggle-button checked="{{isEnabled}}"></paper-toggle-button> 
+              <paper-toggle-button checked="{{isEnabled}}"></paper-toggle-button>
               <input is="iron-input" type="hidden" name="enabled" value="{{isEnabled}}">
             </div>
             <br />
@@ -95,7 +94,7 @@
   </template>
 
   <script>
-    Polymer({ 
+    Polymer({
       is: 'tracking-routes',
       properties: {
         lat: {
@@ -158,7 +157,7 @@
 
       },
       deleteRoute: function(e) {
-        
+
       }
     });
 

@@ -20,7 +20,6 @@
     .stop-map {
       width: 98%;
       height: 450px;
-      padding-right: 30%;
     }
     .stops-list {
       background: #ffffff;
@@ -46,8 +45,8 @@
       handle-as="json"
       last-response="{{stops}}">
     </iron-ajax>
-    <iron-ajax 
-      auto 
+    <iron-ajax
+      auto
       id="fetchRoutes"
       url="/routes"
       handle-as="json"
@@ -81,11 +80,11 @@
     <paper-material class="stops-form">
       <h1> New Stop </h1>
       <div class="layout horizontal">
-        <div class="flex">
+        <div class="flex" style="flex:3">
           <google-map id="stopMap" class="stop-map" click-events="true" zoom="{{zoom}}" latitude="{{lat}}" longitude="{{lng}}"></google-map>
         </div>
-        <div class="flex">
-          <form is="iron-form" id="stopForm" content-type="application/json" method="post" action="/stops/create" style="padding-left:30%"> 
+        <div class="flex" style="flex:2">
+          <form is="iron-form" id="stopForm" content-type="application/json" method="post" action="/stops/create">
             <paper-dropdown-menu class="route-select" label="Route" selected-item="{{selectedRoute}}">
               <paper-menu class="dropdown-content">
                 <template is="dom-repeat" items="{{routes}}" as="route">
@@ -99,8 +98,8 @@
             <paper-input name="startTime" label="Start Time"></paper-input>
             <paper-input name="endTime" label="End Time"></paper-input>
             <br />
-            <div> 
-              Stop Enabled? 
+            <div>
+              Stop Enabled?
               <paper-toggle-button checked="{{isEnabled}}"></paper-toggle-button>
               <input is="iron-input" type="hidden" name="enabled" value="{{isEnabled}}">
             </div>
