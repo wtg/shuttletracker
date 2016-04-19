@@ -89,7 +89,7 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 		}
 
 		updated := 0
-		for i := 1; i < len(vehiclesData)-1; i++ {
+		for i := 0; i < len(vehiclesData)-1; i++ {
 			match := dataRe.FindAllStringSubmatch(vehiclesData[i], -1)[0]
 
 			// Store named capturing group and matching expression as a key value pair
