@@ -256,6 +256,18 @@
               icon: "static/images/stop.png",
               title: stops[i]["name"]
             });
+            
+            // Create infowindow and open it when a stop is clicked
+            (function(marker, i) {
+              var contentString = '<b>' + stops[i]["name"] + '</b>';
+              var infowindow = new google.maps.InfoWindow({
+                content: contentString
+              });
+              google.maps.event.addListener(marker, 'click', function(){
+                infowindow.open(marker.map, marker);
+              });
+            })(marker, i);
+            
             this.stops.push(marker);
           }
         } else {
