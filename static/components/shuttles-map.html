@@ -185,6 +185,22 @@
               icon: "static/images/shuttle.png",
               title: updates[i]["vehicleID"]
             });
+            
+            // Create info window and open it when shuttle clicked
+            (function(marker, i) {
+              /* Include ID, heading, speed, time in the infowindow */
+              var contentString = '<b>Shuttle ID: ' + updates[i]["vehicleID"] + '</b><br />' +
+              'Traveling ' + updates[i]["heading"] + ' at ' + updates[i]["speed"].substring(0,4) + 'mph<br />' +
+              'as of ' + updates[i]["time"].substring(0,2) + ':' + updates[i]["time"].substring(2,4) + ':' + updates[i]["time"].substring(4,6);
+              
+              var infowindow = new google.maps.InfoWindow({
+                content: contentString
+              });
+              google.maps.event.addListener(marker, 'click', function(){
+                infowindow.open(marker.map, marker);
+              });
+            })(marker, i);
+            
             this.vehicles.push(marker);
           }
         } else {
