@@ -167,6 +167,20 @@
         ajax.generateRequest();
       },
 
+      // Translate heading (0-360 degrees) to cardinal direction
+      cardinalDirection: function(heading) {
+        switch (true) {
+          case (heading >= 22.5 && heading < 67.5):   return "North-East";
+          case (heading >= 67.5 && heading < 112.5):  return "East";
+          case (heading >= 112.5 && heading < 157.5): return "South-East";
+          case (heading >= 157.5 && heading < 202.5): return "South";
+          case (heading >= 202.5 && heading < 247.5): return "South-West";
+          case (heading >= 247.5 && heading < 292.5): return "West";
+          case (heading >= 292.5 && heading < 337.5): return "North-West";
+          default:                                    return "North";
+        }
+      },
+
       placeVehicles: function(event, response) {
         var updates = response.response;
         if (updates) {
@@ -186,11 +200,13 @@
               title: updates[i]["vehicleID"]
             });
             
+            // Get cardinal direction for info window
+            var cardinal_dir = this.cardinalDirection(updates[i]["heading"]);
             // Create info window and open it when shuttle clicked
             (function(marker, i) {
               /* Include ID, heading, speed, time in the infowindow */
               var contentString = '<b>Shuttle ID: ' + updates[i]["vehicleID"] + '</b><br />' +
-              'Traveling ' + updates[i]["heading"] + ' at ' + updates[i]["speed"].substring(0,4) + 'mph<br />' +
+              'Traveling ' + cardinal_dir + ' at ' + updates[i]["speed"].substring(0,4) + 'mph<br />' +
               'as of ' + updates[i]["time"].substring(0,2) + ':' + updates[i]["time"].substring(2,4) + ':' + updates[i]["time"].substring(4,6);
               
               var infowindow = new google.maps.InfoWindow({
