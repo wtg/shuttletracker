@@ -40,6 +40,7 @@ func main() {
 	r.HandleFunc("/vehicles", App.VehiclesHandler).Methods("GET")
 	r.HandleFunc("/vehicles/create", App.VehiclesCreateHandler).Methods("POST")
 	r.HandleFunc("/updates", App.UpdatesHandler).Methods("GET")
+  r.HandleFunc("/updates/message", App.UpdateMessageHandler).Methods("GET")
 	r.HandleFunc("/routes", App.RoutesHandler).Methods("GET")
 	r.HandleFunc("/routes/create", App.RoutesCreateHandler).Methods("POST")
 	r.HandleFunc("/stops", App.StopsHandler).Methods("GET")
