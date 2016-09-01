@@ -66,6 +66,12 @@
       handle-as="json"
       on-response="placeStops">
     </iron-ajax>
+    <iron-ajax
+      id="fetchMessages"
+      url="/updates/message"
+      handle-as="json"
+      last-response="{{messages}}">
+    </iron-ajax>
 
     <google-map id="shuttleMap" class="shuttle-map" zoom="{{zoom}}" latitude="{{lat}}" longitude="{{lng}}"></google-map>
     <div id="logo">
@@ -138,6 +144,10 @@
         stops: {
           type: Array,
           value: []
+        },
+        messages: {
+          type: Array,
+          value: []
         }
       },
 
@@ -150,6 +160,7 @@
       },
 
       initializeTracking: function() {
+        this.$.fetchMessages.generateRequest();
         this.$.fetchRoutes.generateRequest();
         this.$.fetchUpdates.generateRequest();
         this.$.fetchStops.generateRequest();
@@ -158,6 +169,7 @@
 
       periodicUpdates: function() {
         // periodically check for vehicle & route updates
+        setInterval(this.checkForUpdates, 15000, this.$.fetchMessages);
         setInterval(this.checkForUpdates, 15000, this.$.fetchUpdates);
         setInterval(this.checkForUpdates, 15000, this.$.fetchRoutes);
         setInterval(this.checkForUpdates, 15000, this.$.fetchStops);
@@ -185,6 +197,19 @@
               icon: "static/images/shuttle.png",
               title: updates[i]["vehicleID"]
             });
+            
+            // Get update message for the info window
+            var contentString = this.messages[i];
+            // Create info window and open it when shuttle clicked
+            (function(marker, i) {
+              var infowindow = new google.maps.InfoWindow({
+                content: contentString
+              });
+              google.maps.event.addListener(marker, 'click', function(){
+                infowindow.open(marker.map, marker);
+              });
+            })(marker, i);
+            
             this.vehicles.push(marker);
           }
         } else {
@@ -240,6 +265,18 @@
               icon: "static/images/stop.png",
               title: stops[i]["name"]
             });
+            
+            // Create infowindow and open it when a stop is clicked
+            (function(marker, i) {
+              var contentString = '<b>' + stops[i]["name"] + '</b>';
+              var infowindow = new google.maps.InfoWindow({
+                content: contentString
+              });
+              google.maps.event.addListener(marker, 'click', function(){
+                infowindow.open(marker.map, marker);
+              });
+            })(marker, i);
+            
             this.stops.push(marker);
           }
         } else {
