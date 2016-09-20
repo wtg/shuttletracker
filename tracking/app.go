@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 	"time"
-
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/mgo.v2"
 )

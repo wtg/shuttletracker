@@ -140,6 +140,8 @@ func (App *App) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
 func (App *App) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Create new vehicle object using request fields
 	vehicle := Vehicle{}
+	vehicle.Created = time.Now()
+	vehicle.Updated = time.Now()
 	vehicleData := json.NewDecoder(r.Body)
 	err := vehicleData.Decode(&vehicle)
 	// Error handling
