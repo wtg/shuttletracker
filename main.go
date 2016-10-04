@@ -45,6 +45,7 @@ func main() {
 	r.HandleFunc("/routes/create", App.RoutesCreateHandler).Methods("POST")
 	r.HandleFunc("/stops", App.StopsHandler).Methods("GET")
 	r.HandleFunc("/stops/create", App.StopsCreateHandler).Methods("POST")
+	r.HandleFunc("/vehicles/{id:[0-9]+}", App.VehiclesDeleteHandler).Methods("DELETE")
 	// Static files
 	r.PathPrefix("/bower_components/").Handler(http.StripPrefix("/bower_components/", http.FileServer(http.Dir("bower_components/"))))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))

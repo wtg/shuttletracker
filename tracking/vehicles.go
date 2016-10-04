@@ -12,6 +12,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/mgo.v2/bson"
+	"github.com/gorilla/mux"
 )
 
 // VehicleUpdate represents a single position observed for a Vehicle from the data feed.
@@ -154,6 +155,17 @@ func (App *App) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (App *App) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	// Delete vehicle from Vehicles collection
+	vars := mux.Vars(r)
+	log.Debugf("deleting", vars["id"])
+	err := App.Vehicles.Remove( bson.M{"vehicleID": vars["id"] })
+	// Error handling
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 // UpdatesHandler get the most recent update for each vehicle in the vehicles collection.
 func (App *App) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 	// Store updates for each vehicle
@@ -198,7 +210,7 @@ func (App *App) UpdateMessageHandler(w http.ResponseWriter, r *http.Request) {
       // Use first 4 char substring of update.Speed
       speed := update.Speed
       if (len(speed) > 4) {
-        speed = speed[0:4] 
+        speed = speed[0:4]
       }
       message = fmt.Sprintf("<b>%s</b><br/>Traveling %s at<br/> %s mph as of %s", vehicle.VehicleName, CardinalDirection(&update.Heading), speed, update.Created.Format("3:04PM"))
       messages = append(messages, message)
