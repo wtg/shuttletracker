@@ -10,9 +10,7 @@ Setting Up
   * On Debian-based linux, run `sudo apt-get install nodejs npm golang mongodb` to install npm and go language packages
   * *On CentOs run `sudo yum install nodejs npm golang mongodb` instead*
   * Run `sudo npm install -g bower` to install bower
-  * Run `bower install` inside shuttle tracking directory to install dependency
-  * 
-3. Run `bower install` to install dependencies listed in bower.json
+3. Run `bower install` inside shuttle tracking directory to install dependencies listed in bower.json
 4. Rename conf.json.sample to conf.json
 5. Edit conf.json with the following:
   * Data Feed: API with tracking information (iTrak in our case)
