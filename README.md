@@ -13,7 +13,7 @@ Setting Up
 3. Run `bower install` inside shuttle tracking directory to install dependencies listed in bower.json
 4. Rename conf.json.sample to conf.json
 5. Edit conf.json with the following:
-  * Data Feed: API with tracking information (iTrak in our case)
+  * Data Feed: API with tracking information, this is a unique API info url that we can get data from it. Since it is private, we will only put this on our private group for now (Slacks).
   * UpdateInterval: Number of seconds between each request to the data feed
   * MongoUrl: Url where MongoDB is located
   * MongoPort: Port where MongoDB is bound (default is 27017)
