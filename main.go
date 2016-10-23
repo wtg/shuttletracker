@@ -42,7 +42,7 @@ func main() {
 	r.HandleFunc("/admin/{*}", AdminHandler).Methods("GET")
 	r.HandleFunc("/vehicles", App.VehiclesHandler).Methods("GET")
 	r.HandleFunc("/vehicles/create", App.VehiclesCreateHandler).Methods("POST")
-	r.HandleFunc("/vehciles/edit", App.VehiclesEditHandler).Methods("POST")
+	r.HandleFunc("/vehicles/edit", App.VehiclesEditHandler).Methods("POST")
 	r.HandleFunc("/vehicles/{id:[0-9]+}", App.VehiclesDeleteHandler).Methods("DELETE")
 	r.HandleFunc("/updates", App.UpdatesHandler).Methods("GET")
 	r.HandleFunc("/updates/message", App.UpdateMessageHandler).Methods("GET")
