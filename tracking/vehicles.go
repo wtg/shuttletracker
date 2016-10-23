@@ -11,6 +11,7 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -153,6 +154,21 @@ func (App *App) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Store new vehicle under vehicles collection
 	err = App.Vehicles.Insert(&vehicle)
+	// Error handling
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (App *App) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (App *App) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	// Delete vehicle from Vehicles collection
+	vars := mux.Vars(r)
+	log.Debugf("deleting", vars["id"])
+	err := App.Vehicles.Remove(bson.M{"vehicleID": vars["id"]})
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
