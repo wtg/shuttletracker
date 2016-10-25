@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 	"time"
-
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/mgo.v2"
 )
@@ -67,7 +66,6 @@ func InitApp(Config *Configuration) *App {
 	if serr != nil {
 		log.Fatalf("error reading vehicle configuration file: %v", serr)
 	}
-
 	return &app
 }
 
@@ -98,8 +96,8 @@ func readSeedConfiguration(fileName string, app *App) error {
 	fileread := json.NewDecoder(file)
 
 	// Create map for json data and slice for vehicles
-	var vehiclesMap map[string][]map[string]interface{}
-	Vehicles := []Vehicle{}
+	var vehiclesMap map[string][]map[string]interface{} // map with string as key and ,list of map with string as key and anything as value, as value
+	Vehicles := []Vehicle{} // list of default vehicle object
 
 	// Call decode on fileread to place items into map
 	if err := fileread.Decode(&vehiclesMap); err != nil {
