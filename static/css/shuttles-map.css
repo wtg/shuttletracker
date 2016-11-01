@@ -31,6 +31,8 @@
     }
     .menu-dialog {
       width: 50%;
-      height: 35%;
+      min-height: 35%;
+      max-height: 50%;
       font-size: 16px;
+      overflow: scroll;
     }
