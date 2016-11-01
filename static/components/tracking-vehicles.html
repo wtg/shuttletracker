@@ -16,6 +16,15 @@
       background: #3f51b5;
       color: white;
     }
+    .vehicle-edit {
+      margin: 25px;
+      padding: 20px;
+      background: #ffffff;
+    }
+    .vehicle-edit paper-button {
+      background: #3f51b5;
+      color: white;
+    }
     .vehicle-card {
       margin: 5px;
     }
@@ -75,6 +84,16 @@
         <paper-button raised onclick="submitVehicle()">Submit</paper-button>
       </form>
     </paper-material>
+
+    <paper-material class="vehicle-form">
+      <h1> Edit Vehicle </h1>
+      <form is="iron-form" id="vehicleEdit" content-type="application/json" method="post" action="/vehicles/edit">
+        <paper-input name="vehicleName" label="Vehicle Name"></paper-input>
+        <paper-input name="vehicleID" label="Vehicle ID"></paper-input>
+        <br />
+        <paper-button raised onclick="submitVehicle()">Submit Updates</paper-button>
+      </form>
+    </paper-material>
   </template>
 
   <script>
@@ -99,6 +118,12 @@
     });
 
     function submitVehicle() {
+      var form = document.getElementById("vehicleForm");
+      form.submit();
+      form.reset();
+    }
+    function submitEdits() {
+
       var form = document.getElementById("vehicleForm");
       form.submit();
       form.reset();
