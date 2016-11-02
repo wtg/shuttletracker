@@ -17,6 +17,8 @@
       last-response="{{vehicles}}">
     </iron-ajax>
 
+    <iron-ajax id="ajaxDelete" method="DELETE" on-response="addVehicleResponse"></iron-ajax>
+
     <div class="vehicle-list">
       <template is="dom-if" if="{{vehicles}}">
         <paper-material class="vehicles-container">
@@ -57,10 +59,14 @@
         this.$.updateVehicles.generateRequest();
       },
       editVehicle: function(e) {
-        
+
       },
       deleteVehicle: function(e) {
-        
+        var entry = Polymer.dom(e).path[6].textContent;
+        var index = entry.search('I');
+        var id = entry.substring(index+5,index+15);
+        this.$.ajaxDelete.url = "/vehicles/" + id;
+        this.$.ajaxDelete.generateRequest();
       }
     });
 
