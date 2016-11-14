@@ -156,9 +156,11 @@
             // Place shuttle marker on map
             var marker = new google.maps.Marker({
               position: pos,
-              rotation: updates[i]["heading"],
               map: this.$.shuttleMap.map,
-              icon: "static/images/shuttle.png",
+              icon: {
+                path: "static/images/shuttle.png",
+                rotation: updates[i]["heading"]
+              },
               title: updates[i]["vehicleID"]
             });
             
