@@ -2,17 +2,20 @@ package main
 
 import (
 	"net/http"
+	"shuttle_tracking_2/demo"
+	"shuttle_tracking_2/tracking"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
-	"shuttle_tracking_2/tracking"
 )
 
 var (
 	// Config holds the global app settings.
 	Config = tracking.InitConfig()
 	// App holds the application itself.
-	App = tracking.InitApp(Config)
+	App       = tracking.InitApp(Config)
+	Demo      = demo.Init()                    // initialize the demo
+	DemoUsers = demo.UserCollectionInit(&Demo) // init users
 )
 
 // IndexHandler serves the index page.
@@ -39,12 +42,19 @@ func main() {
 	r.HandleFunc("/admin/{*}", AdminHandler).Methods("GET")
 	r.HandleFunc("/vehicles", App.VehiclesHandler).Methods("GET")
 	r.HandleFunc("/vehicles/create", App.VehiclesCreateHandler).Methods("POST")
+	r.HandleFunc("/vehicles/edit", App.VehiclesEditHandler).Methods("POST")
+	r.HandleFunc("/vehicles/{id:[0-9]+}", App.VehiclesDeleteHandler).Methods("DELETE")
 	r.HandleFunc("/updates", App.UpdatesHandler).Methods("GET")
-  r.HandleFunc("/updates/message", App.UpdateMessageHandler).Methods("GET")
+	r.HandleFunc("/updates/message", App.UpdateMessageHandler).Methods("GET")
 	r.HandleFunc("/routes", App.RoutesHandler).Methods("GET")
 	r.HandleFunc("/routes/create", App.RoutesCreateHandler).Methods("POST")
+	r.HandleFunc("/routes/{id:.+}", App.RoutesDeleteHandler).Methods("DELETE")
 	r.HandleFunc("/stops", App.StopsHandler).Methods("GET")
 	r.HandleFunc("/stops/create", App.StopsCreateHandler).Methods("POST")
+	r.HandleFunc("/stops/{id:.+}", App.StopsDeleteHandler).Methods("DELETE")
+	r.HandleFunc("/schedule", Demo.ArrivalHandler).Methods("GET")
+	r.HandleFunc("/schedule/arrival", Demo.ArrivalTimeHandler).Methods("GET")
+	r.HandleFunc("/schedule/arrival/by", DemoUsers.SubscriberHandler).Methods("GET")
 	// Static files
 	r.PathPrefix("/bower_components/").Handler(http.StripPrefix("/bower_components/", http.FileServer(http.Dir("bower_components/"))))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
