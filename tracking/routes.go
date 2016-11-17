@@ -10,6 +10,9 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
 
+	"fmt"
+	"io/ioutil"
+
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -50,6 +53,19 @@ type Stop struct {
 	RouteID   string `json:"routeId"        bson:"routeId"`
 }
 
+type MapPoint struct {
+	Latitude  float32 `json:"latitude"`
+	Longitude float32 `json:"longitude"`
+}
+type MapResponsePoint struct {
+	Location      MapPoint `json:"location"`
+	OriginalIndex int      `json:"originalIndex,omitempty"`
+	PlaceID       string   `json:"placeId"`
+}
+type MapResponse struct {
+	SnappedPoints []MapResponsePoint
+}
+
 // RoutesHandler finds all of the routes in the database
 func (App *App) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all routes in database
@@ -86,12 +102,33 @@ func Interpolate(coords []Coord, key string) []Coord {
 		buffer.WriteString(strconv.FormatFloat(coord.Lat, 'f', 10, 64))
 		buffer.WriteString(",")
 		buffer.WriteString(strconv.FormatFloat(coord.Lng, 'f', 10, 64))
-		if i > len(coords) {
+		if i < len(coords)-1 {
 			buffer.WriteString("|")
 		}
 	}
 	buffer.WriteString("&interpolate=true&key=")
 	buffer.WriteString(key)
+	fmt.Print("sending request: " + buffer.String())
+	resp, err := http.Get(buffer.String())
+	if err != nil {
+		fmt.Errorf("Error Not valid response from Google API")
+		return nil
+	}
+	defer resp.Body.Close()
+	fmt.Print(resp.Header)
+	body, err := ioutil.ReadAll(resp.Body)
+
+	mapResponse := MapResponse{}
+	json.Unmarshal(body, &mapResponse)
+	result := []Coord{}
+	for _, location := range mapResponse.SnappedPoints {
+		currentLocation := Coord{
+			Lat: float64(location.Location.Latitude),
+			Lng: float64(location.Location.Longitude),
+		}
+		result = append(result, currentLocation)
+	}
+	return result
 }
 
 // RoutesCreateHandler adds a new route to the database
@@ -119,6 +156,7 @@ func (App *App) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Here do the interpolation
 	coords = Interpolate(coords, App.Config.GoogleMapAPIKey)
+	fmt.Printf("Size of coordinates = %d", len(coords))
 	// Type conversions
 	enabled, _ := strconv.ParseBool(routeData["enabled"])
 	width, _ := strconv.Atoi(routeData["width"])
