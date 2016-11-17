@@ -66,6 +66,36 @@ type MapResponse struct {
 	SnappedPoints []MapResponsePoint
 }
 
+type MapDistanceMatrixDuration struct {
+	Value int    `json:"value"`
+	Text  string `json:"text"`
+}
+
+type MapDistanceMatrixDistance struct {
+	Value int    `json:"value"`
+	Text  string `json:"text"`
+}
+
+type MapDistanceMatrixElement struct {
+	Status   string                    `json:"status"`
+	Duration MapDistanceMatrixDuration `json:"duration"`
+	Distance MapDistanceMatrixDistance `json:"distance"`
+}
+
+type MapDistanceMatrixResponse struct {
+	Status               string   `json:"status"`
+	OriginAddresses      []string `json:"origin_addresses"`
+	DestinationAddresses []string `json:"destination_addresses"`
+	Rows                 []MapDistanceMatrixElement
+}
+
+type Velocity struct {
+	Start    MapPoint `json:"origin"`
+	End      MapPoint `json:"destination"`
+	Distance float32  `json:"distance"`
+	Duration float32  `json:"duration"`
+}
+
 // RoutesHandler finds all of the routes in the database
 func (App *App) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all routes in database
@@ -108,16 +138,13 @@ func Interpolate(coords []Coord, key string) []Coord {
 	}
 	buffer.WriteString("&interpolate=true&key=")
 	buffer.WriteString(key)
-	fmt.Print("sending request: " + buffer.String())
 	resp, err := http.Get(buffer.String())
 	if err != nil {
 		fmt.Errorf("Error Not valid response from Google API")
 		return nil
 	}
 	defer resp.Body.Close()
-	fmt.Print(resp.Header)
 	body, err := ioutil.ReadAll(resp.Body)
-
 	mapResponse := MapResponse{}
 	json.Unmarshal(body, &mapResponse)
 	result := []Coord{}
@@ -128,6 +155,51 @@ func Interpolate(coords []Coord, key string) []Coord {
 		}
 		result = append(result, currentLocation)
 	}
+	return result
+}
+
+func GoogleVelocityCompute(from Coord, to Coord, key string) Velocity {
+	prefix := "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&"
+	var buffer bytes.Buffer
+	buffer.WriteString(prefix)
+	origin := fmt.Sprintf("origins=%f,%f", from.Lat, from.Lng)
+	destination := fmt.Sprintf("destinations=%f,%f", to.Lat, to.Lng)
+	buffer.WriteString(origin + "&" + destination + "&key=" + key)
+	resp, err := http.Get(buffer.String())
+	if err != nil {
+		fmt.Errorf("Error Not valid response from Google API")
+		return Velocity{}
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	mapResponse := MapDistanceMatrixResponse{}
+	json.Unmarshal(body, &mapResponse)
+	result := Velocity{
+		Start: MapPoint{
+			Latitude:  float32(from.Lat),
+			Longitude: float32(from.Lng),
+		},
+		End: MapPoint{
+			Latitude:  float32(to.Lat),
+			Longitude: float32(to.Lng),
+		},
+		Distance: float32(mapResponse.Rows[0].Distance.Value),
+		Duration: float32(mapResponse.Rows[0].Duration.Value),
+	}
+	return result
+}
+
+// Compute the velocity for each segment of the coordinates
+func ComputeVelocity(coords []Coord, key string) []Velocity {
+	result := []Velocity{}
+	for index := 1; index < len(coords); index++ {
+		from := coords[index-1]
+		to := coords[index]
+		v := GoogleVelocityCompute(from, to, key)
+		result = append(result, v)
+	}
+	// compute the last
+	result = append(result, GoogleVelocityCompute(coords[len(coords)-1], coords[0], key))
 	return result
 }
 
@@ -156,6 +228,8 @@ func (App *App) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Here do the interpolation
 	coords = Interpolate(coords, App.Config.GoogleMapAPIKey)
+	velo := ComputeVelocity(coords, App.Config.GoogleMapAPIKey)
+	fmt.Print(velo)
 	fmt.Printf("Size of coordinates = %d", len(coords))
 	// Type conversions
 	enabled, _ := strconv.ParseBool(routeData["enabled"])
