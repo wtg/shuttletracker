@@ -50,6 +50,7 @@ func InitApp(Config *Configuration) *App {
 	}
 	// Create Shuttles object to store database session and collections
 	app := App{
+		Config,
 		session,
 		session.DB("shuttle_tracking").C("updates"),
 		session.DB("shuttle_tracking").C("vehicles"),

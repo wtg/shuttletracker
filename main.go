@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"shuttle_tracking_2/demo"
 	"shuttle_tracking_2/tracking"
 
 	log "github.com/Sirupsen/logrus"
@@ -13,9 +12,7 @@ var (
 	// Config holds the global app settings.
 	Config = tracking.InitConfig()
 	// App holds the application itself.
-	App       = tracking.InitApp(Config)
-	Demo      = demo.Init()                    // initialize the demo
-	DemoUsers = demo.UserCollectionInit(&Demo) // init users
+	App = tracking.InitApp(Config)
 )
 
 // IndexHandler serves the index page.
@@ -52,9 +49,6 @@ func main() {
 	r.HandleFunc("/stops", App.StopsHandler).Methods("GET")
 	r.HandleFunc("/stops/create", App.StopsCreateHandler).Methods("POST")
 	r.HandleFunc("/stops/{id:.+}", App.StopsDeleteHandler).Methods("DELETE")
-	r.HandleFunc("/schedule", Demo.ArrivalHandler).Methods("GET")
-	r.HandleFunc("/schedule/arrival", Demo.ArrivalTimeHandler).Methods("GET")
-	r.HandleFunc("/schedule/arrival/by", DemoUsers.SubscriberHandler).Methods("GET")
 	// Static files
 	r.PathPrefix("/bower_components/").Handler(http.StripPrefix("/bower_components/", http.FileServer(http.Dir("bower_components/"))))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
