@@ -27,6 +27,9 @@ type VehicleUpdate struct {
 	Date      string    `json:"date"        bson:"date"`
 	Status    string    `json:"status"      bson:"status"`
 	Created   time.Time `json:"created"     bson:"created"`
+
+	Arrival ShuttleArrivalTime `json:"arrival"     bson:"arrival"`
+	Segment string             `json:"segment" bson:"segment"` // the segment that a vehicle resides on
 }
 
 // Vehicle represents an object being tracked.

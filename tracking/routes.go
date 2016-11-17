@@ -3,6 +3,7 @@ package tracking
 import (
 	"bytes"
 	"encoding/json"
+	"math"
 	"net/http"
 	"strconv"
 	"time"
@@ -24,17 +25,18 @@ type Coord struct {
 
 // Route represents a set of coordinates to draw a path on our tracking map
 type Route struct {
-	ID          string    `json:"id"             bson:"_id,omitempty"`
-	Name        string    `json:"name"           bson:"name"`
-	Description string    `json:"description"    bson:"description"`
-	StartTime   string    `json:"startTime"      bson:"startTime"`
-	EndTime     string    `json:"endTime"        bson:"endTime"`
-	Enabled     bool      `json:"enabled,string" bson:"enabled"`
-	Color       string    `json:"color"          bson:"color"`
-	Width       int       `json:"width,string"   bson:"width"`
-	Coords      []Coord   `json:"coords"         bson:"coords"`
-	Created     time.Time `json:"created"        bson:"created"`
-	Updated     time.Time `json:"updated"        bson:"updated"`
+	ID          string     `json:"id"             bson:"_id,omitempty"`
+	Name        string     `json:"name"           bson:"name"`
+	Description string     `json:"description"    bson:"description"`
+	StartTime   string     `json:"startTime"      bson:"startTime"`
+	EndTime     string     `json:"endTime"        bson:"endTime"`
+	Enabled     bool       `json:"enabled,string" bson:"enabled"`
+	Color       string     `json:"color"          bson:"color"`
+	Width       int        `json:"width,string"   bson:"width"`
+	Coords      []Coord    `json:"coords"         bson:"coords"`
+	Duration    []Velocity `json:"duration"      bson:"duration"`
+	Created     time.Time  `json:"created"        bson:"created"`
+	Updated     time.Time  `json:"updated"        bson:"updated"`
 }
 
 // Stop indicates where a tracked object is scheduled to arrive
@@ -82,11 +84,14 @@ type MapDistanceMatrixElement struct {
 	Distance MapDistanceMatrixDistance `json:"distance"`
 }
 
+type MapDistanceMatrixElements struct {
+	Elements []MapDistanceMatrixElement `json:"elements"`
+}
 type MapDistanceMatrixResponse struct {
-	Status               string   `json:"status"`
-	OriginAddresses      []string `json:"origin_addresses"`
-	DestinationAddresses []string `json:"destination_addresses"`
-	Rows                 []MapDistanceMatrixElement
+	Status               string                      `json:"status"`
+	OriginAddresses      []string                    `json:"origin_addresses"`
+	DestinationAddresses []string                    `json:"destination_addresses"`
+	Rows                 []MapDistanceMatrixElements `json:"rows"`
 }
 
 type Velocity struct {
@@ -165,6 +170,7 @@ func GoogleVelocityCompute(from Coord, to Coord, key string) Velocity {
 	origin := fmt.Sprintf("origins=%f,%f", from.Lat, from.Lng)
 	destination := fmt.Sprintf("destinations=%f,%f", to.Lat, to.Lng)
 	buffer.WriteString(origin + "&" + destination + "&key=" + key)
+	fmt.Println(buffer.String())
 	resp, err := http.Get(buffer.String())
 	if err != nil {
 		fmt.Errorf("Error Not valid response from Google API")
@@ -174,6 +180,7 @@ func GoogleVelocityCompute(from Coord, to Coord, key string) Velocity {
 	body, err := ioutil.ReadAll(resp.Body)
 	mapResponse := MapDistanceMatrixResponse{}
 	json.Unmarshal(body, &mapResponse)
+	fmt.Println(mapResponse)
 	result := Velocity{
 		Start: MapPoint{
 			Latitude:  float32(from.Lat),
@@ -183,23 +190,41 @@ func GoogleVelocityCompute(from Coord, to Coord, key string) Velocity {
 			Latitude:  float32(to.Lat),
 			Longitude: float32(to.Lng),
 		},
-		Distance: float32(mapResponse.Rows[0].Distance.Value),
-		Duration: float32(mapResponse.Rows[0].Duration.Value),
+		Distance: float32(mapResponse.Rows[0].Elements[0].Distance.Value),
+		Duration: float32(mapResponse.Rows[0].Elements[0].Duration.Value),
 	}
+	fmt.Println(result)
 	return result
 }
 
+// compute distance between two coordinates and return a value
+func ComputeDistance(c1 Coord, c2 Coord) float32 {
+	return float32(math.Sqrt(math.Pow(c1.Lat-c2.Lat, 2) + math.Pow(c1.Lng-c2.Lng, 2)))
+}
+
 // Compute the velocity for each segment of the coordinates
-func ComputeVelocity(coords []Coord, key string) []Velocity {
+func ComputeVelocity(coords []Coord, key string, threshold int) []Velocity {
 	result := []Velocity{}
-	for index := 1; index < len(coords); index++ {
-		from := coords[index-1]
-		to := coords[index]
-		v := GoogleVelocityCompute(from, to, key)
-		result = append(result, v)
+	// only compute the distance greater than some theshold distance and assume all in between has the same velocity
+	prev := 0
+	index := 1
+	// This part could be improved by rewriting with asynchronized call
+	for index = 1; index < len(coords); index++ {
+		if index%threshold == 0 {
+			v := GoogleVelocityCompute(coords[prev], coords[index], key)
+			for inner := prev + 1; inner <= index; inner++ {
+				result = append(result, Velocity{
+					Distance: v.Distance / float32(index-prev),
+					Duration: v.Duration / float32(index-prev),
+					Start:    MapPoint{Latitude: float32(coords[inner-1].Lat), Longitude: float32(coords[inner-1].Lng)},
+					End:      MapPoint{Latitude: float32(coords[inner].Lat), Longitude: float32(coords[inner].Lng)},
+				})
+			}
+			prev = index
+		}
 	}
-	// compute the last
-	result = append(result, GoogleVelocityCompute(coords[len(coords)-1], coords[0], key))
+	// compute the last segment
+	result = append(result, GoogleVelocityCompute(coords[prev], coords[0], key))
 	return result
 }
 
@@ -228,8 +253,9 @@ func (App *App) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Here do the interpolation
 	coords = Interpolate(coords, App.Config.GoogleMapAPIKey)
-	velo := ComputeVelocity(coords, App.Config.GoogleMapAPIKey)
-	fmt.Print(velo)
+	velo := ComputeVelocity(coords, App.Config.GoogleMapAPIKey, App.Config.GoogleMapMinDistance)
+	// now we get the velocity for each segment ( this should be stored in database, just store it inside route for god sake)
+
 	fmt.Printf("Size of coordinates = %d", len(coords))
 	// Type conversions
 	enabled, _ := strconv.ParseBool(routeData["enabled"])
@@ -246,6 +272,7 @@ func (App *App) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 		routeData["color"],
 		width,
 		coords,
+		velo,
 		currentTime,
 		currentTime}
 	// Store new route under routes collection

@@ -12,11 +12,12 @@ import (
 
 // Configuration holds the settings for connecting to outside resources.
 type Configuration struct {
-	DataFeed        string
-	UpdateInterval  int
-	MongoURL        string
-	MongoPort       string
-	GoogleMapAPIKey string
+	DataFeed             string
+	UpdateInterval       int
+	MongoURL             string
+	MongoPort            string
+	GoogleMapAPIKey      string
+	GoogleMapMinDistance int
 }
 
 // App holds references to Mongo resources.
