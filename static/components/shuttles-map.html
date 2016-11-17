@@ -154,12 +154,18 @@
               updates[i]["lat"], 
               updates[i]["lng"]);
             // Place shuttle marker on map
+
+            var image = 'static/images/car.png';
+
             var marker = new google.maps.Marker({
               position: pos,
-              rotation: updates[i]["heading"],
               map: this.$.shuttleMap.map,
-              icon: "static/images/shuttle.png",
-              title: updates[i]["vehicleID"] // rotation...
+              icon: {
+                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                scale: 2.5,
+                rotation: parseInt(updates[i]["heading"])
+              },
+              title: updates[i]["vehicleID"]
             });
             
             // Get update message for the info window
