@@ -1,6 +1,7 @@
 package tracking
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -20,17 +21,17 @@ type Coord struct {
 
 // Route represents a set of coordinates to draw a path on our tracking map
 type Route struct {
-	ID          bson.ObjectId `json:"id"             bson:"_id,omitempty"`
-	Name        string        `json:"name"           bson:"name"`
-	Description string        `json:"description"    bson:"description"`
-	StartTime   string        `json:"startTime"      bson:"startTime"`
-	EndTime     string        `json:"endTime"        bson:"endTime"`
-	Enabled     bool          `json:"enabled,string" bson:"enabled"`
-	Color       string        `json:"color"          bson:"color"`
-	Width       int           `json:"width,string"   bson:"width"`
-	Coords      []Coord       `json:"coords"         bson:"coords"`
-	Created     time.Time     `json:"created"        bson:"created"`
-	Updated     time.Time     `json:"updated"        bson:"updated"`
+	ID          string    `json:"id"             bson:"_id,omitempty"`
+	Name        string    `json:"name"           bson:"name"`
+	Description string    `json:"description"    bson:"description"`
+	StartTime   string    `json:"startTime"      bson:"startTime"`
+	EndTime     string    `json:"endTime"        bson:"endTime"`
+	Enabled     bool      `json:"enabled,string" bson:"enabled"`
+	Color       string    `json:"color"          bson:"color"`
+	Width       int       `json:"width,string"   bson:"width"`
+	Coords      []Coord   `json:"coords"         bson:"coords"`
+	Created     time.Time `json:"created"        bson:"created"`
+	Updated     time.Time `json:"updated"        bson:"updated"`
 }
 
 // Stop indicates where a tracked object is scheduled to arrive
@@ -75,6 +76,24 @@ func (App *App) StopsHandler(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, stops)
 }
 
+func Interpolate(coords []Coord, key string) []Coord {
+	// make request
+	prefix := "https://roads.googleapis.com/v1/snapToRoads?"
+	var buffer bytes.Buffer
+	buffer.WriteString(prefix)
+	buffer.WriteString("path=")
+	for i, coord := range coords {
+		buffer.WriteString(strconv.FormatFloat(coord.Lat, 'f', 10, 64))
+		buffer.WriteString(",")
+		buffer.WriteString(strconv.FormatFloat(coord.Lng, 'f', 10, 64))
+		if i > len(coords) {
+			buffer.WriteString("|")
+		}
+	}
+	buffer.WriteString("&interpolate=true&key=")
+	buffer.WriteString(key)
+}
+
 // RoutesCreateHandler adds a new route to the database
 func (App *App) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Create a new route object using request fields
@@ -98,13 +117,15 @@ func (App *App) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 		coord := Coord{c["lat"], c["lng"]}
 		coords = append(coords, coord)
 	}
+	// Here do the interpolation
+	coords = Interpolate(coords, App.Config.GoogleMapAPIKey)
 	// Type conversions
 	enabled, _ := strconv.ParseBool(routeData["enabled"])
 	width, _ := strconv.Atoi(routeData["width"])
 	currentTime := time.Now()
 	// Create a new route
 	route := Route{
-		bson.NewObjectId(),
+		string(bson.NewObjectId()),
 		routeData["name"],
 		routeData["description"],
 		routeData["startTime"],
