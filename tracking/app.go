@@ -5,20 +5,24 @@ import (
 	"net/http"
 	"os"
 	"time"
+
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/mgo.v2"
 )
 
 // Configuration holds the settings for connecting to outside resources.
 type Configuration struct {
-	DataFeed       string
-	UpdateInterval int
-	MongoURL       string
-	MongoPort      string
+	DataFeed             string
+	UpdateInterval       int
+	MongoURL             string
+	MongoPort            string
+	GoogleMapAPIKey      string
+	GoogleMapMinDistance int
 }
 
 // App holds references to Mongo resources.
 type App struct {
+	Config   *Configuration
 	Session  *mgo.Session
 	Updates  *mgo.Collection
 	Vehicles *mgo.Collection
@@ -47,6 +51,7 @@ func InitApp(Config *Configuration) *App {
 	}
 	// Create Shuttles object to store database session and collections
 	app := App{
+		Config,
 		session,
 		session.DB("shuttle_tracking").C("updates"),
 		session.DB("shuttle_tracking").C("vehicles"),
@@ -97,7 +102,7 @@ func readSeedConfiguration(fileName string, app *App) error {
 
 	// Create map for json data and slice for vehicles
 	var vehiclesMap map[string][]map[string]interface{} // map with string as key and ,list of map with string as key and anything as value, as value
-	Vehicles := []Vehicle{} // list of default vehicle object
+	Vehicles := []Vehicle{}                             // list of default vehicle object
 
 	// Call decode on fileread to place items into map
 	if err := fileread.Decode(&vehiclesMap); err != nil {
