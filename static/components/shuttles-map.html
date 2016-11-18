@@ -108,6 +108,10 @@
           type: Array,
           value: []
         },
+        routes: {
+          type: Array,
+          value: []
+        },
         messages: {
           type: Array,
           value: []
@@ -154,9 +158,6 @@
               updates[i]["lat"], 
               updates[i]["lng"]);
             // Place shuttle marker on map
-
-            var image = 'static/images/car.png';
-
             var marker = new google.maps.Marker({
               position: pos,
               map: this.$.shuttleMap.map,
@@ -196,6 +197,7 @@
 
       drawRoutes: function(event, response) {
         // Draw polylines on map to represent tracking routes
+        this.clearRoutes(this.routes);
         var routes = response.response;
         if (routes) {
           this.$.shuttleMap.clear();
@@ -209,13 +211,21 @@
             var route = new google.maps.Polyline({
               path: coords,
               geodesic: true,
-              strokeOpacity: 1.0,
+              strokeOpacity: 0.5,
               strokeColor: color,
               strokeWeight: width
             });
             route.setMap(this.$.shuttleMap.map);
+            this.routes.push(route);
           }
         }
+      },
+
+      clearRoutes: function(routes) {
+        for (i = 0; i < routes.length; i++) {
+          routes[i].setMap(null);
+        }
+        routes = [];
       },
 
       placeStops: function(event, response) {
