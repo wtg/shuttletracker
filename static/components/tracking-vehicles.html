@@ -61,9 +61,9 @@
         <paper-material class="vehicles-container">
           <h1> Vehicles </h1>
           <template is="dom-repeat" items="{{vehicles}}" as="vehicle">
-            <paper-card class="vehicle-card" heading="{{vehicle.vehicleName}}" elevation="2">
+            <paper-card class="vehicle-card" heading="{{vehicle.vehicleName}}" elevation="2" contenteditable="false">
               <div class="card-content">
-                <b> ID: </b> <span>{{vehicle.vehicleID}}</span>
+                <b> ID: </b> <span id$="{{vehicle.vehicleName}}">{{vehicle.vehicleID}}</span>
               </div>
               <div class="card-actions">
                 <paper-icon-button on-click="editVehicle" icon="create" class="create"></paper-icon-button>
@@ -74,7 +74,7 @@
         </paper-material>
       </template>
     </div>
-
+<!-- class="card-vehicle-id" contenteditable="false" -->
     <paper-material class="vehicle-form">
       <h1> New Vehicle </h1>
       <form is="iron-form" id="vehicleForm" content-type="application/json" method="post" action="/vehicles/create">
@@ -85,7 +85,7 @@
       </form>
     </paper-material>
 
-    <paper-material class="vehicle-form">
+    <!-- <paper-material class="vehicle-form">
       <h1> Edit Vehicle </h1>
       <form is="iron-form" id="vehicleEdit" content-type="application/json" method="post" action="/vehicles/edit">
         <paper-input name="vehicleName" label="Vehicle Name"></paper-input>
@@ -93,7 +93,7 @@
         <br />
         <paper-button raised onclick="submitVehicle()">Submit Updates</paper-button>
       </form>
-    </paper-material>
+    </paper-material> -->
   </template>
 
   <script>
@@ -106,12 +106,15 @@
         this.$.updateVehicles.generateRequest();
       },
       editVehicle: function(e) {
-
+        var model = e.model;
+        var vehicle = model.vehicle;
+        var element = document.getElementById(vehicle.vehicleName);
+        element.contentEditable = true;
       },
       deleteVehicle: function(e) {
-        var entry = Polymer.dom(e).path[6].textContent;
-        var index = entry.search('I');
-        var id = entry.substring(index+5,index+15);
+        var model = e.model;
+        var vehicle = model.vehicle;
+        var id = vehicle.vehicleID;
         this.$.ajaxDelete.url = "/vehicles/" + id;
         this.$.ajaxDelete.generateRequest();
       }
