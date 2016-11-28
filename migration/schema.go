@@ -26,6 +26,7 @@ type RouteEdge struct {
 	EndID    string    `json:"end"`
 	Time     time.Time `json:"time"`
 }
+
 type ShuttleNode struct {
 	ID         string `json:"id"`
 	ShuttleID  string `json:"shuttleid"`
