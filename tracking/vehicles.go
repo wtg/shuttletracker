@@ -17,18 +17,17 @@ import (
 
 //  represents a single position observed for a Vehicle from the data feed.
 type VehicleUpdate struct {
-	VehicleID string             `json:"vehicleID"   bson:"vehicleID,omitempty"`
-	Lat       string             `json:"lat"         bson:"lat"`
-	Lng       string             `json:"lng"         bson:"lng"`
-	Heading   string             `json:"heading"     bson:"heading"`
-	Speed     string             `json:"speed"       bson:"speed"`
-	Lock      string             `json:"lock"        bson:"lock"`
-	Time      string             `json:"time"        bson:"time"`
-	Date      string             `json:"date"        bson:"date"`
-	Status    string             `json:"status"      bson:"status"`
-	Created   time.Time          `json:"created"     bson:"created"`
-	Arrival   ShuttleArrivalTime `json:"arrival" bson:"arrival"`
-	Segment   string             `json:"segment" bson:"segment"` // the segment that a vehicle resides on
+	VehicleID string    `json:"vehicleID"   bson:"vehicleID,omitempty"`
+	Lat       string    `json:"lat"         bson:"lat"`
+	Lng       string    `json:"lng"         bson:"lng"`
+	Heading   string    `json:"heading"     bson:"heading"`
+	Speed     string    `json:"speed"       bson:"speed"`
+	Lock      string    `json:"lock"        bson:"lock"`
+	Time      string    `json:"time"        bson:"time"`
+	Date      string    `json:"date"        bson:"date"`
+	Status    string    `json:"status"      bson:"status"`
+	Created   time.Time `json:"created"     bson:"created"`
+	Segment   string    `json:"segment" bson:"segment"` // the segment that a vehicle resides on
 }
 
 // Vehicle represents an object being tracked.
@@ -220,6 +219,7 @@ func (App *App) UpdateMessageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Find recent updates and generate message
 	for _, vehicle := range vehicles {
+		// find 10 most recent records
 		err := App.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(1).One(&update)
 		if err == nil {
 			// Use first 4 char substring of update.Speed
@@ -227,7 +227,8 @@ func (App *App) UpdateMessageHandler(w http.ResponseWriter, r *http.Request) {
 			if len(speed) > 4 {
 				speed = speed[0:4]
 			}
-			message = fmt.Sprintf("<b>%s</b><br/>Traveling %s at<br/> %s mph as of %s, Time to next stop is ", vehicle.VehicleName, CardinalDirection(&update.Heading), speed, update.Created.Format("3:04PM"))
+			nextArrival := GetArrivalTime(&update, App.Routes, App.Stops)
+			message = fmt.Sprintf("<b>%s</b><br/>Traveling %s at<br/> %s mph as of %s, %s", vehicle.VehicleName, CardinalDirection(&update.Heading), speed, update.Created.Format("3:04PM"), nextArrival)
 			messages = append(messages, message)
 		}
 	}
