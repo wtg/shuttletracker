@@ -6,6 +6,9 @@ import (
 	"strconv"
 	"time"
 
+	log "github.com/Sirupsen/logrus"
+	"github.com/gorilla/mux"
+
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -32,15 +35,18 @@ type Route struct {
 
 // Stop indicates where a tracked object is scheduled to arrive
 type Stop struct {
-	Name        string  `json:"name"           bson:"name"`
-	Description string  `json:"description"    bson:"description"`
-	Address     string  `json:"address"        bson:"address"`
-	StartTime   string  `json:"startTime"      bson:"startTime"`
-	EndTime     string  `json:"endTime"        bson:"endTime"`
-	Lat         float64 `json:"lat,string"     bson:"lat"`
-	Lng         float64 `json:"lng,string"     bson:"lng"`
-	Enabled     bool    `json:"enabled,string" bson:"enabled"`
-	RouteID     string  `json:"routeId"        bson:"routeId"`
+	ID          string `json:"id"             bson:"id"`
+	Name        string `json:"name"           bson:"name"`
+	Description string `json:"description"    bson:"description"`
+	// position on map
+	Lat     float64 `json:"lat,string"     bson:"lat"`
+	Lng     float64 `json:"lng,string"     bson:"lng"`
+	Address string  `json:"address"        bson:"address"`
+
+	StartTime string `json:"startTime"      bson:"startTime"`
+	EndTime   string `json:"endTime"        bson:"endTime"`
+	Enabled   bool   `json:"enabled,string" bson:"enabled"`
+	RouteID   string `json:"routeId"        bson:"routeId"`
 }
 
 // RoutesHandler finds all of the routes in the database
@@ -117,6 +123,17 @@ func (App *App) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//Deletes route from database
+func (App *App) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	log.Debugf("deleting", vars["id"])
+	err := App.Routes.Remove(bson.M{"_id": bson.ObjectIdHex(vars["id"])})
+	// Error handling
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 // StopsCreateHandler adds a new route stop to the database
 func (App *App) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Create a new stop object using request fields
@@ -128,6 +145,16 @@ func (App *App) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Store new stop under stops collection
 	err = App.Stops.Insert(&stop)
+	// Error handling
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (App *App) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	log.Debugf("deleting", vars["id"])
+	err := App.Stops.Remove(bson.M{"name": vars["id"]})
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

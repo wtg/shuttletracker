@@ -16,6 +16,15 @@
       background: #3f51b5;
       color: white;
     }
+    .vehicle-edit {
+      margin: 25px;
+      padding: 20px;
+      background: #ffffff;
+    }
+    .vehicle-edit paper-button {
+      background: #3f51b5;
+      color: white;
+    }
     .vehicle-card {
       margin: 5px;
     }
@@ -45,14 +54,16 @@
       last-response="{{vehicles}}">
     </iron-ajax>
 
+    <iron-ajax id="ajaxDelete" method="DELETE" on-response="addVehicleResponse"></iron-ajax>
+
     <div class="vehicle-list">
       <template is="dom-if" if="{{vehicles}}">
         <paper-material class="vehicles-container">
           <h1> Vehicles </h1>
           <template is="dom-repeat" items="{{vehicles}}" as="vehicle">
-            <paper-card class="vehicle-card" heading="{{vehicle.vehicleName}}" elevation="2">
+            <paper-card class="vehicle-card" heading="{{vehicle.vehicleName}}" elevation="2" contenteditable="false">
               <div class="card-content">
-                <b> ID: </b> <span>{{vehicle.vehicleID}}</span>
+                <b> ID: </b> <span id$="{{vehicle.vehicleName}}">{{vehicle.vehicleID}}</span>
               </div>
               <div class="card-actions">
                 <paper-icon-button on-click="editVehicle" icon="create" class="create"></paper-icon-button>
@@ -63,7 +74,7 @@
         </paper-material>
       </template>
     </div>
-
+<!-- class="card-vehicle-id" contenteditable="false" -->
     <paper-material class="vehicle-form">
       <h1> New Vehicle </h1>
       <form is="iron-form" id="vehicleForm" content-type="application/json" method="post" action="/vehicles/create">
@@ -73,6 +84,16 @@
         <paper-button raised onclick="submitVehicle()">Submit</paper-button>
       </form>
     </paper-material>
+
+    <!-- <paper-material class="vehicle-form">
+      <h1> Edit Vehicle </h1>
+      <form is="iron-form" id="vehicleEdit" content-type="application/json" method="post" action="/vehicles/edit">
+        <paper-input name="vehicleName" label="Vehicle Name"></paper-input>
+        <paper-input name="vehicleID" label="Vehicle ID"></paper-input>
+        <br />
+        <paper-button raised onclick="submitVehicle()">Submit Updates</paper-button>
+      </form>
+    </paper-material> -->
   </template>
 
   <script>
@@ -85,14 +106,22 @@
         this.$.updateVehicles.generateRequest();
       },
       editVehicle: function(e) {
-        
+        var model = e.model;
+        var vehicle = model.vehicle;
+        var element = document.getElementById(vehicle.vehicleName);
+        element.contentEditable = true;
       },
       deleteVehicle: function(e) {
-        
+        this.splice('vehicles', e.model.index, 1);
       }
     });
 
     function submitVehicle() {
+      var form = document.getElementById("vehicleForm");
+      form.submit();
+      form.reset();
+    }
+    function submitEdits() {
       var form = document.getElementById("vehicleForm");
       form.submit();
       form.reset();
