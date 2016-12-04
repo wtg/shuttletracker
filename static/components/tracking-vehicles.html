@@ -112,11 +112,7 @@
         element.contentEditable = true;
       },
       deleteVehicle: function(e) {
-        var model = e.model;
-        var vehicle = model.vehicle;
-        var id = vehicle.vehicleID;
-        this.$.ajaxDelete.url = "/vehicles/" + id;
-        this.$.ajaxDelete.generateRequest();
+        this.splice('vehicles', e.model.index, 1);
       }
     });
 
@@ -126,7 +122,6 @@
       form.reset();
     }
     function submitEdits() {
-
       var form = document.getElementById("vehicleForm");
       form.submit();
       form.reset();

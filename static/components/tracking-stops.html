@@ -165,6 +165,9 @@
       },
       addStopResponse: function() {
         this.$.updateStops.generateRequest();
+      },
+      deleteStop: function(e) {
+        this.splice('stops', e.model.index, 1);
       }
     });
 
