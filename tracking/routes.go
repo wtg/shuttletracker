@@ -366,15 +366,8 @@ func (App *App) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	// check if update success
 	fmt.Println("Closest Segment ID = " + strconv.Itoa(stop.SegmentIndex))
-	fmt.Println(route.Duration[stop.SegmentIndex])
-	test := Route{}
-	App.Routes.Find(bson.M{"id": stop.RouteID}).One(&test)
-	fmt.Println(test.StopsID)
-	fmt.Println(test.AvailableRoute)
-	// When creating a Stop, it actually changes the segments by adding a segment in a route, which the segment will take a different duration
-	// select the route pointed by the stop
+	WriteJSON(w, stop)
 }
 
 func (App *App) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
