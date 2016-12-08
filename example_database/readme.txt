@@ -7,6 +7,7 @@ Use
 chmod +x import.sh
 
 to fix the permission problem
+The sample database contains the example shuttles, west/east routes (snapped to the road), test route surrounding Blitman, and west/east stops. 
 =====================================================================================
 import the sample database:
 
