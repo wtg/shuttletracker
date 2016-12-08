@@ -245,7 +245,6 @@
               icon: "static/images/stop.png",
               title: stops[i]["name"]
             });
-            
             // Create infowindow and open it when a stop is clicked
             (function(marker, i) {
               var contentString = '<b>' + stops[i]["name"] + '</b>';
@@ -256,7 +255,6 @@
                 infowindow.open(marker.map, marker);
               });
             })(marker, i);
-            
             this.stops.push(marker);
           }
         } else {
