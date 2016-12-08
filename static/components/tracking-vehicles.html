@@ -4,37 +4,9 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="stylesheet" type="text/css" href="../css/tracking-vehicles.css">
 
 <dom-module id="tracking-vehicles">
-  <style>
-    .vehicle-form {
-      margin: 25px;
-      padding: 20px;
-      background: #ffffff;
-    }
-    .vehicle-form paper-button {
-      background: #3f51b5;
-      color: white;
-    }
-    .vehicle-card {
-      margin: 5px;
-    }
-    .vehicle-list h1 {
-      margin-left: 15px;
-    }
-    .vehicle-list .vehicle-card {
-      margin-left: 15px;
-    }
-    .vehicle-action {
-      --iron-icon-height: 20px;
-      --iron-icon-width: 20px;
-    }
-    .vehicles-container {
-      margin: 25px;
-      padding: 10px;
-      background: #ffffff;
-    }
-  </style>
 
   <template>
     <iron-ajax
@@ -44,6 +16,8 @@
       handle-as="json"
       last-response="{{vehicles}}">
     </iron-ajax>
+
+    <iron-ajax id="ajaxDelete" method="DELETE" on-response="addVehicleResponse"></iron-ajax>
 
     <div class="vehicle-list">
       <template is="dom-if" if="{{vehicles}}">
@@ -85,10 +59,14 @@
         this.$.updateVehicles.generateRequest();
       },
       editVehicle: function(e) {
-        
+
       },
       deleteVehicle: function(e) {
-        
+        var entry = Polymer.dom(e).path[6].textContent;
+        var index = entry.search('I');
+        var id = entry.substring(index+5,index+15);
+        this.$.ajaxDelete.url = "/vehicles/" + id;
+        this.$.ajaxDelete.generateRequest();
       }
     });
 

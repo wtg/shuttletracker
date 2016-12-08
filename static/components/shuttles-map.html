@@ -6,46 +6,9 @@
 <link rel="import" href="/bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="/bower_components/neon-animation/neon-animations.html">
 <link rel="import" href="../../bower_components/google-map/google-map.html">
+<link rel="stylesheet" type="text/css" href="../css/shuttles-map.css">
 
 <dom-module id="shuttles-map"> 
-  <style> 
-    :host {
-      width: 100%;
-      height: 100%;
-    }
-    .content {
-      margin: 15px;
-    }
-    #logo {
-      position: absolute;
-      width: 100%;
-      top: 1px;
-      left: 1px;
-    }
-    #logo img {
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    #menu paper-fab {
-      position: absolute;
-      background: red;
-      right: 5px;
-      top: 5px;
-    }
-    .menu-toolbar {
-      margin: none;
-    }
-    .shuttle-map {
-      width: 100%;
-      height: 100%;
-    }
-    .menu-dialog {
-      width: 50%;
-      height: 35%;
-      font-size: 16px;
-    }
-  </style>
 
   <template>  
     <iron-ajax
@@ -145,6 +108,10 @@
           type: Array,
           value: []
         },
+        routes: {
+          type: Array,
+          value: []
+        },
         messages: {
           type: Array,
           value: []
@@ -194,10 +161,15 @@
             var marker = new google.maps.Marker({
               position: pos,
               map: this.$.shuttleMap.map,
-              icon: "static/images/shuttle.png",
+              icon: {
+                // Replace this path for future shuttle icon
+                //  icon has to be an svg file
+                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                scale: 2.5,
+                rotation: parseInt(updates[i]["heading"])
+              },
               title: updates[i]["vehicleID"]
             });
-            
             // Get update message for the info window
             var contentString = this.messages[i];
             // Create info window and open it when shuttle clicked
@@ -209,7 +181,6 @@
                 infowindow.open(marker.map, marker);
               });
             })(marker, i);
-            
             this.vehicles.push(marker);
           }
         } else {
@@ -226,6 +197,7 @@
 
       drawRoutes: function(event, response) {
         // Draw polylines on map to represent tracking routes
+        this.clearRoutes(this.routes);
         var routes = response.response;
         if (routes) {
           this.$.shuttleMap.clear();
@@ -239,13 +211,21 @@
             var route = new google.maps.Polyline({
               path: coords,
               geodesic: true,
-              strokeOpacity: 1.0,
+              strokeOpacity: 1,
               strokeColor: color,
               strokeWeight: width
             });
             route.setMap(this.$.shuttleMap.map);
+            this.routes.push(route);
           }
         }
+      },
+
+      clearRoutes: function(routes) {
+        for (i = 0; i < routes.length; i++) {
+          routes[i].setMap(null);
+        }
+        routes = [];
       },
 
       placeStops: function(event, response) {
@@ -265,7 +245,6 @@
               icon: "static/images/stop.png",
               title: stops[i]["name"]
             });
-            
             // Create infowindow and open it when a stop is clicked
             (function(marker, i) {
               var contentString = '<b>' + stops[i]["name"] + '</b>';
@@ -276,7 +255,6 @@
                 infowindow.open(marker.map, marker);
               });
             })(marker, i);
-            
             this.stops.push(marker);
           }
         } else {
