@@ -162,13 +162,14 @@
               position: pos,
               map: this.$.shuttleMap.map,
               icon: {
+                // Replace this path for future shuttle icon
+                //  icon has to be an svg file
                 path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
                 scale: 2.5,
                 rotation: parseInt(updates[i]["heading"])
               },
               title: updates[i]["vehicleID"]
             });
-            
             // Get update message for the info window
             var contentString = this.messages[i];
             // Create info window and open it when shuttle clicked
@@ -180,7 +181,6 @@
                 infowindow.open(marker.map, marker);
               });
             })(marker, i);
-            
             this.vehicles.push(marker);
           }
         } else {
@@ -245,7 +245,6 @@
               icon: "static/images/stop.png",
               title: stops[i]["name"]
             });
-            
             // Create infowindow and open it when a stop is clicked
             (function(marker, i) {
               var contentString = '<b>' + stops[i]["name"] + '</b>';
@@ -256,7 +255,6 @@
                 infowindow.open(marker.map, marker);
               });
             })(marker, i);
-            
             this.stops.push(marker);
           }
         } else {
