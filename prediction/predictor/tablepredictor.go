@@ -1,8 +1,8 @@
 package predictor
 import schedule
-// Table Predictor stores a simple interface to access the table of arrival times stored in database
+// Stores a simple interface to access table of arrival times stored in database
 type TablePredictor struct{
-	Table *mgo.Collection
+  Table *mgo.Collection
 }
 
 // query timetable to get the next N arrival time by select time by stopid with end date > current date > start date, time > current time, weekday = current weekday; 
@@ -12,11 +12,11 @@ func (this TablePredictor) getNextN(StopID []string, CurrentTime time.Time , Nex
 }
 
 type TimeTable struct{
-	ID string `json:"id"`
-	StopID string `json:"stopid"`
-	StartDate time.Time `json:"startdate"`
-	EndDate time.Time `json:"enddate"`
-	Time time.Time `json:"time"`
-	WeekDay int `json:"weekday"`
+  ID string `json:"id"`
+  StopID string `json:"stopid"`
+  StartDate time.Time `json:"startdate"`
+  EndDate time.Time `json:"enddate"`
+  Time time.Time `json:"time"`
+  WeekDay int `json:"weekday"`
 }
 

@@ -2,28 +2,29 @@ package schedule
 
 import "time"
 
-// Arrival Time serving what's the time to next N stops for one shuttle
+// Struct for arrival time for next N shuttles
+//  stores data for only 1 shuttle
 type ShuttleArrivalTime struct{
-	ID string `json:"id"`
-	ShuttleID string `json:"shuttleid"`
-	Created time.Time `json:"created"`
-	Arrival []ArrivalTime `json:"arrival"` // this stores only the arrival time for stops for this specific shuttle
+  ID string `json:"id"`
+  ShuttleID string `json:"shuttleid"`
+  Created time.Time `json:"created"`
+  Arrival []ArrivalTime `json:"arrival"`
 }
 
-// Arrival Time serving what's the time to next N shuttle arrival for one stop
+// Struct for shuttle arrival time for next stop
 type ArrivalTime struct {
-	ID string `json:"id"`
-	StopID string `json:"stopid"`
-	Created time.Time `json:"created"`
-	Arrival []time.Time `json:"arrival`
+  ID string `json:"id"`
+  StopID string `json:"stopid"`
+  Created time.Time `json:"created"`
+  Arrival []time.Time `json:"arrival`
 }
 
-// an interface for generating ArrivalTime
+// Interface for generating/formatting ArrivalTime
 type ArrivalPredictor interface {
-	getNextN(StopID []string, CurrentTime time.Time, NextN int) []ArrivalTime
+  getNextN(StopID []string, CurrentTime time.Time, NextN int) []ArrivalTime
 }
 
 type ShuttleArrivalPredictor interface{
-	getNextN(StopID []string, CurrentTime time.Time, NextN int) []ShuttleArrivalTime
+  getNextN(StopID []string, CurrentTime time.Time, NextN int) []ShuttleArrivalTime
 }
 
