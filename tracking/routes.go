@@ -129,6 +129,7 @@ func (App *App) StopsHandler(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, stops)
 }
 
+// Interpolate do interpolation using user input coordinates
 func Interpolate(coords []Coord, key string) []Coord {
 	// make request
 	prefix := "https://roads.googleapis.com/v1/snapToRoads?"
@@ -143,8 +144,14 @@ func Interpolate(coords []Coord, key string) []Coord {
 			buffer.WriteString("|")
 		}
 	}
+	// add the first point to be evaluated
+	if len(coords) > 1 {
+		buffer.WriteString("|" + strconv.FormatFloat(coords[0].Lat, 'f', 10, 64) + "," + strconv.FormatFloat(coords[1].Lng, 'f', 10, 64))
+	}
 	buffer.WriteString("&interpolate=true&key=")
 	buffer.WriteString(key)
+	fmt.Println(buffer.String())
+	// send request
 	resp, err := http.Get(buffer.String())
 	if err != nil {
 		fmt.Errorf("Error Not valid response from Google API")
@@ -154,6 +161,7 @@ func Interpolate(coords []Coord, key string) []Coord {
 	body, err := ioutil.ReadAll(resp.Body)
 	mapResponse := MapResponse{}
 	json.Unmarshal(body, &mapResponse)
+	// read response
 	result := []Coord{}
 	for _, location := range mapResponse.SnappedPoints {
 		currentLocation := Coord{
@@ -229,8 +237,6 @@ func ComputeSegments(coords []Coord, key string, threshold int) []Segment {
 			prev = index
 		}
 	}
-	// compute the last segment
-	result = append(result, GoogleSegmentCompute(coords[prev], coords[0], key))
 	return result
 }
 
@@ -287,6 +293,7 @@ func (App *App) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
 }
 
 //Deletes route from database
@@ -359,15 +366,8 @@ func (App *App) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	// check if update success
 	fmt.Println("Closest Segment ID = " + strconv.Itoa(stop.SegmentIndex))
-	fmt.Println(route.Duration[stop.SegmentIndex])
-	test := Route{}
-	App.Routes.Find(bson.M{"id": stop.RouteID}).One(&test)
-	fmt.Println(test.StopsID)
-	fmt.Println(test.AvailableRoute)
-	// When creating a Stop, it actually changes the segments by adding a segment in a route, which the segment will take a different duration
-	// select the route pointed by the stop
+	WriteJSON(w, stop)
 }
 
 func (App *App) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
