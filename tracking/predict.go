@@ -13,6 +13,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// GetArrivalTime is experimental
 func GetArrivalTime(update *VehicleUpdate, routes *mgo.Collection, stops *mgo.Collection) string {
 	if i, err := strconv.ParseFloat(update.Speed, 64); i > 5.0 && err == nil {
 		route := Route{}
@@ -26,7 +27,7 @@ func GetArrivalTime(update *VehicleUpdate, routes *mgo.Collection, stops *mgo.Co
 		if err != nil {
 			panic("Parsing Error")
 		}
-		minimumLen := 1000.0
+		minimumLen := 1000.0 // bad code
 		ShuttleSegment := 0
 		for i := 0; i < len(route.Duration); i++ {
 			x1 := route.Duration[i].Start.Latitude
@@ -40,8 +41,10 @@ func GetArrivalTime(update *VehicleUpdate, routes *mgo.Collection, stops *mgo.Co
 				ShuttleSegment = i
 			}
 		}
-		fmt.Printf("ID = %s, Segment = %d (%f, %f), duration = %f\n", update.VehicleID, ShuttleSegment, route.Duration[ShuttleSegment].Start.Latitude, route.Duration[ShuttleSegment].Start.Longitude, route.Duration[ShuttleSegment].Duration)
-		// this section is not correct
+		// when shuttle segment is not found, return N/A
+		if ShuttleSegment >= 0 && ShuttleSegment < len(route.Duration) {
+			fmt.Printf("ID = %s, Segment = %d (%f, %f), duration = %f\n", update.VehicleID, ShuttleSegment, route.Duration[ShuttleSegment].Start.Latitude, route.Duration[ShuttleSegment].Start.Longitude, route.Duration[ShuttleSegment].Duration)
+		}
 		allstops := []Stop{}
 		stops.Find(bson.M{"routeId": route.ID}).All(&allstops)
 		var buffer bytes.Buffer
