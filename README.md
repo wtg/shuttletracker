@@ -28,3 +28,7 @@ Setting Up
   * MongoPort: Port where MongoDB is bound (default is 27017)
 7. Run the app using `go run main.go` in the project root directory
 8. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the admin panel 
+
+More Information
+-----------------
+For more information please visit the [Wiki page](https://github.com/KeyboardNerd/shuttle_tracking_2/wiki).
