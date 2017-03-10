@@ -1,0 +1,30 @@
+.route-select {
+  margin: 1px;
+}
+
+.stop-card {
+  width: 32%;
+  margin: 5px;
+}
+
+.stop-map {
+  width: 98%;
+  height: 450px;
+}
+
+.stops-list {
+  background: #ffffff;
+  margin: 25px;
+  padding: 10px;
+}
+
+.stops-form {
+  background: #ffffff;
+  margin: 25px;
+  padding: 25px;
+}
+
+.submit-stop {
+  background: #3f51b5;
+  color: #ffffff;
+}

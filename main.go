@@ -2,10 +2,10 @@ package main
 
 import (
 	"net/http"
+	"shuttle_tracking_2/tracking"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
-	"shuttle_tracking_2/tracking"
 )
 
 var (
@@ -39,12 +39,16 @@ func main() {
 	r.HandleFunc("/admin/{*}", AdminHandler).Methods("GET")
 	r.HandleFunc("/vehicles", App.VehiclesHandler).Methods("GET")
 	r.HandleFunc("/vehicles/create", App.VehiclesCreateHandler).Methods("POST")
+	r.HandleFunc("/vehicles/edit", App.VehiclesEditHandler).Methods("POST")
+	r.HandleFunc("/vehicles/{id:[0-9]+}", App.VehiclesDeleteHandler).Methods("DELETE")
 	r.HandleFunc("/updates", App.UpdatesHandler).Methods("GET")
-  r.HandleFunc("/updates/message", App.UpdateMessageHandler).Methods("GET")
+	r.HandleFunc("/updates/message", App.UpdateMessageHandler).Methods("GET")
 	r.HandleFunc("/routes", App.RoutesHandler).Methods("GET")
 	r.HandleFunc("/routes/create", App.RoutesCreateHandler).Methods("POST")
+	r.HandleFunc("/routes/{id:.+}", App.RoutesDeleteHandler).Methods("DELETE")
 	r.HandleFunc("/stops", App.StopsHandler).Methods("GET")
 	r.HandleFunc("/stops/create", App.StopsCreateHandler).Methods("POST")
+	r.HandleFunc("/stops/{id:.+}", App.StopsDeleteHandler).Methods("DELETE")
 	// Static files
 	r.PathPrefix("/bower_components/").Handler(http.StripPrefix("/bower_components/", http.FileServer(http.Dir("bower_components/"))))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))

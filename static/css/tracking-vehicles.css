@@ -1,0 +1,33 @@
+.vehicle-form {
+  margin: 25px;
+  padding: 20px;
+  background: #ffffff;
+}
+
+.vehicle-form paper-button {
+  background: #3f51b5;
+  color: white;
+}
+
+.vehicle-card {
+  margin: 5px;
+}
+
+.vehicle-list h1 {
+  margin-left: 15px;
+}
+
+.vehicle-list .vehicle-card {
+  margin-left: 15px;
+}
+
+.vehicle-action {
+  --iron-icon-height: 20px;
+  --iron-icon-width: 20px;
+}
+
+.vehicles-container {
+  margin: 25px;
+  padding: 10px;
+  background: #ffffff;
+}
