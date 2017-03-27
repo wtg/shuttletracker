@@ -243,6 +243,7 @@ func ComputeSegments(coords []Coord, key string, threshold int) []Segment {
 // RoutesCreateHandler adds a new route to the database
 func (App *App) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Create a new route object using request fields
+	fmt.Printf("asdf");
 	var routeData map[string]string
 	var coordsData []map[string]float64
 	// Decode route details
@@ -299,8 +300,9 @@ func (App *App) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 //Deletes route from database
 func (App *App) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	fmt.Printf(vars["id"]);
 	log.Debugf("deleting", vars["id"])
-	err := App.Routes.Remove(bson.M{"_id": bson.ObjectIdHex(vars["id"])})
+	err := App.Routes.Remove(bson.M{"id": vars["id"]});
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

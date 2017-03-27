@@ -18,6 +18,7 @@
       handle-as="json"
       last-response="{{routes}}">
     </iron-ajax>
+    <iron-ajax id="ajaxDelete" method="DELETE" on-response="addRouteResponse"></iron-ajax>
 
     <template is="dom-if" if="{{routes}}">
       <paper-material class="routes-container">
@@ -30,7 +31,7 @@
                 <div> <b> Enabled: </b> <span>{{route.enabled}}</span> </div>
                 <div> <b> Time: </b> <span>{{route.startTime}}</span> - <span>{{route.endTime}}</span> </div>
                 <div> <b> Color: </b> <span>{{route.color}}</span> </div>
-                <div> <b> Width: </b> <span>{{route.width}}</span> </div>
+                <div> <b> ID: </b> <span>{{route.id}}</span> </div>
               </div>
             </div>
             <div class="card-actions">
@@ -135,6 +136,12 @@
 
       },
       deleteRoute: function(e) {
+        var entry = Polymer.dom(e).path[6].textContent;
+        var index = entry.search("ID");
+        var id = entry.substring(index+5,index+29);
+        alert(index);
+        this.$.ajaxDelete.url = "/routes/" + id;
+        this.$.ajaxDelete.generateRequest();
 
       }
     });
