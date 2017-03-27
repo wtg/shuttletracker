@@ -8,10 +8,13 @@ import (
 	"strconv"
 	"time"
 
+	"database/sql"
+	"fmt"
+	_ "github.com/go-sql-driver/mysql"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
 
-	"fmt"
 	"io/ioutil"
 
 	"gopkg.in/mgo.v2/bson"
@@ -240,10 +243,35 @@ func ComputeSegments(coords []Coord, key string, threshold int) []Segment {
 	return result
 }
 
+func (App *App) ImportHandler(w http.ResponseWriter, r *http.Request){
+	fmt.Printf("yo");
+	db,err := sql.Open("mysql","root:pass@/shuttle_tracking");
+	if err != nil{
+		log.Fatalf("Couldnt connect to mysql");
+	}
+	if err := db.Ping(); err != nil {
+  	log.Fatal(err)
+	}
+	if db == nil{
+		log.Fatalf("db empty");
+	}
+	rows,err :=  db.Query("SELECT latitude FROM coords");
+	if(err != nil){
+		log.Fatalf("bad query");
+	}
+
+	for rows.Next() {
+		var lat float64;
+		if err := rows.Scan(&lat); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("Lat: %f\n", lat)
+	}
+}
+
 // RoutesCreateHandler adds a new route to the database
 func (App *App) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Create a new route object using request fields
-	fmt.Printf("asdf");
 	var routeData map[string]string
 	var coordsData []map[string]float64
 	// Decode route details
