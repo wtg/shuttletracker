@@ -24,7 +24,14 @@
       id="fetchRoutes"
       url="/routes"
       handle-as="json"
-      last-response="{{routes}}">
+      on-response="drawRoutes"
+      >
+    </iron-ajax>
+    <iron-ajax
+      id="fetchStops"
+      url="/stops"
+      handle-as="json"
+      on-response="editStopTwo">
     </iron-ajax>
 
     <iron-ajax id="ajaxDelete" method="DELETE" on-response="addStopResponse"></iron-ajax>
@@ -69,21 +76,22 @@
                 </template>
               </paper-menu>
             </paper-dropdown-menu>
-            <paper-input name="name" label="Stop Name"></paper-input>
-            <paper-input name="description" label="Description"></paper-input>
-            <paper-input name="address" label="Address"></paper-input>
-            <paper-input name="startTime" label="Start Time"></paper-input>
-            <paper-input name="endTime" label="End Time"></paper-input>
+            <paper-input name="name" label="Stop Name" id="name" value=""></paper-input>
+            <paper-input name="description" label="Description" id="desc" value=""></paper-input>
+            <paper-input name="address" label="Address" id="addr" value=""></paper-input>
+            <paper-input name="startTime" label="Start Time" id="start" value=""></paper-input>
+            <paper-input name="endTime" label="End Time" id="end" value=""></paper-input>
             <br />
             <div>
               Stop Enabled?
-              <paper-toggle-button checked="{{isEnabled}}"></paper-toggle-button>
-              <input is="iron-input" type="hidden" name="enabled" value="{{isEnabled}}">
+              <paper-toggle-button checked="{{isEnabled}}" id="enButton"></paper-toggle-button>
+              <input is="iron-input" type="hidden" name="enabled" id = "en" value="{{isEnabled}}">
             </div>
             <br />
+            <input type="hidden" name="id" id="id">
             <input type="hidden" name="lat" id="stopLat">
             <input type="hidden" name="lng" id="stopLng">
-            <input type="hidden" name="routeId" value="{{selectedRoute.value}}">
+            <input type="hidden" name="routeId" id = "routeId" value="{{selectedRoute.value}}">
             <paper-button class="submit-stop" raised onclick="submitStop()">Submit</paper-button>
           </form>
         </div>
@@ -117,6 +125,7 @@
         'google-map-click': 'addStopMarker'
       },
       ready: function() {
+        this.$.fetchRoutes.generateRequest();
         this.stopMarker = null;
       },
       clearStopMarker: function() {
@@ -148,9 +157,78 @@
         this.$.ajaxDelete.url = "/stops/" + id;
         this.$.ajaxDelete.generateRequest();
       },
-      editStop: function(){
+      editStop: function(e){
+        var entry = Polymer.dom(e).path[6].textContent;
+        var index = entry.search("ID");
+        var id = entry.substring(index+5,index+29);
+        this.$.id.value = id;
+
+        this.$.fetchStops.generateRequest();
+      },
+      editStopTwo: function(e,response){
+
+        var stops = response.response;
+        if (stops) {
+          for (i = 0; i < stops.length; i++) {
+
+            if(stops[i]["id"] == this.$.id.value){
+              var pos = new google.maps.LatLng(
+                stops[i]["lat"],
+                stops[i]["lng"]);
+              // Place stop marker on map
+              this.clearStopMarker();
+              this.stopMarker = new google.maps.Marker({
+                position: pos,
+                map: this.$.stopMap.map,
+                title: stops[i]["name"]
+              });
+              this.updateStopForm();
+              this.$.name.value = stops[i]["name"];
+              this.$.en.value = stops[i]["enabled"];
+              //This doesnt work?
+              this.$.enButton.value = stops[i]["enabled"];
+              this.$.routeId.value = stops[i]["routeId"];
+              this.$.desc.value = stops[i]["description"];
+              this.$.addr.value = stops[i]["address"];
+              this.$.start.value = stops[i]["startTime"];
+              this.$.end.value = stops[i]["endTime"];
+              //Temporary but should be fine
+              this.$.ajaxDelete.url = "/stops/" + this.$.id.value;
+              this.$.ajaxDelete.generateRequest();
+              break;
+            }
+          }
+        } else {
+          console.log("no vehicle stops found");
+        }
 
       },
+
+      drawRoutes: function(event, response) {
+
+        var routes = response.response;
+        if (routes) {
+          this.$.stopMap.clear();
+
+          for (var i = 0; i < routes.length; i++) {
+            // Route details
+            var data = routes[i];
+            var coords = data['coords'];
+            var color = data['color'];
+            var width = data['width'];
+            // Add route to map
+            var route = new google.maps.Polyline({
+              path: coords,
+              geodesic: true,
+              strokeOpacity: 1,
+              strokeColor: color,
+              strokeWeight: width
+            });
+            route.setMap(this.$.stopMap.map);
+          }
+        }
+      },
+
       addStopResponse: function() {
         this.$.updateStops.generateRequest();
       }

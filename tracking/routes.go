@@ -121,7 +121,7 @@ func (App *App) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 
 // StopsHandler finds all of the route stops in the database
 func (App *App) StopsHandler(w http.ResponseWriter, r *http.Request) {
-	// Find all stops in database
+	// Find all stops in databases
 	var stops []Stop
 	err := App.Stops.Find(bson.M{}).All(&stops)
 	// Handle query errors
