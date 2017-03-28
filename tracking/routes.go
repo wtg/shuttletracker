@@ -121,7 +121,7 @@ func (App *App) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 
 // StopsHandler finds all of the route stops in the database
 func (App *App) StopsHandler(w http.ResponseWriter, r *http.Request) {
-	// Find all stops in database
+	// Find all stops in databases
 	var stops []Stop
 	err := App.Stops.Find(bson.M{}).All(&stops)
 	// Handle query errors
@@ -245,7 +245,8 @@ func ComputeSegments(coords []Coord, key string, threshold int) []Segment {
 
 //This is really a temporary funcion to import the old database, only supports adding two routes
 func (App *App) ImportHandler(w http.ResponseWriter, r *http.Request){
-
+	var count int;
+	count = 0;
 	db,err := sql.Open("mysql","root:pass@/shuttle_tracking");
 	//Begin connecting to database
 	if err != nil{
@@ -310,15 +311,23 @@ func (App *App) ImportHandler(w http.ResponseWriter, r *http.Request){
 				Updated:     time.Now()}
 				_ = newRoute
 				fmt.Printf(name)
-				coords = []Coord{};
+				coords = nil;
 				err = App.Routes.Insert(&newRoute)
 			}
 
 		oldId = route_id
 		myCoord := Coord{lat, long}
-		coords = append(coords,myCoord);
+		if(route_id == 1){
+			coords = append(coords,myCoord);
+		}else{
+			count += 1;
+			if(count % 10 == 0){
+				coords = append(coords,myCoord);
+			}
+		}
 	}
 
+	coords = Interpolate(coords, App.Config.GoogleMapAPIKey)
 	segments := ComputeSegments(coords, App.Config.GoogleMapAPIKey, App.Config.GoogleMapMinDistance)
 
 	route :=  db.QueryRow("SELECT name,description,start_time,end_time,color FROM routes where id = 2");
@@ -486,7 +495,8 @@ func (App *App) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 func (App *App) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	log.Debugf("deleting", vars["id"])
-	err := App.Stops.Remove(bson.M{"name": vars["id"]})
+	fmt.Printf(vars["id"]);
+	err := App.Stops.Remove(bson.M{"id": vars["id"]})
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
