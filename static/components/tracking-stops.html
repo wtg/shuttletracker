@@ -27,6 +27,9 @@
       last-response="{{routes}}">
     </iron-ajax>
 
+    <iron-ajax id="ajaxDelete" method="DELETE" on-response="addStopResponse"></iron-ajax>
+
+
     <template is="dom-if" if="{{stops}}">
       <paper-material class="stops-list">
         <h1> Stops </h1>
@@ -34,7 +37,7 @@
           <paper-card class="stop-card" heading="{{stop.name}}" elevation="2">
             <div class="card-content">
               <div class="layout vertical">
-                <div> <b> Description: </b> <span>{{stop.description}}</span> </div>
+                <div> <b> ID: </b> <span>{{stop.id}}</span> </div>
                 <div> <b> Enabled: </b> <span>{{stop.enabled}}</span> </div>
                 <div> <b> Time: </b> <span>{{stop.startTime}}</span> - <span>{{stop.endTime}}</span> </div>
                 <div> <b> Lat: </b> <span>{{stop.lat}}</span> </div>
@@ -137,11 +140,16 @@
         this.$.stopLat.value = this.stopMarker.position.lat();
         this.$.stopLng.value = this.stopMarker.position.lng();
       },
-      deleteStop: function(){
-        
+      deleteStop: function(e){
+        var entry = Polymer.dom(e).path[6].textContent;
+        var index = entry.search("ID");
+        var id = entry.substring(index+5,index+29);
+
+        this.$.ajaxDelete.url = "/stops/" + id;
+        this.$.ajaxDelete.generateRequest();
       },
       editStop: function(){
-        
+
       },
       addStopResponse: function() {
         this.$.updateStops.generateRequest();
