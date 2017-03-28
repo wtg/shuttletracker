@@ -243,9 +243,11 @@ func ComputeSegments(coords []Coord, key string, threshold int) []Segment {
 	return result
 }
 
+//This is really a temporary funcion to import the old database, only supports adding two routes
 func (App *App) ImportHandler(w http.ResponseWriter, r *http.Request){
-	fmt.Printf("yo");
+
 	db,err := sql.Open("mysql","root:pass@/shuttle_tracking");
+	//Begin connecting to database
 	if err != nil{
 		log.Fatalf("Couldnt connect to mysql");
 	}
@@ -255,18 +257,99 @@ func (App *App) ImportHandler(w http.ResponseWriter, r *http.Request){
 	if db == nil{
 		log.Fatalf("db empty");
 	}
-	rows,err :=  db.Query("SELECT latitude FROM coords");
+	//Begin grabbing information we need
+	rows,err :=  db.Query("SELECT * FROM coords");
 	if(err != nil){
 		log.Fatalf("bad query");
 	}
-
+	//iterate through rows
+	coords := []Coord{}
+	var oldId int;
+	oldId = 1;
 	for rows.Next() {
+		var id int;
 		var lat float64;
-		if err := rows.Scan(&lat); err != nil {
+		var long float64;
+		var position int;
+		var route_id int;
+		var created_at string;
+		var updated_at string;
+
+		if err := rows.Scan(&id,&lat,&long,&position,&route_id,&created_at,&updated_at); err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("Lat: %f\n", lat)
+		//We're done with the first route, update it and put it in the database.
+		if(oldId == 1 &&  route_id == 2){
+
+			coords = Interpolate(coords, App.Config.GoogleMapAPIKey)
+			segments := ComputeSegments(coords, App.Config.GoogleMapAPIKey, App.Config.GoogleMapMinDistance)
+
+			route :=  db.QueryRow("SELECT name,description,start_time,end_time,color FROM routes where id = 1");
+			var name string;
+			var desc string;
+			var color string;
+			var start_time string;
+			var end_time string;
+			err := route.Scan(&name,&desc,&start_time,&end_time,&color);
+			if(err != nil){
+				log.Fatal(err);
+			}
+
+			newRoute := Route{
+				ID:          bson.NewObjectId().Hex(),
+				Name:        name,
+				Description: desc,
+				StartTime:   start_time,
+				EndTime:     end_time,
+				Enabled:     true,
+				Color:       color,
+				Width:       4,
+				Coords:      coords,
+				Duration:    segments,
+				Created:     time.Now(),
+				Updated:     time.Now()}
+				_ = newRoute
+				fmt.Printf(name)
+				coords = []Coord{};
+				err = App.Routes.Insert(&newRoute)
+			}
+
+		oldId = route_id
+		myCoord := Coord{lat, long}
+		coords = append(coords,myCoord);
 	}
+
+	segments := ComputeSegments(coords, App.Config.GoogleMapAPIKey, App.Config.GoogleMapMinDistance)
+
+	route :=  db.QueryRow("SELECT name,description,start_time,end_time,color FROM routes where id = 2");
+	var name string;
+	var desc string;
+	var color string;
+	var start_time string;
+	var end_time string;
+	err = route.Scan(&name,&desc,&start_time,&end_time,&color);
+	if(err != nil){
+		log.Fatal(err);
+	}
+
+	newRoute := Route{
+		ID:          bson.NewObjectId().Hex(),
+		Name:        name,
+		Description: desc,
+		StartTime:   start_time,
+		EndTime:     end_time,
+		Enabled:     true,
+		Color:       color,
+		Width:       4,
+		Coords:      coords,
+		Duration:    segments,
+		Created:     time.Now(),
+		Updated:     time.Now()}
+		_ = newRoute
+		fmt.Printf(name)
+		coords = []Coord{};
+		err = App.Routes.Insert(&newRoute)
+
 }
 
 // RoutesCreateHandler adds a new route to the database

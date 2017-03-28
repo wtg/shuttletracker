@@ -139,7 +139,7 @@
         var entry = Polymer.dom(e).path[6].textContent;
         var index = entry.search("ID");
         var id = entry.substring(index+5,index+29);
-        alert(index);
+      
         this.$.ajaxDelete.url = "/routes/" + id;
         this.$.ajaxDelete.generateRequest();
 
