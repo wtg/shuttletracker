@@ -8,9 +8,9 @@
 <link rel="import" href="../../bower_components/google-map/google-map.html">
 <link rel="stylesheet" type="text/css" href="../css/shuttles-map.css">
 
-<dom-module id="shuttles-map"> 
+<dom-module id="shuttles-map">
 
-  <template>  
+  <template>
     <iron-ajax
       id="fetchUpdates"
       url="/updates"
@@ -67,8 +67,8 @@
                 Download the RPI Parking and Transportation shuttle schedule.
               </div>
             </section>
-            <section> 
-              <!-- API Docs & KML --> 
+            <section>
+              <!-- API Docs & KML -->
               <div class="content">
                 Developers may use our API to enrich their applications, create mobile applications, or implement any other creative ideas!<br/>
                 Visit our wiki to learn more about using our API.
@@ -83,7 +83,7 @@
   </template>
 
   <script>
-    Polymer({ 
+    Polymer({
 
       is: "shuttles-map",
 
@@ -93,7 +93,7 @@
           reflectToAttribute: true
         },
         lng : {
-          type: String, 
+          type: String,
           reflectToAttribute: true
         },
         zoom: {
@@ -155,7 +155,7 @@
           for (i = 0; i < updates.length; i++) {
             // Create position from vehicle coordinates
             var pos = new google.maps.LatLng(
-              updates[i]["lat"], 
+              updates[i]["lat"],
               updates[i]["lng"]);
             // Place shuttle marker on map
             var marker = new google.maps.Marker({
@@ -234,7 +234,7 @@
           // Clear previous stop markers
           this.clearMarkers(this.stops);
           for (i = 0; i < stops.length; i++) {
-            // Create position from stop coordinates 
+            // Create position from stop coordinates
             var pos = new google.maps.LatLng(
               stops[i]["lat"],
               stops[i]["lng"]);

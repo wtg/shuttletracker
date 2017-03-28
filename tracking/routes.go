@@ -245,7 +245,8 @@ func ComputeSegments(coords []Coord, key string, threshold int) []Segment {
 
 //This is really a temporary funcion to import the old database, only supports adding two routes
 func (App *App) ImportHandler(w http.ResponseWriter, r *http.Request){
-
+	var count int;
+	count = 0;
 	db,err := sql.Open("mysql","root:pass@/shuttle_tracking");
 	//Begin connecting to database
 	if err != nil{
@@ -310,15 +311,23 @@ func (App *App) ImportHandler(w http.ResponseWriter, r *http.Request){
 				Updated:     time.Now()}
 				_ = newRoute
 				fmt.Printf(name)
-				coords = []Coord{};
+				coords = nil;
 				err = App.Routes.Insert(&newRoute)
 			}
 
 		oldId = route_id
 		myCoord := Coord{lat, long}
-		coords = append(coords,myCoord);
+		if(route_id == 1){
+			coords = append(coords,myCoord);
+		}else{
+			count += 1;
+			if(count % 10 == 0){
+				coords = append(coords,myCoord);
+			}
+		}
 	}
 
+	coords = Interpolate(coords, App.Config.GoogleMapAPIKey)
 	segments := ComputeSegments(coords, App.Config.GoogleMapAPIKey, App.Config.GoogleMapMinDistance)
 
 	route :=  db.QueryRow("SELECT name,description,start_time,end_time,color FROM routes where id = 2");
