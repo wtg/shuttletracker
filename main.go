@@ -49,6 +49,7 @@ func main() {
 	r.HandleFunc("/stops", App.StopsHandler).Methods("GET")
 	r.HandleFunc("/stops/create", App.StopsCreateHandler).Methods("POST")
 	r.HandleFunc("/stops/{id:.+}", App.StopsDeleteHandler).Methods("DELETE")
+	r.HandleFunc("/import", App.ImportHandler).Methods("GET")
 	// Static files
 	r.PathPrefix("/bower_components/").Handler(http.StripPrefix("/bower_components/", http.FileServer(http.Dir("bower_components/"))))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))

@@ -44,6 +44,7 @@ func InitConfig() *Configuration {
 // InitApp initializes the application given a config and connects to backends.
 // It also seeds any needed information to the database.
 func InitApp(Config *Configuration) *App {
+
 	// Connect to MongoDB
 	session, err := mgo.Dial(Config.MongoURL + ":" + Config.MongoPort)
 	if err != nil {
