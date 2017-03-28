@@ -202,6 +202,7 @@
         if (routes) {
           this.$.shuttleMap.clear();
           for (var i = 0; i < routes.length; i++) {
+            if(routes[i]["enabled"] == "false"){continue;}
             // Route details
             var data = routes[i];
             var coords = data['coords'];
@@ -234,6 +235,7 @@
           // Clear previous stop markers
           this.clearMarkers(this.stops);
           for (i = 0; i < stops.length; i++) {
+            if(stops[i]["enabled"] == "false"){continue;}
             // Create position from stop coordinates
             var pos = new google.maps.LatLng(
               stops[i]["lat"],
