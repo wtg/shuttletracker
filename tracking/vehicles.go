@@ -30,6 +30,11 @@ type VehicleUpdate struct {
 	Segment   string    `json:"segment" bson:"segment"` // the segment that a vehicle resides on
 }
 
+type Dump struct{
+	id				int				`json:id						bson:"id"`
+	Data			string		`json:"Data"				bson:"Data"`
+}
+
 // Vehicle represents an object being tracked.
 type Vehicle struct {
 	VehicleID   string    `json:"vehicleID"   bson:"vehicleID,omitempty"`
@@ -55,13 +60,16 @@ var (
 )
 
 var ShuttleInactivityCounter = make(map[string]int);
+var info []Dump;
 
 // UpdateShuttles send a request to iTrak API, gets updated shuttle info, and
 // finally store updated records in db.
 func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 	var st time.Duration
-	for {
+	count := 0;
 
+	for {
+		count ++;
 		// Sleep for n seconds before updating again
 		log.Debugf("sleeping for %v", st)
 		time.Sleep(st)
@@ -86,6 +94,12 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 			log.Errorf("error reading data feed: %v", err)
 			continue
 		}
+
+		currData := Dump{
+			id: count,
+			Data: string(body)}
+
+		info = append(info, currData)
 
 		delim := "eof"
 		// split the body of response by delimiter
@@ -129,7 +143,6 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 			}
 			if(spd < 3){
 				ShuttleInactivityCounter[(strings.Replace(result["id"], "Vehicle ID:","",-1))] += 1;
-				fmt.Printf(update.Status);
 			}else{
 					ShuttleInactivityCounter[(strings.Replace(result["id"], "Vehicle ID:","",-1))] = 0;
 			}
@@ -147,6 +160,12 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 		}
 		log.Infof("sucessfully updated %d/%d vehicles", updated, len(vehiclesData)-1)
 	}
+}
+
+func (App *App) GetData(w http.ResponseWriter, r *http.Request) {
+
+	// Send each vehicle to client as JSON
+	WriteJSON(w, info)
 }
 
 // VehiclesHandler finds all the vehicles in the database.
