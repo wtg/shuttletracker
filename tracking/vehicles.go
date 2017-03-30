@@ -54,11 +54,14 @@ var (
 	dataNames = dataRe.SubexpNames()
 )
 
+var ShuttleInactivityCounter = make(map[string]int);
+
 // UpdateShuttles send a request to iTrak API, gets updated shuttle info, and
 // finally store updated records in db.
 func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 	var st time.Duration
 	for {
+
 		// Sleep for n seconds before updating again
 		log.Debugf("sleeping for %v", st)
 		time.Sleep(st)
@@ -119,11 +122,27 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 				Status:    strings.Replace(result["status"], "trig:", "", -1),
 				Created:   time.Now()}
 
+			//if a shuttle hasnt gone over 3 miles per hour in 5 minutes, it is probably inactive, and we shouldnt show it.
+			spd, err := strconv.ParseFloat(update.Speed, 64)
+			if(err != nil){
+				log.Errorf("error finding speed");
+			}
+			if(spd < 3){
+				ShuttleInactivityCounter[(strings.Replace(result["id"], "Vehicle ID:","",-1))] += 1;
+				fmt.Printf(update.Status);
+			}else{
+					ShuttleInactivityCounter[(strings.Replace(result["id"], "Vehicle ID:","",-1))] = 0;
+			}
+			if(ShuttleInactivityCounter[(strings.Replace(result["id"], "Vehicle ID:","",-1))] > 0){
+				update.Speed = "-1";
+			}
+
 			if err := App.Updates.Insert(&update); err != nil {
 				log.Errorf("error inserting vehicle update(%v): %v", update, err)
 			} else {
 				updated++
 			}
+
 			// here if parsing error, updated will be incremented, wait, the whole thing will crash, isn't it?
 		}
 		log.Infof("sucessfully updated %d/%d vehicles", updated, len(vehiclesData)-1)
@@ -211,6 +230,7 @@ func (App *App) UpdateMessageHandler(w http.ResponseWriter, r *http.Request) {
 	var message string
 	var vehicles []Vehicle
 	var update VehicleUpdate
+
 	// Query all Vehicles
 	err := App.Vehicles.Find(bson.M{}).All(&vehicles)
 	// Handle errors
@@ -227,8 +247,8 @@ func (App *App) UpdateMessageHandler(w http.ResponseWriter, r *http.Request) {
 			if len(speed) > 4 {
 				speed = speed[0:4]
 			}
-			nextArrival := GetArrivalTime(&update, App.Routes, App.Stops)
-			message = fmt.Sprintf("<b>%s</b><br/>Traveling %s at<br/> %s mph as of %s, %s", vehicle.VehicleName, CardinalDirection(&update.Heading), speed, update.Created.Format("3:04PM"), nextArrival)
+			//nextArrival := GetArrivalTime(&update, App.Routes, App.Stops)
+			message = fmt.Sprintf("<b>%s</b><br/>Traveling %s at<br/> %s mph as of %s", vehicle.VehicleName, CardinalDirection(&update.Heading), speed, update.Created.Format("3:04PM")/*, nextArrival*/)
 			messages = append(messages, message)
 		}
 	}
