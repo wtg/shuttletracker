@@ -133,7 +133,7 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 			}else{
 					ShuttleInactivityCounter[(strings.Replace(result["id"], "Vehicle ID:","",-1))] = 0;
 			}
-			if(ShuttleInactivityCounter[(strings.Replace(result["id"], "Vehicle ID:","",-1))] > 0){
+			if(ShuttleInactivityCounter[(strings.Replace(result["id"], "Vehicle ID:","",-1))] > 20){
 				update.Speed = "-1";
 			}
 
