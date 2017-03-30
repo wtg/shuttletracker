@@ -11,7 +11,7 @@ import (
 	"github.com/gorilla/mux"
 
 )
-
+/*This serves collected shuttle data in a loop*/
 var (
 	// Config holds the global app settings.
 	Config = tracking.InitConfig()
@@ -20,20 +20,20 @@ var (
 )
 
 type Dump struct{
-	id				int				`json:id						bson:"id"`
+	Id				int				`json:id						bson:"id"`
 	Data			string		`json:"Data"				bson:"Data"`
 }
-
+var data []Dump;
 func readFromFile(id int) string{
-  in, err := os.Open("test.json")
-  if err != nil {
-      fmt.Printf("you failed")
-  }
-  var data []Dump;
-
-  jsonParser := json.NewDecoder(in)
-  if err = jsonParser.Decode(&data); err != nil {
-     fmt.Printf("you failed")
+  if(len(data) == 0){
+    in, err := os.Open("dummy_data.json")
+    if err != nil {
+        fmt.Printf("you failed")
+    }
+      jsonParser := json.NewDecoder(in)
+      if err = jsonParser.Decode(&data); err != nil {
+        fmt.Printf("you failed")
+     }
   }
   return data[id].Data;
 }
@@ -47,6 +47,9 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
   byteArray := []byte(readFromFile(count));
   w.Write(byteArray)
   count += 1
+  if(count >= len(data)){
+    count = 0;
+  }
 }
 func main() {
 
