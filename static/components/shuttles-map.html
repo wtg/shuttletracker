@@ -158,6 +158,14 @@
               updates[i]["lat"],
               updates[i]["lng"]);
             // Place shuttle marker on map
+            // Get update message for the info window
+            var contentString = this.messages[i];
+            var idx = contentString.search("mph");
+            var speed = contentString.substring(idx-3, idx-1);
+            //If a shuttle has speed -1 it has been inactive for two long and is not displayed
+            if(speed == "-1"){
+              continue;
+            }
             var marker = new google.maps.Marker({
               position: pos,
               map: this.$.shuttleMap.map,
@@ -170,8 +178,6 @@
               },
               title: updates[i]["vehicleID"]
             });
-            // Get update message for the info window
-            var contentString = this.messages[i];
             // Create info window and open it when shuttle clicked
             (function(marker, i) {
               var infowindow = new google.maps.InfoWindow({
