@@ -20,14 +20,14 @@ Setting Up
   * MongoPort: Port where MongoDB is bound (default is 27017)
 3. Change your gopath to the parent directory or src directory listed on step 1 using `export GOPATH="path-to-directory"`
 4. Run `bower install` inside shuttle tracking directory to install dependencies listed in bower.json
-5. Run `./goget` (script provided) to install additional dependencies 
+5. Run `./goget` (script provided) to install additional dependencies
 6. Rename conf.json.sample to conf.json and edit with the following:
-  * Data Feed: API with tracking information (iTrak in our case)
+  * Data Feed: API with tracking information (iTrak in our case), if using the dummy server, http://localhost:8081
   * UpdateInterval: Number of seconds between each request to the data feed
   * MongoUrl: Url where MongoDB is located
   * MongoPort: Port where MongoDB is bound (default is 27017)
 7. Run the app using `go run main.go` in the project root directory
-8. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the admin panel 
+8. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the admin panel
 
 More Information
 -----------------
