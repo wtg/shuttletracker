@@ -31,7 +31,7 @@ type VehicleUpdate struct {
 }
 
 type Dump struct{
-	id				int				`json:id						bson:"id"`
+	Id				int				`json:id				bson:"id"`
 	Data			string		`json:"Data"				bson:"Data"`
 }
 
@@ -96,7 +96,7 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 		}
 
 		currData := Dump{
-			id: count,
+			Id: count,
 			Data: string(body)}
 
 		info = append(info, currData)
