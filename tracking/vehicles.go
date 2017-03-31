@@ -129,7 +129,7 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 			}
 			if(spd < 3){
 				ShuttleInactivityCounter[(strings.Replace(result["id"], "Vehicle ID:","",-1))] += 1;
-				fmt.Printf(update.Status);
+				//fmt.Printf(update.Status);
 			}else{
 					ShuttleInactivityCounter[(strings.Replace(result["id"], "Vehicle ID:","",-1))] = 0;
 			}

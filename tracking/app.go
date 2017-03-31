@@ -5,9 +5,11 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"net/url"
 
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/cas.v1"
 )
 
 // Configuration holds the settings for connecting to outside resources.
@@ -18,6 +20,7 @@ type Configuration struct {
 	MongoPort            string
 	GoogleMapAPIKey      string
 	GoogleMapMinDistance int
+	CasURL							 string
 }
 
 // App holds references to Mongo resources.
@@ -28,6 +31,7 @@ type App struct {
 	Vehicles *mgo.Collection
 	Routes   *mgo.Collection
 	Stops    *mgo.Collection
+	CasAUTH	 *cas.Client
 }
 
 // InitConfig loads and return the app config.
@@ -44,6 +48,14 @@ func InitConfig() *Configuration {
 // InitApp initializes the application given a config and connects to backends.
 // It also seeds any needed information to the database.
 func InitApp(Config *Configuration) *App {
+	//Initialize cas connection
+	url, error := url.Parse(Config.CasURL);
+	if(error != nil){
+		log.Fatalf("invalid url");
+	}
+	client := cas.NewClient(&cas.Options{
+		URL: url,
+	});
 
 	// Connect to MongoDB
 	session, err := mgo.Dial(Config.MongoURL + ":" + Config.MongoPort)
@@ -58,6 +70,7 @@ func InitApp(Config *Configuration) *App {
 		session.DB("shuttle_tracking").C("vehicles"),
 		session.DB("shuttle_tracking").C("routes"),
 		session.DB("shuttle_tracking").C("stops"),
+		client,
 	}
 
 	// Ensure unique vehicle identification

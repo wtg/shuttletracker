@@ -3,6 +3,8 @@ package main
 import (
 	"net/http"
 	"shuttle_tracking_2/tracking"
+	"fmt"
+	"gopkg.in/cas.v1"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
@@ -22,7 +24,15 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 
 // AdminHandler serves the admin page.
 func AdminHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "admin.html")
+
+		if !cas.IsAuthenticated(r) {
+			cas.RedirectToLogin(w, r)
+			return
+		}else{
+			fmt.Printf(cas.Username(r));
+			http.ServeFile(w, r, "admin.html")
+		}
+
 }
 
 func main() {
@@ -31,7 +41,6 @@ func main() {
 
 	// Start auto updater
 	go App.UpdateShuttles(Config.DataFeed, Config.UpdateInterval)
-
 	// Routing
 	r := mux.NewRouter()
 	r.HandleFunc("/", IndexHandler).Methods("GET")
@@ -54,8 +63,8 @@ func main() {
 	r.PathPrefix("/bower_components/").Handler(http.StripPrefix("/bower_components/", http.FileServer(http.Dir("bower_components/"))))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
 	// Serve requests
-	http.Handle("/", r)
-	if err := http.ListenAndServe(":8080", r); err != nil {
+	//http.Handle("/", r)
+	if err := http.ListenAndServe(":8080", App.CasAUTH.Handle(r)); err != nil {
 		log.Fatalf("Unable to ListenAndServe: %v", err)
 	}
 }
