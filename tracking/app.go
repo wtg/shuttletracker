@@ -31,6 +31,7 @@ type App struct {
 	Vehicles *mgo.Collection
 	Routes   *mgo.Collection
 	Stops    *mgo.Collection
+	Users    *mgo.Collection
 	CasAUTH	 *cas.Client
 	CasMEM	 *cas.MemoryStore
 }
@@ -75,6 +76,7 @@ func InitApp(Config *Configuration) *App {
 		session.DB("shuttle_tracking").C("vehicles"),
 		session.DB("shuttle_tracking").C("routes"),
 		session.DB("shuttle_tracking").C("stops"),
+		session.DB("shuttle_tracking").C("users"),
 		client,
 		tickets,
 	}

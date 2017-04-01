@@ -3,12 +3,19 @@ package main
 import (
 	"net/http"
 	"shuttle_tracking_2/tracking"
-	"fmt"
+
 	"gopkg.in/cas.v1"
+	"strings"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
+	"gopkg.in/mgo.v2/bson"
 )
+var users []User
+
+type User struct{
+		Name   string
+}
 
 var (
 	// Config holds the global app settings.
@@ -29,9 +36,17 @@ func AdminHandler(w http.ResponseWriter, r *http.Request) {
 			cas.RedirectToLogin(w, r)
 			return
 		}else{
-			fmt.Printf("redirecting");
-			http.Redirect(w,r,"/admin/success/",301);
-
+			valid := false;
+			for _, u := range users{
+				if(u.Name == strings.ToLower(cas.Username(r))){
+					valid = true;
+				}
+			}
+			if valid{
+				http.Redirect(w,r,"/admin/success/",301);
+			}else{
+				http.Redirect(w,r,"/admin/logout/",301);
+			}
 		}
 
 }
@@ -58,6 +73,10 @@ func AdminLogout(w http.ResponseWriter, r *http.Request) {
 func main() {
 	// close Mongo session when server terminates
 	defer App.Session.Close()
+
+
+	err := App.Users.Find(bson.M{}).All(&users)
+	_ = err;
 
 	// Start auto updater
 	go App.UpdateShuttles(Config.DataFeed, Config.UpdateInterval)
