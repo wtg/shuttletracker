@@ -65,11 +65,11 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", IndexHandler).Methods("GET")
 	r.HandleFunc("/admin/", AdminHandler).Methods("GET")
-
+	r.HandleFunc("/admin", AdminHandler).Methods("GET")
 	r.HandleFunc("/admin/success/", AdminPageServer).Methods("GET")
-
+	r.HandleFunc("/admin/success", AdminPageServer).Methods("GET")
 	r.HandleFunc("/admin/logout/", AdminLogout).Methods("GET")
-
+	r.HandleFunc("/admin/logout", AdminLogout).Methods("GET")
 	r.HandleFunc("/vehicles", App.VehiclesHandler).Methods("GET")
 	r.HandleFunc("/vehicles/create", App.VehiclesCreateHandler).Methods("POST")
 	r.HandleFunc("/vehicles/edit", App.VehiclesEditHandler).Methods("POST")
