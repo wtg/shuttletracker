@@ -29,8 +29,28 @@ func AdminHandler(w http.ResponseWriter, r *http.Request) {
 			cas.RedirectToLogin(w, r)
 			return
 		}else{
-			fmt.Printf(cas.Username(r));
+			fmt.Printf("redirecting");
+			http.Redirect(w,r,"/admin/success/",301);
+
+		}
+
+}
+
+func AdminPageServer(w http.ResponseWriter, r *http.Request) {
+
+		if !cas.IsAuthenticated(r) {
+			http.Redirect(w,r,"/admin/",301);
+			return
+		}else{
 			http.ServeFile(w, r, "admin.html")
+		}
+
+}
+
+func AdminLogout(w http.ResponseWriter, r *http.Request) {
+
+		if cas.IsAuthenticated(r){
+			cas.RedirectToLogout(w,r);
 		}
 
 }
@@ -44,8 +64,12 @@ func main() {
 	// Routing
 	r := mux.NewRouter()
 	r.HandleFunc("/", IndexHandler).Methods("GET")
-	r.HandleFunc("/admin", AdminHandler).Methods("GET")
-	r.HandleFunc("/admin/{*}", AdminHandler).Methods("GET")
+	r.HandleFunc("/admin/", AdminHandler).Methods("GET")
+
+	r.HandleFunc("/admin/success/", AdminPageServer).Methods("GET")
+
+	r.HandleFunc("/admin/logout/", AdminLogout).Methods("GET")
+
 	r.HandleFunc("/vehicles", App.VehiclesHandler).Methods("GET")
 	r.HandleFunc("/vehicles/create", App.VehiclesCreateHandler).Methods("POST")
 	r.HandleFunc("/vehicles/edit", App.VehiclesEditHandler).Methods("POST")

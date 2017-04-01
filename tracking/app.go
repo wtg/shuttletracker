@@ -32,6 +32,7 @@ type App struct {
 	Routes   *mgo.Collection
 	Stops    *mgo.Collection
 	CasAUTH	 *cas.Client
+	CasMEM	 *cas.MemoryStore
 }
 
 // InitConfig loads and return the app config.
@@ -53,8 +54,12 @@ func InitApp(Config *Configuration) *App {
 	if(error != nil){
 		log.Fatalf("invalid url");
 	}
+	var tickets *cas.MemoryStore
+
 	client := cas.NewClient(&cas.Options{
 		URL: url,
+		Store: nil,
+
 	});
 
 	// Connect to MongoDB
@@ -71,6 +76,7 @@ func InitApp(Config *Configuration) *App {
 		session.DB("shuttle_tracking").C("routes"),
 		session.DB("shuttle_tracking").C("stops"),
 		client,
+		tickets,
 	}
 
 	// Ensure unique vehicle identification

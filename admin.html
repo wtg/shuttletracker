@@ -4,7 +4,7 @@
     <title> Shuttle Tracking - Fleet Management </title>
     <link rel="icon" href="/static/images/favicon.ico">
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="/static/css/application.css"> 
+    <link rel="stylesheet" href="/static/css/application.css">
     <!-- Polymer dependencies -->
     <script src="/bower_components/webcomponentsjs/webcomponents.min.js"></script>
     <link rel="import" href="/bower_components/polymer/polymer.html">
@@ -25,15 +25,19 @@
   </head>
 
   <body unresolved class="fullbleed layout vertical">
+
     <template is="dom-bind">
       <paper-header-panel class="flex">
+
         <paper-toolbar>
           <paper-tabs class="flex" selected="{{selected}}">
             <paper-tab> Vehicles </paper-tab>
             <paper-tab> Routes </paper-tab>
             <paper-tab> Stops </paper-tab>
+
           </paper-tabs>
         </paper-toolbar>
+        <center><p><a href = "/admin/logout/" >logout</a></p></center>
         <iron-pages selected="{{selected}}">
           <section>
             <!-- Vehicles -->
@@ -43,7 +47,7 @@
             <!-- Routes -->
             <tracking-routes lat="42.730172" lng="-73.678803" zoom="15"></tracking-routes>
           </section>
-          <section> 
+          <section>
             <tracking-stops lat="42.730172" lng="-73.678803" zoom="15"></tracking-stops>
           </section>
         </iron-pages>
