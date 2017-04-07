@@ -3,4 +3,5 @@
   "UpdateInterval": 15,
   "MongoURL": "localhost",
   "MongoPort": "27017"
+  "Authenticate": false;
 }

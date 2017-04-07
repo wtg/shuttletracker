@@ -21,6 +21,7 @@ type Configuration struct {
 	GoogleMapAPIKey      string
 	GoogleMapMinDistance int
 	CasURL							 string
+	Authenticate				 bool
 }
 
 // App holds references to Mongo resources.

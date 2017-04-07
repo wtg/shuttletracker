@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-
+	"gopkg.in/cas.v1"
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
@@ -364,6 +364,7 @@ func (App *App) ImportHandler(w http.ResponseWriter, r *http.Request){
 // RoutesCreateHandler adds a new route to the database
 func (App *App) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Create a new route object using request fields
+	if(App.Config.Authenticate && !cas.IsAuthenticated(r)){return;}
 	var routeData map[string]string
 	var coordsData []map[string]float64
 	// Decode route details
@@ -419,6 +420,8 @@ func (App *App) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 //Deletes route from database
 func (App *App) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	if(App.Config.Authenticate && !cas.IsAuthenticated(r)){return;}
+
 	vars := mux.Vars(r)
 	fmt.Printf(vars["id"]);
 	log.Debugf("deleting", vars["id"])
@@ -454,6 +457,8 @@ func GetSegment(stop Stop, startIndex int, segments []Segment) int {
 
 // StopsCreateHandler adds a new route stop to the database
 func (App *App) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
+	if(App.Config.Authenticate && !cas.IsAuthenticated(r)){return;}
+
 	fmt.Print("Create Stop Handler called")
 	// Create a new stop object using request fields
 	stop := Stop{}
@@ -493,6 +498,8 @@ func (App *App) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (App *App) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	if(App.Config.Authenticate && !cas.IsAuthenticated(r)){return;}
+
 	vars := mux.Vars(r)
 	log.Debugf("deleting", vars["id"])
 	fmt.Printf(vars["id"]);

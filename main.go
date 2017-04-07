@@ -6,6 +6,7 @@ import (
 
 	"gopkg.in/cas.v1"
 	"strings"
+	"fmt"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
@@ -31,8 +32,8 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 
 // AdminHandler serves the admin page.
 func AdminHandler(w http.ResponseWriter, r *http.Request) {
-
-		if !cas.IsAuthenticated(r) {
+		fmt.Printf("%u",App.Config.Authenticate);
+		if  App.Config.Authenticate && !cas.IsAuthenticated(r) {
 			cas.RedirectToLogin(w, r)
 			return
 		}else{
@@ -41,6 +42,10 @@ func AdminHandler(w http.ResponseWriter, r *http.Request) {
 				if(u.Name == strings.ToLower(cas.Username(r))){
 					valid = true;
 				}
+			}
+			if(App.Config.Authenticate == false){
+				valid = true;
+				fmt.Printf("not authenticating");
 			}
 			if valid{
 				http.Redirect(w,r,"/admin/success/",301);
@@ -53,7 +58,7 @@ func AdminHandler(w http.ResponseWriter, r *http.Request) {
 
 func AdminPageServer(w http.ResponseWriter, r *http.Request) {
 
-		if !cas.IsAuthenticated(r) {
+		if App.Config.Authenticate && !cas.IsAuthenticated(r) {
 			http.Redirect(w,r,"/admin/",301);
 			return
 		}else{

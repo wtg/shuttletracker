@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"gopkg.in/cas.v1"
+
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
@@ -151,6 +153,7 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 
 // VehiclesHandler finds all the vehicles in the database.
 func (App *App) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
+
 	// Find all vehicles in database
 	var vehicles []Vehicle
 	err := App.Vehicles.Find(bson.M{}).All(&vehicles)
@@ -164,6 +167,8 @@ func (App *App) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
 
 // VehiclesCreateHandler adds a new vehicle to the database.
 func (App *App) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
+	if(App.Config.Authenticate && !cas.IsAuthenticated(r)){return;}
+
 	// Create new vehicle object using request fields
 	vehicle := Vehicle{}
 	vehicle.Created = time.Now()
@@ -187,6 +192,8 @@ func (App *App) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (App *App) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	if(App.Config.Authenticate && !cas.IsAuthenticated(r)){return;}
+
 	// Delete vehicle from Vehicles collection
 	vars := mux.Vars(r)
 	log.Debugf("deleting", vars["id"])
