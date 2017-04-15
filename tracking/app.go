@@ -79,11 +79,11 @@ func InitApp(Config *Configuration) *App {
 	app := App{
 		Config,
 		session,
-		session.DB("shuttle_tracking").C("updates"),
-		session.DB("shuttle_tracking").C("vehicles"),
-		session.DB("shuttle_tracking").C("routes"),
-		session.DB("shuttle_tracking").C("stops"),
-		session.DB("shuttle_tracking").C("users"),
+		session.DB("").C("updates"),
+		session.DB("").C("vehicles"),
+		session.DB("").C("routes"),
+		session.DB("").C("stops"),
+		session.DB("").C("users"),
 		client,
 		tickets,
 	}
