@@ -17,7 +17,7 @@ import (
 type Configuration struct {
 	DataFeed             string `env:"DATA_FEED"`
 	UpdateInterval       int    `env:"UPDATE_INTERVAL" envDefault:"15"`
-	MongoURL             string `env:"DATABASE_URL" envDefault:"localhost:27017"`
+	MongoURL             string `env:"MONGO_URL" envDefault:"localhost:27017"`
 	GoogleMapAPIKey      string
 	GoogleMapMinDistance int
 	CasURL               string `env:"CAS_URL"`
