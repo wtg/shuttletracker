@@ -3,25 +3,25 @@ package tracking
 import (
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
-	"net/url"
 
 	log "github.com/Sirupsen/logrus"
-	"gopkg.in/mgo.v2"
+	"github.com/caarlos0/env"
 	"gopkg.in/cas.v1"
+	"gopkg.in/mgo.v2"
 )
 
 // Configuration holds the settings for connecting to outside resources.
 type Configuration struct {
-	DataFeed             string
-	UpdateInterval       int
-	MongoURL             string
-	MongoPort            string
+	DataFeed             string `env:"DATA_FEED"`
+	UpdateInterval       int    `env:"UPDATE_INTERVAL" envDefault:"15"`
+	MongoURL             string `env:"DATABASE_URL" envDefault:"localhost:27017"`
 	GoogleMapAPIKey      string
 	GoogleMapMinDistance int
-	CasURL							 string
-	Authenticate				 bool
+	CasURL               string `env:"CAS_URL"`
+	Authenticate         bool   `env:"AUTHENTICATE" envDefault:"true"`
 }
 
 // App holds references to Mongo resources.
@@ -33,15 +33,22 @@ type App struct {
 	Routes   *mgo.Collection
 	Stops    *mgo.Collection
 	Users    *mgo.Collection
-	CasAUTH	 *cas.Client
-	CasMEM	 *cas.MemoryStore
+	CasAUTH  *cas.Client
+	CasMEM   *cas.MemoryStore
 }
 
 // InitConfig loads and return the app config.
 func InitConfig() *Configuration {
 	// Read app configuration file
 	config, err := readConfiguration("conf.json")
-	if err != nil {
+	if os.IsNotExist(err) {
+		log.Debug("reading configuration from environment")
+		config = &Configuration{}
+		err := env.Parse(config)
+		if err != nil {
+			log.Fatalf("error reading configuration from environment: %v", err)
+		}
+	} else if err != nil {
 		log.Fatalf("error reading configuration file: %v", err)
 	}
 
@@ -52,22 +59,21 @@ func InitConfig() *Configuration {
 // It also seeds any needed information to the database.
 func InitApp(Config *Configuration) *App {
 	//Initialize cas connection
-	url, error := url.Parse(Config.CasURL);
-	if(error != nil){
-		log.Fatalf("invalid url");
+	url, error := url.Parse(Config.CasURL)
+	if error != nil {
+		log.Fatalf("invalid url")
 	}
 	var tickets *cas.MemoryStore
 
 	client := cas.NewClient(&cas.Options{
-		URL: url,
+		URL:   url,
 		Store: nil,
-
-	});
+	})
 
 	// Connect to MongoDB
-	session, err := mgo.Dial(Config.MongoURL + ":" + Config.MongoPort)
+	session, err := mgo.Dial(Config.MongoURL)
 	if err != nil {
-		log.Fatalf("mongoDB connection failed: %v", err)
+		log.Fatalf("MongoDB connection to \"%v\" failed: %v", Config.MongoURL, err)
 	}
 	// Create Shuttles object to store database session and collections
 	app := App{
