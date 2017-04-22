@@ -111,6 +111,7 @@
           lat: e.detail.latLng.lat(),
           lng: e.detail.latLng.lng()
         };
+
         this.push('routeCoords', coord);
         this.drawRoute();
       },
@@ -123,6 +124,7 @@
           strokeColor: '#FF0000',
           strokeWeight: 2
         });
+
         newRoutePath.setMap(this.$.routeMap.map);
       },
       clearRoutes: function() {
@@ -139,7 +141,7 @@
         var entry = Polymer.dom(e).path[6].textContent;
         var index = entry.search("ID");
         var id = entry.substring(index+5,index+29);
-      
+
         this.$.ajaxDelete.url = "/routes/" + id;
         this.$.ajaxDelete.generateRequest();
 
