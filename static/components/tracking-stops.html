@@ -91,8 +91,9 @@
             <input type="hidden" name="id" id="id">
             <input type="hidden" name="lat" id="stopLat">
             <input type="hidden" name="lng" id="stopLng">
+            <input type="hidden" name="toDelete" id="toDelete">
             <input type="hidden" name="routeId" id = "routeId" value="{{selectedRoute.value}}">
-            <paper-button class="submit-stop" raised onclick="submitStop()">Submit</paper-button>
+            <paper-button class="submit-stop" raised on-click="submitStop">Submit</paper-button>
           </form>
         </div>
       </div>
@@ -192,9 +193,9 @@
               this.$.addr.value = stops[i]["address"];
               this.$.start.value = stops[i]["startTime"];
               this.$.end.value = stops[i]["endTime"];
+              this.$.toDelete.value = true;
               //Temporary but should be fine
               this.$.ajaxDelete.url = "/stops/" + this.$.id.value;
-              this.$.ajaxDelete.generateRequest();
               break;
             }
           }
@@ -231,13 +232,19 @@
 
       addStopResponse: function() {
         this.$.updateStops.generateRequest();
+      },
+      submitStop: function() {
+        if(this.$.toDelete.value == "true"){
+          this.$.ajaxDelete.generateRequest();
+
+        }
+
+        this.$.toDelete.value = false;
+        var form = document.getElementById("stopForm");
+        form.submit();
+        form.reset();
       }
     });
 
-    function submitStop() {
-      var form = document.getElementById("stopForm");
-      form.submit();
-      form.reset();
-    }
   </script>
 </dom-module>

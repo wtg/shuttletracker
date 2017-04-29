@@ -88,31 +88,32 @@ func main() {
 	// Routing
 	r := mux.NewRouter()
 	r.HandleFunc("/", IndexHandler).Methods("GET")
-	r.HandleFunc("/admin/", AdminHandler).Methods("GET")
-	r.HandleFunc("/admin", AdminHandler).Methods("GET")
-	r.HandleFunc("/admin/success/", AdminPageServer).Methods("GET")
-	r.HandleFunc("/admin/success", AdminPageServer).Methods("GET")
-	r.HandleFunc("/admin/logout/", AdminLogout).Methods("GET")
-	r.HandleFunc("/admin/logout", AdminLogout).Methods("GET")
+	r.Handle("/admin/", App.CasAUTH.HandleFunc(AdminHandler)).Methods("GET")
+	r.Handle("/admin", App.CasAUTH.HandleFunc(AdminHandler)).Methods("GET")
+	r.Handle("/admin/success/", App.CasAUTH.HandleFunc(AdminPageServer)).Methods("GET")
+	r.Handle("/admin/success", App.CasAUTH.HandleFunc(AdminPageServer)).Methods("GET")
+	r.Handle("/admin/logout/", App.CasAUTH.HandleFunc(AdminLogout)).Methods("GET")
+	r.Handle("/admin/logout", App.CasAUTH.HandleFunc(AdminLogout)).Methods("GET")
+	//Has to do with r not being a client?
 	r.HandleFunc("/vehicles", App.VehiclesHandler).Methods("GET")
-	r.HandleFunc("/vehicles/create", App.VehiclesCreateHandler).Methods("POST")
-	r.HandleFunc("/vehicles/edit", App.VehiclesEditHandler).Methods("POST")
-	r.HandleFunc("/vehicles/{id:[0-9]+}", App.VehiclesDeleteHandler).Methods("DELETE")
+	r.Handle("/vehicles/create", App.CasAUTH.HandleFunc(App.VehiclesCreateHandler)).Methods("POST")
+	r.Handle("/vehicles/edit", App.CasAUTH.HandleFunc(App.VehiclesEditHandler)).Methods("POST")
+	r.Handle("/vehicles/{id:[0-9]+}", App.CasAUTH.HandleFunc(App.VehiclesDeleteHandler)).Methods("DELETE")
 	r.HandleFunc("/updates", App.UpdatesHandler).Methods("GET")
 	r.HandleFunc("/updates/message", App.UpdateMessageHandler).Methods("GET")
 	r.HandleFunc("/routes", App.RoutesHandler).Methods("GET")
-	r.HandleFunc("/routes/create", App.RoutesCreateHandler).Methods("POST")
-	r.HandleFunc("/routes/{id:.+}", App.RoutesDeleteHandler).Methods("DELETE")
+	r.Handle("/routes/create", App.CasAUTH.HandleFunc(App.RoutesCreateHandler)).Methods("POST")
+	r.Handle("/routes/{id:.+}", App.CasAUTH.HandleFunc(App.RoutesDeleteHandler)).Methods("DELETE")
 	r.HandleFunc("/stops", App.StopsHandler).Methods("GET")
-	r.HandleFunc("/stops/create", App.StopsCreateHandler).Methods("POST")
-	r.HandleFunc("/stops/{id:.+}", App.StopsDeleteHandler).Methods("DELETE")
+	r.Handle("/stops/create", App.CasAUTH.HandleFunc(App.StopsCreateHandler)).Methods("POST")
+	r.Handle("/stops/{id:.+}", App.CasAUTH.HandleFunc(App.StopsDeleteHandler)).Methods("DELETE")
 	//r.HandleFunc("/import", App.ImportHandler).Methods("GET")
 	// Static files
 	r.PathPrefix("/bower_components/").Handler(http.StripPrefix("/bower_components/", http.FileServer(http.Dir("bower_components/"))))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
 	// Serve requests
-	//http.Handle("/", r)
-	if err := http.ListenAndServe(":8080", App.CasAUTH.Handle(r)); err != nil {
+	hand := App.CasAUTH.Handle(r)
+	if err := http.ListenAndServe(":8080", hand); err != nil {
 		log.Fatalf("Unable to ListenAndServe: %v", err)
 	}
 }

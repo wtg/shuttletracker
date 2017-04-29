@@ -3,14 +3,13 @@ package tracking
 import (
 	"encoding/json"
 	"fmt"
+	"gopkg.in/cas.v1"
 	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-	"gopkg.in/cas.v1"
-
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
@@ -56,7 +55,8 @@ var (
 	dataNames = dataRe.SubexpNames()
 )
 
-var ShuttleInactivityCounter = make(map[string]int);
+var ShuttleInactivityCounter = make(map[string]int)
+var lastUpdate time.Time
 
 // UpdateShuttles send a request to iTrak API, gets updated shuttle info, and
 // finally store updated records in db.
@@ -123,20 +123,21 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 				Date:      strings.Replace(result["date"], "date:", "", -1),
 				Status:    strings.Replace(result["status"], "trig:", "", -1),
 				Created:   time.Now()}
+			lastUpdate = time.Now()
 
-			//if a shuttle hasnt gone over 3 miles per hour in 5 minutes, it is probably inactive, and we shouldnt show it.
+			//if a shuttle hasnt gone over 3 miles per hour in 5 minutes, it is probably inactive, and we shouldn't show it.
 			spd, err := strconv.ParseFloat(update.Speed, 64)
-			if(err != nil){
-				log.Errorf("error finding speed");
+			if err != nil {
+				log.Errorf("error finding speed")
 			}
-			if(spd < 3){
-				ShuttleInactivityCounter[(strings.Replace(result["id"], "Vehicle ID:","",-1))] += 1;
+			if spd < 3 {
+				ShuttleInactivityCounter[(strings.Replace(result["id"], "Vehicle ID:", "", -1))] += 1
 				//fmt.Printf(update.Status);
-			}else{
-					ShuttleInactivityCounter[(strings.Replace(result["id"], "Vehicle ID:","",-1))] = 0;
+			} else {
+				ShuttleInactivityCounter[(strings.Replace(result["id"], "Vehicle ID:", "", -1))] = 0
 			}
-			if(ShuttleInactivityCounter[(strings.Replace(result["id"], "Vehicle ID:","",-1))] > 20){
-				update.Speed = "-1";
+			if ShuttleInactivityCounter[(strings.Replace(result["id"], "Vehicle ID:", "", -1))] > 20 {
+				update.Speed = "-1"
 			}
 
 			if err := App.Updates.Insert(&update); err != nil {
@@ -167,7 +168,9 @@ func (App *App) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
 
 // VehiclesCreateHandler adds a new vehicle to the database.
 func (App *App) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
-	if(App.Config.Authenticate && !cas.IsAuthenticated(r)){return;}
+	if App.Config.Authenticate && !cas.IsAuthenticated(r) {
+		return
+	}
 
 	// Create new vehicle object using request fields
 	vehicle := Vehicle{}
@@ -192,7 +195,9 @@ func (App *App) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (App *App) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if(App.Config.Authenticate && !cas.IsAuthenticated(r)){return;}
+	if App.Config.Authenticate && !cas.IsAuthenticated(r) {
+		return
+	}
 
 	// Delete vehicle from Vehicles collection
 	vars := mux.Vars(r)
@@ -255,7 +260,7 @@ func (App *App) UpdateMessageHandler(w http.ResponseWriter, r *http.Request) {
 				speed = speed[0:4]
 			}
 			//nextArrival := GetArrivalTime(&update, App.Routes, App.Stops)
-			message = fmt.Sprintf("<b>%s</b><br/>Traveling %s at<br/> %s mph as of %s", vehicle.VehicleName, CardinalDirection(&update.Heading), speed, update.Created.Format("3:04PM")/*, nextArrival*/)
+			message = fmt.Sprintf("<b>%s</b><br/>Traveling %s at<br/> %s mph as of %s", vehicle.VehicleName, CardinalDirection(&update.Heading), speed, lastUpdate.Format("03:04:05") /*, nextArrival*/)
 			messages = append(messages, message)
 		}
 	}

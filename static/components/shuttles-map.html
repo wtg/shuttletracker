@@ -136,10 +136,10 @@
 
       periodicUpdates: function() {
         // periodically check for vehicle & route updates
-        setInterval(this.checkForUpdates, 15000, this.$.fetchMessages);
-        setInterval(this.checkForUpdates, 15000, this.$.fetchUpdates);
-        setInterval(this.checkForUpdates, 15000, this.$.fetchRoutes);
-        setInterval(this.checkForUpdates, 15000, this.$.fetchStops);
+        setInterval(this.checkForUpdates, 10000, this.$.fetchMessages);
+        setInterval(this.checkForUpdates, 10000, this.$.fetchUpdates);
+        setInterval(this.checkForUpdates, 10000, this.$.fetchRoutes);
+        setInterval(this.checkForUpdates, 10000, this.$.fetchStops);
       },
 
       checkForUpdates: function(ajax) {
