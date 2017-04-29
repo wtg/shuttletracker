@@ -3,7 +3,7 @@ package tracking
 import (
 	"net/http"
 	"gopkg.in/mgo.v2/bson"
-//	log "github.com/Sirupsen/logrus"
+	// log "github.com/Sirupsen/logrus"
 	"strconv"
 	"time"
 	"math/big"
@@ -43,8 +43,17 @@ type LegacyRoute struct {
 	Coordinates []LegacyCoordinate `json:"coords"`
 }
 
-type LegacyStop struct {
+type LegacyStopRoute struct {
+	Name string `json:"name"`
+	ID big.Int `json:"id"`
+}
 
+type LegacyStop struct {
+	Name string `json:"name"`
+	Longitude string `json:"longitude"`
+	Latitude string `json:"latitude"`
+	ShortName string `json:"short_name"`
+	Routes []LegacyStopRoute `json:"routes"`
 }
 
 type LegacyRoutesAndStopsContainer struct {
@@ -153,7 +162,7 @@ func (App *App) LegacyRoutesHandler(w http.ResponseWriter, r *http.Request) {
 		// convert coordinates to legacy coordinates
 		var coordinates []LegacyCoordinate
 		for _, coordinate := range route.Coords {
-			// convert from float to string 
+			// convert from float to string
 			latitude := strconv.FormatFloat(coordinate.Lat, 'f', 5, 64)
 			longitude := strconv.FormatFloat(coordinate.Lng, 'f', 5, 64)
 
@@ -176,21 +185,82 @@ func (App *App) LegacyRoutesHandler(w http.ResponseWriter, r *http.Request) {
 		legacyRoutes = append(legacyRoutes, legacyRoute)
 	}
 
-	// Send to client as JSON
-	routesAndStops := LegacyRoutesAndStopsContainer{
-		Routes: legacyRoutes,
-		Stops: nil,
-	}
-	WriteJSON(w, routesAndStops)
-/*
 	// Find all stops in databases
 	var stops []Stop
-	err := App.Stops.Find(bson.M{}).All(&stops)
+	err = App.Stops.Find(bson.M{}).All(&stops)
 	// Handle query errors
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	// Send each stop to client as JSON
-	WriteJSON(w, stops)
-	*/
+
+	// convert stops to legacy stops
+	var legacyStops []LegacyStop
+	for _, stop := range stops {
+		// see if this stop has already been created. this should probably use a map for faster lookup, but the data is small.
+		found := false
+		for i := range legacyStops {
+			ls := &legacyStops[i]
+			if ls.Name == stop.Name {
+				// already created, so just append this route to the stop's routes instead of creating a duplicate
+
+				// get route name
+				var route Route
+				err := App.Routes.Find(bson.M{"id": stop.RouteID}).One(&route)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+
+				// convert route ID to int
+				var routeID big.Int
+				routeID.SetString(route.ID, 16)
+
+				legacyStopRoute := LegacyStopRoute{Name: route.Name, ID: routeID}
+				ls.Routes = append(ls.Routes, legacyStopRoute)
+
+				found = true
+				break
+			}
+		}
+		if found {
+			continue
+		}
+
+		// convert from float to string
+		latitude := strconv.FormatFloat(stop.Lat, 'f', 5, 64)
+		longitude := strconv.FormatFloat(stop.Lng, 'f', 5, 64)
+
+		// get route name
+		var route Route
+		err := App.Routes.Find(bson.M{"id": stop.RouteID}).One(&route)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// convert route ID to int
+		var routeID big.Int
+		routeID.SetString(route.ID, 16)
+
+		legacyStopRoute := LegacyStopRoute{Name: route.Name, ID: routeID}
+		legacyStopRoutes := []LegacyStopRoute{legacyStopRoute}
+
+		legacyStop := LegacyStop{
+			Name: stop.Name,
+			Longitude: longitude,
+			Latitude: latitude,
+			ShortName: stop.Name,
+			Routes: legacyStopRoutes,
+		}
+
+		legacyStops = append(legacyStops, legacyStop)
+	}
+
+	// Send to client as JSON
+	routesAndStops := LegacyRoutesAndStopsContainer{
+		Routes: legacyRoutes,
+		Stops: legacyStops,
+	}
+	WriteJSON(w, routesAndStops)
 }
