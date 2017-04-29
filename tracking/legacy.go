@@ -3,9 +3,10 @@ package tracking
 import (
 	"net/http"
 	"gopkg.in/mgo.v2/bson"
-	// log "github.com/Sirupsen/logrus"
+//	log "github.com/Sirupsen/logrus"
 	"strconv"
 	"time"
+	"math/big"
 )
 
 type LatestPosition struct {
@@ -27,6 +28,28 @@ type LegacyVehicle struct {
 
 type LegacyVehicleContainer struct {
 	Vehicle LegacyVehicle `json:"vehicle"`
+}
+
+type LegacyCoordinate struct {
+	Latitude string `json:"latitude"`
+	Longitude string `json:"longitude"`
+}
+
+type LegacyRoute struct {
+	Name string `json:"name"`
+	Width int `json:"width"`
+	ID big.Int `json:"id"`
+	Color string `json:"color"`
+	Coordinates []LegacyCoordinate `json:"coords"`
+}
+
+type LegacyStop struct {
+
+}
+
+type LegacyRoutesAndStopsContainer struct {
+	Routes []LegacyRoute `json:"routes"`
+	Stops []LegacyStop `json:"stops"`
 }
 
 func (App *App) LegacyVehiclesHandler(w http.ResponseWriter, r *http.Request) {
@@ -108,4 +131,66 @@ func (App *App) LegacyVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Convert updates to JSON
 	WriteJSON(w, legacy_vehicles)
+}
+
+func (App *App) LegacyRoutesHandler(w http.ResponseWriter, r *http.Request) {
+	// Find all routes in database
+	var routes []Route
+	err := App.Routes.Find(bson.M{}).All(&routes)
+	// Handle query errors
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Convert routes to legacy routes
+	var legacyRoutes []LegacyRoute
+	for _, route := range routes {
+		// legacy app expects route ID to be a number, so we convert Mongo's base 16 ID to base 10 int
+		var routeID big.Int
+		routeID.SetString(route.ID, 16)
+
+		// convert coordinates to legacy coordinates
+		var coordinates []LegacyCoordinate
+		for _, coordinate := range route.Coords {
+			// convert from float to string 
+			latitude := strconv.FormatFloat(coordinate.Lat, 'f', 5, 64)
+			longitude := strconv.FormatFloat(coordinate.Lng, 'f', 5, 64)
+
+			legacyCoordinate := LegacyCoordinate{
+				Latitude: latitude,
+				Longitude: longitude,
+			}
+
+			coordinates = append(coordinates, legacyCoordinate)
+		}
+
+		legacyRoute := LegacyRoute{
+			Name: route.Name,
+			Width: route.Width,
+			Color: route.Color,
+			ID: routeID,
+			Coordinates: coordinates,
+		}
+
+		legacyRoutes = append(legacyRoutes, legacyRoute)
+	}
+
+	// Send to client as JSON
+	routesAndStops := LegacyRoutesAndStopsContainer{
+		Routes: legacyRoutes,
+		Stops: nil,
+	}
+	WriteJSON(w, routesAndStops)
+/*
+	// Find all stops in databases
+	var stops []Stop
+	err := App.Stops.Find(bson.M{}).All(&stops)
+	// Handle query errors
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	// Send each stop to client as JSON
+	WriteJSON(w, stops)
+	*/
 }
