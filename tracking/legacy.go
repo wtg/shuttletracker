@@ -5,12 +5,13 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	// log "github.com/Sirupsen/logrus"
 	"strconv"
+	"time"
 )
 
 type LatestPosition struct {
 	Longitude string `json:"longitude"`
 	Latitude string `json:"latitude"`
-	Timestamp string `json:"timestamp"`
+	Timestamp time.Time `json:"timestamp"`
 	Speed float64 `json:"speed"`
 	Heading int `json:"heading"`
 	Cardinal string `json:"cardinal_point"`
@@ -19,7 +20,7 @@ type LatestPosition struct {
 
 type LegacyVehicle struct {
 	Name string `json:"name"`
-	ID string `json:"id"`
+	ID int `json:"id"`
 	LatestPosition LatestPosition `json:"latest_position"`
 	Icon map[string]int `json:"icon"`
 }
@@ -77,17 +78,26 @@ func (App *App) LegacyVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 			cardinal = "West"
 		}
 
+		// legacy app expects vehicle ID to be a number...
+		vehicleID, err := strconv.Atoi(vehicle.VehicleID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+
 		latestPosition := LatestPosition{
 			Longitude: update.Lng,
 			Latitude: update.Lat,
 			Heading: int(heading),
 			Cardinal: cardinal,
 			Speed: speed,
+			Timestamp: update.Created,
 		}
 
 		legacy_vehicle := LegacyVehicle{
 			Name: vehicle.VehicleName,
-			ID: vehicle.VehicleID,
+			ID: vehicleID,
 			LatestPosition: latestPosition,
 			Icon: map[string]int{"id": 1},
 		}
