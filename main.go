@@ -108,6 +108,8 @@ func main() {
 	r.Handle("/stops/create", App.CasAUTH.HandleFunc(App.StopsCreateHandler)).Methods("POST")
 	r.Handle("/stops/{id:.+}", App.CasAUTH.HandleFunc(App.StopsDeleteHandler)).Methods("DELETE")
 	//r.HandleFunc("/import", App.ImportHandler).Methods("GET")
+	// Legacy routes to support the ancient iOS app
+	r.HandleFunc("/vehicles/current.js", App.LegacyVehiclesHandler).Methods("GET")
 	// Static files
 	r.PathPrefix("/bower_components/").Handler(http.StripPrefix("/bower_components/", http.FileServer(http.Dir("bower_components/"))))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
