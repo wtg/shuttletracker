@@ -95,6 +95,9 @@ func InitApp(Config *Configuration) *App {
 		DropDups: true}
 	app.Vehicles.EnsureIndex(vehicleIndex)
 
+	// Create index on update created time to quickly find the most recent updates
+	app.Updates.EnsureIndexKey("created")
+
 	// Read vehicle configuration file
 	serr := readSeedConfiguration("seed/vehicle_seed.json", &app)
 	if serr != nil {
