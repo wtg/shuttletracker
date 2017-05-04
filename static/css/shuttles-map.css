@@ -7,17 +7,13 @@
   margin: 15px;
 }
 
-#logo {
-  position: absolute;
-  width: 100%;
-  top: 1px;
-  left: 1px;
-}
-
 #logo img {
   display: block;
-  margin-left: auto;
-  margin-right: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
 }
 
 #menu paper-fab {
