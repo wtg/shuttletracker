@@ -26,6 +26,6 @@ RUN bower install --allow-root
 COPY . $GOPATH/src/shuttle_tracking_2
 
 RUN go get
+RUN go build
 
-EXPOSE 8080
-CMD ["go", "run", "main.go"]
+CMD ["shuttle_tracking_2"]
