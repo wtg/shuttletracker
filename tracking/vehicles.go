@@ -80,7 +80,6 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 			log.Errorf("error getting data feed: %v", err)
 			continue
 		}
-		defer resp.Body.Close()
 
 		// Read response body content
 		body, err := ioutil.ReadAll(resp.Body)
@@ -88,6 +87,9 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 			log.Errorf("error reading data feed: %v", err)
 			continue
 		}
+
+		// this cannot be deferred because that will never get garbage collected
+		resp.Body.Close()
 
 		delim := "eof"
 		// split the body of response by delimiter
