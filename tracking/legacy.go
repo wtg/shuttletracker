@@ -104,16 +104,7 @@ func (App *App) LegacyVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// calculate cardinal direction
-		var cardinal string
-		if heading >= 315 || heading < 45 {
-			cardinal = "North"
-		} else if heading >= 45 && heading < 135 {
-			cardinal = "East"
-		} else if heading >= 135 && heading < 225 {
-			cardinal = "South"
-		} else if heading >= 225 && heading < 315 {
-			cardinal = "West"
-		}
+		cardinal := CardinalDirection(&update.Heading)
 
 		// legacy app expects vehicle ID to be a number...
 		vehicleID, err := strconv.Atoi(vehicle.VehicleID)
