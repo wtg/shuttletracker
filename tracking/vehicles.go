@@ -114,18 +114,35 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 			// Create new vehicle update & insert update into database
 			// add computation of segment that the shuttle resides on and the arrival time to next N stops [here]
 
+			// convert KPH to MPH
+			speedKMH, err := strconv.ParseFloat(strings.Replace(result["speed"], "spd:", "", -1), 64)
+			if err != nil {
+				log.Error(err)
+				continue
+			}
+			speedMPH := KPHtoMPH(speedKMH)
+			speedMPHString := strconv.FormatFloat(speedMPH, 'f', 5, 64)
+
 			update := VehicleUpdate{
 				VehicleID: strings.Replace(result["id"], "Vehicle ID:", "", -1),
 				Lat:       strings.Replace(result["lat"], "lat:", "", -1),
 				Lng:       strings.Replace(result["lng"], "lon:", "", -1),
 				Heading:   strings.Replace(result["heading"], "dir:", "", -1),
-				Speed:     strings.Replace(result["speed"], "spd:", "", -1),
+				Speed:     speedMPHString,
 				Lock:      strings.Replace(result["lock"], "lck:", "", -1),
 				Time:      strings.Replace(result["time"], "time:", "", -1),
 				Date:      strings.Replace(result["date"], "date:", "", -1),
 				Status:    strings.Replace(result["status"], "trig:", "", -1),
 				Created:   time.Now()}
-			lastUpdate = time.Now()
+
+			// convert updated time to local time
+			loc, err := time.LoadLocation("America/New_York")
+			if err != nil {
+				log.Error(err.Error())
+				continue
+			}
+
+			lastUpdate = time.Now().In(loc)
 
 			//if a shuttle hasnt gone over 3 miles per hour in 5 minutes, it is probably inactive, and we shouldn't show it.
 			spd, err := strconv.ParseFloat(update.Speed, 64)
@@ -163,7 +180,9 @@ func (App *App) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	// Handle query errors
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
+
 	// Send each vehicle to client as JSON
 	WriteJSON(w, vehicles)
 }
@@ -262,7 +281,7 @@ func (App *App) UpdateMessageHandler(w http.ResponseWriter, r *http.Request) {
 				speed = speed[0:4]
 			}
 			//nextArrival := GetArrivalTime(&update, App.Routes, App.Stops)
-			message = fmt.Sprintf("<b>%s</b><br/>Traveling %s at<br/> %s mph as of %s", vehicle.VehicleName, CardinalDirection(&update.Heading), speed, lastUpdate.Format("03:04:05") /*, nextArrival*/)
+			message = fmt.Sprintf("<b>%s</b><br/>Traveling %s at<br/> %s mph as of %s", vehicle.VehicleName, CardinalDirection(&update.Heading), speed, lastUpdate.Format("3:04:05pm") /*, nextArrival*/)
 			messages = append(messages, message)
 		}
 	}
@@ -296,3 +315,10 @@ func CardinalDirection(h *string) string {
 		return "North"
 	}
 }
+
+// convert kmh to mph
+func KPHtoMPH(kmh float64) (mph float64) {
+	mph = kmh * 0.621371192
+	return
+}
+
