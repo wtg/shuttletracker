@@ -10,8 +10,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"gopkg.in/mgo.v2"
-
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
@@ -39,7 +37,6 @@ type Vehicle struct {
 	VehicleName string    `json:"vehicleName" bson:"vehicleName"`
 	Created     time.Time `bson:"created"`
 	Updated     time.Time `bson:"updated"`
-	ActiveStatus			int				`bson:"activeCount"`
 	Active bool `json:"active"`
 }
 
@@ -58,7 +55,7 @@ var (
 	dataRe    = regexp.MustCompile(`(?P<id>Vehicle ID:([\d\.]+)) (?P<lat>lat:([\d\.-]+)) (?P<lng>lon:([\d\.-]+)) (?P<heading>dir:([\d\.-]+)) (?P<speed>spd:([\d\.-]+)) (?P<lock>lck:([\d\.-]+)) (?P<time>time:([\d]+)) (?P<date>date:([\d]+)) (?P<status>trig:([\d]+))`)
 	dataNames = dataRe.SubexpNames()
 )
-var lastUpdate time.Time
+var lastUpdate time.Time;
 
 // UpdateShuttles send a request to iTrak API, gets updated shuttle info, and
 // finally store updated records in db.
@@ -143,36 +140,8 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 				log.Error(err.Error())
 				continue
 			}
-			var currentVehicle Vehicle;
-			findErr := App.Vehicles.Find(bson.M{"vehicleID":update.VehicleID}).One(&currentVehicle);
-			_ = findErr //Error Handling!
 
 			lastUpdate = time.Now().In(loc)
-
-			//if a shuttle hasnt gone over 3 miles per hour in 5 minutes, it is probably inactive, and we shouldn't show it.
-			spd, err := strconv.ParseFloat(update.Speed, 64)
-			if err != nil {
-				log.Errorf("error finding speed")
-			}
-			if spd < 3 {
-				currentVehicle.ActiveStatus += 1
-
-			} else {
-			 	currentVehicle.ActiveStatus = 0
-				currentVehicle.Active = true
-			}
-			c := mgo.Change{
-				currentVehicle,
-				true,
-				false,
-				true,
-			}
-			if currentVehicle.ActiveStatus > 20 {
-				currentVehicle.Active = false;
-			}
-			changeInfo,findErr := App.Vehicles.Find(bson.M{"vehicleID":update.VehicleID}).Apply(c,&currentVehicle)
-			_ = changeInfo
-
 
 			if err := App.Updates.Insert(&update); err != nil {
 				log.Errorf("error inserting vehicle update(%v): %v", update, err)
@@ -252,6 +221,7 @@ func (App *App) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 	var vehicles []Vehicle
 	var updates []VehicleUpdate
 	var update VehicleUpdate
+	var vehicleUpdates []VehicleUpdate
 	// Query all Vehicles
 	err := App.Vehicles.Find(bson.M{}).All(&vehicles)
 	// Handle errors
@@ -261,12 +231,25 @@ func (App *App) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find recent updates for each vehicle
 	for _, vehicle := range vehicles {
 		// here, huge waste of computational power, you record every shit inside the Updates table and using sort, I don't know what the hell is going on
-		err := App.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(1).One(&update)
+		err := App.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(20).All(&vehicleUpdates);
+		update = vehicleUpdates[0]
 
-		if err == nil && vehicle.Active{
-			updates = append(updates, update)
+		if err == nil {
+			count := 0.0
+			speed := 0.0
+			for i, elem := range vehicleUpdates{
+				if(time.Since(elem.Created).Minutes() < 5){
+					val,_ := strconv.ParseFloat(vehicleUpdates[i].Speed,64);
+					speed += val
+					count += 1;
+				}
+			}
+			if(count > 0 && speed/count > 5){
+				updates = append(updates, update)
+			}
 		}
 	}
+
 	// Convert updates to JSON
 	WriteJSON(w, updates) // it's good to take some REST in our server :)
 }

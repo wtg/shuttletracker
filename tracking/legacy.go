@@ -90,12 +90,6 @@ func (App *App) LegacyVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-
-		// if speed == -1, the vehicle has not moved recently, so don't return it
-		if speed == -1 {
-			continue
-		}
-
 		// convert heading from string (why????) to float (and eventually int as legacy API provided)
 		heading, err := strconv.ParseFloat(update.Heading, 64)
 		if err != nil {
