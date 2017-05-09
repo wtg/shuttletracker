@@ -162,12 +162,12 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 				currentVehicle.Active = true
 			}
 			c := mgo.Change{
-				ve,
+				currentVehicle,
 				true,
 				false,
 				true,
 			}
-			if = currentVehicle.ActiveStatus > 20 {
+			if currentVehicle.ActiveStatus > 20 {
 				currentVehicle.Active = false;
 			}
 			changeInfo,findErr := App.Vehicles.Find(bson.M{"vehicleID":update.VehicleID}).Apply(c,&currentVehicle)
