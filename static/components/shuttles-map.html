@@ -240,6 +240,11 @@
 				vehicle['description'] = this.vehicleDescription(vehicle);
 				vehicle['latitude'] = vehicle.lat;
 				vehicle['longitude'] = vehicle.lng;
+				var icon = {
+					path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+					scale: 5,
+					rotation: parseInt(vehicle["heading"])
+				};
 
 				if (vehicle.vehicleID in this.vehicles) {
 					var marker = this.vehicles[vehicle.vehicleID];
@@ -249,13 +254,9 @@
 					var marker_info = this.addPointToMap(vehicle, map, true);
 					var marker = marker_info[0];
 					marker.infoWindow = marker_info[1];
-					marker.setIcon({
-						path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-						scale: 5,
-						rotation: parseInt(vehicle["heading"])
-				        });
 				}
 
+				marker.setIcon(icon);
 				marker.updatedAt = now;
 				this.vehicles[vehicle.vehicleID] = marker;
 			}
