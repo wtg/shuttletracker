@@ -15,7 +15,13 @@
       id="fetchUpdates"
       url="/updates"
       handle-as="json"
-      on-response="placeVehicles">
+      on-response="updateVehicles">
+    </iron-ajax>
+    <iron-ajax
+      id="fetchVehicles"
+      url="/vehicles"
+      handle-as="json"
+      on-response="updateVehicleInfo">
     </iron-ajax>
     <iron-ajax
       id="fetchRoutes"
@@ -101,8 +107,8 @@
           reflectToAttribute: true
         },
         vehicles: {
-          type: Array,
-          value: []
+          type: Object,
+          value: new Object()
         },
         stops: {
           type: Array,
@@ -115,7 +121,11 @@
         messages: {
           type: Array,
           value: []
-        }
+        },
+	      vehicleInfo: {
+		      type: Array,
+		      value: []
+	      }
       },
 
       listeners: {
@@ -131,67 +141,21 @@
         this.$.fetchRoutes.generateRequest();
         this.$.fetchUpdates.generateRequest();
         this.$.fetchStops.generateRequest();
+	      this.$.fetchVehicles.generateRequest();
         this.periodicUpdates();
       },
 
       periodicUpdates: function() {
         // periodically check for vehicle & route updates
         setInterval(this.checkForUpdates, 10000, this.$.fetchMessages);
-        setInterval(this.checkForUpdates, 10000, this.$.fetchUpdates);
+        setInterval(this.checkForUpdates, 1000, this.$.fetchUpdates);
         setInterval(this.checkForUpdates, 10000, this.$.fetchRoutes);
         setInterval(this.checkForUpdates, 10000, this.$.fetchStops);
+	      setInterval(this.checkForUpdates, 10000, this.$.fetchVehicles);
       },
 
       checkForUpdates: function(ajax) {
         ajax.generateRequest();
-      },
-
-      placeVehicles: function(event, response) {
-        var updates = response.response;
-        if (updates) {
-          // Clear previous vehicle markers from map
-          this.clearMarkers(this.vehicles);
-          // Iterate through each vehicle update
-          for (i = 0; i < updates.length; i++) {
-            // Create position from vehicle coordinates
-            var pos = new google.maps.LatLng(
-              updates[i]["lat"],
-              updates[i]["lng"]);
-            // Place shuttle marker on map
-            // Get update message for the info window
-            var contentString = this.messages[i];
-            var idx = contentString.search("mph");
-            var speed = contentString.substring(idx-3, idx-1);
-            //If a shuttle has speed -1 it has been inactive for two long and is not displayed
-            if(speed == "-1"){
-              continue;
-            }
-            var marker = new google.maps.Marker({
-              position: pos,
-              map: this.$.shuttleMap.map,
-              icon: {
-                // Replace this path for future shuttle icon
-                //  icon has to be an svg file
-                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-                scale: 5,
-                rotation: parseInt(updates[i]["heading"])
-              },
-              title: updates[i]["vehicleID"]
-            });
-            // Create info window and open it when shuttle clicked
-            (function(marker, i) {
-              var infowindow = new google.maps.InfoWindow({
-                content: contentString
-              });
-              google.maps.event.addListener(marker, 'click', function(){
-                infowindow.open(marker.map, marker);
-              });
-            })(marker, i);
-            this.vehicles.push(marker);
-          }
-        } else {
-          console.log("no vehicle updates found");
-        }
       },
 
       clearMarkers: function(markers) {
@@ -268,7 +232,83 @@
         } else {
           console.log("no vehicle stops found");
         }
-      }
+      },
+		updateVehicles: function(event, response) {
+			var updates = response.response;
+			var now = new Date();
+			for (vehicle of updates) {
+				vehicle['description'] = this.vehicleDescription(vehicle);
+				vehicle['latitude'] = vehicle.lat;
+				vehicle['longitude'] = vehicle.lng;
+
+				if (vehicle.vehicleID in this.vehicles) {
+					var marker = this.vehicles[vehicle.vehicleID];
+					marker.setPosition(new google.maps.LatLng(vehicle.latitude, vehicle.longitude));
+					marker.infoWindow.setContent(vehicle['description']);
+				} else {
+					var marker_info = this.addPointToMap(vehicle, map, true);
+					var marker = marker_info[0];
+					marker.infoWindow = marker_info[1];
+					marker.setIcon({
+						path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+						scale: 5,
+						rotation: parseInt(vehicle["heading"])
+				        });
+				}
+
+				marker.updatedAt = now;
+				this.vehicles[vehicle.vehicleID] = marker;
+			}
+
+			// remove shuttles that weren't updated
+			for (let id in this.vehicles) {
+				var vehicle = this.vehicles[id];
+				if (vehicle.updatedAt < now) {
+					vehicle.setMap(null);
+					delete this.vehicles[id];
+				}
+			}
+		},
+	    addPointToMap: function(point, map, returnInfo) {
+		    if (typeof returnInfo == "undefined") {
+			    returnInfo = false;
+		    }
+		    var infoWindow = new google.maps.InfoWindow({
+			    content: point.description
+		    });
+		    var options = {
+			    position: new google.maps.LatLng(point.latitude, point.longitude),
+			    map: this.$.shuttleMap.map,
+			    title: point.name
+		    };
+
+		    var marker = new google.maps.Marker(options);
+		    google.maps.event.addListener(marker, 'click', function() {
+			    infoWindow.open(map, marker);
+		    });
+
+		    if (returnInfo) {
+			    return [marker, infoWindow];
+		    } else {
+			    return marker;
+		    }
+	    },
+	    vehicleDescription: function(vehicle) {
+		    res = '';
+		    for (v of this.vehicleInfo) {
+			    if (v.vehicleID == vehicle.vehicleID) {
+				    res += v.vehicleName;
+				    res += ': ';
+			    }
+		    }
+		    res += Number(vehicle.speed).toFixed(1);
+		    res += ' mph';
+		    return res;
+	    },
+	    updateVehicleInfo: function(event, response) {
+		    this.vehicleInfo = response.response;
+	    }
+
     });
   </script>
   <script>
