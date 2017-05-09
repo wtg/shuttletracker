@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"gopkg.in/mgo.v2"
+
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
@@ -28,7 +30,7 @@ type VehicleUpdate struct {
 	Date      string    `json:"date"        bson:"date"`
 	Status    string    `json:"status"      bson:"status"`
 	Created   time.Time `json:"created"     bson:"created"`
-	Segment   string    `json:"segment" bson:"segment"` // the segment that a vehicle resides on
+	Segment   string    `json:"segment" 		bson:"segment"` // the segment that a vehicle resides on
 }
 
 // Vehicle represents an object being tracked.
@@ -37,6 +39,8 @@ type Vehicle struct {
 	VehicleName string    `json:"vehicleName" bson:"vehicleName"`
 	Created     time.Time `bson:"created"`
 	Updated     time.Time `bson:"updated"`
+	ActiveStatus			int				`bson:"activeCount"`
+	Active bool `json:"active"`
 }
 
 // Status contains a detailed message on the tracked object's status
@@ -54,8 +58,6 @@ var (
 	dataRe    = regexp.MustCompile(`(?P<id>Vehicle ID:([\d\.]+)) (?P<lat>lat:([\d\.-]+)) (?P<lng>lon:([\d\.-]+)) (?P<heading>dir:([\d\.-]+)) (?P<speed>spd:([\d\.-]+)) (?P<lock>lck:([\d\.-]+)) (?P<time>time:([\d]+)) (?P<date>date:([\d]+)) (?P<status>trig:([\d]+))`)
 	dataNames = dataRe.SubexpNames()
 )
-
-var ShuttleInactivityCounter = make(map[string]int)
 var lastUpdate time.Time
 
 // UpdateShuttles send a request to iTrak API, gets updated shuttle info, and
@@ -141,6 +143,9 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 				log.Error(err.Error())
 				continue
 			}
+			var ve Vehicle;
+			findErr := App.Vehicles.Find(bson.M{"vehicleID":update.VehicleID}).One(&ve);
+			_ = findErr //Error Handling!
 
 			lastUpdate = time.Now().In(loc)
 
@@ -150,14 +155,24 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 				log.Errorf("error finding speed")
 			}
 			if spd < 3 {
-				ShuttleInactivityCounter[(strings.Replace(result["id"], "Vehicle ID:", "", -1))] += 1
-				//fmt.Printf(update.Status);
+				ve.ActiveStatus += 1
+
 			} else {
-				ShuttleInactivityCounter[(strings.Replace(result["id"], "Vehicle ID:", "", -1))] = 0
+			 	ve.ActiveStatus = 0
+				ve.Active = true
 			}
-			if ShuttleInactivityCounter[(strings.Replace(result["id"], "Vehicle ID:", "", -1))] > 20 {
-				update.Speed = "-1"
+			c := mgo.Change{
+				ve,
+				true,
+				false,
+				true,
 			}
+			changeInfo,findErr := App.Vehicles.Find(bson.M{"vehicleID":update.VehicleID}).Apply(c,&ve)
+			_ = changeInfo
+			if ve.ActiveStatus > 20 {
+				ve.Active = false;
+			}
+
 
 			if err := App.Updates.Insert(&update); err != nil {
 				log.Errorf("error inserting vehicle update(%v): %v", update, err)
@@ -248,7 +263,7 @@ func (App *App) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 		// here, huge waste of computational power, you record every shit inside the Updates table and using sort, I don't know what the hell is going on
 		err := App.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(1).One(&update)
 
-		if err == nil {
+		if err == nil && vehicle.Active{
 			updates = append(updates, update)
 		}
 	}
@@ -321,4 +336,3 @@ func KPHtoMPH(kmh float64) (mph float64) {
 	mph = kmh * 0.621371192
 	return
 }
-

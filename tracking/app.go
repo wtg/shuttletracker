@@ -146,7 +146,7 @@ func readSeedConfiguration(fileName string, app *App) error {
 		item := vehiclesMap["Vehicles"][i]
 		VehicleID, _ := item["VehicleID"].(string)
 		VehicleName, _ := item["VehicleName"].(string)
-		vehicle := Vehicle{VehicleID, VehicleName, time.Now(), time.Now()}
+		vehicle := Vehicle{VehicleID, VehicleName, time.Now(), time.Now(),0,false}
 		Vehicles = append(Vehicles, vehicle)
 	}
 
