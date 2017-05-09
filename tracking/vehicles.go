@@ -143,8 +143,8 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 				log.Error(err.Error())
 				continue
 			}
-			var ve Vehicle;
-			findErr := App.Vehicles.Find(bson.M{"vehicleID":update.VehicleID}).One(&ve);
+			var currentVehicle Vehicle;
+			findErr := App.Vehicles.Find(bson.M{"vehicleID":update.VehicleID}).One(&currentVehicle);
 			_ = findErr //Error Handling!
 
 			lastUpdate = time.Now().In(loc)
@@ -155,11 +155,11 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 				log.Errorf("error finding speed")
 			}
 			if spd < 3 {
-				ve.ActiveStatus += 1
+				currentVehicle.ActiveStatus += 1
 
 			} else {
-			 	ve.ActiveStatus = 0
-				ve.Active = true
+			 	currentVehicle.ActiveStatus = 0
+				currentVehicle.Active = true
 			}
 			c := mgo.Change{
 				ve,
@@ -167,11 +167,11 @@ func (App *App) UpdateShuttles(dataFeed string, updateInterval int) {
 				false,
 				true,
 			}
-			changeInfo,findErr := App.Vehicles.Find(bson.M{"vehicleID":update.VehicleID}).Apply(c,&ve)
-			_ = changeInfo
-			if ve.ActiveStatus > 20 {
-				ve.Active = false;
+			if = currentVehicle.ActiveStatus > 20 {
+				currentVehicle.Active = false;
 			}
+			changeInfo,findErr := App.Vehicles.Find(bson.M{"vehicleID":update.VehicleID}).Apply(c,&currentVehicle)
+			_ = changeInfo
 
 
 			if err := App.Updates.Insert(&update); err != nil {
