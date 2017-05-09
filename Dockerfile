@@ -1,7 +1,7 @@
 FROM ubuntu:17.04
 
 RUN apt-get update \
-	&& apt-get install --no-install-recommends --no-install-suggests -y golang git npm ca-certificates \
+	&& apt-get install --no-install-recommends --no-install-suggests -y golang git npm ca-certificates tzdata \
 	&& rm -rf /var/lib/apt/lists/*
 
 # forward nginx logs to docker logs
