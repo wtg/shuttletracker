@@ -69,13 +69,8 @@
         </div>
         <div class="flex" style="flex:2">
           <form is="iron-form" id="stopForm" content-type="application/json" method="post" action="/stops/create">
-            <paper-dropdown-menu class="route-select" label="Route" selected-item="{{selectedRoute}}">
-              <paper-menu class="dropdown-content">
-                <template is="dom-repeat" items="{{routes}}" as="route">
-                  <paper-item value="{{route.id}}">{{route.name}}</paper-item>
-                </template>
-              </paper-menu>
-            </paper-dropdown-menu>
+
+            <paper-input name="routeId" label="Route Id" id="routeId" value=""></paper-input>
             <paper-input name="name" label="Stop Name" id="name" value=""></paper-input>
             <paper-input name="description" label="Description" id="desc" value=""></paper-input>
             <paper-input name="address" label="Address" id="addr" value=""></paper-input>
@@ -92,7 +87,7 @@
             <input type="hidden" name="lat" id="stopLat">
             <input type="hidden" name="lng" id="stopLng">
             <input type="hidden" name="toDelete" id="toDelete">
-            <input type="hidden" name="routeId" id = "routeId" value="{{selectedRoute.value}}">
+          
             <paper-button class="submit-stop" raised on-click="submitStop">Submit</paper-button>
           </form>
         </div>
@@ -184,6 +179,8 @@
                 title: stops[i]["name"]
               });
               this.updateStopForm();
+
+              this.$.routeId.value = stops[i]["routeId"];
               this.$.name.value = stops[i]["name"];
               this.$.en.value = stops[i]["enabled"];
               //This doesnt work?
