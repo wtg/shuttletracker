@@ -1,4 +1,4 @@
-package tracking
+package api
 
 import (
 	"net/http"
@@ -61,10 +61,10 @@ type LegacyRoutesAndStopsContainer struct {
 	Stops []LegacyStop `json:"stops"`
 }
 
-func (App *App) LegacyVehiclesHandler(w http.ResponseWriter, r *http.Request) {
+func (App *API) LegacyVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	// Query all Vehicles
 	var vehicles []Vehicle
-	err := App.Vehicles.Find(bson.M{}).All(&vehicles)
+	err := App.db.Vehicles.Find(bson.M{}).All(&vehicles)
 	// Handle errors
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -75,7 +75,7 @@ func (App *App) LegacyVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	for _, vehicle := range vehicles {
 		var update VehicleUpdate
 		// here, huge waste of computational power, you record every shit inside the Updates table and using sort, I don't know what the hell is going on
-		err := App.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(1).One(&update)
+		err := App.db.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(1).One(&update)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -132,10 +132,10 @@ func (App *App) LegacyVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, legacy_vehicles)
 }
 
-func (App *App) LegacyRoutesHandler(w http.ResponseWriter, r *http.Request) {
+func (App *API) LegacyRoutesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all routes in database
 	var routes []Route
-	err := App.Routes.Find(bson.M{}).All(&routes)
+	err := App.db.Routes.Find(bson.M{}).All(&routes)
 	// Handle query errors
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -177,7 +177,7 @@ func (App *App) LegacyRoutesHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Find all stops in databases
 	var stops []Stop
-	err = App.Stops.Find(bson.M{}).All(&stops)
+	err = App.db.Stops.Find(bson.M{}).All(&stops)
 	// Handle query errors
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -196,7 +196,7 @@ func (App *App) LegacyRoutesHandler(w http.ResponseWriter, r *http.Request) {
 
 				// get route name
 				var route Route
-				err := App.Routes.Find(bson.M{"id": stop.RouteID}).One(&route)
+				err := App.db.Routes.Find(bson.M{"id": stop.RouteID}).One(&route)
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return
@@ -223,7 +223,7 @@ func (App *App) LegacyRoutesHandler(w http.ResponseWriter, r *http.Request) {
 
 		// get route name
 		var route Route
-		err := App.Routes.Find(bson.M{"id": stop.RouteID}).One(&route)
+		err := App.db.Routes.Find(bson.M{"id": stop.RouteID}).One(&route)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

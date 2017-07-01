@@ -1,12 +1,13 @@
-Shuttle Tracking v2
-===================
+Shuttle Tracker
+===============
 
 Remaking the original [Shuttle Tracker](https://github.com/wtg/shuttle_tracking) using [Go](https://golang.org/), [Polymer Web Components](https://www.polymer-project.org/), and [MongoDB](https://www.mongodb.org/).
 
 Setting Up
 -----------------
-1. Clone this repository using `git clone https://github.com/wtg/shuttle_tracking_2`
-  * Make sure the repository is cloned to a parent directory named `src`
+1. Install Go
+2. `go get github.com/wtg/shuttles`
+3. `govendor sync`
 2. Make sure you have npm, bower, golang and mongodb installed
   * On Debian-based linux, run `sudo apt-get install nodejs npm golang mongodb` to install npm and go language packages
   * On CentOs run `sudo yum install nodejs npm golang mongodb` instead
@@ -20,7 +21,6 @@ Setting Up
   * MongoPort: Port where MongoDB is bound (default is 27017)
 3. Change your gopath to the parent directory or src directory listed on step 1 using `export GOPATH="path-to-directory"`
 4. Run `bower install` inside shuttle tracking directory to install dependencies listed in bower.json
-5. Run `./goget` (script provided) to install additional dependencies
 6. Rename conf.json.sample to conf.json and edit with the following:
   * Data Feed: API with tracking information (iTrak in our case), if using the dummy server, http://localhost:8081
   * UpdateInterval: Number of seconds between each request to the data feed
@@ -31,4 +31,4 @@ Setting Up
 
 More Information
 -----------------
-For more information please visit the [Wiki page](https://github.com/KeyboardNerd/shuttle_tracking_2/wiki).
+~~For more information please visit the [Wiki page](https://github.com/KeyboardNerd/shuttle_tracking_2/wiki).~~

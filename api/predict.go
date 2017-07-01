@@ -1,4 +1,4 @@
-package tracking
+package api
 
 // Arrival Time serving what's the time to next N stops for one shuttle
 import (

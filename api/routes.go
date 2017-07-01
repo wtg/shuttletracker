@@ -1,4 +1,4 @@
-package tracking
+package api
 
 import (
 	"bytes"
@@ -107,10 +107,10 @@ type Segment struct {
 }
 
 // RoutesHandler finds all of the routes in the database
-func (App *App) RoutesHandler(w http.ResponseWriter, r *http.Request) {
+func (App *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all routes in database
 	var routes []Route
-	err := App.Routes.Find(bson.M{}).All(&routes)
+	err := App.db.Routes.Find(bson.M{}).All(&routes)
 	// Handle query errors
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -120,10 +120,10 @@ func (App *App) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // StopsHandler finds all of the route stops in the database
-func (App *App) StopsHandler(w http.ResponseWriter, r *http.Request) {
+func (App *API) StopsHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all stops in databases
 	var stops []Stop
-	err := App.Stops.Find(bson.M{}).All(&stops)
+	err := App.db.Stops.Find(bson.M{}).All(&stops)
 	// Handle query errors
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -244,7 +244,7 @@ func ComputeSegments(coords []Coord, key string, threshold int) []Segment {
 }
 
 //This is really a temporary funcion to import the old database, only supports adding two routes
-func (App *App) ImportHandler(w http.ResponseWriter, r *http.Request){
+func (App *API) ImportHandler(w http.ResponseWriter, r *http.Request){
 	var count int;
 	count = 0;
 	db,err := sql.Open("mysql","root:pass@/shuttle_tracking");
@@ -282,8 +282,8 @@ func (App *App) ImportHandler(w http.ResponseWriter, r *http.Request){
 		//We're done with the first route, update it and put it in the database.
 		if(oldId == 1 &&  route_id == 2){
 
-			coords = Interpolate(coords, App.Config.GoogleMapAPIKey)
-			segments := ComputeSegments(coords, App.Config.GoogleMapAPIKey, App.Config.GoogleMapMinDistance)
+			coords = Interpolate(coords, App.cfg.GoogleMapAPIKey)
+			segments := ComputeSegments(coords, App.cfg.GoogleMapAPIKey, App.cfg.GoogleMapMinDistance)
 
 			route :=  db.QueryRow("SELECT name,description,start_time,end_time,color FROM routes where id = 1");
 			var name string;
@@ -312,7 +312,7 @@ func (App *App) ImportHandler(w http.ResponseWriter, r *http.Request){
 				_ = newRoute
 				fmt.Printf(name)
 				coords = nil;
-				err = App.Routes.Insert(&newRoute)
+				err = App.db.Routes.Insert(&newRoute)
 			}
 
 		oldId = route_id
@@ -327,8 +327,8 @@ func (App *App) ImportHandler(w http.ResponseWriter, r *http.Request){
 		}
 	}
 
-	coords = Interpolate(coords, App.Config.GoogleMapAPIKey)
-	segments := ComputeSegments(coords, App.Config.GoogleMapAPIKey, App.Config.GoogleMapMinDistance)
+	coords = Interpolate(coords, App.cfg.GoogleMapAPIKey)
+	segments := ComputeSegments(coords, App.cfg.GoogleMapAPIKey, App.cfg.GoogleMapMinDistance)
 
 	route :=  db.QueryRow("SELECT name,description,start_time,end_time,color FROM routes where id = 2");
 	var name string;
@@ -357,14 +357,14 @@ func (App *App) ImportHandler(w http.ResponseWriter, r *http.Request){
 		_ = newRoute
 		fmt.Printf(name)
 		coords = []Coord{};
-		err = App.Routes.Insert(&newRoute)
+		err = App.db.Routes.Insert(&newRoute)
 
 }
 
 // RoutesCreateHandler adds a new route to the database
-func (App *App) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
+func (App *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Create a new route object using request fields
-	if(App.Config.Authenticate && !cas.IsAuthenticated(r)){return;}
+	if(App.cfg.Authenticate && !cas.IsAuthenticated(r)){return;}
 	var routeData map[string]string
 	var coordsData []map[string]float64
 	// Decode route details
@@ -386,8 +386,8 @@ func (App *App) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 		coords = append(coords, coord)
 	}
 	// Here do the interpolation
-	coords = Interpolate(coords, App.Config.GoogleMapAPIKey)
-	segments := ComputeSegments(coords, App.Config.GoogleMapAPIKey, App.Config.GoogleMapMinDistance)
+	coords = Interpolate(coords, App.cfg.GoogleMapAPIKey)
+	segments := ComputeSegments(coords, App.cfg.GoogleMapAPIKey, App.cfg.GoogleMapMinDistance)
 	// now we get the Segment for each segment ( this should be stored in database, just store it inside route for god sake)
 
 	fmt.Printf("Size of coordinates = %d", len(coords))
@@ -410,7 +410,7 @@ func (App *App) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 		Created:     currentTime,
 		Updated:     currentTime}
 	// Store new route under routes collection
-	err = App.Routes.Insert(&route)
+	err = App.db.Routes.Insert(&route)
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -419,13 +419,13 @@ func (App *App) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 //Deletes route from database
-func (App *App) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if(App.Config.Authenticate && !cas.IsAuthenticated(r)){return;}
+func (App *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	if(App.cfg.Authenticate && !cas.IsAuthenticated(r)){return;}
 
 	vars := mux.Vars(r)
 	fmt.Printf(vars["id"]);
 	log.Debugf("deleting", vars["id"])
-	err := App.Routes.Remove(bson.M{"id": vars["id"]});
+	err := App.db.Routes.Remove(bson.M{"id": vars["id"]});
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -456,8 +456,8 @@ func GetSegment(stop Stop, startIndex int, segments []Segment) int {
 }
 
 // StopsCreateHandler adds a new route stop to the database
-func (App *App) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
-	if(App.Config.Authenticate && !cas.IsAuthenticated(r)){return;}
+func (App *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
+	if(App.cfg.Authenticate && !cas.IsAuthenticated(r)){return;}
 
 	fmt.Print("Create Stop Handler called")
 	// Create a new stop object using request fields
@@ -465,7 +465,7 @@ func (App *App) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&stop)
 	stop.ID = bson.NewObjectId().Hex()
 	route := Route{}
-	err1 := App.Routes.Find(bson.M{"id": stop.RouteID}).One(&route)
+	err1 := App.db.Routes.Find(bson.M{"id": stop.RouteID}).One(&route)
 	// Error handling
 
 	if err1 != nil {
@@ -480,7 +480,7 @@ func (App *App) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	stop.SegmentIndex = GetSegment(stop, route.AvailableRoute, route.Duration)
 
 	// Store new stop under stops collection
-	err = App.Stops.Insert(&stop)
+	err = App.db.Stops.Insert(&stop)
 	// Error handling
 	if err != nil {
 		fmt.Println(err.Error())
@@ -489,7 +489,7 @@ func (App *App) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	query := bson.M{"id": stop.RouteID}
 	change := bson.M{"$set": bson.M{"availableroute": stop.SegmentIndex + 1, "stopsid": route.StopsID}}
 
-	err = App.Routes.Update(query, change)
+	err = App.db.Routes.Update(query, change)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -497,13 +497,13 @@ func (App *App) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, stop)
 }
 
-func (App *App) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if(App.Config.Authenticate && !cas.IsAuthenticated(r)){return;}
+func (App *API) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	if(App.cfg.Authenticate && !cas.IsAuthenticated(r)){return;}
 
 	vars := mux.Vars(r)
 	log.Debugf("deleting", vars["id"])
 	fmt.Printf(vars["id"]);
-	err := App.Stops.Remove(bson.M{"id": vars["id"]})
+	err := App.db.Stops.Remove(bson.M{"id": vars["id"]})
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
