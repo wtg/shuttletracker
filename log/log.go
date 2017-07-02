@@ -17,7 +17,9 @@ func init() {
 }
 
 func NewConfig() *Config {
-	return &Config{}
+	return &Config{
+		Level: "info",
+	}
 }
 
 func SetLevel(level string) {

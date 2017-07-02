@@ -4,17 +4,15 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
-	"os"
 
 	"github.com/wtg/shuttletracker/log"
 
-	"github.com/caarlos0/env"
-	"gopkg.in/cas.v1"
-	"github.com/wtg/shuttletracker/database"
 	"fmt"
-	"strings"
-	"gopkg.in/mgo.v2/bson"
 	"github.com/gorilla/mux"
+	"github.com/wtg/shuttletracker/database"
+	"gopkg.in/cas.v1"
+	"gopkg.in/mgo.v2/bson"
+	"strings"
 )
 
 // Configuration holds the settings for connecting to outside resources.
@@ -23,32 +21,15 @@ type Config struct {
 	GoogleMapMinDistance int
 	CasURL               string `env:"CAS_URL"`
 	Authenticate         bool   `env:"AUTHENTICATE" envDefault:"true"`
+	ListenURL            string
 }
 
 // App holds references to Mongo resources.
 type API struct {
-	cfg   Config
-	CasAUTH  *cas.Client
-	CasMEM   *cas.MemoryStore
-	db database.Database
-}
-
-// InitConfig loads and return the app config.
-func InitConfig() *Config {
-	// Read app configuration file
-	config, err := readConfiguration("conf.json")
-	if os.IsNotExist(err) {
-		log.Debug("reading configuration from environment")
-		config = &Config{}
-		err := env.Parse(config)
-		if err != nil {
-			log.Errorf("error reading configuration from environment: %v", err)
-		}
-	} else if err != nil {
-		log.Errorf("error reading configuration file: %v", err)
-	}
-
-	return config
+	cfg     Config
+	CasAUTH *cas.Client
+	CasMEM  *cas.MemoryStore
+	db      database.Database
 }
 
 // InitApp initializes the application given a config and connects to backends.
@@ -74,7 +55,6 @@ func New(cfg Config, db database.Database) *API {
 		db,
 	}
 
-
 	// Read vehicle configuration file
 	/*serr := readSeedConfiguration("seed/vehicle_seed.json", &app)
 	if serr != nil {
@@ -84,21 +64,9 @@ func New(cfg Config, db database.Database) *API {
 }
 
 func NewConfig() *Config {
-	return &Config{}
-}
-
-func readConfiguration(fileName string) (*Config, error) {
-	// Open config file and decode JSON to Configuration struct
-	file, err := os.Open(fileName)
-	if err != nil {
-		return nil, err
+	return &Config{
+		ListenURL: "localhost:8080",
 	}
-	decoder := json.NewDecoder(file)
-	config := Config{}
-	if err := decoder.Decode(&config); err != nil {
-		return nil, err
-	}
-	return &config, nil
 }
 
 //readSeedConfiguration adds a new vehicle to the database from seed.
@@ -144,34 +112,33 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "index.html")
 }
 
-var users []User
-
-type User struct{
-	Name   string
+type User struct {
+	Name string
 }
 
 // AdminHandler serves the admin page.
 func (api *API) AdminHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("%u",api.cfg.Authenticate);
+	fmt.Printf("%u", api.cfg.Authenticate)
 	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		cas.RedirectToLogin(w, r)
 		return
-	}else{
-		valid := false;
+	} else {
+		valid := false
+		var users []User
 		api.db.Users.Find(bson.M{}).All(&users)
 		for _, u := range users {
-			if(u.Name == strings.ToLower(cas.Username(r))){
-				valid = true;
+			if u.Name == strings.ToLower(cas.Username(r)) {
+				valid = true
 			}
 		}
-		if(api.cfg.Authenticate == false){
-			valid = true;
-			fmt.Printf("not authenticating");
+		if api.cfg.Authenticate == false {
+			valid = true
+			fmt.Printf("not authenticating")
 		}
-		if valid{
-			http.Redirect(w,r,"/admin/success/",301);
-		}else{
-			http.Redirect(w,r,"/admin/logout/",301);
+		if valid {
+			http.Redirect(w, r, "/admin/success/", 301)
+		} else {
+			http.Redirect(w, r, "/admin/logout/", 301)
 		}
 	}
 
@@ -180,9 +147,9 @@ func (api *API) AdminHandler(w http.ResponseWriter, r *http.Request) {
 func (api *API) AdminPageServer(w http.ResponseWriter, r *http.Request) {
 
 	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
-		http.Redirect(w,r,"/admin/",301);
+		http.Redirect(w, r, "/admin/", 301)
 		return
-	}else{
+	} else {
 		http.ServeFile(w, r, "admin.html")
 	}
 
@@ -190,12 +157,11 @@ func (api *API) AdminPageServer(w http.ResponseWriter, r *http.Request) {
 
 func (api *API) AdminLogout(w http.ResponseWriter, r *http.Request) {
 
-	if cas.IsAuthenticated(r){
-		cas.RedirectToLogout(w,r);
+	if cas.IsAuthenticated(r) {
+		cas.RedirectToLogout(w, r)
 	}
 
 }
-
 
 // WriteJSON writes the data as JSON.
 func WriteJSON(w http.ResponseWriter, data interface{}) error {
@@ -241,7 +207,7 @@ func (api *API) Run() {
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
 	// Serve requests
 	hand := api.CasAUTH.Handle(r)
-	if err := http.ListenAndServe(":8080", hand); err != nil {
+	if err := http.ListenAndServe(api.cfg.ListenURL, hand); err != nil {
 		log.Errorf("Unable to ListenAndServe: %v", err)
 	}
 }

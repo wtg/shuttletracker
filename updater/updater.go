@@ -36,11 +36,21 @@ type Config struct {
 func New(cfg Config, db database.Database) (*Updater) {
 	updater := &Updater{cfg: cfg, db: db}
 
+	interval, err := time.ParseDuration(cfg.UpdateInterval)
+	if err != nil {
+		log.Error(err)
+		return nil
+	}
+	updater.updateInterval = interval
+
 	return updater
 }
 
 func NewConfig() *Config {
-	return &Config{}
+	return &Config{
+		UpdateInterval: "10s",
+	}
+
 }
 
 // Run updater forever.
@@ -55,9 +65,6 @@ func (u *Updater) Run() {
 // finally store updated records in db.
 func (u *Updater) update() {
 	var st time.Duration
-	// Sleep for n seconds before updating again
-	log.Debugf("sleeping for %v", st)
-	time.Sleep(st)
 	if st == 0 {
 		// Initialize the sleep timer after the first sleep.  This lets us sleep during errors
 		// when we 'continue' back to the top of the loop without waiting to sleep for the first
@@ -143,7 +150,7 @@ func (u *Updater) update() {
 
 		// here if parsing error, updated will be incremented, wait, the whole thing will crash, isn't it?
 	}
-	log.Infof("sucessfully updated %d/%d vehicles", updated, len(vehiclesData)-1)
+	log.Debugf("Successfully updated %d/%d vehicles.", updated, len(vehiclesData)-1)
 }
 
 // convert kmh to mph
