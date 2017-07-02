@@ -176,6 +176,7 @@ func WriteJSON(w http.ResponseWriter, data interface{}) error {
 }
 
 func (api *API) Run() {
+	log.Debug("API started.")
 	// Routing
 	r := mux.NewRouter()
 	r.HandleFunc("/", IndexHandler).Methods("GET")
@@ -208,6 +209,6 @@ func (api *API) Run() {
 	// Serve requests
 	hand := api.CasAUTH.Handle(r)
 	if err := http.ListenAndServe(api.cfg.ListenURL, hand); err != nil {
-		log.Errorf("Unable to ListenAndServe: %v", err)
+		log.WithError(err).Error("Unable to ListenAndServe.")
 	}
 }

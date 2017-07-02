@@ -15,12 +15,18 @@ func Run() {
 	log.SetLevel(cfg.Log.Level)
 
 	db := database.New(*cfg.Database)
-	log.Debug("Connected to database.")
 
+	// Start shuttle position updater
 	updater := updater.New(*cfg.Updater, *db)
-	api := api.New(*cfg.API, *db)
-
-	// Start auto updater
 	go updater.Run()
-	api.Run()
+
+	// Start API server
+	api := api.New(*cfg.API, *db)
+	go api.Run()
+
+	// Wait until quit
+	quit := make(chan bool, 0)
+	select {
+	case <-quit:
+	}
 }

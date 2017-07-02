@@ -55,6 +55,7 @@ func NewConfig() *Config {
 
 // Run updater forever.
 func (u *Updater) Run() {
+	log.Debug("Updater started.")
 	for {
 		u.update()
 		time.Sleep(u.updateInterval)
