@@ -4,9 +4,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/wtg/shuttletracker/api"
 	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/log"
+	"github.com/wtg/shuttletracker/model"
+
 	"io/ioutil"
 	"regexp"
 	"strconv"
@@ -117,7 +118,7 @@ func (u *Updater) update() {
 		speedMPH := kphToMPH(speedKMH)
 		speedMPHString := strconv.FormatFloat(speedMPH, 'f', 5, 64)
 
-		update := api.VehicleUpdate{
+		update := model.VehicleUpdate{
 			VehicleID: strings.Replace(result["id"], "Vehicle ID:", "", -1),
 			Lat:       strings.Replace(result["lat"], "lat:", "", -1),
 			Lng:       strings.Replace(result["lng"], "lon:", "", -1),

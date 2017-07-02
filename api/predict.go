@@ -9,14 +9,15 @@ import (
 
 	"bytes"
 
+	"github.com/wtg/shuttletracker/model"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
 // GetArrivalTime is experimental
-func GetArrivalTime(update *VehicleUpdate, routes *mgo.Collection, stops *mgo.Collection) string {
+func GetArrivalTime(update *model.VehicleUpdate, routes *mgo.Collection, stops *mgo.Collection) string {
 	if i, err := strconv.ParseFloat(update.Speed, 64); i > 5.0 && err == nil {
-		route := Route{}
+		route := model.Route{}
 		routes.Find(bson.M{"id": "582f2794e05a0b9c1f2948fa"}).One(&route)
 		// get closest segment
 		x0, err := strconv.ParseFloat(update.Lat, 64)
@@ -45,7 +46,7 @@ func GetArrivalTime(update *VehicleUpdate, routes *mgo.Collection, stops *mgo.Co
 		if ShuttleSegment >= 0 && ShuttleSegment < len(route.Duration) {
 			fmt.Printf("ID = %s, Segment = %d (%f, %f), duration = %f\n", update.VehicleID, ShuttleSegment, route.Duration[ShuttleSegment].Start.Latitude, route.Duration[ShuttleSegment].Start.Longitude, route.Duration[ShuttleSegment].Duration)
 		}
-		allstops := []Stop{}
+		allstops := []model.Stop{}
 		stops.Find(bson.M{"routeId": route.ID}).All(&allstops)
 		var buffer bytes.Buffer
 		for _, i := range allstops {

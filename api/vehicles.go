@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/wtg/shuttletracker/log"
+	"github.com/wtg/shuttletracker/model"
 
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
@@ -18,43 +19,11 @@ var (
 	lastUpdate time.Time
 )
 
-//  represents a single position observed for a Vehicle from the data feed.
-type VehicleUpdate struct {
-	VehicleID string    `json:"vehicleID"   bson:"vehicleID,omitempty"`
-	Lat       string    `json:"lat"         bson:"lat"`
-	Lng       string    `json:"lng"         bson:"lng"`
-	Heading   string    `json:"heading"     bson:"heading"`
-	Speed     string    `json:"speed"       bson:"speed"`
-	Lock      string    `json:"lock"        bson:"lock"`
-	Time      string    `json:"time"        bson:"time"`
-	Date      string    `json:"date"        bson:"date"`
-	Status    string    `json:"status"      bson:"status"`
-	Created   time.Time `json:"created"     bson:"created"`
-	Segment   string    `json:"segment"     bson:"segment"` // the segment that a vehicle resides on
-}
-
-// Vehicle represents an object being tracked.
-type Vehicle struct {
-	VehicleID   string    `json:"vehicleID"   bson:"vehicleID,omitempty"`
-	VehicleName string    `json:"vehicleName" bson:"vehicleName"`
-	Created     time.Time `bson:"created"`
-	Updated     time.Time `bson:"updated"`
-	Active      bool      `json:"active"`
-}
-
-// Status contains a detailed message on the tracked object's status
-type Status struct {
-	Public  bool      `bson:"public"`
-	Message string    `json:"message" bson:"message"`
-	Created time.Time `bson:"created"`
-	Updated time.Time `bson:"updated"`
-}
-
 // VehiclesHandler finds all the vehicles in the database.
 func (api *API) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Find all vehicles in database
-	var vehicles []Vehicle
+	var vehicles []model.Vehicle
 	err := api.db.Vehicles.Find(bson.M{}).All(&vehicles)
 	// Handle query errors
 	if err != nil {
@@ -73,7 +42,7 @@ func (api *API) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create new vehicle object using request fields
-	vehicle := Vehicle{}
+	vehicle := model.Vehicle{}
 	vehicle.Created = time.Now()
 	vehicle.Updated = vehicle.Created
 	vehicleData := json.NewDecoder(r.Body)
@@ -114,10 +83,10 @@ func (api *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 // UpdatesHandler get the most recent update for each vehicle in the vehicles collection.
 func (App *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 	// Store updates for each vehicle
-	var vehicles []Vehicle
-	var updates []VehicleUpdate
-	var update VehicleUpdate
-	var vehicleUpdates []VehicleUpdate
+	var vehicles []model.Vehicle
+	var updates []model.VehicleUpdate
+	var update model.VehicleUpdate
+	var vehicleUpdates []model.VehicleUpdate
 	// Query all Vehicles
 	err := App.db.Vehicles.Find(bson.M{}).All(&vehicles)
 	// Handle errors
@@ -155,8 +124,8 @@ func (App *API) UpdateMessageHandler(w http.ResponseWriter, r *http.Request) {
 	// For each vehicle/update, store message as a string
 	var messages []string
 	var message string
-	var vehicles []Vehicle
-	var update VehicleUpdate
+	var vehicles []model.Vehicle
+	var update model.VehicleUpdate
 
 	// Query all Vehicles
 	err := App.db.Vehicles.Find(bson.M{}).All(&vehicles)
@@ -183,7 +152,7 @@ func (App *API) UpdateMessageHandler(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, messages)
 }
 
-// CardinalDirection figures out the cardinal direction of a vehicle's heading
+// CardinalDirection returns the cardinal direction of a vehicle's heading.
 func CardinalDirection(h *string) string {
 	heading, err := strconv.ParseFloat(*h, 64)
 	if err != nil {

@@ -1,69 +1,16 @@
 package api
 
 import (
-	"net/http"
+	"github.com/wtg/shuttletracker/model"
 	"gopkg.in/mgo.v2/bson"
-	// log "github.com/Sirupsen/logrus"
-	"strconv"
-	"time"
 	"math/big"
+	"net/http"
+	"strconv"
 )
-
-type LatestPosition struct {
-	Longitude string `json:"longitude"`
-	Latitude string `json:"latitude"`
-	Timestamp time.Time `json:"timestamp"`
-	Speed float64 `json:"speed"`
-	Heading int `json:"heading"`
-	Cardinal string `json:"cardinal_point"`
-	StatusMessage *string `json:"public_status_message"` // this is a pointer so it defaults to null
-}
-
-type LegacyVehicle struct {
-	Name string `json:"name"`
-	ID int `json:"id"`
-	LatestPosition LatestPosition `json:"latest_position"`
-	Icon map[string]int `json:"icon"`
-}
-
-type LegacyVehicleContainer struct {
-	Vehicle LegacyVehicle `json:"vehicle"`
-}
-
-type LegacyCoordinate struct {
-	Latitude string `json:"latitude"`
-	Longitude string `json:"longitude"`
-}
-
-type LegacyRoute struct {
-	Name string `json:"name"`
-	Width int `json:"width"`
-	ID big.Int `json:"id"`
-	Color string `json:"color"`
-	Coordinates []LegacyCoordinate `json:"coords"`
-}
-
-type LegacyStopRoute struct {
-	Name string `json:"name"`
-	ID big.Int `json:"id"`
-}
-
-type LegacyStop struct {
-	Name string `json:"name"`
-	Longitude string `json:"longitude"`
-	Latitude string `json:"latitude"`
-	ShortName string `json:"short_name"`
-	Routes []LegacyStopRoute `json:"routes"`
-}
-
-type LegacyRoutesAndStopsContainer struct {
-	Routes []LegacyRoute `json:"routes"`
-	Stops []LegacyStop `json:"stops"`
-}
 
 func (App *API) LegacyVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	// Query all Vehicles
-	var vehicles []Vehicle
+	var vehicles []model.Vehicle
 	err := App.db.Vehicles.Find(bson.M{}).All(&vehicles)
 	// Handle errors
 	if err != nil {
@@ -71,9 +18,9 @@ func (App *API) LegacyVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Find recent updates for each vehicle
-	var legacy_vehicles []LegacyVehicleContainer
+	var legacy_vehicles []model.LegacyVehicleContainer
 	for _, vehicle := range vehicles {
-		var update VehicleUpdate
+		var update model.VehicleUpdate
 		// here, huge waste of computational power, you record every shit inside the Updates table and using sort, I don't know what the hell is going on
 		err := App.db.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(1).One(&update)
 
@@ -107,26 +54,23 @@ func (App *API) LegacyVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-
-		latestPosition := LatestPosition{
+		latestPosition := model.LatestPosition{
 			Longitude: update.Lng,
-			Latitude: update.Lat,
-			Heading: int(heading),
-			Cardinal: cardinal,
-			Speed: speed,
+			Latitude:  update.Lat,
+			Heading:   int(heading),
+			Cardinal:  cardinal,
+			Speed:     speed,
 			Timestamp: update.Created,
 		}
 
-		legacy_vehicle := LegacyVehicle{
-			Name: vehicle.VehicleName,
-			ID: vehicleID,
+		legacy_vehicle := model.LegacyVehicle{
+			Name:           vehicle.VehicleName,
+			ID:             vehicleID,
 			LatestPosition: latestPosition,
-			Icon: map[string]int{"id": 1},
+			Icon:           map[string]int{"id": 1},
 		}
 
-
-
-		legacy_vehicles = append(legacy_vehicles, LegacyVehicleContainer{Vehicle: legacy_vehicle})
+		legacy_vehicles = append(legacy_vehicles, model.LegacyVehicleContainer{Vehicle: legacy_vehicle})
 	}
 	// Convert updates to JSON
 	WriteJSON(w, legacy_vehicles)
@@ -134,7 +78,7 @@ func (App *API) LegacyVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 
 func (App *API) LegacyRoutesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all routes in database
-	var routes []Route
+	var routes []model.Route
 	err := App.db.Routes.Find(bson.M{}).All(&routes)
 	// Handle query errors
 	if err != nil {
@@ -143,32 +87,32 @@ func (App *API) LegacyRoutesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Convert routes to legacy routes
-	var legacyRoutes []LegacyRoute
+	var legacyRoutes []model.LegacyRoute
 	for _, route := range routes {
 		// legacy app expects route ID to be a number, so we convert Mongo's base 16 ID to base 10 int
 		var routeID big.Int
 		routeID.SetString(route.ID, 16)
 
 		// convert coordinates to legacy coordinates
-		var coordinates []LegacyCoordinate
+		var coordinates []model.LegacyCoordinate
 		for _, coordinate := range route.Coords {
 			// convert from float to string
 			latitude := strconv.FormatFloat(coordinate.Lat, 'f', 5, 64)
 			longitude := strconv.FormatFloat(coordinate.Lng, 'f', 5, 64)
 
-			legacyCoordinate := LegacyCoordinate{
-				Latitude: latitude,
+			legacyCoordinate := model.LegacyCoordinate{
+				Latitude:  latitude,
 				Longitude: longitude,
 			}
 
 			coordinates = append(coordinates, legacyCoordinate)
 		}
 
-		legacyRoute := LegacyRoute{
-			Name: route.Name,
-			Width: route.Width,
-			Color: route.Color,
-			ID: routeID,
+		legacyRoute := model.LegacyRoute{
+			Name:        route.Name,
+			Width:       route.Width,
+			Color:       route.Color,
+			ID:          routeID,
 			Coordinates: coordinates,
 		}
 
@@ -176,7 +120,7 @@ func (App *API) LegacyRoutesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Find all stops in databases
-	var stops []Stop
+	var stops []model.Stop
 	err = App.db.Stops.Find(bson.M{}).All(&stops)
 	// Handle query errors
 	if err != nil {
@@ -185,7 +129,7 @@ func (App *API) LegacyRoutesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// convert stops to legacy stops
-	var legacyStops []LegacyStop
+	var legacyStops []model.LegacyStop
 	for _, stop := range stops {
 		// see if this stop has already been created. this should probably use a map for faster lookup, but the data is small.
 		found := false
@@ -195,7 +139,7 @@ func (App *API) LegacyRoutesHandler(w http.ResponseWriter, r *http.Request) {
 				// already created, so just append this route to the stop's routes instead of creating a duplicate
 
 				// get route name
-				var route Route
+				var route model.Route
 				err := App.db.Routes.Find(bson.M{"id": stop.RouteID}).One(&route)
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -206,7 +150,7 @@ func (App *API) LegacyRoutesHandler(w http.ResponseWriter, r *http.Request) {
 				var routeID big.Int
 				routeID.SetString(route.ID, 16)
 
-				legacyStopRoute := LegacyStopRoute{Name: route.Name, ID: routeID}
+				legacyStopRoute := model.LegacyStopRoute{Name: route.Name, ID: routeID}
 				ls.Routes = append(ls.Routes, legacyStopRoute)
 
 				found = true
@@ -222,7 +166,7 @@ func (App *API) LegacyRoutesHandler(w http.ResponseWriter, r *http.Request) {
 		longitude := strconv.FormatFloat(stop.Lng, 'f', 5, 64)
 
 		// get route name
-		var route Route
+		var route model.Route
 		err := App.db.Routes.Find(bson.M{"id": stop.RouteID}).One(&route)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -233,24 +177,24 @@ func (App *API) LegacyRoutesHandler(w http.ResponseWriter, r *http.Request) {
 		var routeID big.Int
 		routeID.SetString(route.ID, 16)
 
-		legacyStopRoute := LegacyStopRoute{Name: route.Name, ID: routeID}
-		legacyStopRoutes := []LegacyStopRoute{legacyStopRoute}
+		legacyStopRoute := model.LegacyStopRoute{Name: route.Name, ID: routeID}
+		legacyStopRoutes := []model.LegacyStopRoute{legacyStopRoute}
 
-		legacyStop := LegacyStop{
-			Name: stop.Name,
+		legacyStop := model.LegacyStop{
+			Name:      stop.Name,
 			Longitude: longitude,
-			Latitude: latitude,
+			Latitude:  latitude,
 			ShortName: stop.Name,
-			Routes: legacyStopRoutes,
+			Routes:    legacyStopRoutes,
 		}
 
 		legacyStops = append(legacyStops, legacyStop)
 	}
 
 	// Send to client as JSON
-	routesAndStops := LegacyRoutesAndStopsContainer{
+	routesAndStops := model.LegacyRoutesAndStopsContainer{
 		Routes: legacyRoutes,
-		Stops: legacyStops,
+		Stops:  legacyStops,
 	}
 	WriteJSON(w, routesAndStops)
 }

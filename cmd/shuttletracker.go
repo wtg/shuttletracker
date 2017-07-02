@@ -1,3 +1,5 @@
+// Package cmd bundles together all of shuttletracker's subpackages
+// to create, configure, and run the shuttle tracker.
 package cmd
 
 import (
@@ -8,6 +10,7 @@ import (
 	"github.com/wtg/shuttletracker/updater"
 )
 
+// Run starts the shuttle tracker and blocks forever.
 func Run() {
 	log.Info("Shuttle Tracker starting...")
 
