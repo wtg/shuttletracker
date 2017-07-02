@@ -48,7 +48,7 @@ func New(cfg Config, db database.Database) *API {
 	})
 
 	// Create Shuttles object to store database session and collections
-	app := API{
+	api := API{
 		cfg,
 		client,
 		tickets,
@@ -60,7 +60,7 @@ func New(cfg Config, db database.Database) *API {
 	if serr != nil {
 		log.Fatalf("error reading vehicle configuration file: %v", serr)
 	}*/
-	return &app
+	return &api
 }
 
 func NewConfig() *Config {

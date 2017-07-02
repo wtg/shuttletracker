@@ -31,6 +31,14 @@ func SetLevel(level string) {
 	logger.Level = parsed
 }
 
+func WithField(f string, v interface{}) *logrus.Entry {
+	return logger.WithField(f, v)
+}
+
+func WithError(err error) *logrus.Entry {
+	return WithField("error", err)
+}
+
 func Error(args ...interface{}) {
 	logger.Error(args...)
 }
