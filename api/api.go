@@ -83,6 +83,10 @@ func New(cfg Config, db database.Database) *API {
 	return &app
 }
 
+func NewConfig() *Config {
+	return &Config{}
+}
+
 func readConfiguration(fileName string) (*Config, error) {
 	// Open config file and decode JSON to Configuration struct
 	file, err := os.Open(fileName)

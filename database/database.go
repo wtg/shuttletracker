@@ -1,17 +1,17 @@
 package database
 
 import (
-	"gopkg.in/mgo.v2"
 	"github.com/wtg/shuttletracker/log"
+	"gopkg.in/mgo.v2"
 )
 
 type Database struct {
-	session *mgo.Session
-	Updates *mgo.Collection
+	session  *mgo.Session
+	Updates  *mgo.Collection
 	Vehicles *mgo.Collection
-Routes   *mgo.Collection
-Stops    *mgo.Collection
-Users    *mgo.Collection
+	Routes   *mgo.Collection
+	Stops    *mgo.Collection
+	Users    *mgo.Collection
 }
 
 type Config struct {
@@ -44,4 +44,10 @@ func New(cfg Config) *Database {
 	db.Updates.EnsureIndexKey("created")
 
 	return db
+}
+
+func NewConfig() *Config {
+	return &Config{
+		MongoURL: "localhost:27017",
+	}
 }

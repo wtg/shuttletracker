@@ -39,6 +39,10 @@ func New(cfg Config, db database.Database) (*Updater) {
 	return updater
 }
 
+func NewConfig() *Config {
+	return &Config{}
+}
+
 // Run updater forever.
 func (u *Updater) Run() {
 	for {
