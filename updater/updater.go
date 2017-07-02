@@ -1,49 +1,48 @@
 package updater
 
 import (
-	"time"
 	"net/http"
+	"time"
 
-	"github.com/wtg/shuttletracker/log"
-	"io/ioutil"
-	"strings"
-	"regexp"
-	"strconv"
 	"github.com/wtg/shuttletracker/api"
 	"github.com/wtg/shuttletracker/database"
+	"github.com/wtg/shuttletracker/log"
+	"io/ioutil"
+	"regexp"
+	"strconv"
+	"strings"
 )
 
 var (
 	// Match each API field with any number (+)
 	//   of the previous expressions (\d digit, \. escaped period, - negative number)
 	//   Specify named capturing groups to store each field from data feed
-	dataRe    = regexp.MustCompile(`(?P<id>Vehicle ID:([\d\.]+)) (?P<lat>lat:([\d\.-]+)) (?P<lng>lon:([\d\.-]+)) (?P<heading>dir:([\d\.-]+)) (?P<speed>spd:([\d\.-]+)) (?P<lock>lck:([\d\.-]+)) (?P<time>time:([\d]+)) (?P<date>date:([\d]+)) (?P<status>trig:([\d]+))`)
-	dataNames = dataRe.SubexpNames()
+	dataRe     = regexp.MustCompile(`(?P<id>Vehicle ID:([\d\.]+)) (?P<lat>lat:([\d\.-]+)) (?P<lng>lon:([\d\.-]+)) (?P<heading>dir:([\d\.-]+)) (?P<speed>spd:([\d\.-]+)) (?P<lock>lck:([\d\.-]+)) (?P<time>time:([\d]+)) (?P<date>date:([\d]+)) (?P<status>trig:([\d]+))`)
+	dataNames  = dataRe.SubexpNames()
 	lastUpdate time.Time
 )
 
 type Updater struct {
-	cfg Config
+	cfg            Config
 	updateInterval time.Duration
-	db database.Database
+	db             database.Database
 }
 
 type Config struct {
-	DataFeed string
+	DataFeed       string
 	UpdateInterval string
 }
 
-func New(cfg Config, db database.Database) (*Updater) {
+func New(cfg Config, db database.Database) (*Updater, error) {
 	updater := &Updater{cfg: cfg, db: db}
 
 	interval, err := time.ParseDuration(cfg.UpdateInterval)
 	if err != nil {
-		log.Error(err)
-		return nil
+		return nil, err
 	}
 	updater.updateInterval = interval
 
-	return updater
+	return updater, nil
 }
 
 func NewConfig() *Config {
@@ -56,38 +55,34 @@ func NewConfig() *Config {
 // Run updater forever.
 func (u *Updater) Run() {
 	log.Debug("Updater started.")
-	for {
+	ticker := time.Tick(u.updateInterval)
+
+	// Do one initial update.
+	u.update()
+
+	// Call update() every updateInterval.
+	for range ticker {
 		u.update()
-		time.Sleep(u.updateInterval)
 	}
 }
 
-// UpdateShuttles send a request to iTrak API, gets updated shuttle info, and
-// finally store updated records in db.
+// Send a request to iTrak API, get updated shuttle info, and
+// finally store updated records in the database.
 func (u *Updater) update() {
-	var st time.Duration
-	if st == 0 {
-		// Initialize the sleep timer after the first sleep.  This lets us sleep during errors
-		// when we 'continue' back to the top of the loop without waiting to sleep for the first
-		// update run.
-		st = time.Duration(u.updateInterval) * time.Second
-	}
-
 	// Make request to our tracking data feed
-	resp, err := http.Get(u.cfg.DataFeed)
+	client := http.Client{Timeout: time.Second * 5}
+	resp, err := client.Get(u.cfg.DataFeed)
 	if err != nil {
-		log.Errorf("error getting data feed: %v", err)
+		log.WithError(err).Error("Could not get data feed.")
 		return
 	}
 
 	// Read response body content
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Errorf("error reading data feed: %v", err)
+		log.WithError(err).Error("Could not read data feed.")
 		return
 	}
-
-	// this cannot be deferred because that will never get garbage collected
 	resp.Body.Close()
 
 	delim := "eof"
@@ -119,7 +114,7 @@ func (u *Updater) update() {
 			log.Error(err)
 			continue
 		}
-		speedMPH := KPHtoMPH(speedKMH)
+		speedMPH := kphToMPH(speedKMH)
 		speedMPHString := strconv.FormatFloat(speedMPH, 'f', 5, 64)
 
 		update := api.VehicleUpdate{
@@ -137,14 +132,14 @@ func (u *Updater) update() {
 		// convert updated time to local time
 		loc, err := time.LoadLocation("America/New_York")
 		if err != nil {
-			log.Error(err.Error())
+			log.WithError(err).Error("Could not load time zone information.")
 			continue
 		}
 
 		lastUpdate = time.Now().In(loc)
 
 		if err := u.db.Updates.Insert(&update); err != nil {
-			log.Errorf("error inserting vehicle update(%v): %v", update, err)
+			log.WithError(err).Errorf("Could not insert vehicle update.")
 		} else {
 			updated++
 		}
@@ -154,8 +149,8 @@ func (u *Updater) update() {
 	log.Debugf("Successfully updated %d/%d vehicles.", updated, len(vehiclesData)-1)
 }
 
-// convert kmh to mph
-func KPHtoMPH(kmh float64) (mph float64) {
+// Convert kmh to mph
+func kphToMPH(kmh float64) (mph float64) {
 	mph = kmh * 0.621371192
 	return
 }

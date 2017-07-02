@@ -39,7 +39,7 @@ type Vehicle struct {
 	VehicleName string    `json:"vehicleName" bson:"vehicleName"`
 	Created     time.Time `bson:"created"`
 	Updated     time.Time `bson:"updated"`
-	Active bool `json:"active"`
+	Active      bool      `json:"active"`
 }
 
 // Status contains a detailed message on the tracked object's status
@@ -50,13 +50,12 @@ type Status struct {
 	Updated time.Time `bson:"updated"`
 }
 
-
 // VehiclesHandler finds all the vehicles in the database.
-func (App *API) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
+func (api *API) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Find all vehicles in database
 	var vehicles []Vehicle
-	err := App.db.Vehicles.Find(bson.M{}).All(&vehicles)
+	err := api.db.Vehicles.Find(bson.M{}).All(&vehicles)
 	// Handle query errors
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -68,42 +67,43 @@ func (App *API) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // VehiclesCreateHandler adds a new vehicle to the database.
-func (App *API) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
-	if App.cfg.Authenticate && !cas.IsAuthenticated(r) {
+func (api *API) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
+	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
 	}
 
 	// Create new vehicle object using request fields
 	vehicle := Vehicle{}
 	vehicle.Created = time.Now()
-	vehicle.Updated = time.Now()
+	vehicle.Updated = vehicle.Created
 	vehicleData := json.NewDecoder(r.Body)
 	err := vehicleData.Decode(&vehicle)
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	// Store new vehicle under vehicles collection
-	err = App.db.Vehicles.Insert(&vehicle)
+	err = api.db.Vehicles.Insert(&vehicle)
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
-func (App *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
+func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (App *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if App.cfg.Authenticate && !cas.IsAuthenticated(r) {
+func (api *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
 	}
 
 	// Delete vehicle from Vehicles collection
 	vars := mux.Vars(r)
 	log.Debugf("deleting", vars["id"])
-	err := App.db.Vehicles.Remove(bson.M{"vehicleID": vars["id"]})
+	err := api.db.Vehicles.Remove(bson.M{"vehicleID": vars["id"]})
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -127,20 +127,20 @@ func (App *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find recent updates for each vehicle
 	for _, vehicle := range vehicles {
 		// here, huge waste of computational power, you record every shit inside the Updates table and using sort, I don't know what the hell is going on
-		err := App.db.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(20).All(&vehicleUpdates);
+		err := App.db.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(20).All(&vehicleUpdates)
 		update = vehicleUpdates[0]
 
 		if err == nil {
 			count := 0.0
 			speed := 0.0
-			for i, elem := range vehicleUpdates{
-				if(time.Since(elem.Created).Minutes() < 5){
-					val,_ := strconv.ParseFloat(vehicleUpdates[i].Speed,64);
+			for i, elem := range vehicleUpdates {
+				if time.Since(elem.Created).Minutes() < 5 {
+					val, _ := strconv.ParseFloat(vehicleUpdates[i].Speed, 64)
 					speed += val
-					count += 1;
+					count += 1
 				}
 			}
-			if(count > 0 && speed/count > 5){
+			if count > 0 && speed/count > 5 {
 				updates = append(updates, update)
 			}
 		}
@@ -209,4 +209,3 @@ func CardinalDirection(h *string) string {
 		return "North"
 	}
 }
-

@@ -10,19 +10,37 @@ import (
 
 func Run() {
 	log.Info("Shuttle Tracker starting...")
-	cfg := config.New()
 
+	// Config
+	cfg, err := config.New()
+	if err != nil {
+		log.WithError(err).Error("Could not create config.")
+		return
+	}
+
+	// Log
 	log.SetLevel(cfg.Log.Level)
 
+	// Database
 	db := database.New(*cfg.Database)
 
 	// Start shuttle position updater
-	updater := updater.New(*cfg.Updater, *db)
+	updater, err := updater.New(*cfg.Updater, *db)
+	if err != nil {
+		log.WithError(err).Error("Could not create updater.")
+		return
+	}
 	go updater.Run()
 
 	// Start API server
-	api := api.New(*cfg.API, *db)
+	api, err := api.New(*cfg.API, *db)
+	if err != nil {
+		log.WithError(err).Error("Could not create API.")
+		return
+	}
 	go api.Run()
+
+	log.Info("Shuttle Tracker started.")
 
 	// Wait until quit
 	quit := make(chan bool, 0)

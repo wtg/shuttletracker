@@ -34,11 +34,11 @@ type API struct {
 
 // InitApp initializes the application given a config and connects to backends.
 // It also seeds any needed information to the database.
-func New(cfg Config, db database.Database) *API {
-	//Initialize cas connection
-	url, error := url.Parse(cfg.CasURL)
-	if error != nil {
-		log.Errorf("invalid url")
+func New(cfg Config, db database.Database) (*API, error) {
+	// Set up CAS authentication
+	url, err := url.Parse(cfg.CasURL)
+	if err != nil {
+		return nil, err
 	}
 	var tickets *cas.MemoryStore
 
@@ -60,7 +60,7 @@ func New(cfg Config, db database.Database) *API {
 	if serr != nil {
 		log.Fatalf("error reading vehicle configuration file: %v", serr)
 	}*/
-	return &api
+	return &api, nil
 }
 
 func NewConfig() *Config {

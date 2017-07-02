@@ -11,15 +11,15 @@ import (
 
 // Global configuration struct.
 type Config struct {
-	Database *database.Config `structs:",omitnested"`
-	Updater  *updater.Config  `structs:",omitnested"`
-	API      *api.Config      `structs:",omitnested"`
-	Log      *log.Config      `structs:",omitnested"`
+	Database *database.Config
+	Updater  *updater.Config
+	API      *api.Config
+	Log      *log.Config
 }
 
-// Create a new, global Config. Reads in configuration from the environment and config files.
-func New() Config {
-	cfg := Config{
+// Create a new, global Config. Reads in configuration from config files.
+func New() (*Config, error) {
+	cfg := &Config{
 		Database: database.NewConfig(),
 		Updater:  updater.NewConfig(),
 		API:      api.NewConfig(),
@@ -29,12 +29,12 @@ func New() Config {
 	viper.SetConfigName("conf")
 	viper.AddConfigPath(".")
 	if err := viper.ReadInConfig(); err != nil {
-		log.WithError(err).Error("Unable to read configuration.")
+		return nil, err
 	}
 
 	if err := viper.Unmarshal(&cfg); err != nil {
-		log.WithError(err).Error("Unable to unmarshal configuration.")
+		return nil, err
 	}
 
-	return cfg
+	return cfg, nil
 }
