@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/model"
 	"gopkg.in/mgo.v2/bson"
 	"math/big"
@@ -25,6 +26,7 @@ func (App *API) LegacyVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 		err := App.db.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(1).One(&update)
 
 		if err != nil {
+			log.WithError(err).Error("Could not fetch vehicle updates.")
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -44,7 +46,7 @@ func (App *API) LegacyVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// calculate cardinal direction
+		// determine cardinal direction
 		cardinal := CardinalDirection(&update.Heading)
 
 		// legacy app expects vehicle ID to be a number...

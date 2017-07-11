@@ -21,33 +21,34 @@ func Run() {
 		return
 	}
 
+	runner := NewRunner()
+
 	// Log
 	log.SetLevel(cfg.Log.Level)
 
 	// Database
-	db := database.New(*cfg.Database)
+	db, err := database.New(*cfg.Database)
+	if err != nil {
+		log.WithError(err).Errorf("MongoDB connection to \"%v\" failed.", cfg.Database.MongoURL)
+		return
+	}
 
-	// Start shuttle position updater
+	// Make shuttle position updater
 	updater, err := updater.New(*cfg.Updater, *db)
 	if err != nil {
 		log.WithError(err).Error("Could not create updater.")
 		return
 	}
-	go updater.Run()
+	runner.Add(updater)
 
-	// Start API server
+	// Make API server
 	api, err := api.New(*cfg.API, *db)
 	if err != nil {
-		log.WithError(err).Error("Could not create API.")
+		log.WithError(err).Error("Could not create API server.")
 		return
 	}
-	go api.Run()
+	runner.Add(api)
 
-	log.Info("Shuttle Tracker started.")
-
-	// Wait until quit
-	quit := make(chan bool, 0)
-	select {
-	case <-quit:
-	}
+	// Run all runnables
+	runner.Run()
 }

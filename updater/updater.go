@@ -136,7 +136,6 @@ func (u *Updater) update() {
 			log.WithError(err).Error("Could not load time zone information.")
 			continue
 		}
-
 		lastUpdate = time.Now().In(loc)
 
 		if err := u.db.Updates.Insert(&update); err != nil {
@@ -151,7 +150,6 @@ func (u *Updater) update() {
 }
 
 // Convert kmh to mph
-func kphToMPH(kmh float64) (mph float64) {
-	mph = kmh * 0.621371192
-	return
+func kphToMPH(kmh float64) float64 {
+	return kmh * 0.621371192
 }

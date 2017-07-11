@@ -1,7 +1,6 @@
 package database
 
 import (
-	"github.com/wtg/shuttletracker/log"
 	"gopkg.in/mgo.v2"
 )
 
@@ -18,12 +17,12 @@ type Config struct {
 	MongoURL string
 }
 
-func New(cfg Config) *Database {
+func New(cfg Config) (*Database, error) {
 	db := &Database{}
 
 	session, err := mgo.Dial(cfg.MongoURL)
 	if err != nil {
-		log.Errorf("MongoDB connection to \"%v\" failed: %v", cfg.MongoURL, err)
+		return nil, err
 	}
 	db.session = session
 
@@ -40,10 +39,10 @@ func New(cfg Config) *Database {
 		DropDups: true}
 	db.Vehicles.EnsureIndex(vehicleIndex)
 
-	// Create index on update created time to quickly find the most recent updates
+	// Create index on update create time to quickly find the most recent updates
 	db.Updates.EnsureIndexKey("created")
 
-	return db
+	return db, nil
 }
 
 func NewConfig() *Config {
