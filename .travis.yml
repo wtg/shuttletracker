@@ -6,6 +6,7 @@ go:
 
 before_install:
   - go get -u github.com/kardianos/govendor
+  - govendor sync
 
 script:
   - go test -race -coverprofile=coverage.txt -covermode=atomic
