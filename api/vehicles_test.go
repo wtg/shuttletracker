@@ -12,6 +12,7 @@ func TestCardinalDirection(t *testing.T) {
 		{"225", "South-West"},
 		{"270", "West"},
 		{"315", "North-West"},
+		{"this isn't a direction lol", "North"},
 	}
 
 	for _, testCase := range table {
