@@ -13,19 +13,19 @@ RUN ln -s /usr/bin/nodejs /usr/bin/node
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
-RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
-WORKDIR $GOPATH/src/shuttle_tracking_2
+RUN mkdir -p "$GOPATH/src/github.com/wtg/shuttletracker" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
+WORKDIR $GOPATH/src/github.com/wtg/shuttletracker
+RUN go get -u github.com/kardianos/govendor
 
 # ADD ./package.json /app
 RUN npm install -g bower
 
-
-COPY ./bower.json $GOPATH/src/shuttle_tracking_2
+COPY ./bower.json .
 RUN bower install --allow-root
 
-COPY . $GOPATH/src/shuttle_tracking_2
+COPY . .
 
-RUN go get
-RUN go build
+RUN govendor sync
+RUN go build -o shuttletracker
 
-CMD ["shuttle_tracking_2"]
+CMD ["./shuttletracker"]
