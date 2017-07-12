@@ -4,7 +4,6 @@ import (
 	"github.com/wtg/shuttletracker/api"
 	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/log"
-	"github.com/wtg/shuttletracker/server"
 	"github.com/wtg/shuttletracker/updater"
 
 	"github.com/spf13/viper"
@@ -16,7 +15,6 @@ type Config struct {
 	Updater  *updater.Config
 	API      *api.Config
 	Log      *log.Config
-	Server   *server.Config
 }
 
 // Create a new, global Config. Reads in configuration from config files.
@@ -26,7 +24,6 @@ func New() (*Config, error) {
 		Updater:  updater.NewConfig(),
 		API:      api.NewConfig(),
 		Log:      log.NewConfig(),
-		Server:   server.NewConfig(),
 	}
 
 	viper.SetConfigName("conf")

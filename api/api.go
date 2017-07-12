@@ -56,12 +56,6 @@ func New(cfg Config, db database.Database) (*API, error) {
 		db:      db,
 	}
 
-	// Read vehicle configuration file
-	/*serr := readSeedConfiguration("seed/vehicle_seed.json", &app)
-	if serr != nil {
-		log.Fatalf("error reading vehicle configuration file: %v", serr)
-	}*/
-
 	r := mux.NewRouter()
 
 	// Public
@@ -117,44 +111,6 @@ func (api *API) Run() {
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "index.html")
 }
-
-//readSeedConfiguration adds a new vehicle to the database from seed.
-/*func readSeedConfiguration(fileName string, app *App) error {
-	// Open seed_vehicle config file and decode JSON to app struct
-	file, err := os.Open(fileName)
-
-	// Error handling
-	if err != nil {
-		log.Warn(err)
-	}
-	// Create a decoder for a file
-	fileread := json.NewDecoder(file)
-
-	// Create map for json data and slice for vehicles
-	var vehiclesMap map[string][]map[string]interface{} // map with string as key and ,list of map with string as key and anything as value, as value
-	Vehicles := []Vehicle{}                             // list of default vehicle object
-
-	// Call decode on fileread to place items into map
-	if err := fileread.Decode(&vehiclesMap); err != nil {
-		log.Warn(err)
-	}
-
-	// Initialize our vehicles
-	for i := range vehiclesMap["Vehicles"] {
-		item := vehiclesMap["Vehicles"][i]
-		VehicleID, _ := item["VehicleID"].(string)
-		VehicleName, _ := item["VehicleName"].(string)
-		vehicle := Vehicle{VehicleID, VehicleName, time.Now(), time.Now(),false}
-		Vehicles = append(Vehicles, vehicle)
-	}
-
-	// Add vehicles to the database
-	for j := range Vehicles {
-		api.Vehicles.Insert(&Vehicles[j])
-	}
-
-	return nil
-}*/
 
 type User struct {
 	Name string
