@@ -1,7 +1,7 @@
 var App ={
   ShuttleMap: null,
   ShuttleRoutes: [],
-  Stops: {},
+  Stops: [],
   Shuttles: {},
   MapBoundPoints: [],
 
@@ -22,6 +22,7 @@ var App ={
 
   updateRoutes: function(data){
     console.log(data);
+    var updatedRoute = []
     for(var i = 0; i < data.length; i ++){
       var points = []
       for(var j = 0; j < data[i]['coords'].length; j ++){
@@ -50,14 +51,21 @@ var App ={
         line: polyline
       };
 
-      App.ShuttleRoutes.push(r);
+      updatedRoute.push(r);
 
     }
+
+    App.ShuttleRoutes = updatedRoute;
+
     App.drawRoutes();
 
   },
 
+
   drawRoutes: function(){
+    for(var i = 0; i < 2; i ++){
+      App.ShuttleMap.removeLayer(App.ShuttleRoutes[i]['line'])
+    }
     for(var i = 0; i < App.ShuttleRoutes.length; i ++){
       for(var j = 0; j < App.ShuttleRoutes[i]['points'].length; j ++){
         App.MapBoundPoints.push(App.ShuttleRoutes[i]['points'][j]);
@@ -75,11 +83,42 @@ var App ={
       App.ShuttleMap.addLayer(App.ShuttleRoutes[i]['line']);
     }
 
+  },
+
+  grabStops: function(){
+    $.get( "http://127.0.0.1:8080/stops", App.updateStops);
+
+  },
+
+  updateStops: function(data){
+    var stopIcon = L.icon({
+      iconUrl: 'static/images/stop.png',
+
+      iconSize:     [16, 16], // size of the icon
+      iconAnchor:   [0, 0], // point of the icon which will correspond to marker's location
+      shadowAnchor: [4, 62],  // the same for the shadow
+      popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
+    });
+    for(var i = 0; i < data.length; i ++){
+      var stop = {
+        name: data[i]['name'],
+        description: data[i]['description'],
+        id: data[i]['id'],
+        latlng: [data[i]['lat'], data[i]['lng']],
+        marker: L.marker([data[i]['lat'],data[i]['lng']], {icon: stopIcon})
+      }
+      stop['marker'].addTo(App.ShuttleMap);
+    }
+
+  },
+
+  drawStops: function(){
+
   }
 
 }
 
 $(document).ready(function(){
   App.initMap();
-
+  App.grabStops();
 });
