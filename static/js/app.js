@@ -97,7 +97,7 @@ var App ={
       iconSize:     [16, 16], // size of the icon
       iconAnchor:   [0, 0], // point of the icon which will correspond to marker's location
       shadowAnchor: [4, 62],  // the same for the shadow
-      popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
+      popupAnchor:  [8, 8] // point from which the popup should open relative to the iconAnchor
     });
     for(var i = 0; i < data.length; i ++){
       var stop = {
@@ -107,6 +107,7 @@ var App ={
         latlng: [data[i]['lat'], data[i]['lng']],
         marker: L.marker([data[i]['lat'],data[i]['lng']], {icon: stopIcon})
       }
+      stop['marker'].bindPopup(stop['name']);
       stop['marker'].addTo(App.ShuttleMap);
     }
 
