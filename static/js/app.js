@@ -1,3 +1,5 @@
+var ShuttlesArray = {};
+
 var App ={
   ShuttleMap: null,
   ShuttleRoutes: [],
@@ -113,13 +115,39 @@ var App ={
 
   },
 
-  drawStops: function(){
+  grabVehicles: function(){
+    $.get( "http://127.0.0.1:8080/updates", App.updateVehicles);
+    console.log("asfd");
+  },
 
+  updateVehicles: function(data){
+    console.log(data);
+    console.log(data.length + " shuttles updated");
+    var shuttleIcon = L.icon({
+      iconUrl: 'static/images/shuttle.png',
+
+      iconSize:     [32, 16], // size of the icon
+      iconAnchor:   [0, 0], // point of the icon which will correspond to marker's location
+      shadowAnchor: [4, 62],  // the same for the shadow
+      popupAnchor:  [8, 8] // point from which the popup should open relative to the iconAnchor
+    });
+
+    for(var i = 0; i < data.length; i ++){
+      if(ShuttlesArray[data[i]['vehicleID']] == null){
+        ShuttlesArray[data[i]['vehicleID']] = {
+          data: data[i],
+          marker: L.marker([data[i]['lat'],data[i]['lng']], {icon: shuttleIcon})
+        };
+        ShuttlesArray[data[i]['vehicleID']]['marker'].addTo(App.ShuttleMap);
+      }else{
+        ShuttlesArray[data[i]['vehicleID']]['marker'].setLatLng([data[i]['lat'],data[i]['lng']]);
+      }
+    }
   }
 
 }
 
 $(document).ready(function(){
   App.initMap();
-  App.grabStops();
+  var a = setInterval(App.grabVehicles, 1000);
 });
