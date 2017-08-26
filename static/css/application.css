@@ -13,6 +13,59 @@ html, body {
   padding: 0px;
 }
 
+.titleBar{
+  height:50px;
+  background-color:#ffffff;
+}
+
+.floating-logo{
+  float:none;
+  height: 40px;
+  bottom: 20px;
+  right: 5px;
+  width:auto;
+  position: fixed;
+  z-index: 1;
+}
+
+.btn-sm {
+    padding: .25rem .5rem;
+    font-size: .875rem;
+    border-radius: .2rem;
+}
+.btn {
+    display: inline-block;
+    font-weight: 400;
+    line-height: 1.25;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border: 1px solid transparent;
+    padding: .5rem 1rem;
+    font-size: 1rem;
+    border-radius: .25rem;
+    -webkit-transition: all .2s ease-in-out;
+    -o-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+}
+
+.btn:hover{
+  background-color: #d9534f;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.btn-outline-danger {
+    color: #d9534f;
+    background-image: none;
+    background-color: transparent;
+    border-color: #d9534f;
+}
+
 #navheader {
   background-color: #686868;
   margin: 0px;

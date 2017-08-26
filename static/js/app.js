@@ -138,10 +138,13 @@ var App ={
             good = true;
           }
         }
-        if(good == false) {App.ShuttleMap.removeLayer(ShuttlesArray[key]['marker']);}
+        if(good == false) {
+          App.ShuttleMap.removeLayer(ShuttlesArray[key]['marker']);
+          ShuttlesArray[key] = null;
+        }
+
       }
 
-      ShuttlesArray = {};
       App.ShuttleUpdateCounter = 0;
     }
 
@@ -184,7 +187,7 @@ var App ={
   updateMessages: function(){
     for(var key in ShuttlesArray){
       for(var messageKey in ShuttleMessages){
-        if(key == messageKey){
+        if(key == messageKey && ShuttlesArray[key]['marker'] != null){
           ShuttlesArray[key]['marker'].bindPopup(ShuttleMessages[messageKey]);
         }
       }
@@ -196,5 +199,6 @@ var App ={
 
 $(document).ready(function(){
   App.initMap();
+  App.grabStops();
   var a = setInterval(App.grabVehicles, 1000);
 });
