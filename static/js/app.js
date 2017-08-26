@@ -7,6 +7,7 @@ var App ={
   Stops: [],
   Shuttles: {},
   MapBoundPoints: [],
+  ShuttleUpdateCounter: 0,
 
   initMap: function(){
     App.ShuttleMap = L.map('mapid').setView([42.728172, -73.678803], 15.3);
@@ -129,6 +130,21 @@ var App ={
       popupAnchor:  [16, 8] // point from which the popup should open relative to the iconAnchor
     });
 
+    if(App.ShuttleUpdateCounter >= 15){
+      for (var key in ShuttlesArray){
+        var good = false;
+        for(var i = 0; i < data.length; i ++){
+          if(key == data[i]['vehicleID']){
+            good = true;
+          }
+        }
+        if(good == false) {App.ShuttleMap.removeLayer(ShuttlesArray[key]['marker']);}
+      }
+
+      ShuttlesArray = {};
+      App.ShuttleUpdateCounter = 0;
+    }
+
     for(var i = 0; i < data.length; i ++){
       if(ShuttlesArray[data[i]['vehicleID']] == null){
         ShuttlesArray[data[i]['vehicleID']] = {
@@ -141,6 +157,7 @@ var App ={
         ShuttlesArray[data[i]['vehicleID']]['marker'].setLatLng([data[i]['lat'],data[i]['lng']]);
       }
     }
+    App.ShuttleUpdateCounter ++;
     App.grabVehicleInfo();
 
   },
