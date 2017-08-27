@@ -4,87 +4,101 @@
     <title> Shuttle Tracking - Fleet Management </title>
     <link rel="icon" href="/static/images/favicon.ico">
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="/static/css/application.css">
-    <!-- Polymer dependencies -->
-    <script src="/bower_components/webcomponentsjs/webcomponents.min.js"></script>
-    <link rel="import" href="/bower_components/polymer/polymer.html">
-    <!-- Iron Elements -->
-    <link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
-    <link rel="import" href="/bower_components/iron-pages/iron-pages.html">
-    <link rel="import" href="/bower_components/iron-flex-layout/classes/iron-flex-layout.html">
-    <!-- Paper Elements -->
-    <link rel="import" href="/bower_components/paper-header-panel/paper-header-panel.html">
-    <link rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html">
-    <link rel='import' href='/bower_components/paper-tabs/paper-tabs.html'>
-    <link rel='import' href='/bower_components/paper-item/paper-item.html'>
-    <!-- Custom Polymer elements -->
-    <link rel="import" href="/static/components/shuttles-map.html">
-    <link rel="import" href="/static/components/tracking-vehicles.html">
-    <link rel="import" href="/static/components/tracking-routes.html">
-    <link rel="import" href="/static/components/tracking-stops.html">
-  </head>
-
-  <body unresolved class="fullbleed layout vertical">
-
-    <template is="dom-bind">
-      <paper-header-panel class="flex">
-
-        <paper-toolbar>
-          <paper-tabs class="flex" selected="{{selected}}">
-            <paper-tab> Vehicles </paper-tab>
-            <paper-tab> Routes </paper-tab>
-            <paper-tab> Stops </paper-tab>
-
-          </paper-tabs>
-        </paper-toolbar>
-        <div align = "center">
-          <br>
-          <a href = "/admin/logout"> logout </a>
-        </div>
-        <iron-pages selected="{{selected}}">
-          <section>
-            <!-- Vehicles -->
-            <tracking-vehicles><tracking-vehicles>
-          </section>
-          <section>
-            <!-- Routes -->
-            <tracking-routes lat="42.730172" lng="-73.678803" zoom="15"></tracking-routes>
-          </section>
-          <section>
-            <tracking-stops lat="42.730172" lng="-73.678803" zoom="15"></tracking-stops>
-          </section>
-        </iron-pages>
-      </paper-header-panel>
-    </template>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script>
-      // return to previously selected tab on page reload
-      function prevSelected() {
-        if (document.cookie) {
-          var cookies = document.cookie.split(";");
-          for (i = 0; i < cookies.length; i++) {
-            var cookie = cookies[i].split("=");
-            if (cookie[0].replace(/ /g,'') == "selectedTab") {
-              return cookie[1];
-            }
-          }
+      function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+          tabcontent[i].style.display = "none";
         }
-        return 0;
+
+        tablinks = document.getElementsByClassName("tab");
+        for (i = 0; i < tablinks.length; i++) {
+          tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        document.getElementById(tabName).style.display = "block";
+        if(evt != null){
+          evt.currentTarget.className += " active";
+        }else{
+          document.getElementById("RoutesTab").className += " active";
+        }
       }
-      // set current selected tab
-      function setSelected(tab) {
-        document.cookie = "selectedTab=" + tab + ";";
-      }
-      // select the first page when site is loaded
-      document.addEventListener('WebComponentsReady', function () {
-        var template = document.querySelector('template[is="dom-bind"]');
-        template.selected = prevSelected();
-        setSelected(template.selected);
-      });
-      // store selected tab when paper tab is selected
-      document.addEventListener('click', function() {
-        var template = document.querySelector('template[is="dom-bind"]');
-        setSelected(template.selected);
+      $(document).ready(function(){
+        openTab(null, "Stops");
       });
     </script>
+
+  </head>
+
+  <body>
+    <div class="titleBar" style="text-align:center;">
+      <button class="tab" id="RoutesTab" onclick="openTab(event, 'Routes')">Routes</button>
+      <button class="tab" onclick="openTab(event, 'Stops')">Stops</button>
+      <button class="tab" onclick="openTab(event, 'Vehicles')">Vehicles</button>
+    </div>
+
+    <div id="Routes" class="tabcontent">
+      Routes!
+    </div>
+    <div class="floating-logo"><img style="height: 100%;" src="/static/images/wtg.svg"></img></div>
+
+    <div id="Stops" class="tabcontent">
+
+      <div class = "stop" id="123">
+        <b> Stop 1</b>
+        <p> Stop Information here</p>
+        <button class = "rbtn"><i class="fa fa-trash" aria-hidden="true"></i></button>
+        <button class = "rbtn"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+
+      </div>
+      <div class = "stop" id="123">
+        <b> Stop 1</b>
+        <p> Stop Information here</p>
+        <button class = "rbtn"><i class="fa fa-trash" aria-hidden="true"></i></button>
+        <button class = "rbtn"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+
+      </div>
+      <div class = "stop" id="123">
+        <b> Stop 1</b>
+        <p> Stop Information here</p>
+        <button class = "rbtn"><i class="fa fa-trash" aria-hidden="true"></i></button>
+        <button class = "rbtn"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+
+      </div>
+      <br style="clear:both;"/>
+      <div class = "stop" id="123">
+        <b> Stop 1</b>
+        <p> Stop Information here</p>
+        <button class = "rbtn"><i class="fa fa-trash" aria-hidden="true"></i></button>
+        <button class = "rbtn"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+
+      </div>
+      <div class = "stop" id="123">
+        <b> Stop 1</b>
+        <p> Stop Information here</p>
+        <button class = "rbtn"><i class="fa fa-trash" aria-hidden="true"></i></button>
+        <button class = "rbtn"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+
+      </div>
+      <div class = "stop" id="123">
+        <b> Stop 1</b>
+        <p> Stop Information here</p>
+        <button class = "rbtn"><i class="fa fa-trash" aria-hidden="true"></i></button>
+        <button class = "rbtn"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+
+      </div>
+      <br style="clear:both;"/>
+
+    </div>
+
+    <div id="Vehicles" class="tabcontent">
+      Vehicles!
+    </div>
+
   </body>
 </html>

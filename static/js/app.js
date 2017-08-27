@@ -111,7 +111,7 @@ var App ={
         marker: L.marker([data[i]['lat'],data[i]['lng']], {icon: stopIcon})
       }
       stop['marker'].bindPopup(stop['name']);
-      stop['marker'].addTo(App.ShuttleMap);
+      stop['marker'].addTo(App.ShuttleMap).on('click', App.stopClicked);
     }
 
   },
@@ -121,7 +121,7 @@ var App ={
   },
 
   updateVehicles: function(data){
-    console.log(data.length + " shuttles updated");
+    //console.log(data.length + " shuttles updated");
     var shuttleIcon = L.icon({
       iconUrl: 'static/images/shuttle.png',
 
@@ -147,22 +147,27 @@ var App ={
 
       App.ShuttleUpdateCounter = 0;
     }
-
-    for(var i = 0; i < data.length; i ++){
-      if(ShuttlesArray[data[i]['vehicleID']] == null){
-        ShuttlesArray[data[i]['vehicleID']] = {
-          data: data[i],
-          marker: L.marker([data[i]['lat'],data[i]['lng']], {icon: shuttleIcon}),
-          message: ""
-        };
-        ShuttlesArray[data[i]['vehicleID']]['marker'].addTo(App.ShuttleMap);
-      }else{
-        ShuttlesArray[data[i]['vehicleID']]['marker'].setLatLng([data[i]['lat'],data[i]['lng']]);
+    if(data != null){
+      for(var i = 0; i < data.length; i ++){
+        if(ShuttlesArray[data[i]['vehicleID']] == null){
+          ShuttlesArray[data[i]['vehicleID']] = {
+            data: data[i],
+            marker: L.marker([data[i]['lat'],data[i]['lng']], {icon: shuttleIcon}),
+            message: ""
+          };
+          ShuttlesArray[data[i]['vehicleID']]['marker'].addTo(App.ShuttleMap);
+        }else{
+          ShuttlesArray[data[i]['vehicleID']]['marker'].setLatLng([data[i]['lat'],data[i]['lng']]);
+        }
       }
     }
     App.ShuttleUpdateCounter ++;
     App.grabVehicleInfo();
 
+  },
+
+  stopClicked: function(e){
+    App.ShuttleMap.setView(e.target.getLatLng(),16);
   },
 
   grabVehicleInfo: function(){

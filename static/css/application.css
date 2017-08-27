@@ -1,10 +1,16 @@
 html, body {
-  background-color: #e5e5e5;
+  background-color: #f7f7f7;
   height: 100%;
   width: 100%;
   margin: 0px;
   padding: 0px;
 }
+
+.active{
+  background-color: #d9534f;
+  color: #ffffff;
+}
+
 
 .page-container {
   height: 100%;

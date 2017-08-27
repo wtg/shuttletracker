@@ -1,0 +1,106 @@
+html, body {
+  background-color: #f7f7f7;
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+
+.tab{
+  font-size: 1rem;
+  float:left;
+  border-width: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+  margin: 0px;
+  width: 33.33%;
+
+  border-right-color: gray;
+  height: 100%;
+}
+
+.tabcontent {
+  text-align: center;
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border: none;
+}
+
+.tabcontent{
+}
+
+.tab:hover{
+  cursor: pointer;
+}
+
+.active{
+  background-color: #d9534f;
+  color: #ffffff;
+}
+
+.page-container {
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+
+.titleBar{
+  height:50px;
+  background-color:#ffffff;
+}
+
+.stop{
+  float: center;
+  width: 15rem;
+  height: 15rem;
+  display: inline-block;
+  background-color: #fff;
+  padding: 10px;
+  margin: 10px;
+  border-style: solid;
+  border-radius: .25rem;
+  border-width: 1px;
+  border-color: rgba(0, 0, 0, 0.25);
+  -webkit-transition: all .2s ease-in-out;
+  -o-transition: all .2s ease-in-out;
+  transition: all .2s ease-in-out;
+}
+
+.stop:hover{
+  background-color: rgba(255, 255, 255, .1);
+}
+
+.rbtn{
+  float:fixed;
+  bottom: 1px;
+  right:1px;
+  margin: 5px;
+  border-style: solid;
+  border-radius: 50%;
+  width:30px;
+  height: 30px;
+  border-color: rgba(0, 0, 0, 0.25);
+  border-width: 1px;
+  background-color: transparent;
+  -webkit-transition: all .2s ease-in-out;
+  -o-transition: all .2s ease-in-out;
+  transition: all .2s ease-in-out;
+}
+
+.floating-logo{
+  float:none;
+  height: 40px;
+  bottom: 20px;
+  right: 5px;
+  width:auto;
+  position: fixed;
+  z-index: 1;
+}
+
+.rbtn:hover{
+  background-color: #d9534f;
+  color: #ffffff;
+  cursor: pointer;
+}
