@@ -149,15 +149,17 @@ var App ={
     }
     if(data != null){
       for(var i = 0; i < data.length; i ++){
+        console.log(parseInt(data[i]['heading']));
         if(ShuttlesArray[data[i]['vehicleID']] == null){
           ShuttlesArray[data[i]['vehicleID']] = {
             data: data[i],
-            marker: L.marker([data[i]['lat'],data[i]['lng']], {icon: shuttleIcon}),
+            marker: L.marker([data[i]['lat'],data[i]['lng']], {icon: shuttleIcon, rotationAngle: parseInt(data[i]['heading']),}),
             message: ""
           };
           ShuttlesArray[data[i]['vehicleID']]['marker'].addTo(App.ShuttleMap);
         }else{
           ShuttlesArray[data[i]['vehicleID']]['marker'].setLatLng([data[i]['lat'],data[i]['lng']]);
+          ShuttlesArray[data[i]['vehicleID']]['marker'].rotationAngle = parseInt(data[i]['heading']);
         }
       }
     }
