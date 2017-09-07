@@ -10,7 +10,7 @@ var App ={
   ShuttleUpdateCounter: 0,
 
   initMap: function(){
-    App.ShuttleMap = L.map('mapid').setView([42.728172, -73.678803], 15.3);
+    App.ShuttleMap = L.map('mapid', {zoomControl:false}).setView([42.728172, -73.678803], 15.3);
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
       maxZoom: 20,
@@ -25,18 +25,23 @@ var App ={
   },
 
   updateRoutes: function(data){
+    console.log(data);
     var updatedRoute = []
     for(var i = 0; i < data.length; i ++){
+      console.log(data[i]['name']);
       var points = []
+      console.log(data[i]['color'])
       for(var j = 0; j < data[i]['coords'].length; j ++){
         points.push(new L.LatLng(data[i]['coords'][j]['lat'],data[i]['coords'][j]['lng']));
       }
-
       var polylineOptions = {
         color: data[i]['color'],
-        weight: data[i]['width'],
+        weight: 3,//data[i]['width'],
         opacity: 1
       };
+      if(data[i]['width'] == 0){
+        polylineOptions['dashArray'] = '10,10';
+      }
 
       var polyline = new L.Polyline(points, polylineOptions);
 
@@ -59,14 +64,13 @@ var App ={
     }
 
     App.ShuttleRoutes = updatedRoute;
-
     App.drawRoutes();
 
   },
 
 
   drawRoutes: function(){
-    for(var i = 0; i < 2; i ++){
+    for(var i = 0; i < 3; i ++){
       App.ShuttleMap.removeLayer(App.ShuttleRoutes[i]['line'])
     }
     for(var i = 0; i < App.ShuttleRoutes.length; i ++){
@@ -74,6 +78,7 @@ var App ={
         App.MapBoundPoints.push(App.ShuttleRoutes[i]['points'][j]);
       }
     }
+
     var polylineOptions = {
       color: 'blue',
       weight: 1,
@@ -81,7 +86,6 @@ var App ={
     };
     var polyline = new L.Polyline(App.MapBoundPoints, polylineOptions);
     App.ShuttleMap.fitBounds(polyline.getBounds());
-
     for(var i = 0; i < App.ShuttleRoutes.length; i ++){
       App.ShuttleMap.addLayer(App.ShuttleRoutes[i]['line']);
     }
@@ -138,7 +142,7 @@ var App ={
             good = true;
           }
         }
-        if(good == false) {
+        if(good == false && ShuttlesArray[key] != null) {
           App.ShuttleMap.removeLayer(ShuttlesArray[key]['marker']);
           ShuttlesArray[key] = null;
         }
@@ -149,11 +153,11 @@ var App ={
     }
     if(data != null){
       for(var i = 0; i < data.length; i ++){
-        console.log(parseInt(data[i]['heading']));
+        //console.log(parseInt(data[i]['heading']));
         if(ShuttlesArray[data[i]['vehicleID']] == null){
           ShuttlesArray[data[i]['vehicleID']] = {
             data: data[i],
-            marker: L.marker([data[i]['lat'],data[i]['lng']], {icon: shuttleIcon, rotationAngle: parseInt(data[i]['heading'])-90}),
+            marker: L.marker([data[i]['lat'],data[i]['lng']], {icon: shuttleIcon, rotationAngle: parseInt(data[i]['heading'])-90,rotationOrigin: 'left'}),
             message: ""
           };
           ShuttlesArray[data[i]['vehicleID']]['marker'].addTo(App.ShuttleMap);
@@ -194,7 +198,7 @@ var App ={
   updateMessages: function(){
     for(var key in ShuttlesArray){
       for(var messageKey in ShuttleMessages){
-        if(key == messageKey && ShuttlesArray[key]['marker'] != null){
+        if(key == messageKey && ShuttlesArray[key] != null){
           ShuttlesArray[key]['marker'].bindPopup(ShuttleMessages[messageKey]);
         }
       }
