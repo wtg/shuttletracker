@@ -21,7 +21,7 @@ var App ={
   },
 
   grabRoutes: function(){
-    $.get( "http://127.0.0.1:8080/routes", App.updateRoutes);
+    $.get( "/routes", App.updateRoutes);
   },
 
   updateRoutes: function(data){
@@ -93,7 +93,7 @@ var App ={
   },
 
   grabStops: function(){
-    $.get( "http://127.0.0.1:8080/stops", App.updateStops);
+    $.get( "/stops", App.updateStops);
 
   },
 
@@ -121,7 +121,7 @@ var App ={
   },
 
   grabVehicles: function(){
-    $.get( "http://127.0.0.1:8080/updates", App.updateVehicles);
+    $.get( "/updates", App.updateVehicles);
   },
 
   updateVehicles: function(data){
@@ -177,7 +177,7 @@ var App ={
   },
 
   grabVehicleInfo: function(){
-    $.get( "http://127.0.0.1:8080/vehicles", App.grabMessages);
+    $.get( "/vehicles", App.grabMessages);
 
   },
 
@@ -186,7 +186,7 @@ var App ={
     for(var i = 0; i < data.length; i ++){
       nameToId[data[i].vehicleName] = data[i].vehicleID;
     }
-    $.get( "http://127.0.0.1:8080/updates/message", function(data){
+    $.get( "/updates/message", function(data){
       for(var i = 0 ; i < data.length; i ++){
         ShuttleMessages[nameToId[data[i].substring(3,9)]] = data[i];
       }
