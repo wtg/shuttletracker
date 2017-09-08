@@ -46,15 +46,15 @@ var App ={
       var polyline = new L.Polyline(points, polylineOptions);
 
       var r ={
-        name: data[i]['name'],
-        id: data[i]['id'],
-        description: data[i]['description'],
-        color: data[i]['color'],
-        created: data[i]['created'],
-        enabled: data[i]['enabled'],
-        stops: data[i]['stopsid'],
-        start_time: data[i]['startTime'],
-        end_time: data[i]['endTime'],
+        name: data[i].name,
+        id: data[i].id,
+        description: data[i].description,
+        color: data[i].color,
+        created: data[i].created,
+        enabled: data[i].enabled,
+        stops: data[i].stopsid,
+        start_time: data[i].startTime,
+        end_time: data[i].endTime,
         points: points,
         line: polyline
       };
@@ -70,12 +70,12 @@ var App ={
 
 
   drawRoutes: function(){
-    for(var i = 0; i < App.ShuttleRoutes.length; i ++){
-      App.ShuttleMap.removeLayer(App.ShuttleRoutes[i]['line'])
+    for(i = 0; i < App.ShuttleRoutes.length; i ++){
+      App.ShuttleMap.removeLayer(App.ShuttleRoutes[i].line)
     }
-    for(var i = 0; i < App.ShuttleRoutes.length; i ++){
-      for(var j = 0; j < App.ShuttleRoutes[i]['points'].length; j ++){
-        App.MapBoundPoints.push(App.ShuttleRoutes[i]['points'][j]);
+    for(i = 0; i < App.ShuttleRoutes.length; i ++){
+      for(var j = 0; j < App.ShuttleRoutes[i].points.length; j ++){
+        App.MapBoundPoints.push(App.ShuttleRoutes[i].points[j]);
       }
     }
 
@@ -86,7 +86,7 @@ var App ={
     };
     var polyline = new L.Polyline(App.MapBoundPoints, polylineOptions);
     App.ShuttleMap.fitBounds(polyline.getBounds());
-    for(var i = 0; i < App.ShuttleRoutes.length; i ++){
+    for(i = 0; i < App.ShuttleRoutes.length; i ++){
       App.ShuttleMap.addLayer(App.ShuttleRoutes[i].line);
     }
 
@@ -182,7 +182,7 @@ var App ={
   },
 
   grabMessages: function(data){
-    var nameToId = {}
+    var nameToId = {};
     for(var i = 0; i < data.length; i ++){
       nameToId[data[i].vehicleName] = data[i].vehicleID;
     }
@@ -198,7 +198,7 @@ var App ={
   updateMessages: function(){
     for(var key in ShuttlesArray){
       for(var messageKey in ShuttleMessages){
-        if(key == messageKey && ShuttlesArray[key] != null){
+        if(key == messageKey && ShuttlesArray[key] !== null){
           ShuttlesArray[key].marker.bindPopup(ShuttleMessages[messageKey]);
         }
       }
@@ -206,7 +206,7 @@ var App ={
 
   }
 
-}
+};
 
 $(document).ready(function(){
   App.initMap();
