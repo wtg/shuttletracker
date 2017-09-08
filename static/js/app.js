@@ -184,7 +184,7 @@ var App ={
   grabMessages: function(data){
     var nameToId = {}
     for(var i = 0; i < data.length; i ++){
-      nameToId[data[i]['vehicleName']] = data[i]['vehicleID'];
+      nameToId[data[i].vehicleName] = data[i].vehicleID;
     }
     $.get( "http://127.0.0.1:8080/updates/message", function(data){
       for(var i = 0 ; i < data.length; i ++){
@@ -199,7 +199,7 @@ var App ={
     for(var key in ShuttlesArray){
       for(var messageKey in ShuttleMessages){
         if(key == messageKey && ShuttlesArray[key] != null){
-          ShuttlesArray[key]['marker'].bindPopup(ShuttleMessages[messageKey]);
+          ShuttlesArray[key].marker.bindPopup(ShuttleMessages[messageKey]);
         }
       }
     }
