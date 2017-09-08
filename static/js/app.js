@@ -87,7 +87,7 @@ var App ={
     var polyline = new L.Polyline(App.MapBoundPoints, polylineOptions);
     App.ShuttleMap.fitBounds(polyline.getBounds());
     for(var i = 0; i < App.ShuttleRoutes.length; i ++){
-      App.ShuttleMap.addLayer(App.ShuttleRoutes[i]['line']);
+      App.ShuttleMap.addLayer(App.ShuttleRoutes[i].line);
     }
 
   },
@@ -108,13 +108,13 @@ var App ={
     });
     for(var i = 0; i < data.length; i ++){
       var stop = {
-        name: data[i]['name'],
-        description: data[i]['description'],
-        id: data[i]['id'],
-        latlng: [data[i]['lat'], data[i]['lng']],
-        marker: L.marker([data[i]['lat'],data[i]['lng']], {icon: stopIcon})
-      }
-      stop['marker'].bindPopup(stop['name']);
+        name: data[i].name,
+        description: data[i].description,
+        id: data[i].id,
+        latlng: [data[i].lat, data[i].lng],
+        marker: L.marker([data[i].lat,data[i].lng], {icon: stopIcon})
+      };
+      stop['marker'].bindPopup(stop.name);
       stop['marker'].addTo(App.ShuttleMap).on('click', App.stopClicked);
     }
 
@@ -138,12 +138,12 @@ var App ={
       for (var key in ShuttlesArray){
         var good = false;
         for(var i = 0; i < data.length; i ++){
-          if(key == data[i]['vehicleID']){
+          if(key == data[i].vehicleID){
             good = true;
           }
         }
-        if(good == false && ShuttlesArray[key] != null) {
-          App.ShuttleMap.removeLayer(ShuttlesArray[key]['marker']);
+        if(good === false && ShuttlesArray[key] !== null) {
+          App.ShuttleMap.removeLayer(ShuttlesArray[key].marker);
           ShuttlesArray[key] = null;
         }
 
@@ -151,19 +151,19 @@ var App ={
 
       App.ShuttleUpdateCounter = 0;
     }
-    if(data != null){
-      for(var i = 0; i < data.length; i ++){
+    if(data !== null){
+      for(var j = 0; j < data.length; j ++){
         //console.log(parseInt(data[i]['heading']));
-        if(ShuttlesArray[data[i]['vehicleID']] == null){
-          ShuttlesArray[data[i]['vehicleID']] = {
-            data: data[i],
-            marker: L.marker([data[i]['lat'],data[i]['lng']], {icon: shuttleIcon, rotationAngle: parseInt(data[i]['heading'])-45,rotationOrigin: 'center'}),
+        if(ShuttlesArray[data[j].vehicleID] == null){
+          ShuttlesArray[data[j].vehicleID] = {
+            data: data[j],
+            marker: L.marker([data[j].lat,data[j].lng, {icon: shuttleIcon, rotationAngle: parseInt(data[j].heading)-45,rotationOrigin: 'center'}),
             message: ""
           };
-          ShuttlesArray[data[i]['vehicleID']]['marker'].addTo(App.ShuttleMap);
+          ShuttlesArray[data[j]['vehicleID']].marker.addTo(App.ShuttleMap);
         }else{
-          ShuttlesArray[data[i]['vehicleID']]['marker'].setLatLng([data[i]['lat'],data[i]['lng']]);
-          ShuttlesArray[data[i]['vehicleID']]['marker'].setRotationAngle(parseInt(data[i]['heading'])-45);
+          ShuttlesArray[data[j]['vehicleID']].marker.setLatLng([data[j].lat,data[j].lng);
+          ShuttlesArray[data[j]['vehicleID']].marker.setRotationAngle(parseInt(data[j].heading)-45);
         }
       }
     }
