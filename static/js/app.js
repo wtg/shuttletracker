@@ -157,13 +157,13 @@ var App ={
         if(ShuttlesArray[data[j].vehicleID] == null){
           ShuttlesArray[data[j].vehicleID] = {
             data: data[j],
-            marker: L.marker([data[j].lat,data[j].lng, {icon: shuttleIcon, rotationAngle: parseInt(data[j].heading)-45,rotationOrigin: 'center'}),
+            marker: L.marker([data[j].lat,data[j].lng], {icon: shuttleIcon, rotationAngle: parseInt(data[j].heading)-45,rotationOrigin: 'center'}),
             message: ""
           };
-          ShuttlesArray[data[j]['vehicleID']].marker.addTo(App.ShuttleMap);
+          ShuttlesArray[data[j].vehicleID].marker.addTo(App.ShuttleMap);
         }else{
-          ShuttlesArray[data[j]['vehicleID']].marker.setLatLng([data[j].lat,data[j].lng);
-          ShuttlesArray[data[j]['vehicleID']].marker.setRotationAngle(parseInt(data[j].heading)-45);
+          ShuttlesArray[data[j].vehicleID].marker.setLatLng([data[j].lat,data[j].lng]);
+          ShuttlesArray[data[j].vehicleID].marker.setRotationAngle(parseInt(data[j].heading)-45);
         }
       }
     }
