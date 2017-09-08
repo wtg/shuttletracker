@@ -2,25 +2,26 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
+
+	"github.com/gorilla/mux"
+	"github.com/spf13/viper"
+	"gopkg.in/cas.v1"
+	"gopkg.in/mgo.v2/bson"
 
 	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/log"
-
-	"fmt"
-	"github.com/gorilla/mux"
-	"gopkg.in/cas.v1"
-	"gopkg.in/mgo.v2/bson"
-	"strings"
 )
 
 // Configuration holds the settings for connecting to outside resources.
 type Config struct {
 	GoogleMapAPIKey      string
 	GoogleMapMinDistance int
-	CasURL               string `env:"CAS_URL"`
-	Authenticate         bool   `env:"AUTHENTICATE" envDefault:"true"`
+	CasURL               string
+	Authenticate         bool
 	ListenURL            string
 }
 
@@ -97,8 +98,15 @@ func New(cfg Config, db database.Database) (*API, error) {
 	return &api, nil
 }
 
-func NewConfig() *Config {
-	return &Config{ListenURL: "localhost:8080"}
+func NewConfig(v *viper.Viper) *Config {
+	cfg := &Config{
+		ListenURL:    "0.0.0.0:8080",
+		Authenticate: true,
+	}
+	v.SetDefault("api.listenurl", cfg.ListenURL)
+	v.SetDefault("api.casurl", cfg.CasURL)
+	v.SetDefault("api.authenticate", cfg.Authenticate)
+	return cfg
 }
 
 func (api *API) Run() {

@@ -1,17 +1,17 @@
 package updater
 
 import (
-	"net/http"
-	"time"
-
-	"github.com/wtg/shuttletracker/database"
-	"github.com/wtg/shuttletracker/log"
-	"github.com/wtg/shuttletracker/model"
-
 	"io/ioutil"
+	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/spf13/viper"
+	"github.com/wtg/shuttletracker/database"
+	"github.com/wtg/shuttletracker/log"
+	"github.com/wtg/shuttletracker/model"
 )
 
 var (
@@ -46,11 +46,13 @@ func New(cfg Config, db database.Database) (*Updater, error) {
 	return updater, nil
 }
 
-func NewConfig() *Config {
-	return &Config{
+func NewConfig(v *viper.Viper) *Config {
+	cfg := &Config{
 		UpdateInterval: "10s",
 	}
-
+	v.SetDefault("updater.updateinterval", cfg.UpdateInterval)
+	v.SetDefault("updater.datafeed", cfg.DataFeed)
+	return cfg
 }
 
 // Run updater forever.
