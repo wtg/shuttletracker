@@ -1,23 +1,43 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Shuttle Tracking</title>
-    <link rel="icon" href="/static/images/favicon.ico">
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="/static/css/application.css">
-    <!-- Polymer dependencies -->
-    <script src="/bower_components/webcomponentsjs/webcomponents.min.js"></script>
-    <link rel="import" href="/bower_components/polymer/polymer.html">
-    <link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
-    <!-- Custom Polymer elements -->
-    <link rel="import" href="/static/components/shuttles-map.html">
-    <!-- CSS for content inside frames -->
-    <link rel="stylesheet" type="text/css" href="/static/css/tracking-stops.css">
-    <link rel="stylesheet" type="text/css" href="/static/css/tracking-routes.css">
-    <link rel="stylesheet" type="text/css" href="/static/css/tracking-vehicles.css">
-    <link rel="stylesheet" type="text/css" href="/static/css/shuttles-map.css">
-  </head>
-  <body>
-    <shuttles-map lat="42.730172" lng="-73.678803" zoom="15"></shuttles-map>
-  </body>
+
+<head>
+  <title>Shuttle Tracking</title>
+  <link rel="icon" href="/static/images/favicon.ico">
+  <link rel="stylesheet" href="/static/css/application.css">
+
+  <link rel="stylesheet" href="/bower_components/leaflet/dist/leaflet.css"></link>
+  <script src="/bower_components/leaflet/dist/leaflet.js"></script>
+  <script src="/bower_components/leaflet-rotatedmarker/leaflet.rotatedMarker.js"></script>
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+  <div class="titleBar">
+    <div class ="titleContent">
+      <p class="title">Shuttle Tracker</p>
+      <form action="https://github.com/wtg/shuttletracker" style = "height: 70%; margin-top: 7px; margin-right: 5px; margin-bottom: 0px; float:right;">
+        <button class="btn btn-outline-danger btn-sm" style="">GitHub</button>
+      </form>
+      <form action="https://webtech.union.rpi.edu/" style="height: 70%; margin-top: 7px; margin-right: 5px; margin-bottom: 0px; float:right;">
+        <button class="btn btn-outline-danger btn-sm" style="">WebTech</button>
+      </form>
+    </div>
+    <div class ="blur"></div>
+
+  </div>
+
+
+  <div class="floating-logo"><img style="height: 100%;" src="static/images/wtg.svg"></img></div>
+  <div id="mapid" style="height: 100%; z-index:0;"></div>
+
+  </script>
+</body>
+
+  <script src="static/js/app.js"></script>
+
+
 </html>
