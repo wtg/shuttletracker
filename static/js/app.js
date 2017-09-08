@@ -70,7 +70,7 @@ var App ={
 
 
   drawRoutes: function(){
-    for(var i = 0; i < 3; i ++){
+    for(var i = 0; i < App.ShuttleRoutes.length; i ++){
       App.ShuttleMap.removeLayer(App.ShuttleRoutes[i]['line'])
     }
     for(var i = 0; i < App.ShuttleRoutes.length; i ++){
@@ -127,11 +127,11 @@ var App ={
   updateVehicles: function(data){
     //console.log(data.length + " shuttles updated");
     var shuttleIcon = L.icon({
-      iconUrl: 'static/images/shuttle.png',
+      iconUrl: 'static/images/shuttle_arrow.png',
 
-      iconSize:     [32, 16], // size of the icon
-      iconAnchor:   [0, 0], // point of the icon which will correspond to marker's location
-      popupAnchor:  [16, 8] // point from which the popup should open relative to the iconAnchor
+      iconSize:     [26, 26], // size of the icon
+      iconAnchor:   [13, 13], // point of the icon which will correspond to marker's location
+      popupAnchor:  [13, 13] // point from which the popup should open relative to the iconAnchor
     });
 
     if(App.ShuttleUpdateCounter >= 15){
@@ -157,13 +157,13 @@ var App ={
         if(ShuttlesArray[data[i]['vehicleID']] == null){
           ShuttlesArray[data[i]['vehicleID']] = {
             data: data[i],
-            marker: L.marker([data[i]['lat'],data[i]['lng']], {icon: shuttleIcon, rotationAngle: parseInt(data[i]['heading'])-90,rotationOrigin: 'left'}),
+            marker: L.marker([data[i]['lat'],data[i]['lng']], {icon: shuttleIcon, rotationAngle: parseInt(data[i]['heading'])-45,rotationOrigin: 'center'}),
             message: ""
           };
           ShuttlesArray[data[i]['vehicleID']]['marker'].addTo(App.ShuttleMap);
         }else{
           ShuttlesArray[data[i]['vehicleID']]['marker'].setLatLng([data[i]['lat'],data[i]['lng']]);
-          ShuttlesArray[data[i]['vehicleID']]['marker'].setRotationAngle(parseInt(data[i]['heading'])-90);
+          ShuttlesArray[data[i]['vehicleID']]['marker'].setRotationAngle(parseInt(data[i]['heading'])-45);
         }
       }
     }
