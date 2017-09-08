@@ -3,10 +3,11 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"gopkg.in/cas.v1"
 	"net/http"
 	"strconv"
 	"time"
+
+	"gopkg.in/cas.v1"
 
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/model"
@@ -156,7 +157,7 @@ func (App *API) UpdateMessageHandler(w http.ResponseWriter, r *http.Request) {
 func CardinalDirection(h *string) string {
 	heading, err := strconv.ParseFloat(*h, 64)
 	if err != nil {
-		fmt.Println("ERROR", err.Error())
+		log.WithError(err).Error("Unable to parse float")
 		return "North"
 	}
 	switch {

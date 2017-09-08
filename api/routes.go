@@ -5,12 +5,14 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
-	"gopkg.in/cas.v1"
 	"math"
 	"net/http"
 	"strconv"
 	"time"
+
+	// MySQL driver
+	_ "github.com/go-sql-driver/mysql"
+	"gopkg.in/cas.v1"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"

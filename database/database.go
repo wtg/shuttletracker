@@ -1,6 +1,7 @@
 package database
 
 import (
+	"github.com/spf13/viper"
 	"gopkg.in/mgo.v2"
 )
 
@@ -45,8 +46,10 @@ func New(cfg Config) (*Database, error) {
 	return db, nil
 }
 
-func NewConfig() *Config {
-	return &Config{
+func NewConfig(v *viper.Viper) *Config {
+	cfg := &Config{
 		MongoURL: "localhost:27017",
 	}
+	v.SetDefault("database.mongourl", cfg.MongoURL)
+	return cfg
 }
