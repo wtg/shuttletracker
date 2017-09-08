@@ -26,21 +26,21 @@ var App ={
 
   updateRoutes: function(data){
     console.log(data);
-    var updatedRoute = []
+    var updatedRoute = [];
     for(var i = 0; i < data.length; i ++){
-      console.log(data[i]['name']);
-      var points = []
-      console.log(data[i]['color'])
-      for(var j = 0; j < data[i]['coords'].length; j ++){
-        points.push(new L.LatLng(data[i]['coords'][j]['lat'],data[i]['coords'][j]['lng']));
+      console.log(data[i].name);
+      var points = [];
+      console.log(data[i].color)
+      for(var j = 0; j < data[i].coords.length; j ++){
+        points.push(new L.LatLng(data[i].coords[j].lat,data[i].coords[j].lng));
       }
       var polylineOptions = {
-        color: data[i]['color'],
+        color: data[i].color,
         weight: 3,//data[i]['width'],
         opacity: 1
       };
-      if(data[i]['width'] == 0){
-        polylineOptions['dashArray'] = '10,10';
+      if(data[i].width === 0){
+        polylineOptions.dashArray = '10,10';
       }
 
       var polyline = new L.Polyline(points, polylineOptions);
