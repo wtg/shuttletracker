@@ -2,35 +2,31 @@
 <html>
 
 <head>
-  <title>Shuttle Tracker</title>
-  <link rel="icon" href="/static/images/favicon.ico">
-  <link rel="stylesheet" href="/static/css/application.css">
+    <title>Shuttle Tracker</title>
+    <link rel="icon" href="/static/images/favicon.ico">
+    <link rel="stylesheet" href="/static/css/application.css">
 
-  <link rel="stylesheet" href="/bower_components/leaflet/dist/leaflet.css"></link>
-  <script src="/bower_components/leaflet/dist/leaflet.js"></script>
-  <script src="/bower_components/leaflet-rotatedmarker/leaflet.rotatedMarker.js"></script>
+    <link rel="stylesheet" href="/bower_components/leaflet/dist/leaflet.css"></link>
+    <script src="/bower_components/leaflet/dist/leaflet.js"></script>
+    <script src="/bower_components/leaflet-rotatedmarker/leaflet.rotatedMarker.js"></script>
 
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
-  <div class="titleBar">
-    <div class="titleContent">
-      <p class="title">RPI Shuttle Tracker</p>
-      <div class="buttons">
-          <a href="https://github.com/wtg/shuttletracker" class="btn btn-outline-danger">GitHub</a>
-          <a href="https://webtech.union.rpi.edu" class="btn btn-outline-danger">WebTech</a>
-      </div>
+    <div class="titleBar">
+        <div class="titleContent">
+            <p class="title">RPI Shuttle Tracker</p>
+            <a href="https://webtech.union.rpi.edu" class="logo">
+                <img src="static/images/wtg.svg">
+            </a>
+        </div>
     </div>
-    <div class="blur"></div>
-  </div>
-  <div class="floating-logo">
-      <img src="static/images/wtg.svg"></img>
-  </div>
-  <div id="mapid" style="height: 100%; z-index:0;"></div>
-  <script src="static/js/app.js"></script>
+    <div id="mapid" style="height: 100%; z-index:0;"></div>
+    <script src="static/js/app.js"></script>
 </body>
+
 </html>
