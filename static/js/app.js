@@ -11,7 +11,7 @@ var App ={
 
   initMap: function(){
     App.ShuttleMap = L.map('mapid', {zoomControl:false}).setView([42.728172, -73.678803], 15.3);
-    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}' + (L.Browser.retina ? '@2x.png' : '.png') + '?access_token={accessToken}', {
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
       maxZoom: 20,
       id: 'mapbox.streets',
@@ -101,10 +101,10 @@ var App ={
     var stopIcon = L.icon({
       iconUrl: 'static/images/stop.png',
 
-      iconSize:     [16, 16], // size of the icon
-      iconAnchor:   [0, 0], // point of the icon which will correspond to marker's location
+      iconSize:     [8, 8], // size of the icon
+      iconAnchor:   [4, 4], // point of the icon which will correspond to marker's location
       shadowAnchor: [4, 62],  // the same for the shadow
-      popupAnchor:  [8, 8] // point from which the popup should open relative to the iconAnchor
+      popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
     });
     for(var i = 0; i < data.length; i ++){
       var stop = {
@@ -129,9 +129,9 @@ var App ={
     var shuttleIcon = L.icon({
       iconUrl: 'static/images/shuttle_arrow.png',
 
-      iconSize:     [26, 26], // size of the icon
-      iconAnchor:   [13, 13], // point of the icon which will correspond to marker's location
-      popupAnchor:  [13, 13] // point from which the popup should open relative to the iconAnchor
+      iconSize:     [14, 14], // size of the icon
+      iconAnchor:   [7, 7], // point of the icon which will correspond to marker's location
+      popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
     });
 
     if(App.ShuttleUpdateCounter >= 15){
