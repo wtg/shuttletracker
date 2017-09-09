@@ -1,0 +1,79 @@
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="stylesheet" type="text/css" href="../css/tracking-vehicles.css">
+
+<dom-module id="tracking-vehicles">
+
+  <template>
+    <iron-ajax
+      auto
+      id="updateVehicles"
+      url="/vehicles"
+      handle-as="json"
+      last-response="{{vehicles}}">
+    </iron-ajax>
+
+    <iron-ajax id="ajaxDelete" method="DELETE" on-response="addVehicleResponse"></iron-ajax>
+
+    <div class="vehicle-list">
+      <template is="dom-if" if="{{vehicles}}">
+        <paper-material class="vehicles-container">
+          <h1> Vehicles </h1>
+          <template is="dom-repeat" items="{{vehicles}}" as="vehicle">
+            <paper-card class="vehicle-card" heading="{{vehicle.vehicleName}}" elevation="2">
+              <div class="card-content">
+                <b> ID: </b> <span>{{vehicle.vehicleID}}</span>
+              </div>
+              <div class="card-actions">
+                <paper-icon-button on-click="editVehicle" icon="create" class="create"></paper-icon-button>
+                <paper-icon-button on-click="deleteVehicle" icon="delete" class="delete"></paper-icon-button>
+              </div>
+            </paper-card>
+          </template>
+        </paper-material>
+      </template>
+    </div>
+
+    <paper-material class="vehicle-form">
+      <h1> New Vehicle </h1>
+      <form is="iron-form" id="vehicleForm" content-type="application/json" method="post" action="/vehicles/create">
+        <paper-input name="vehicleName" label="Vehicle Name"></paper-input>
+        <paper-input name="vehicleID" label="Vehicle ID"></paper-input>
+        <br />
+        <paper-button raised onclick="submitVehicle()">Submit</paper-button>
+      </form>
+    </paper-material>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'tracking-vehicles',
+      listeners: {
+        'iron-form-response': 'addVehicleResponse'
+      },
+      addVehicleResponse: function() {
+        this.$.updateVehicles.generateRequest();
+      },
+      editVehicle: function(e) {
+
+      },
+      deleteVehicle: function(e) {
+        var entry = Polymer.dom(e).path[6].textContent;
+        var index = entry.search('I');
+        var id = entry.substring(index+5,index+15);
+        this.$.ajaxDelete.url = "/vehicles/" + id;
+        this.$.ajaxDelete.generateRequest();
+      }
+    });
+
+    function submitVehicle() {
+      var form = document.getElementById("vehicleForm");
+      form.submit();
+      form.reset();
+    }
+  </script>
+</dom-module>
