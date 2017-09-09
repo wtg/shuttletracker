@@ -2,42 +2,30 @@
 <html>
 
 <head>
-  <title>Shuttle Tracking</title>
-  <link rel="icon" href="/static/images/favicon.ico">
-  <link rel="stylesheet" href="/static/css/application.css">
+    <title>Shuttle Tracker</title>
+    <link rel="icon" href="/static/images/favicon.ico">
+    <link rel="stylesheet" href="/static/css/application.css">
 
-  <link rel="stylesheet" href="/bower_components/leaflet/dist/leaflet.css"></link>
-  <script src="/bower_components/leaflet/dist/leaflet.js"></script>
-  <script src="/bower_components/leaflet-rotatedmarker/leaflet.rotatedMarker.js"></script>
+    <link rel="stylesheet" href="static/dist/leaflet/leaflet.css"></link>
+    <script src="static/dist/leaflet/leaflet.js"></script>
+    <script src="static/dist/leaflet/leaflet.rotatedMarker.js"></script>
 
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
-  <div class="titleBar">
-    <div class ="titleContent">
-      <p class="title">Shuttle Tracker</p>
-      <form action="https://github.com/wtg/shuttletracker" style = "height: 70%; margin-top: 7px; margin-right: 5px; margin-bottom: 0px; float:right;">
-        <button class="btn btn-outline-danger btn-sm" style="">GitHub</button>
-      </form>
-      <form action="https://webtech.union.rpi.edu/" style="height: 70%; margin-top: 7px; margin-right: 5px; margin-bottom: 0px; float:right;">
-        <button class="btn btn-outline-danger btn-sm" style="">WebTech</button>
-      </form>
+    <div class="titleBar">
+        <div class="titleContent">
+            <p class="title">RPI Shuttle Tracker</p>
+            <a href="https://webtech.union.rpi.edu" class="logo">
+                <img src="static/images/wtg.svg">
+            </a>
+        </div>
     </div>
-    <div class ="blur"></div>
-
-  </div>
-
-
-  <div class="floating-logo"><img style="height: 100%;" src="static/images/wtg.svg"></img></div>
-  <div id="mapid" style="height: 100%; z-index:0;"></div>
-
-  </script>
+    <div id="mapid" style="height: 100%; z-index:0;"></div>
+    <script src="static/js/app.js"></script>
 </body>
-
-  <script src="static/js/app.js"></script>
-
 
 </html>

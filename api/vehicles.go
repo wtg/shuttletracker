@@ -145,7 +145,7 @@ func (App *API) UpdateMessageHandler(w http.ResponseWriter, r *http.Request) {
 				speed = speed[0:4]
 			}
 			//nextArrival := GetArrivalTime(&update, App.Routes, App.Stops)
-			message = fmt.Sprintf("<b>%s</b><br/>Traveling %s at<br/> %s mph as of %s", vehicle.VehicleName, CardinalDirection(&update.Heading), speed, lastUpdate.Format("3:04:05pm") /*, nextArrival*/)
+			message = fmt.Sprintf("<b>%s</b><br/>Traveling %s at<br/> %s mph as of %s", vehicle.VehicleName, CardinalDirection(&update.Heading), speed, update.Created.Format("3:04:05pm") /*, nextArrival*/)
 			messages = append(messages, message)
 		}
 	}

@@ -10,12 +10,20 @@ var App ={
   ShuttleUpdateCounter: 0,
 
   initMap: function(){
-    App.ShuttleMap = L.map('mapid', {zoomControl:false}).setView([42.728172, -73.678803], 15.3);
-    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-      maxZoom: 20,
-      id: 'mapbox.streets',
-      accessToken: 'pk.eyJ1Ijoiamx5b24xIiwiYSI6ImNqNmR4ZTVmejAwaTEzM3FsMmU0d2RmYjIifQ._VUaEMHioVwJIf11PzIqAQ'
+    App.ShuttleMap = L.map('mapid', {
+        zoomControl: false,
+        attributionControl: false // hide Leaflet
+    });
+    App.ShuttleMap.setView([42.728172, -73.678803], 15.3);
+    // show attribution without Leaflet
+    App.ShuttleMap.addControl(L.control.attribution({
+        position: 'bottomright',
+        prefix: ''
+    }));
+    L.tileLayer('http://tile.stamen.com/toner-lite/{z}/{x}/{y}{r}.png', {
+      attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
+      maxZoom: 17,
+      minZoom: 14
     }).addTo(App.ShuttleMap);
     App.grabRoutes();
   },
@@ -25,19 +33,16 @@ var App ={
   },
 
   updateRoutes: function(data){
-    console.log(data);
     var updatedRoute = [];
     for(var i = 0; i < data.length; i ++){
-      console.log(data[i].name);
       var points = [];
-      console.log(data[i].color)
       for(var j = 0; j < data[i].coords.length; j ++){
         points.push(new L.LatLng(data[i].coords[j].lat,data[i].coords[j].lng));
       }
       var polylineOptions = {
         color: data[i].color,
-        weight: 3,//data[i]['width'],
-        opacity: 1
+        weight: 3,
+        opacity: 1,
       };
       if(data[i].width === 0){
         polylineOptions.dashArray = '10,10';
@@ -99,12 +104,12 @@ var App ={
 
   updateStops: function(data){
     var stopIcon = L.icon({
-      iconUrl: 'static/images/stop.png',
+      iconUrl: 'static/images/circle.svg',
 
-      iconSize:     [16, 16], // size of the icon
-      iconAnchor:   [0, 0], // point of the icon which will correspond to marker's location
-      shadowAnchor: [4, 62],  // the same for the shadow
-      popupAnchor:  [8, 8] // point from which the popup should open relative to the iconAnchor
+      iconSize:     [12, 12], // size of the icon
+      iconAnchor:   [6, 6], // point of the icon which will correspond to marker's location
+      shadowAnchor: [6, 6],  // the same for the shadow
+      popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
     });
     for(var i = 0; i < data.length; i ++){
       var stop = {
@@ -127,11 +132,11 @@ var App ={
   updateVehicles: function(data){
     //console.log(data.length + " shuttles updated");
     var shuttleIcon = L.icon({
-      iconUrl: 'static/images/shuttle_arrow.png',
+      iconUrl: 'static/images/shuttle.svg',
 
-      iconSize:     [26, 26], // size of the icon
-      iconAnchor:   [13, 13], // point of the icon which will correspond to marker's location
-      popupAnchor:  [13, 13] // point from which the popup should open relative to the iconAnchor
+      iconSize:     [32, 32], // size of the icon
+      iconAnchor:   [16, 16], // point of the icon which will correspond to marker's location
+      popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
     });
 
     if(App.ShuttleUpdateCounter >= 15){
@@ -157,7 +162,11 @@ var App ={
         if(ShuttlesArray[data[j].vehicleID] == null){
           ShuttlesArray[data[j].vehicleID] = {
             data: data[j],
-            marker: L.marker([data[j].lat,data[j].lng], {icon: shuttleIcon, rotationAngle: parseInt(data[j].heading)-45,rotationOrigin: 'center'}),
+            marker: L.marker([data[j].lat,data[j].lng], {
+                icon: shuttleIcon,
+                rotationAngle: parseInt(data[j].heading)-45,rotationOrigin: 'center',
+                zIndexOffset: 1000
+            }),
             message: ""
           };
           ShuttlesArray[data[j].vehicleID].marker.addTo(App.ShuttleMap);
@@ -173,7 +182,6 @@ var App ={
   },
 
   stopClicked: function(e){
-    App.ShuttleMap.setView(e.target.getLatLng(),16);
   },
 
   grabVehicleInfo: function(){
