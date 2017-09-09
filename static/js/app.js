@@ -25,12 +25,9 @@ var App ={
   },
 
   updateRoutes: function(data){
-    console.log(data);
     var updatedRoute = [];
     for(var i = 0; i < data.length; i ++){
-      console.log(data[i].name);
       var points = [];
-      console.log(data[i].color)
       for(var j = 0; j < data[i].coords.length; j ++){
         points.push(new L.LatLng(data[i].coords[j].lat,data[i].coords[j].lng));
       }

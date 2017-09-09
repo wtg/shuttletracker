@@ -58,14 +58,18 @@ html, body {
   background-color: rgba(255, 255, 255, 0.8);
 }
 
-.floating-logo{
+.floating-logo {
   float:none;
-  height: 40px;
+  height: 24px;
   bottom: 20px;
   right: 5px;
   width:auto;
   position: fixed;
   z-index: 1;
+}
+
+.floating-logo img {
+    height: 100%;
 }
 
 .btn {
