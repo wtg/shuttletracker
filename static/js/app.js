@@ -10,12 +10,19 @@ var App ={
   ShuttleUpdateCounter: 0,
 
   initMap: function(){
-    App.ShuttleMap = L.map('mapid', {zoomControl:false}).setView([42.728172, -73.678803], 15.3);
-    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}' + (L.Browser.retina ? '@2x.png' : '.png') + '?access_token={accessToken}', {
-      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-      maxZoom: 20,
-      id: 'mapbox.streets',
-      accessToken: 'pk.eyJ1Ijoiamx5b24xIiwiYSI6ImNqNmR4ZTVmejAwaTEzM3FsMmU0d2RmYjIifQ._VUaEMHioVwJIf11PzIqAQ'
+    App.ShuttleMap = L.map('mapid', {
+        zoomControl: false,
+        attributionControl: false // hide Leaflet
+    })
+    App.ShuttleMap.setView([42.728172, -73.678803], 15.3);
+    // show attribution without Leaflet
+    App.ShuttleMap.addControl(L.control.attribution({
+        position: 'bottomright',
+        prefix: ''
+    }));
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      maxZoom: 19
     }).addTo(App.ShuttleMap);
     App.grabRoutes();
   },
