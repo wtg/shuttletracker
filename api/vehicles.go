@@ -144,8 +144,16 @@ func (App *API) UpdateMessageHandler(w http.ResponseWriter, r *http.Request) {
 			if len(speed) > 4 {
 				speed = speed[0:4]
 			}
-			//nextArrival := GetArrivalTime(&update, App.Routes, App.Stops)
-			message = fmt.Sprintf("<b>%s</b><br/>Traveling %s at<br/> %s mph as of %s", vehicle.VehicleName, CardinalDirection(&update.Heading), speed, update.Created.Format("3:04:05pm") /*, nextArrival*/)
+
+			// Convert last updated time to local timezone
+			loc, err := time.LoadLocation("America/New_York")
+			if err != nil {
+				log.WithError(err).Error("Could not load time zone information.")
+				continue
+			}
+			lastUpdate := update.Created.In(loc).Format("3:04:05pm")
+
+			message = fmt.Sprintf("<b>%s</b><br/>Traveling %s at<br/> %s mph as of %s", vehicle.VehicleName, CardinalDirection(&update.Heading), speed, lastUpdate)
 			messages = append(messages, message)
 		}
 	}
