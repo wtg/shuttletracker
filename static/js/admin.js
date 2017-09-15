@@ -147,24 +147,26 @@ var Admin = {
       layer = e.layer;
 
       Admin.drawnRoute.addLayer(layer);
+
+      var coords = [];
+      if(Admin.drawnRoute.toGeoJSON().features.length != 0){
+        var data = Admin.drawnRoute.toGeoJSON().features[0].geometry.coordinates;
+        for(var i = 0; i < data.length; i ++){
+          coords.push({
+            "lat": data[i][0],
+            "lng": data[i][1]
+          });
+        }
+      }
+      console.log();
+      $("#routeCoords").attr("value", JSON.stringify(coords));
+
     });
   },
 
   submitForm: function(){
-    var coords = [];
-    if(Admin.drawnRoute.toGeoJSON().features.length != 0){
-      var data = Admin.drawnRoute.toGeoJSON().features[0].geometry.coordinates;
-      for(var i = 0; i < data.length; i ++){
-        coords.push({
-          "lat": data[i][0],
-          "lng": data[i][1]
-        });
-      }
-    }
-    var toSend = {"name":$("#name").val(), "description":$("#desc").val(), "enabled":$("#en").val(), "color":$("#color").val(), "width":$("#width").val(), "coords":coords};
-    $.post("/routes/create",toSend).done(function(data){
-      console.log(data);
-    });
+
+
 
   }
 
