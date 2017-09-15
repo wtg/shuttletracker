@@ -151,7 +151,17 @@ var Admin = {
   },
 
   submitForm: function(){
-    console.log(Admin.drawnRoute.toGeoJSON().features[0].geometry.coordinates);
+    var coords = [];
+    if(Admin.drawnRoute.toGeoJSON().features.length != 0){
+      var data = Admin.drawnRoute.toGeoJSON().features[0].geometry.coordinates;
+      for(var i = 0; i < data.length; i ++){
+        coords.push({"lat": data[i][0],"lng":data[i][1]});
+      }
+    }
+    var toSend = {"name":$("#name").val(), "description":$("#desc").val(), "enabled":$("#en").val(), "color":$("#color").val(), "width":$("#width").val(), "coords":coords};
+
+    console.log(toSend);
+
   }
 
 };
