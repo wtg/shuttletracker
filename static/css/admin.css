@@ -24,7 +24,7 @@ html, body {
 }
 
 .pbutton{
-  width: 20%;
+  width: 100%;
   height: 20%;
   margin: auto;
   text-align: center;
@@ -37,6 +37,40 @@ html, body {
   font-size: 22px;
   float:left;
 }
+.formtext{
+  float:left;
+  margin: 10px;
+  padding: 5px;
+}
+
+.mapform{
+  height: 25%;
+  width: 100%;
+  float: right;
+  margin-top: 10px;
+}
+.textbox{
+  width: 70%;
+  float: right;;
+  border-radius: 5px;
+  border-style: solid;;
+  border-width: 1px;
+  right: 0px;
+  height: 20px;
+
+  background-color: rgba(255,255,255,.5);
+  box-shadow: inset 1px 1px 2px 0 #707070;
+}
+.center{
+  width: 300px;
+  height: auto;
+  margin: auto;
+  height: 300px;
+  left: 0;
+  right: 0;
+  float: none;
+}
+
 .prompt{
   display: none;
   z-index: 19;
@@ -45,6 +79,7 @@ html, body {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
 }
+
 .prompt-box{
   float:none;
   position: absolute;

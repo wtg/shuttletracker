@@ -7,17 +7,36 @@
     <script src="/static/dist/leaflet/leaflet.js"></script>
     <script src="/static/dist/leaflet/leaflet.rotatedMarker.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
     <script src="/static/js/admin.js"></script>
 
   </head>
   <body>
-    <div class="prompt"><div class ="prompt-box"><p class="emphasis prompttext"> Are you sure? </p><button class = "button cbutton pbutton">Yes</button><button class = "button cbutton pbutton">No</button></div></div>
-    <div class ="navbar"><p class="title">Shuttle Tracker</p><a class ="logout button" href="/admin/logout/">Logout</a></div>
+    <div class="prompt">
+      <div class ="prompt-box">
+          <p class="emphasis prompttext"> Are you sure? </p>
+          <div class ="center">
+          <button class = "button cbutton pbutton">Yes</button>
+          <button class = "button cbutton pbutton">No</button>
+        </div>
+      </div>
+    </div>
+    <div class ="navbar"><p class="title">RPI Shuttle Tracker</p><a class ="logout button" href="/admin/logout/">Logout</a></div>
     <div class="docBody">
       <div class = "routePanel">
       </div>
       <div class = "mapPanel">
-        <div id="mapid" style="height: 100%; width: 100%; background-color:black;z-index:0;"></div>
+        <div id="mapid" style="height: 75%;float: left; width: 100%; background-color:black;z-index:0;"></div>
+        <div class="mapform">
+          <span class="emphasis formtext">Name: </span><input class ="textbox" type="text"></input><br>
+          <span class="emphasis formtext">Description: </span><input class ="textbox" type="text"></input><br>
+          <span class="emphasis formtext">Enabled: </span><input class ="textbox" type="text"></input><br>
+          <span class="emphasis formtext">Color: </span><input class ="textbox" type="text"></input><br>
+          <span class="emphasis formtext">Time: </span><input class ="textbox" type="text"></input><br>
+          <span class="emphasis formtext">Width: </span><input class ="textbox" type="text"></input><br>
+          <div class="button formtext" type="button">Submit</div>
+        </div>
       </div>
     </div>
   </body>
