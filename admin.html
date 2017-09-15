@@ -27,7 +27,7 @@
       <div class = "routePanel">
       </div>
       <div class = "mapPanel">
-        <div id="mapid" style="height: 75%;float: left; width: 100%; background-color:black;z-index:0;"></div>
+        <div id="mapid" style="height: 70%;float: left; width: 100%; background-color:black;z-index:0;"></div>
         <div class="mapform">
           <form id="routeform" action="/routes/create" method="post" content-type="application/json">
             <span class="emphasis formtext">Name: </span><input class ="textbox" id="name" type="text"></input><br>
@@ -37,7 +37,7 @@
             <span class="emphasis formtext">Time: </span><input class ="textbox" id="time" type="text"></input><br>
             <span class="emphasis formtext">Width: </span><input class ="textbox" id="width" type="text"></input><br>
             <input type="hidden" id="routeCoords" name="coords"></input>
-            <div class="button formtext" onclick="Admin.submitForm()"> do some shit</div>
+            <div class="button formtext" onclick="Admin.submitForm()"> Submit</div>
           </form>
         </div>
       </div>

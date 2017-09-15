@@ -148,6 +148,8 @@ html, body {
 }
 .routePanel{
   width: 50%;
+  height: 100%;
+  overflow: scroll;
   float: left;
 }
 .mapPanel{
