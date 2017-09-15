@@ -3,88 +3,49 @@
   <head>
     <title> Shuttle Tracking - Fleet Management </title>
     <link rel="icon" href="/static/images/favicon.ico">
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="/static/css/application.css">
-    <!-- Polymer dependencies -->
-    <script src="/bower_components/webcomponentsjs/webcomponents.min.js"></script>
-    <link rel="import" href="/bower_components/polymer/polymer.html">
-    <!-- Iron Elements -->
-    <link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
-    <link rel="import" href="/bower_components/iron-pages/iron-pages.html">
-    <link rel="import" href="/bower_components/iron-flex-layout/classes/iron-flex-layout.html">
-    <!-- Paper Elements -->
-    <link rel="import" href="/bower_components/paper-header-panel/paper-header-panel.html">
-    <link rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html">
-    <link rel='import' href='/bower_components/paper-tabs/paper-tabs.html'>
-    <link rel='import' href='/bower_components/paper-item/paper-item.html'>
-    <!-- Custom Polymer elements -->
-    <link rel="import" href="/static/components/shuttles-map.html">
-    <link rel="import" href="/static/components/tracking-vehicles.html">
-    <link rel="import" href="/static/components/tracking-routes.html">
-    <link rel="import" href="/static/components/tracking-stops.html">
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/dist/leaflet/leaflet.css"></link>
+    <script src="/static/dist/leaflet/leaflet.js"></script>
+    <script src="/static/dist/leaflet/leaflet.rotatedMarker.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="/static/js/admin.js"></script>
+
   </head>
+  <body>
+    <div class ="navbar"><p class="title">Shuttle Tracker</p><a class ="logout button" href="/admin/logout/">Logout</a></div>
+    <div class="docBody">
+      <div class = "routePanel">
+        <div class = "route-description-box">
+          <span class = "emphasis">name:</span><span class ="content"> West Campus</span><br>
+          <span class = "emphasis">description:</span><span class ="content"> The west campus Red Hawk shuttle will make stops at the Student Union Horseshoe, Sage Ave & Troy Building crosswalks, Blitman Residence Commons, 6th Avenue and City Station, Polytechnic Residence Commons, and 15th Street and College Avenue. This shuttle route will have a yellow indicator labeled "WEST" on the front of the shuttle.</span><br>
+          <span class = "emphasis">enabled:</span><span class="content">true</span><br>
+          <span class = "emphasis">color:</span><span class="content">#fff</span><br>
+          <span class = "emphasis">time:</span><span class="content">idek</span><br>
+          <span class = "emphasis">id:</span><span class="content">13445213a</span><br>
+          <div style="float: right;"><a class="button">edit</a><a class="button">delete</a></div><br>
 
-  <body unresolved class="fullbleed layout vertical">
-
-    <template is="dom-bind">
-      <paper-header-panel class="flex">
-
-        <paper-toolbar>
-          <paper-tabs class="flex" selected="{{selected}}">
-            <paper-tab> Vehicles </paper-tab>
-            <paper-tab> Routes </paper-tab>
-            <paper-tab> Stops </paper-tab>
-
-          </paper-tabs>
-        </paper-toolbar>
-        <div align = "center">
-          <br>
-          <a href = "/admin/logout"> logout </a>
         </div>
-        <iron-pages selected="{{selected}}">
-          <section>
-            <!-- Vehicles -->
-            <tracking-vehicles><tracking-vehiclfes>
-          </section>
-          <section>
-            <!-- Routes -->
-            <tracking-routes lat="42.730172" lng="-73.678803" zoom="15"></tracking-routes>
-          </section>
-          <section>
-            <tracking-stops lat="42.730172" lng="-73.678803" zoom="15"></tracking-stops>
-          </section>
-        </iron-pages>
-      </paper-header-panel>
-    </template>
-    <script>
-      // return to previously selected tab on page reload
-      function prevSelected() {
-        if (document.cookie) {
-          var cookies = document.cookie.split(";");
-          for (i = 0; i < cookies.length; i++) {
-            var cookie = cookies[i].split("=");
-            if (cookie[0].replace(/ /g,'') == "selectedTab") {
-              return cookie[1];
-            }
-          }
-        }
-        return 0;
-      }
-      // set current selected tab
-      function setSelected(tab) {
-        document.cookie = "selectedTab=" + tab + ";";
-      }
-      // select the first page when site is loaded
-      document.addEventListener('WebComponentsReady', function () {
-        var template = document.querySelector('template[is="dom-bind"]');
-        template.selected = prevSelected();
-        setSelected(template.selected);
-      });
-      // store selected tab when paper tab is selected
-      document.addEventListener('click', function() {
-        var template = document.querySelector('template[is="dom-bind"]');
-        setSelected(template.selected);
-      });
-    </script>
+        <div class = "route-description-box">
+          <span class = "emphasis">name:</span><span class ="content"> West Campus</span><br>
+          <span class = "emphasis">description:</span><span class ="content"> The west campus Red Hawk shuttle will make stops at the Student Union Horseshoe, Sage Ave & Troy Building crosswalks, Blitman Residence Commons, 6th Avenue and City Station, Polytechnic Residence Commons, and 15th Street and College Avenue. This shuttle route will have a yellow indicator labeled "WEST" on the front of the shuttle.</span><br>
+          <span class = "emphasis">enabled:</span><span class="content">true</span><br>
+          <span class = "emphasis">color:</span><span class="content">#fff</span><br>
+          <span class = "emphasis">time:</span><span class="content">idek</span><br>
+          <span class = "emphasis">id:</span><span class="content">13445213a</span>
+        </div>
+        <div class = "route-description-box">
+          <span class = "emphasis">name:</span><span class ="content"> West Campus</span><br>
+          <span class = "emphasis">description:</span><span class ="content"> The west campus Red Hawk shuttle will make stops at the Student Union Horseshoe, Sage Ave & Troy Building crosswalks, Blitman Residence Commons, 6th Avenue and City Station, Polytechnic Residence Commons, and 15th Street and College Avenue. This shuttle route will have a yellow indicator labeled "WEST" on the front of the shuttle.</span><br>
+          <span class = "emphasis">enabled:</span><span class="content">true</span><br>
+          <span class = "emphasis">color:</span><span class="content">#fff</span><br>
+          <span class = "emphasis">time:</span><span class="content">idek</span><br>
+          <span class = "emphasis">id:</span><span class="content">13445213a</span>
+
+        </div>
+      </div>
+      <div class = "mapPanel">
+        <div id="mapid" style="height: 100%; width: 100%; background-color:black;z-index:0;"></div>
+      </div>
+    </div>
   </body>
 </html>
