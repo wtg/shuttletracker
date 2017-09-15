@@ -72,22 +72,22 @@ var Admin = {
 
   populateRoutesPanel: function(data){
     //console.log(data);
-    $(".routePanel").html("");
     //Admin.updateRoutes(data);
     if(data == null){
 
     }else{
       for(var i = 0; i < data.length; i ++){
-        //console.log(data[i]);
+        console.log(data[i]);
         Admin.buildRouteBox(data[i]);
+
       }
       $(".deleteroute").click(function(){
         $.ajax({
           url: '/routes/' + $(this).attr("routeId"),
           type: 'DELETE',
           success: function(result) {
-            Admin.populateRoutesPanel(data);
-            //$.get( "/routes", Admin.populateRoutesPanel);
+            //Admin.populateRoutesPanel(data);
+            $.get( "/routes", Admin.populateRoutesPanel);
           }
         });
       });
@@ -147,26 +147,38 @@ var Admin = {
       layer = e.layer;
 
       Admin.drawnRoute.addLayer(layer);
-
-      var coords = [];
-      if(Admin.drawnRoute.toGeoJSON().features.length != 0){
-        var data = Admin.drawnRoute.toGeoJSON().features[0].geometry.coordinates;
-        for(var i = 0; i < data.length; i ++){
-          coords.push({
-            "lat": data[i][0],
-            "lng": data[i][1]
-          });
-        }
-      }
-      console.log();
-      $("#routeCoords").attr("value", JSON.stringify(coords));
-
     });
   },
 
   submitForm: function(){
-
-
+    var coords = [];
+    if(Admin.drawnRoute.toGeoJSON().features.length != 0){
+      var data = Admin.drawnRoute.toGeoJSON().features[0].geometry.coordinates;
+      for(var i = 0; i < data.length; i ++){
+        coords.push({
+          "lat": data[i][0],
+          "lng": data[i][1]
+        });
+      }
+    }
+    var toSend = {
+      "name":$("#name").val(),
+      "description":$("#desc").val(),
+      "startTime":"",
+      "endTime":"",
+      "enabled":$("#en").val(),
+      "color":$("#color").val(),
+      "width":$("#width").val(),
+      "coords":JSON.stringify(coords)};
+    $.ajax({
+      url: "/routes/create",
+      type: "POST",
+      data: JSON.stringify(toSend),
+      contentType: "application/json",
+      complete: function(data){
+        $.get( "/routes", Admin.populateRoutesPanel);
+      }
+    });
 
   }
 
