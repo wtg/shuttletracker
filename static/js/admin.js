@@ -14,9 +14,23 @@ var Admin = {
   */
   populateRoutesPanel: function(data){
     console.log(data);
-    for(var i = 0; i < data.length; i ++){
-      console.log(data[i]);
-      Admin.buildRouteBox(data[i]);
+    $(".routePanel").html("");
+    if(data == null){
+
+    }else{
+      for(var i = 0; i < data.length; i ++){
+        console.log(data[i]);
+        Admin.buildRouteBox(data[i]);
+      }
+      $(".deleteroute").click(function(){
+        $.ajax({
+          url: '/routes/' + $(this).attr("routeId"),
+          type: 'DELETE',
+          success: function(result) {
+            $.get( "/routes", Admin.populateRoutesPanel);
+          }
+        });
+      });
     }
   },
 
@@ -29,8 +43,13 @@ var Admin = {
     box += "<span class = 'emphasis'>color:</span><span class='content'>" + routeInfo.color + "</span><br>";
     box += "<span class = 'emphasis'>time:</span><span class='content'>lel</span><br>";
     box += "<span class = 'emphasis'>id:</span><span class='content'>"+ routeInfo.id + "</span><br>";
-    box += "<div style='float: right;'><a class='button'>edit</a><a class='button'>delete</a></div><br>"
+    box += "<div style='float: right;width:auto;'><button class='button cbutton'>edit</button><button id='delete' routeId="+routeInfo.id +" class='button cbutton deleteroute'>delete</button></div><br></div>"
     $(".routePanel").append(box);
+
+  },
+
+  routeDeleteHandler: function(info){
+    console.log(info);
   },
 
   initMap: function(){

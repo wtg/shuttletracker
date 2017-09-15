@@ -17,14 +17,56 @@ html, body {
   top: 0;
   left: 0;
 }
+.prompttext{
+  color: black;
+  text-align: center;
+  font-size: 25px;
+}
+
+.pbutton{
+  width: 20%;
+  height: 20%;
+  margin: auto;
+  text-align: center;
+}
 
 .title{
   padding: 0px;
   margin-top: 6px;
+  margin-left: 5px;
   font-size: 22px;
   float:left;
 }
+.prompt{
+  display: none;
+  z-index: 19;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.prompt-box{
+  float:none;
+  position: absolute;
+  z-index: 20;
+  margin: auto;
+  text-align: center;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  width: 50%;
+  height: 50%;
+  background-color: #ecf0f1;
+  border-radius: 20px;
+}
+.cbutton{
+  float:left;
+  bottom: 10px;
+  background-color: transparent;
+}
 .button{
+  margin: 2px;
   padding: 5px;
   font-size: 12px;
   text-decoration: none;
@@ -39,6 +81,7 @@ html, body {
 .button:hover{
   background-color: #e74c3c;
   color: #eee;
+  cursor: pointer;
 
 }
 
