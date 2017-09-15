@@ -1,6 +1,7 @@
 var Admin = {
   RoutesMap: null,
   ShuttleRoutes: [],
+  drawnRoute: new L.featureGroup(),
   /*
   <div class = "route-description-box">
     <span class = "emphasis">name:</span><span class ="content"> West Campus</span><br>
@@ -70,14 +71,14 @@ var Admin = {
   },
 
   populateRoutesPanel: function(data){
-    console.log(data);
+    //console.log(data);
     $(".routePanel").html("");
     //Admin.updateRoutes(data);
     if(data == null){
 
     }else{
       for(var i = 0; i < data.length; i ++){
-        console.log(data[i]);
+        //console.log(data[i]);
         Admin.buildRouteBox(data[i]);
       }
       $(".deleteroute").click(function(){
@@ -109,7 +110,7 @@ var Admin = {
   },
 
   routeDeleteHandler: function(info){
-    console.log(info);
+    //console.log(info);
   },
 
   initMap: function(){
@@ -128,11 +129,10 @@ var Admin = {
       minZoom: 14
     }).addTo(Admin.RoutesMap);
 
-    var drawnRoute = new L.FeatureGroup();
-    Admin.RoutesMap.addLayer(drawnRoute);
+    Admin.RoutesMap.addLayer(Admin.drawnRoute);
     var drawControl = new L.Control.Draw({
       edit: {
-        featureGroup: drawnRoute
+        featureGroup: Admin.drawnRoute
       },
       draw: {
         polygon: false,
@@ -146,13 +146,15 @@ var Admin = {
       var type = e.layerType,
       layer = e.layer;
 
-      drawnRoute.addLayer(layer);
+      Admin.drawnRoute.addLayer(layer);
     });
+  },
+
+  submitForm: function(){
+    console.log(Admin.drawnRoute.toGeoJSON().features[0].geometry.coordinates);
   }
 
 };
-
-
 $(document).ready(function(){
   Admin.initMap();
   $.get( "/routes", Admin.populateRoutesPanel);
