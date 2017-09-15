@@ -156,8 +156,8 @@ var Admin = {
       var data = Admin.drawnRoute.toGeoJSON().features[0].geometry.coordinates;
       for(var i = 0; i < data.length; i ++){
         coords.push({
-          "lat": data[i][0],
-          "lng": data[i][1]
+          "lat": data[i][1],
+          "lng": data[i][0]
         });
       }
     }
