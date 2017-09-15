@@ -97,8 +97,48 @@ var Admin = {
           $(this).html("sure?")
         }
       });
+      $(".changeroute").click(function(){
+        Admin.loadRoute($(this).attr("routeId"));
+      });
 
     }
+  },
+  populateRouteForm: function(data){
+    var polylineOptions = {
+      color: data.color,
+      weight: 3,
+      opacity: 1,
+    };
+    var points = [];
+    for(var j = 0; j < data.coords.length; j ++){
+      points.push(new L.LatLng(data.coords[j].lat,data.coords[j].lng));
+    }
+
+    var polyline = new L.Polyline(points, polylineOptions);
+    polyline.addTo(Admin.drawnRoute);
+
+    $("#name").val(data.name);
+    $("#desc").val(data.description);
+    $("#en").val(data.enabled);
+    $("#color").val(data.color);
+    $("#time").val("lel");
+    $("#width").val(data.width);
+
+
+
+
+
+  },
+
+  loadRoute: function(id){
+    $.get( "/routes", function(data){
+      for(var i = 0; i < data.length; i ++){
+        if(data[i].id == id){
+          Admin.populateRouteForm(data[i])
+        }
+      }
+    });
+
   },
 
   buildRouteBox: function(routeInfo){
@@ -110,7 +150,7 @@ var Admin = {
     box += "<span class = 'emphasis'>color:</span><span class='content'>" + routeInfo.color + "</span><br>";
     box += "<span class = 'emphasis'>time:</span><span class='content'>lel</span><br>";
     box += "<span class = 'emphasis'>id:</span><span class='content'>"+ routeInfo.id + "</span><br>";
-    box += "<div style='float: right;width:auto;'><button class='button cbutton'>change</button><button id='delete' routeId="+routeInfo.id +" class='button cbutton deleteroute'>delete</button></div><br></div>"
+    box += "<div style='float: right;width:auto;'><button class='button cbutton changeroute' routeId="+routeInfo.id +">change</button><button id='delete' routeId="+routeInfo.id +" class='button cbutton deleteroute'>delete</button></div><br></div>"
     $(".routePanel").append(box);
 
   },
