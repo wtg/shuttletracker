@@ -6,25 +6,21 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 
 ## Setting Up
 
-1. Install Go
-2. `go get github.com/wtg/shuttletracker`
-3. `govendor sync`
-4. Make sure you have npm, bower, golang and mongodb installed
-5. Run `bower install` inside shuttle tracking directory to install dependencies listed in bower.json
-6. Rename conf.json.sample to conf.json
+1. Install Golang (https://golang.org/doc/install)
+2. Run `go get github.com/wtg/shuttletracker`
+3. Run `govendor sync`
+4. Ensure you have NPM, Bower, and MongoDB installed.
+5. Run `bower install` inside the Shuttle Tracker directory (`$GOPATH/src/github.com/wtg/shuttletracker`) to install dependencies listed in bower.json
+6. Rename `conf.json.sample` to `conf.json`
 7. Edit conf.json with the following:
-   * Data Feed: API with tracking information, this is a unique API info url that we can get data from it. Since it is private, we will only put this on our private group for now (Slacks).
-   * UpdateInterval: Number of seconds between each request to the data feed
-   * MongoUrl: Url where MongoDB is located
-   * MongoPort: Port where MongoDB is bound (default is 27017)
-9. Run `bower install` inside shuttle tracking directory to install dependencies listed in bower.json
-10. Rename conf.json.sample to conf.json and edit with the following:
-   * Data Feed: API with tracking information (iTrak in our case), if using the dummy server, http://localhost:8081
-   * UpdateInterval: Number of seconds between each request to the data feed
-   * MongoUrl: Url where MongoDB is located
-   * MongoPort: Port where MongoDB is bound (default is 27017)
-11. Run the app using `go run main.go` in the project root directory
-12. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the admin panel
+   * `Data Feed`: API with tracking information from iTrak... For RPI, this is a unique API URL that we can get data from it. It's currently private, and we will only share it with authorized members for now.
+   * `UpdateInterval`: Number of seconds between each request to the data feed
+   * `MongoUrl`: Url where MongoDB is located
+   * `MongoPort`: Port where MongoDB is bound (default is 27017)
+8. Start MongoDB, and ensure it is running, and listening on port 27017 (or whichever port you defined in `MongoPort` within `conf.json`)
+9. Add data to your database. Example DBs are provided in `example_database`, as well as a simple import/export script to setup the database for you.
+10. Start the app by running `go run main.go` in the project root directory.
+11. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel
 
 ## Configuration
 
@@ -54,7 +50,7 @@ Shuttle Tracker reads from a `conf.json` file. It can look like this:
 }
 ```
 
-### Environment variables
+### Environment Variables
 
 Most keys can be overridden with environment variables. The variables are usually
 named `SECTION_KEY`. For example, overriding database's Mongo URL could be done with a variable named `DATABASE_MONGOURL`.
