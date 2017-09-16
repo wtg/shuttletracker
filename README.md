@@ -19,6 +19,7 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
    * `MongoPort`: Port where MongoDB is bound (default is 27017)
 8. Start MongoDB, and ensure it is running, and listening on port 27017 (or whichever port you defined in `MongoPort` within `conf.json`)
 9. Add data to your database. Example DBs are provided in `example_database`, as well as a simple import/export script to setup the database for you.
+    - If using an example database, you might need to check the name of the imported database, and change `MongoUrl` accordingly.
 10. Start the app by running `go run main.go` in the project root directory.
 11. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel
 
