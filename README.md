@@ -13,7 +13,7 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 5. Run `bower install` inside the Shuttle Tracker directory (`$GOPATH/src/github.com/wtg/shuttletracker`) to install dependencies listed in bower.json
 6. Rename `conf.json.sample` to `conf.json`
 7. Edit conf.json with the following:
-   * `Data Feed`: API with tracking information from iTrak... For RPI, this is a unique API URL that we can get data from it. It's currently private, and we will only share it with authorized members for now.
+   * `Data Feed`: API with tracking information from iTrak... For RPI, this is a unique API URL that we can get data from. It's currently private, and we will only share it with authorized members for now.
    * `UpdateInterval`: Number of seconds between each request to the data feed
    * `MongoUrl`: Url where MongoDB is located
    * `MongoPort`: Port where MongoDB is bound (default is 27017)
@@ -52,5 +52,4 @@ Shuttle Tracker reads from a `conf.json` file. It can look like this:
 
 ### Environment Variables
 
-Most keys can be overridden with environment variables. The variables are usually
-named `SECTION_KEY`. For example, overriding database's Mongo URL could be done with a variable named `DATABASE_MONGOURL`.
+Most keys can be overridden with environment variables. The variables names usually take the format `SECTION_KEY`. For example, overriding database's Mongo URL could be done with a variable named `DATABASE_MONGOURL`.
