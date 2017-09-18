@@ -202,8 +202,9 @@ var Admin = {
       "color":$("#color").val(),
       "width":$("#width").val(),
       "coords":JSON.stringify(coords)};
-    return toSend;
     Admin.hideMapPanel();
+    return toSend;
+
   },
 
   submitChange: function(){
