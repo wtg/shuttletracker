@@ -119,7 +119,7 @@ var Admin = {
     box += "<span class = 'emphasis'>description:</span><span class ='content'>" + routeInfo.description + "</span><br>"
     box += "<span class = 'emphasis'>enabled:</span><span class='content'>"+routeInfo.enabled + "</span><br>";
     box += "<span class = 'emphasis'>color:</span><span class='content'>" + routeInfo.color + "</span><br>";
-    box += "<span class = 'emphasis'>time:</span><span class='content'>lel</span><br>";
+    box += "<span class = 'emphasis'>time:</span><span class='content'>"+routeInfo.startTime + "-" + routeInfo.endTime + "</span><br>";
     box += "<span class = 'emphasis'>id:</span><span class='content'>"+ routeInfo.id + "</span><br>";
     box += "<div style='float: right;width:auto;'><button class='button cbutton changeroute' routeId="+routeInfo.id +">change</button><button id='delete' routeId="+routeInfo.id +" class='button cbutton deleteroute'>delete</button></div><br></div>"
     $(".routePanel").append(box);
@@ -128,6 +128,17 @@ var Admin = {
 
   routeDeleteHandler: function(info){
     //console.log(info);
+  },
+
+  showMapPanel: function(){
+    $('.mapPanel').css('display','block');
+    $('.routePanel').css('width','50%');
+    Admin.RoutesMap.invalidateSize();
+  },
+  hideMapPanel: function(){
+    $('.mapPanel').css('display','none');
+    $('.routePanel').css('width','100%');
+    Admin.RoutesMap.invalidateSize();
   },
 
   initMap: function(){
@@ -185,13 +196,14 @@ var Admin = {
     var toSend = {
       "name":$("#name").val(),
       "description":$("#desc").val(),
-      "startTime":"",
-      "endTime":"",
+      "startTime":$("#startTimeDay").val() +";"+ $("#startTimeTime").val(),
+      "endTime":$("#endTimeDay").val() +";"+ $("#endTimeTime").val(),
       "enabled":$("#en").val(),
       "color":$("#color").val(),
       "width":$("#width").val(),
       "coords":JSON.stringify(coords)};
     return toSend;
+    Admin.hideMapPanel();
   },
 
   submitChange: function(){

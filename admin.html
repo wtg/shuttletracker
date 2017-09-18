@@ -25,7 +25,11 @@
         </div>
       </div>
     </div>
-    <div class ="navbar"><p class="title">RPI Shuttle Tracker</p><a class ="logout button" href="/admin/logout/">Logout</a></div>
+    <div class ="navbar">
+      <p class="title">RPI Shuttle Tracker</p>
+      <a class ="logout button" href="/admin/logout/">Logout</a>
+      <div class ="button logout" onclick="Admin.showMapPanel();">Create rotue</div>
+    </div>
     <div class="docBody">
       <div class = "routePanel">
       </div>
@@ -38,7 +42,9 @@
             <span class="emphasis formtext">Description: </span><input class ="textbox" id="desc" type="text"></input><br>
             <span class="emphasis formtext">Enabled: </span><input class ="textbox" id="en" type="text"></input><br>
             <span class="emphasis formtext">Color: </span><input class ="textbox" id="color" type="text"></input><br>
-            <span class="emphasis formtext">Time: </span><input class ="textbox" id="time" type="text"></input><br>
+            <span class="emphasis formtext">StartTime: </span><input class ="textbox" id="startTimeTime" type="text" value=""></span><input class ="textbox" id="startTimeDay" type="text" value="day"></input><br>
+            <span class="emphasis formtext">EndTime: </span><input class ="textbox" id="endTimeTime" type="text" value="time"></span><input class ="textbox" id="endTimeDay" type="text" value="day"></input><br>
+
             <span class="emphasis formtext">Width: </span><input class ="textbox" id="width" type="text"></input><br>
             <input type="hidden" id="routeCoords" name="coords"></input>
             <div class="button formtext" onclick="Admin.submitForm(JSON.stringify(Admin.pullForm()))"> Submit</div>
