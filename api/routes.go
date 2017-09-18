@@ -304,14 +304,11 @@ func (App *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 		coord := model.Coord{c["lat"], c["lng"]}
 		coords = append(coords, coord)
 	}
-	//Need a better solution than this
-	if(len(coords) > 100){
-		// Here do the interpolation
-		coords = Interpolate(coords, App.cfg.GoogleMapAPIKey)
-		// now we get the Segment for each segment ( this should be stored in database, just store it inside route for god sake)
-	}else{
-		fmt.Printf("\nGoogle maps api cant handle more than 100 pts\n");
-	}
+
+	// Here do the interpolation
+	coords = Interpolate(coords, App.cfg.GoogleMapAPIKey)
+	// now we get the Segment for each segment ( this should be stored in database, just store it inside route for god sake)
+
 	segments := ComputeSegments(coords, App.cfg.GoogleMapAPIKey, App.cfg.GoogleMapMinDistance)
 	fmt.Printf("Size of coordinates = %d", len(coords))
 	// Type conversions

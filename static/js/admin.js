@@ -164,21 +164,26 @@ var Admin = {
         zoomControl: false,
         attributionControl: false
     });
+
     Admin.RoutesMap.setView([42.728172, -73.678803], 15.3);
     Admin.RoutesMap.addControl(L.control.attribution({
         position: 'bottomright',
         prefix: ''
     }));
+
+
     L.tileLayer('http://tile.stamen.com/toner-lite/{z}/{x}/{y}{r}.png', {
       attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
       minZoom: 13
     }).addTo(Admin.RoutesMap);
 
     Admin.RoutesMap.addLayer(Admin.drawnRoute);
+
     var drawControl = new L.Control.Draw({
       edit: {
         featureGroup: Admin.drawnRoute
       },
+
       draw: {
         polygon: false,
         marker: false,
@@ -186,13 +191,32 @@ var Admin = {
         rectangle: false,
       },
     });
+
     Admin.RoutesMap.addControl(drawControl);
     Admin.RoutesMap.on(L.Draw.Event.CREATED, function (e) {
       var type = e.layerType,
       layer = e.layer;
-
       Admin.drawnRoute.addLayer(layer);
     });
+
+    var tmp = L.Routing.control({
+      waypoints: [
+        L.latLng(42.728172, -73.678803),
+        L.latLng(42.728372, -73.678803)
+      ],
+      routeWhileDragging: true
+    });
+    tmp.addTo(Admin.RoutesMap);
+    var waypoints =[
+      L.latLng(42.728172, -73.678803),
+      L.latLng(42.728372, -73.678803)
+    ];
+
+    Admin.RoutesMap.on('click', function(e) {
+      waypoints.push(e.latlng);
+      tmp.setWaypoints(waypoints);
+    });
+
   },
 
   submitForm: function(){
