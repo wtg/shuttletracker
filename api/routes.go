@@ -1,7 +1,6 @@
 package api
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -14,8 +13,6 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
-
-	"io/ioutil"
 
 	"github.com/wtg/shuttletracker/model"
 	"gopkg.in/mgo.v2/bson"
@@ -47,84 +44,6 @@ func (App *API) StopsHandler(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, stops)
 }
 
-// Interpolate do interpolation using user input coordinates
-func Interpolate(coords []model.Coord, key string) []model.Coord {
-	// make request
-	prefix := "https://roads.googleapis.com/v1/snapToRoads?"
-	var buffer bytes.Buffer
-	buffer.WriteString(prefix)
-	buffer.WriteString("path=")
-	for i, coord := range coords {
-		buffer.WriteString(strconv.FormatFloat(coord.Lat, 'f', 10, 64))
-		buffer.WriteString(",")
-		buffer.WriteString(strconv.FormatFloat(coord.Lng, 'f', 10, 64))
-		if i < len(coords)-1 {
-			buffer.WriteString("|")
-		}
-	}
-	// add the first point to be evaluated
-	if len(coords) > 1 {
-		buffer.WriteString("|" + strconv.FormatFloat(coords[0].Lat, 'f', 10, 64) + "," + strconv.FormatFloat(coords[1].Lng, 'f', 10, 64))
-	}
-	buffer.WriteString("&interpolate=false&key=")
-	buffer.WriteString(key)
-	fmt.Println(buffer.String())
-	// send request
-	resp, err := http.Get(buffer.String())
-	if err != nil {
-		fmt.Errorf("Error Not valid response from Google API")
-		return nil
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	mapResponse := model.MapResponse{}
-	json.Unmarshal(body, &mapResponse)
-	// read response
-	result := []model.Coord{}
-	for _, location := range mapResponse.SnappedPoints {
-		currentLocation := model.Coord{
-			Lat: float64(location.Location.Latitude),
-			Lng: float64(location.Location.Longitude),
-		}
-		result = append(result, currentLocation)
-	}
-	return result
-}
-
-func GoogleSegmentCompute(from model.Coord, to model.Coord, key string) model.Segment {
-	prefix := "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&"
-	var buffer bytes.Buffer
-	buffer.WriteString(prefix)
-	origin := fmt.Sprintf("origins=%f,%f", from.Lat, from.Lng)
-	destination := fmt.Sprintf("destinations=%f,%f", to.Lat, to.Lng)
-	buffer.WriteString(origin + "&" + destination + "&key=" + key)
-	fmt.Println(buffer.String())
-	resp, err := http.Get(buffer.String())
-	if err != nil {
-		fmt.Errorf("Error Not valid response from Google API")
-		return model.Segment{}
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	mapResponse := model.MapDistanceMatrixResponse{}
-	json.Unmarshal(body, &mapResponse)
-	fmt.Println(mapResponse)
-	result := model.Segment{
-		Start: model.MapPoint{
-			Latitude:  float64(from.Lat),
-			Longitude: float64(from.Lng),
-		},
-		End: model.MapPoint{
-			Latitude:  float64(to.Lat),
-			Longitude: float64(to.Lng),
-		},
-		Distance: float64(mapResponse.Rows[0].Elements[0].Distance.Value),
-		Duration: float64(mapResponse.Rows[0].Elements[0].Duration.Value),
-	}
-	fmt.Println(result)
-	return result
-}
-
 // compute distance between two coordinates and return a value
 func ComputeDistance(c1 model.Coord, c2 model.Coord) float64 {
 	return float64(math.Sqrt(math.Pow(c1.Lat-c2.Lat, 2) + math.Pow(c1.Lng-c2.Lng, 2)))
@@ -132,30 +51,6 @@ func ComputeDistance(c1 model.Coord, c2 model.Coord) float64 {
 
 func ComputeDistanceMapPoint(c1 model.MapPoint, c2 model.MapPoint) float64 {
 	return float64(math.Sqrt(math.Pow(c1.Latitude-c2.Latitude, 2) + math.Pow(c1.Longitude-c2.Longitude, 2)))
-}
-
-// Compute the Segment for each segment of the coordinates
-func ComputeSegments(coords []model.Coord, key string, threshold int) []model.Segment {
-	result := []model.Segment{}
-	// only compute the distance greater than some theshold distance and assume all in between has the same Segment
-	prev := 0
-	index := 1
-	// This part could be improved by rewriting with asynchronized call
-	for index = 1; index < len(coords); index++ {
-		if index%threshold == 0 {
-			v := GoogleSegmentCompute(coords[prev], coords[index], key)
-			for inner := prev + 1; inner <= index; inner++ {
-				result = append(result, model.Segment{
-					Distance: v.Distance / float64(index-prev),
-					Duration: v.Duration / float64(index-prev),
-					Start:    model.MapPoint{Latitude: float64(coords[inner-1].Lat), Longitude: float64(coords[inner-1].Lng)},
-					End:      model.MapPoint{Latitude: float64(coords[inner].Lat), Longitude: float64(coords[inner].Lng)},
-				})
-			}
-			prev = index
-		}
-	}
-	return result
 }
 
 // RoutesCreateHandler adds a new route to the database
