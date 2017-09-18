@@ -8,6 +8,15 @@ html, body {
 
 }
 
+.undoButton{
+  float: none;
+  position: absolute;
+  z-index: 10;
+  top: 10;
+  left: 50%;
+  width: auto;
+}
+
 .navbar{
   background-color: #eee;
   width: 100%;

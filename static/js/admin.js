@@ -1,7 +1,9 @@
 var Admin = {
   RoutesMap: null,
   ShuttleRoutes: [],
-  drawnRoute: new L.featureGroup(),
+  drawnRoute: null,
+  RoutingControl: null,
+  RoutingWaypoints: [],
   /*
   <div class = "route-description-box">
     <span class = "emphasis">name:</span><span class ="content"> West Campus</span><br>
@@ -98,46 +100,15 @@ var Admin = {
         }
       });
       $(".changeroute").click(function(){
-        Admin.loadRoute($(this).attr("routeId"));
       });
 
     }
   },
   populateRouteForm: function(data){
-    var polylineOptions = {
-      color: data.color,
-      weight: 3,
-      opacity: 1,
-    };
-    var points = [];
-    for(var j = 0; j < data.coords.length; j ++){
-      points.push(new L.LatLng(data.coords[j].lat,data.coords[j].lng));
-    }
-
-    var polyline = new L.Polyline(points, polylineOptions);
-    polyline.addTo(Admin.drawnRoute);
-
-    $("#name").val(data.name);
-    $("#desc").val(data.description);
-    $("#en").val(data.enabled);
-    $("#color").val(data.color);
-    $("#time").val("lel");
-    $("#width").val(data.width);
-
-
-
-
 
   },
 
   loadRoute: function(id){
-    $.get( "/routes", function(data){
-      for(var i = 0; i < data.length; i ++){
-        if(data[i].id == id){
-          Admin.populateRouteForm(data[i])
-        }
-      }
-    });
 
   },
 
@@ -171,65 +142,48 @@ var Admin = {
         prefix: ''
     }));
 
-
     L.tileLayer('http://tile.stamen.com/toner-lite/{z}/{x}/{y}{r}.png', {
       attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
       minZoom: 13
     }).addTo(Admin.RoutesMap);
 
-    Admin.RoutesMap.addLayer(Admin.drawnRoute);
-
-    var drawControl = new L.Control.Draw({
-      edit: {
-        featureGroup: Admin.drawnRoute
-      },
-
-      draw: {
-        polygon: false,
-        marker: false,
-        circle: false,
-        rectangle: false,
-      },
-    });
-
-    Admin.RoutesMap.addControl(drawControl);
-    Admin.RoutesMap.on(L.Draw.Event.CREATED, function (e) {
-      var type = e.layerType,
-      layer = e.layer;
-      Admin.drawnRoute.addLayer(layer);
-    });
-
-    var tmp = L.Routing.control({
+    Admin.RoutingControl = L.Routing.control({
       waypoints: [
         L.latLng(42.728172, -73.678803),
         L.latLng(42.728372, -73.678803)
       ],
       routeWhileDragging: true
     });
-    tmp.addTo(Admin.RoutesMap);
-    var waypoints =[
+
+    Admin.RoutingControl.on('routeselected', function(e) {
+      if (Admin.drawnRoute != null){
+        Admin.RoutesMap.removeLayer(Admin.drawnRoute);
+      }
+      Admin.drawnRoute = L.polyline(e.route.coordinates, {color: 'blue'});
+      Admin.drawnRoute.addTo(Admin.RoutesMap)
+
+    });
+    Admin.RoutingControl.addTo(Admin.RoutesMap);
+    Admin.RoutingWaypoints =[
       L.latLng(42.728172, -73.678803),
       L.latLng(42.728372, -73.678803)
     ];
 
     Admin.RoutesMap.on('click', function(e) {
-      waypoints.push(e.latlng);
-      tmp.setWaypoints(waypoints);
+      Admin.RoutingWaypoints.push(e.latlng);
+      Admin.RoutingControl.setWaypoints(Admin.RoutingWaypoints);
     });
 
   },
+  removeLastPoint: function(){
+    Admin.RoutingWaypoints = Admin.RoutingWaypoints.slice(0, -1);
+    Admin.RoutingControl.setWaypoints(Admin.RoutingWaypoints);
 
-  submitForm: function(){
+  },
+  pullForm: function(){
     var coords = [];
-    if(Admin.drawnRoute.toGeoJSON().features.length != 0){
-      var data = Admin.drawnRoute.toGeoJSON().features[0].geometry.coordinates;
-      for(var i = 0; i < data.length; i ++){
-        coords.push({
-          "lat": data[i][1],
-          "lng": data[i][0]
-        });
-      }
-    }
+    coords = Admin.drawnRoute.getLatLngs();
+
     var toSend = {
       "name":$("#name").val(),
       "description":$("#desc").val(),
@@ -239,6 +193,18 @@ var Admin = {
       "color":$("#color").val(),
       "width":$("#width").val(),
       "coords":JSON.stringify(coords)};
+    return toSend;
+  },
+
+  getJson: function(){
+    var toSend = Admin.pullForm()
+    var wnd = window.open("about:blank", "", "_blank");
+    wnd.document.write(JSON.stringify(toSend));
+
+  },
+
+  submitForm: function(){
+    var toSend = Admin.pullForm()
     $.ajax({
       url: "/routes/create",
       type: "POST",
