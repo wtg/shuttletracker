@@ -81,7 +81,7 @@ var Admin = {
 
     }else{
       for(var i = 0; i < data.length; i ++){
-        console.log(data[i]);
+        //console.log(data[i]);
         Admin.buildRouteBox(data[i]);
 
       }
@@ -149,8 +149,7 @@ var Admin = {
 
     Admin.RoutingControl = L.Routing.control({
       waypoints: [
-        L.latLng(42.728172, -73.678803),
-        L.latLng(42.728372, -73.678803)
+
       ],
       routeWhileDragging: true
     });
@@ -165,8 +164,7 @@ var Admin = {
     });
     Admin.RoutingControl.addTo(Admin.RoutesMap);
     Admin.RoutingWaypoints =[
-      L.latLng(42.728172, -73.678803),
-      L.latLng(42.728372, -73.678803)
+
     ];
 
     Admin.RoutesMap.on('click', function(e) {
@@ -196,6 +194,12 @@ var Admin = {
     return toSend;
   },
 
+  submitChange: function(){
+      Admin.submitForm($('#jsonField').val());
+      console.log($('#jsonField').val());
+      $('.prompt').css('display','none');
+  },
+
   getJson: function(){
     var toSend = Admin.pullForm()
     var wnd = window.open("about:blank", "", "_blank");
@@ -203,12 +207,11 @@ var Admin = {
 
   },
 
-  submitForm: function(){
-    var toSend = Admin.pullForm()
+  submitForm: function(toSend){
     $.ajax({
       url: "/routes/create",
       type: "POST",
-      data: JSON.stringify(toSend),
+      data: toSend,
       contentType: "application/json",
       complete: function(data){
         $.get( "/routes", Admin.populateRoutesPanel);

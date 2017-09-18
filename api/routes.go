@@ -68,7 +68,7 @@ func Interpolate(coords []model.Coord, key string) []model.Coord {
 	if len(coords) > 1 {
 		buffer.WriteString("|" + strconv.FormatFloat(coords[0].Lat, 'f', 10, 64) + "," + strconv.FormatFloat(coords[1].Lng, 'f', 10, 64))
 	}
-	buffer.WriteString("&interpolate=true&key=")
+	buffer.WriteString("&interpolate=false&key=")
 	buffer.WriteString(key)
 	fmt.Println(buffer.String())
 	// send request
@@ -244,7 +244,6 @@ func (App *API) ImportHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	coords = Interpolate(coords, App.cfg.GoogleMapAPIKey)
 	segments := ComputeSegments(coords, App.cfg.GoogleMapAPIKey, App.cfg.GoogleMapMinDistance)
 
 	route := db.QueryRow("SELECT name,description,start_time,end_time,color FROM routes where id = 2")
@@ -306,10 +305,9 @@ func (App *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Here do the interpolation
-	coords = Interpolate(coords, App.cfg.GoogleMapAPIKey)
 	// now we get the Segment for each segment ( this should be stored in database, just store it inside route for god sake)
 
-	segments := ComputeSegments(coords, App.cfg.GoogleMapAPIKey, App.cfg.GoogleMapMinDistance)
+	//segments := ComputeSegments(coords, App.cfg.GoogleMapAPIKey, App.cfg.GoogleMapMinDistance)
 	fmt.Printf("Size of coordinates = %d", len(coords))
 	// Type conversions
 	enabled, _ := strconv.ParseBool(routeData["enabled"])
@@ -326,7 +324,6 @@ func (App *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 		Color:       routeData["color"],
 		Width:       width,
 		Coords:      coords,
-		Duration:    segments,
 		Created:     currentTime,
 		Updated:     currentTime}
 	// Store new route under routes collection

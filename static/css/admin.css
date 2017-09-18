@@ -15,6 +15,7 @@ html, body {
   top: 10;
   left: 50%;
   width: auto;
+  background-color: white;
 }
 
 .navbar{
