@@ -5,6 +5,7 @@ var Admin = {
   RoutingControl: null,
   RoutingWaypoints: [],
   RouteData: null,
+  StopMap: null,
 
   updateRoutes: function(data){
     var updatedRoute = [];
@@ -61,6 +62,23 @@ var Admin = {
 
   },
 
+  bindStopButtons: function(){
+    $(".stopDelete").click(function(e){
+      var routeId = $(this).parent().attr("id");
+      $.ajax({
+        url: '/stops/' + $(this).parent().attr("stopId"),
+        type: 'DELETE',
+        success: function(result) {
+          $.get( "/stops", function(e){
+            Admin.showStopsPanel();
+            Admin.populateStopsForm(e, routeId);
+            Admin.bindStopButtons();
+          });
+        }
+      });
+    });
+  },
+
   populateRoutesPanel: function(data){
     Admin.RouteData = data;
     $(".routePanel").html("");
@@ -92,7 +110,11 @@ var Admin = {
       $(".stops").click(function(){
         var a = $(this).attr("routeId");
         $.get( "/stops", function(e){
+          Admin.showStopsPanel();
           Admin.populateStopsForm(e,a);
+          Admin.bindStopButtons();
+
+
         });
 
       });
@@ -102,27 +124,71 @@ var Admin = {
   populateRouteForm: function(data){
 
   },
+  initStopMap: function(){
+    if(Admin.StopsMap == null){
+      Admin.StopsMap = L.map('newStopMap', {
+        zoomControl: false,
+        attributionControl: false
+      });
+
+      Admin.StopsMap.setView([42.728172, -73.678803], 15.3);
+      Admin.StopsMap.addControl(L.control.attribution({
+        position: 'bottomright',
+        prefix: ''
+      }));
+
+      L.tileLayer('http://tile.stamen.com/toner-lite/{z}/{x}/{y}{r}.png', {
+        attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
+        minZoom: 13
+      }).addTo(Admin.StopsMap);
+    }
+
+  },
+
   populateStopsForm: function(data,routeId){
+    $(".stopPanel").html("");
+    Admin.StopsMap= null;
+    for (var i = -1; i < data.length; i ++){
+      if (i != -1 && data[i].routeId == routeId){
+        var box = "";
+        box += "<div id=" + data[i].routeId + " stopId='"+data[i].id+"' class = 'route-description-box'>";
+        box += "<span class = 'emphasis'>Name:</span><input type='text' value='" + data[i].name + "'></input><br>";
+        box += "<span class = 'emphasis'>Description:</span><input type='text' value='" + data[i].description + "'></input><br>";
+        box += "<span class = 'emphasis'>Route:</span><select>";
 
-  for (var i = 0; i < data.length; i ++){
-    if (data[i].routeId == routeId){
-      var box = "";
-      box += "<div id=" + data[i].routeId + " class = 'route-description-box'>";
-      box += "<span class = 'emphasis'>Name:</span><input disabled='disabled' type='text' value=" + data[i].name + "></input><br>";
-      box += "<span class = 'emphasis'>Description:</span><input disabled='disabled' type='text' value=" + data[i].description + "></input><br>";
-      box += "<span class = 'emphasis'>Route:</span><select>";
+        for (var j = 0 ; j < Admin.RouteData.length; j++){
+          box += "<option value="+ Admin.RouteData[j].routeId + ">" + Admin.RouteData[j].name + "</option>"
+          //console.log(box);
+        }
 
-      for (var j = 0 ; j < Admin.RouteData.length; j++){
-        box += "<option value="+ Admin.RouteData[j].routeId + ">" + Admin.RouteData[j].name + "</option>"
-        console.log(box);
+        box += "</select><br>"
+        box += "<span class = 'emphasis'>Enabled:</span><input type='textbox' value="+data[i].enabled+"></input>"
+        box += "<span class='button stopEdit' style='float:right;'>submit</span><span class='button stopDelete' style='float:right;'>delete</span></div>"
+
+        $(".stopPanel").append(box);
+
+      }else if(i == -1){
+        var box = "";
+        box += "<div id='' stopId='' class = 'route-description-box'>";
+        box += "<div id='newStopMap'style='height: 50%;position: inherit;width: 50%;background-color:black;z-index:0;border-style: solid; border-width:1px; border-color:black; float: inherit;'; background-color:black;z-index:0;'></div>";
+
+        box += "<span class = 'emphasis'>Name:</span><input type='text' value='New stop' ></input><br>";
+        box += "<span class = 'emphasis'>Description:</span><input type='text' value=></input><br>";
+        box += "<span class = 'emphasis'>Route:</span><select>";
+
+        for (var j = 0 ; j < Admin.RouteData.length; j++){
+          box += "<option value="+ Admin.RouteData[j].routeId + ">" + Admin.RouteData[j].name + "</option>"
+          //console.log(box);
+        }
+
+        box += "</select><br>"
+        box += "<span class = 'emphasis'>Enabled:</span><input type='textbox' value=></input>"
+        box += "<span class='button stopEdit' style='float:right;'>submit</span></div>"
+        $(".stopPanel").append(box);
+        Admin.initStopMap();
       }
 
-      box += "</select><br>"
-      box += "<span class = 'emphasis'>Enabled:</span><input disabled='disabled' type='textbox' value="+data[i].enabled+"></input>"
-      box += "<span class='button' style='float:right;'>sdf</span></div>"
-      $(".stopPanel").append(box);
     }
-  }
   },
 
   loadRoute: function(id){
@@ -148,14 +214,25 @@ var Admin = {
   },
 
   showMapPanel: function(){
+    Admin.hideStopsPanel();
     $('.mapPanel').css('display','block');
-    $('.routePanel').css('width','50%');
     Admin.RoutesMap.invalidateSize();
   },
   hideMapPanel: function(){
     $('.mapPanel').css('display','none');
-    $('.routePanel').css('width','100%');
     Admin.RoutesMap.invalidateSize();
+  },
+  hideStopsPanel: function(){
+    $('.stopPanel').css('display','none');
+
+  },
+  showStopsPanel: function(){
+    Admin.hideMapPanel();
+    $('.stopPanel').css('display','block');
+    if(Admin.StopsMap != null){
+      Admin.StopsMap.invalidateSize();
+    }
+
   },
 
   initMap: function(){
@@ -201,6 +278,7 @@ var Admin = {
     });
 
   },
+
   removeLastPoint: function(){
     Admin.RoutingWaypoints = Admin.RoutingWaypoints.slice(0, -1);
     Admin.RoutingControl.setWaypoints(Admin.RoutingWaypoints);

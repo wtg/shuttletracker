@@ -159,16 +159,19 @@ html, body {
   float: left;
 }
 .mapPanel{
-  display: none;
   width: 50%;
   float: right;
   height: 100%;
+  display: none;
 }
 .stopPanel{
-  display: block;
   width: 50%;
   float: right;
   height: 100%;
+  overflow: scroll;
+}
+.stopInfo{
+  height: 50%;
 }
 .route-description-box{
   padding: 20px;
