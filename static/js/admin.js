@@ -4,18 +4,7 @@ var Admin = {
   drawnRoute: null,
   RoutingControl: null,
   RoutingWaypoints: [],
-  /*
-  <div class = "route-description-box">
-    <span class = "emphasis">name:</span><span class ="content"> West Campus</span><br>
-    <span class = "emphasis">description:</span><span class ="content"> The west campus Red Hawk shuttle will make stops at the Student Union Horseshoe, Sage Ave & Troy Building crosswalks, Blitman Residence Commons, 6th Avenue and City Station, Polytechnic Residence Commons, and 15th Street and College Avenue. This shuttle route will have a yellow indicator labeled "WEST" on the front of the shuttle.</span><br>
-    <span class = "emphasis">enabled:</span><span class="content">true</span><br>
-    <span class = "emphasis">color:</span><span class="content">#fff</span><br>
-    <span class = "emphasis">time:</span><span class="content">idek</span><br>
-    <span class = "emphasis">id:</span><span class="content">13445213a</span><br>
-    <div style="float: right;"><a class="button">edit</a><a class="button">delete</a></div><br>
-
-  </div>
-  */
+  RouteData: null,
 
   updateRoutes: function(data){
     var updatedRoute = [];
@@ -73,6 +62,7 @@ var Admin = {
   },
 
   populateRoutesPanel: function(data){
+    Admin.RouteData = data;
     $(".routePanel").html("");
 
     //console.log(data);
@@ -99,13 +89,40 @@ var Admin = {
           $(this).html("sure?")
         }
       });
-      $(".changeroute").click(function(){
+      $(".stops").click(function(){
+        var a = $(this).attr("routeId");
+        $.get( "/stops", function(e){
+          Admin.populateStopsForm(e,a);
+        });
+
       });
 
     }
   },
   populateRouteForm: function(data){
 
+  },
+  populateStopsForm: function(data,routeId){
+
+  for (var i = 0; i < data.length; i ++){
+    if (data[i].routeId == routeId){
+      var box = "";
+      box += "<div id=" + data[i].routeId + " class = 'route-description-box'>";
+      box += "<span class = 'emphasis'>Name:</span><input disabled='disabled' type='text' value=" + data[i].name + "></input><br>";
+      box += "<span class = 'emphasis'>Description:</span><input disabled='disabled' type='text' value=" + data[i].description + "></input><br>";
+      box += "<span class = 'emphasis'>Route:</span><select>";
+
+      for (var j = 0 ; j < Admin.RouteData.length; j++){
+        box += "<option value="+ Admin.RouteData[j].routeId + ">" + Admin.RouteData[j].name + "</option>"
+        console.log(box);
+      }
+
+      box += "</select><br>"
+      box += "<span class = 'emphasis'>Enabled:</span><input disabled='disabled' type='textbox' value="+data[i].enabled+"></input>"
+      box += "<span class='button' style='float:right;'>sdf</span></div>"
+      $(".stopPanel").append(box);
+    }
+  }
   },
 
   loadRoute: function(id){
@@ -121,7 +138,7 @@ var Admin = {
     box += "<span class = 'emphasis'>color:</span><span class='content'>" + routeInfo.color + "</span><br>";
     box += "<span class = 'emphasis'>time:</span><span class='content'>"+routeInfo.startTime + "-" + routeInfo.endTime + "</span><br>";
     box += "<span class = 'emphasis'>id:</span><span class='content'>"+ routeInfo.id + "</span><br>";
-    box += "<div style='float: right;width:auto;'><button class='button cbutton changeroute' routeId="+routeInfo.id +">change</button><button id='delete' routeId="+routeInfo.id +" class='button cbutton deleteroute'>delete</button></div><br></div>"
+    box += "<div style='float: right;width:auto;'><button class='button cbutton stops' routeId="+routeInfo.id +">stops</button><button id='delete' routeId="+routeInfo.id +" class='button cbutton deleteroute'>delete</button></div><br></div>"
     $(".routePanel").append(box);
 
   },

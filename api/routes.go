@@ -127,29 +127,6 @@ func (App *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// this could be improved
-func GetSegment(stop model.Stop, startIndex int, segments []model.Segment) int {
-	// choose the segment with lowest distance
-	fmt.Println(len(segments))
-	x0 := float64(stop.Lat)
-	y0 := float64(stop.Lng)
-	minimumLen := 1000.0
-	minimumIndex := startIndex
-	for i := startIndex; i < len(segments); i++ {
-		x1 := segments[i].Start.Latitude
-		y1 := segments[i].Start.Longitude
-		x2 := segments[i].End.Latitude
-		y2 := segments[i].End.Longitude
-		// compute the distance between a point and a line
-		length := math.Abs((x2-x1)*(y1-y0)-(x1-x0)*(y2-y1)) / math.Sqrt(math.Pow(x2-x1, 2)+math.Pow(y2-y1, 2))
-		if length < minimumLen {
-			minimumLen = length
-			minimumIndex = i
-		}
-	}
-	return minimumIndex
-}
-
 // StopsCreateHandler adds a new route stop to the database
 func (App *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	if App.cfg.Authenticate && !cas.IsAuthenticated(r) {
@@ -174,7 +151,6 @@ func (App *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// We have to know the order of the stop and store a velocity vector into duration for the prediction
 	route.StopsID = append(route.StopsID, stop.ID) // THIS REQUIRES the front end to have correct order << to be improved
 	fmt.Println(route.StopsID)
-	stop.SegmentIndex = GetSegment(stop, route.AvailableRoute, route.Duration)
 
 	// Store new stop under stops collection
 	err = App.db.Stops.Insert(&stop)

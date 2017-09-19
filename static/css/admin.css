@@ -153,13 +153,19 @@ html, body {
   width: 100%;
 }
 .routePanel{
-  width: 100%;
+  width: 50%;
   height: 100%;
   overflow: scroll;
   float: left;
 }
 .mapPanel{
   display: none;
+  width: 50%;
+  float: right;
+  height: 100%;
+}
+.stopPanel{
+  display: block;
   width: 50%;
   float: right;
   height: 100%;
