@@ -6,6 +6,7 @@ var Admin = {
   RoutingWaypoints: [],
   RouteData: null,
   StopMap: null,
+  addStopMarker: null,
 
   updateRoutes: function(data){
     var updatedRoute = [];
@@ -141,9 +142,21 @@ var Admin = {
         attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
         minZoom: 13
       }).addTo(Admin.StopsMap);
-    }
 
-  },
+      Admin.StopsMap.on( 'click', function(e){
+        if(Admin.addStopMarker != null){
+          Admin.StopsMap.removeLayer(Admin.addStopMarker);
+        }
+        Admin.addStopMarker = L.marker(e.latlng,
+          {
+            draggable: true
+          })
+        Admin.addStopMarker.addTo(Admin.StopsMap);
+
+      });
+
+  }
+},
 
   populateStopsForm: function(data,routeId){
     $(".stopPanel").html("");
@@ -157,7 +170,13 @@ var Admin = {
         box += "<span class = 'emphasis'>Route:</span><select>";
 
         for (var j = 0 ; j < Admin.RouteData.length; j++){
-          box += "<option value="+ Admin.RouteData[j].routeId + ">" + Admin.RouteData[j].name + "</option>"
+          if(Admin.RouteData[j].routeId == data[i].routeId){
+            box += "<option value="+ Admin.RouteData[j].routeId + " selected>" + Admin.RouteData[j].name + "</option>"
+          }else{
+            box += "<option value="+ Admin.RouteData[j].routeId + ">" + Admin.RouteData[j].name + "</option>"
+
+          }
+
           //console.log(box);
         }
 
