@@ -1,0 +1,20 @@
+{
+  "Updater": {
+    "DataFeed": "",
+    "UpdateInterval": "3s"
+  },
+  "API": {
+    "GoogleMapAPIKey": "",
+    "GoogleMapMinDistance": 1,
+    "CasURL": "https://cas-auth.rpi.edu/cas/",
+    "Authenticate": true
+  },
+  "Database": {
+  },
+  "Log": {
+    "Level": "debug"
+  },
+  "Server": {
+    "ListenURL": "localhost:8080"
+  }
+}
