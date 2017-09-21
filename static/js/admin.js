@@ -296,7 +296,7 @@ var Admin = {
     Admin.StopsMap= null;
     var tmp = "";
     var box = "";
-    var j = 0;;
+    var j = 0;
     if (data === null){
       data = [];
     }
