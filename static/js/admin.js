@@ -63,7 +63,7 @@ var Routes = {
 
     //console.log(data);
     //Routes.updateRoutes(data);
-    if(data == null){
+    if(data === null){
 
     }else{
       for(var i = 0; i < data.length; i ++){
@@ -82,7 +82,7 @@ var Routes = {
             }
           });
         }else{
-          $(this).html("sure?")
+          $(this).html("sure?");
         }
       });
       $(".stops").click(function(){
@@ -100,12 +100,12 @@ var Routes = {
     var box = "";
     box += "<div id = " + routeInfo.id +" class = 'route-description-box'>";
     box += "<span class = 'emphasis'>name:</span><span class ='content'> " + routeInfo.name + "</span><br>";
-    box += "<span class = 'emphasis'>description:</span><span class ='content'>" + routeInfo.description + "</span><br>"
+    box += "<span class = 'emphasis'>description:</span><span class ='content'>" + routeInfo.description + "</span><br>";
     box += "<span class = 'emphasis'>enabled:</span><span class='content'>"+routeInfo.enabled + "</span><br>";
     box += "<span class = 'emphasis'>color:</span><span class='content'>" + routeInfo.color + "</span><br>";
     box += "<span class = 'emphasis'>time:</span><span class='content'>"+routeInfo.startTime + "-" + routeInfo.endTime + "</span><br>";
     box += "<span class = 'emphasis'>id:</span><span class='content'>"+ routeInfo.id + "</span><br>";
-    box += "<div style='float: right;width:auto;'><button class='button cbutton stops' routeId="+routeInfo.id +">stops</button><button id='delete' routeId="+routeInfo.id +" class='button cbutton deleteroute'>delete</button></div><br></div>"
+    box += "<div style='float: right;width:auto;'><button class='button cbutton stops' routeId="+routeInfo.id +">stops</button><button id='delete' routeId="+routeInfo.id +" class='button cbutton deleteroute'>delete</button></div><br></div>";
     $(".routePanel").append(box);
 
   },
@@ -134,11 +134,11 @@ var Routes = {
     });
 
     Routes.RoutingControl.on('routeselected', function(e) {
-      if (Routes.drawnRoute != null){
+      if (Routes.drawnRoute !== null){
         Routes.RoutesMap.removeLayer(Routes.drawnRoute);
       }
       Routes.drawnRoute = L.polyline(e.route.coordinates, {color: 'blue'});
-      Routes.drawnRoute.addTo(Routes.RoutesMap)
+      Routes.drawnRoute.addTo(Routes.RoutesMap);
 
     });
     Routes.RoutingControl.addTo(Routes.RoutesMap);
@@ -181,7 +181,7 @@ var Routes = {
     },
 
     getJson: function(){
-      var toSend = Routes.pullForm()
+      var toSend = Routes.pullForm();
       var wnd = window.open("about:blank", "", "_blank");
       wnd.document.write(JSON.stringify(toSend));
 
@@ -199,11 +199,11 @@ var Routes = {
       });
     },
 
-}
+};
 
 var Stops = {
 
-}
+};
 
 var Admin = {
   StopMap: null,
@@ -239,9 +239,9 @@ var Admin = {
         "lng":1,
       };
       console.log(toSend);
-      $(this).parent().attr("lat", Admin.addStopMarker.getLatLng().lat)
-      $(this).parent().attr("lng", Admin.addStopMarker.getLatLng().lng)
-      if($(this).parent().attr("stopid") != ""){
+      $(this).parent().attr("lat", Admin.addStopMarker.getLatLng().lat);
+      $(this).parent().attr("lng", Admin.addStopMarker.getLatLng().lng);
+      if($(this).parent().attr("stopid") !== ""){
         toSend.toDelete = true;
       }
       toSend.id = $(this).parent().attr("stopid");
@@ -258,7 +258,7 @@ var Admin = {
   },
 
   initStopMap: function(){
-    if(Admin.StopsMap == null){
+    if(Admin.StopsMap === null){
       Admin.StopsMap = L.map('newStopMap', {
         zoomControl: false,
         attributionControl: false
@@ -276,7 +276,7 @@ var Admin = {
       }).addTo(Admin.StopsMap);
 
       Admin.StopsMap.on( 'click', function(e){
-        if(Admin.addStopMarker != null){
+        if(Admin.addStopMarker !== null){
           Admin.StopsMap.removeLayer(Admin.addStopMarker);
         }
         Admin.addStopMarker = L.marker(e.latlng,
@@ -295,7 +295,9 @@ var Admin = {
     Admin.StopsMap= null;
     var tmp = "";
     var box = "";
-    if (data === null){data = [];};
+    if (data === null){
+      data = [];
+    }
     for (var i = -1; i < data.length; i ++){
       if (i != -1 && data[i].routeId == routeId){
         tmp = "";
