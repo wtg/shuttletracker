@@ -7,7 +7,6 @@ var Admin = {
   RouteData: null,
   StopMap: null,
   addStopMarker: null,
-
   updateRoutes: function(data){
     var updatedRoute = [];
     for(var i = 0; i < data.length; i ++){
@@ -67,7 +66,7 @@ var Admin = {
     $(".stopDelete").click(function(e){
       var routeId = $(this).parent().attr("id");
       $.ajax({
-        url: '/stops/' + $(this).parent().attr("stopId"),
+        url: '/stops/' + $(this).parent().attr("stopid"),
         type: 'DELETE',
         success: function(result) {
           $.get( "/stops", function(e){
@@ -77,6 +76,11 @@ var Admin = {
           });
         }
       });
+    });
+    /*{"routeId":"asdf","name":"Test","description":"asdf","address":"aSDFASD","startTime":"asd","endTime":"asdf","enabled":"true","id":"","lat":"42.73074227479951","lng":"-73.67736339569092","toDelete":"false"}*/
+    $(".stopSubmit").click(function(e){
+      console.log($(this).parent().find('#name').val());
+
     });
   },
 
@@ -114,11 +118,10 @@ var Admin = {
           Admin.showStopsPanel();
           Admin.populateStopsForm(e,a);
           Admin.bindStopButtons();
-
-
         });
 
       });
+
 
     }
   },
@@ -164,8 +167,8 @@ var Admin = {
     for (var i = -1; i < data.length; i ++){
       if (i != -1 && data[i].routeId == routeId){
         var box = "";
-        box += "<div id=" + data[i].routeId + " stopId='"+data[i].id+"' class = 'route-description-box'>";
-        box += "<span class = 'emphasis'>Name:</span><input type='text' value='" + data[i].name + "'></input><br>";
+        box += "<div id=" + data[i].routeId + " stopid='"+data[i].id+"' class = 'route-description-box'>";
+        box += "<span class = 'emphasis'>Name:</span><input id='name' type='text' value='" + data[i].name + "'></input><br>";
         box += "<span class = 'emphasis'>Description:</span><input type='text' value='" + data[i].description + "'></input><br>";
         box += "<span class = 'emphasis'>Route:</span><select>";
 
@@ -174,7 +177,6 @@ var Admin = {
             box += "<option value="+ Admin.RouteData[j].routeId + " selected>" + Admin.RouteData[j].name + "</option>"
           }else{
             box += "<option value="+ Admin.RouteData[j].routeId + ">" + Admin.RouteData[j].name + "</option>"
-
           }
 
           //console.log(box);
@@ -182,16 +184,16 @@ var Admin = {
 
         box += "</select><br>"
         box += "<span class = 'emphasis'>Enabled:</span><input type='textbox' value="+data[i].enabled+"></input>"
-        box += "<span class='button stopEdit' style='float:right;'>submit</span><span class='button stopDelete' style='float:right;'>delete</span></div>"
+        box += "<span class='button stopSubmit' style='float:right;'>submit</span><span class='button stopDelete' style='float:right;'>delete</span></div>"
 
         $(".stopPanel").append(box);
 
       }else if(i == -1){
         var box = "";
-        box += "<div id='' stopId='' class = 'route-description-box'>";
+        box += "<div id='' stopid='new' class = 'route-description-box'>";
         box += "<div id='newStopMap'style='height: 50%;position: inherit;width: 50%;background-color:black;z-index:0;border-style: solid; border-width:1px; border-color:black; float: inherit;'; background-color:black;z-index:0;'></div>";
 
-        box += "<span class = 'emphasis'>Name:</span><input type='text' value='New stop' ></input><br>";
+        box += "<br><span class = 'emphasis'>Name:</span><input id='name' input type='text' value='New stop' ></input><br>";
         box += "<span class = 'emphasis'>Description:</span><input type='text' value=></input><br>";
         box += "<span class = 'emphasis'>Route:</span><select>";
 
@@ -202,7 +204,7 @@ var Admin = {
 
         box += "</select><br>"
         box += "<span class = 'emphasis'>Enabled:</span><input type='textbox' value=></input>"
-        box += "<span class='button stopEdit' style='float:right;'>submit</span></div>"
+        box += "<span class='button stopSubmit' style='float:right;'>submit</span></div>"
         $(".stopPanel").append(box);
         Admin.initStopMap();
       }
