@@ -282,7 +282,7 @@ var Admin = {
         Admin.addStopMarker = L.marker(e.latlng,
           {
             draggable: true
-          })
+          });
         Admin.addStopMarker.addTo(Admin.StopsMap);
 
       });
@@ -293,7 +293,7 @@ var Admin = {
   populateStopsForm: function(data,routeId){
     $(".stopPanel").html("");
     Admin.StopsMap= null;
-    if (data == null){data = [];};
+    if (data === null){data = [];};
     for (var i = -1; i < data.length; i ++){
       if (i != -1 && data[i].routeId == routeId){
         var tmp = "";
@@ -305,24 +305,24 @@ var Admin = {
 
         for (var j = 0 ; j < Routes.RouteData.length; j++){
           if(Routes.RouteData[j].id == data[i].routeId){
-            box += "<option value='"+ Routes.RouteData[j].id + "' selected>" + Routes.RouteData[j].name + "</option>"
+            box += "<option value='"+ Routes.RouteData[j].id + "' selected>" + Routes.RouteData[j].name + "</option>";
           }else{
-            tmp += "<option value='"+ Routes.RouteData[j].id + "'>" + Routes.RouteData[j].name + "</option>"
+            tmp += "<option value='"+ Routes.RouteData[j].id + "'>" + Routes.RouteData[j].name + "</option>";
           }
           box += tmp;
 
           //console.log(box);
         }
 
-        box += "</select><br>"
-        box += "<span class = 'emphasis'>Enabled:</span><input id='enabled' type='textbox' value="+data[i].enabled+"></input>"
-        box += "<span class='button stopSubmit' style='float:right;'>submit</span><span class='button stopDelete' style='float:right;'>delete</span></div>"
+        box += "</select><br>";
+        box += "<span class = 'emphasis'>Enabled:</span><input id='enabled' type='textbox' value="+data[i].enabled+"></input>";
+        box += "<span class='button stopSubmit' style='float:right;'>submit</span><span class='button stopDelete' style='float:right;'>delete</span></div>";
 
         $(".stopPanel").append(box);
 
       }else if(i == -1){
-        var tmp = "";
-        var box = "";
+        tmp = "";
+        box = "";
         box += "<div id='' stopid='new' class = 'route-description-box'>";
         box += "<div id='newStopMap'style='height: 50%;position: inherit;width: 50%;background-color:black;z-index:0;border-style: solid; border-width:1px; border-color:black; float: inherit;'; background-color:black;z-index:0;'></div>";
 
@@ -330,18 +330,18 @@ var Admin = {
         box += "<span class = 'emphasis'>Description:</span><input id='desc' type='text' value=></input><br>";
         box += "<span class = 'emphasis'>Route:</span><select id='route'>";
 
-        for (var j = 0 ; j < Routes.RouteData.length; j++){
+        for (j = 0 ; j < Routes.RouteData.length; j++){
           if(Routes.RouteData[j].id == routeId){
-            box += "<option value='"+ Routes.RouteData[j].id + "' selected>" + Routes.RouteData[j].name + "</option>"
+            box += "<option value='"+ Routes.RouteData[j].id + "' selected>" + Routes.RouteData[j].name + "</option>";
           }else{
-            tmp += "<option value='"+ Routes.RouteData[j].id + "'>" + Routes.RouteData[j].name + "</option>"
+            tmp += "<option value='"+ Routes.RouteData[j].id + "'>" + Routes.RouteData[j].name + "</option>";
           }
           box += tmp;
         }
 
-        box += "</select><br>"
-        box += "<span class = 'emphasis'>Enabled:</span><input id='enabled' type='textbox' value=></input>"
-        box += "<span class='button stopSubmit' style='float:right;'>submit</span></div>"
+        box += "</select><br>";
+        box += "<span class = 'emphasis'>Enabled:</span><input id='enabled' type='textbox' value=></input>";
+        box += "<span class='button stopSubmit' style='float:right;'>submit</span></div>";
         $(".stopPanel").append(box);
         Admin.initStopMap();
       }
@@ -364,7 +364,7 @@ var Admin = {
   showStopsPanel: function(){
     Admin.hideMapPanel();
     $('.stopPanel').css('display','block');
-    if(Admin.StopsMap != null){
+    if(Admin.StopsMap !== null){
       Admin.StopsMap.invalidateSize();
     }
 
