@@ -88,9 +88,9 @@ var Routes = {
       $(".stops").click(function(){
         var a = $(this).attr("routeId");
         $.get( "/stops", function(e){
-          /*Routes.showStopsPanel();
-          Routes.populateStopsForm(e,a);
-          Routes.bindStopButtons();*/
+          Admin.showStopsPanel();
+          Admin.populateStopsForm(e,a);
+          Admin.bindStopButtons();
         });
 
       });
@@ -233,24 +233,21 @@ var Admin = {
         "startTime":"",
         "endTime":"",
         "routeId":$(this).parent().find("#route").find(":selected").val(),
-        "enabled":true,
+        "enabled":"true",
         "toDelete":false,
-        "lat":"",
-        "lng":"",
+        "lat":1,
+        "lng":1,
       };
-      if(Admin.addStopMarker != null){
-        toSend.lat = Admin.addStopMarker.getLatLng().lat;
-        toSend.lng = Admin.addStopMarker.getLatLng().lng;
-        console.log(toSend.lat);
-      }
-
+      console.log(toSend);
+      $(this).parent().attr("lat", Admin.addStopMarker.getLatLng().lat)
+      $(this).parent().attr("lng", Admin.addStopMarker.getLatLng().lng)
       if($(this).parent().attr("stopid") != ""){
         toSend.toDelete = true;
-        toSend.id = $(this).parent().attr("stopid");
-        toSend.lat = $(this).parent().attr("lat");
-        toSend.lng = $(this).parent().attr("lng");
-
       }
+      toSend.id = $(this).parent().attr("stopid");
+      toSend.lat = $(this).parent().attr("lat");
+      toSend.lng = $(this).parent().attr("lng");
+
       Admin.submitStopForm(toSend);
 
     });
@@ -296,20 +293,23 @@ var Admin = {
   populateStopsForm: function(data,routeId){
     $(".stopPanel").html("");
     Admin.StopsMap= null;
+    if (data == null){data = [];};
     for (var i = -1; i < data.length; i ++){
       if (i != -1 && data[i].routeId == routeId){
+        var tmp = "";
         var box = "";
         box += "<div id=" + data[i].routeId + " lat="+data[i].lat+" lng="+data[i].lng+" stopid='"+data[i].id+"' class = 'route-description-box'>";
         box += "<span class = 'emphasis'>Name:</span><input id='name' type='text' value='" + data[i].name + "'></input><br>";
         box += "<span class = 'emphasis'>Description:</span><input id='desc' type='text' value='" + data[i].description + "'></input><br>";
         box += "<span class = 'emphasis'>Route:</span><select id='route'>";
 
-        for (var j = 0 ; j < Admin.RouteData.length; j++){
-          if(Admin.RouteData[j].id == data[i].routeId){
-            box += "<option value='"+ Admin.RouteData[j].id + "' selected>" + Admin.RouteData[j].name + "</option>"
+        for (var j = 0 ; j < Routes.RouteData.length; j++){
+          if(Routes.RouteData[j].id == data[i].routeId){
+            box += "<option value='"+ Routes.RouteData[j].id + "' selected>" + Routes.RouteData[j].name + "</option>"
           }else{
-            box += "<option value='"+ Admin.RouteData[j].id + "'>" + Admin.RouteData[j].name + "</option>"
+            tmp += "<option value='"+ Routes.RouteData[j].id + "'>" + Routes.RouteData[j].name + "</option>"
           }
+          box += tmp;
 
           //console.log(box);
         }
@@ -321,6 +321,7 @@ var Admin = {
         $(".stopPanel").append(box);
 
       }else if(i == -1){
+        var tmp = "";
         var box = "";
         box += "<div id='' stopid='new' class = 'route-description-box'>";
         box += "<div id='newStopMap'style='height: 50%;position: inherit;width: 50%;background-color:black;z-index:0;border-style: solid; border-width:1px; border-color:black; float: inherit;'; background-color:black;z-index:0;'></div>";
@@ -329,9 +330,13 @@ var Admin = {
         box += "<span class = 'emphasis'>Description:</span><input id='desc' type='text' value=></input><br>";
         box += "<span class = 'emphasis'>Route:</span><select id='route'>";
 
-        for (var j = 0 ; j < Admin.RouteData.length; j++){
-          box += "<option value='"+ Admin.RouteData[j].id + "'>" + Admin.RouteData[j].name + "</option>"
-          //console.log(box);
+        for (var j = 0 ; j < Routes.RouteData.length; j++){
+          if(Routes.RouteData[j].id == routeId){
+            box += "<option value='"+ Routes.RouteData[j].id + "' selected>" + Routes.RouteData[j].name + "</option>"
+          }else{
+            tmp += "<option value='"+ Routes.RouteData[j].id + "'>" + Routes.RouteData[j].name + "</option>"
+          }
+          box += tmp;
         }
 
         box += "</select><br>"
@@ -379,7 +384,12 @@ var Admin = {
       data: JSON.stringify(toSend),
       contentType: "application/json",
       complete: function(data){
-        $.get( "/stops", Admin.populateStopsForm);
+
+        $.get( "/stops", function(e){
+          Admin.populateStopsForm(e,toSend.routeId);
+          Admin.bindStopButtons();
+
+        });
       }
     });
   }
