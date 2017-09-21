@@ -296,6 +296,7 @@ var Admin = {
     Admin.StopsMap= null;
     var tmp = "";
     var box = "";
+    var j = 0;;
     if (data === null){
       data = [];
     }
@@ -308,7 +309,7 @@ var Admin = {
         box += "<span class = 'emphasis'>Description:</span><input id='desc' type='text' value='" + data[i].description + "'></input><br>";
         box += "<span class = 'emphasis'>Route:</span><select id='route'>";
 
-        for (var j = 0 ; j < Routes.RouteData.length; j++){
+        for (j = 0 ; j < Routes.RouteData.length; j++){
           if(Routes.RouteData[j].id == data[i].routeId){
             box += "<option value='"+ Routes.RouteData[j].id + "' selected>" + Routes.RouteData[j].name + "</option>";
           }else{
@@ -335,7 +336,7 @@ var Admin = {
         box += "<span class = 'emphasis'>Description:</span><input id='desc' type='text' value=></input><br>";
         box += "<span class = 'emphasis'>Route:</span><select id='route'>";
 
-        for (var j = 0 ; j < Routes.RouteData.length; j++){
+        for (j = 0 ; j < Routes.RouteData.length; j++){
           if(Routes.RouteData[j].id == routeId){
             box += "<option value='"+ Routes.RouteData[j].id + "' selected>" + Routes.RouteData[j].name + "</option>";
           }else{
