@@ -293,11 +293,13 @@ var Admin = {
   populateStopsForm: function(data,routeId){
     $(".stopPanel").html("");
     Admin.StopsMap= null;
+    var tmp = "";
+    var box = "";
     if (data === null){data = [];};
     for (var i = -1; i < data.length; i ++){
       if (i != -1 && data[i].routeId == routeId){
-        var tmp = "";
-        var box = "";
+        tmp = "";
+        box = "";
         box += "<div id=" + data[i].routeId + " lat="+data[i].lat+" lng="+data[i].lng+" stopid='"+data[i].id+"' class = 'route-description-box'>";
         box += "<span class = 'emphasis'>Name:</span><input id='name' type='text' value='" + data[i].name + "'></input><br>";
         box += "<span class = 'emphasis'>Description:</span><input id='desc' type='text' value='" + data[i].description + "'></input><br>";
@@ -330,7 +332,7 @@ var Admin = {
         box += "<span class = 'emphasis'>Description:</span><input id='desc' type='text' value=></input><br>";
         box += "<span class = 'emphasis'>Route:</span><select id='route'>";
 
-        for (j = 0 ; j < Routes.RouteData.length; j++){
+        for (var j = 0 ; j < Routes.RouteData.length; j++){
           if(Routes.RouteData[j].id == routeId){
             box += "<option value='"+ Routes.RouteData[j].id + "' selected>" + Routes.RouteData[j].name + "</option>";
           }else{
