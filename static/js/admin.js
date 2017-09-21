@@ -1,12 +1,11 @@
-var Admin = {
+var Routes = {
   RoutesMap: null,
   ShuttleRoutes: [],
   drawnRoute: null,
   RoutingControl: null,
   RoutingWaypoints: [],
   RouteData: null,
-  StopMap: null,
-  addStopMarker: null,
+
   updateRoutes: function(data){
     var updatedRoute = [];
     for(var i = 0; i < data.length; i ++){
@@ -43,24 +42,172 @@ var Admin = {
 
     }
 
-    Admin.ShuttleRoutes = updatedRoute;
-    Admin.drawRoutes();
+    Routes.ShuttleRoutes = updatedRoute;
+    Routes.drawRoutes();
 
   },
-
-
   drawRoutes: function(){
-
     var polylineOptions = {
       color: 'blue',
       weight: 1,
       opacity: 1
     };
-    for(i = 0; i < Admin.ShuttleRoutes.length; i ++){
-      Admin.RoutesMap.addLayer(Admin.ShuttleRoutes[i].line);
+    for(i = 0; i < Routes.ShuttleRoutes.length; i ++){
+      Routes.RoutesMap.addLayer(Routes.ShuttleRoutes[i].line);
     }
 
   },
+  populateRoutesPanel: function(data){
+    Routes.RouteData = data;
+    $(".routePanel").html("");
+
+    //console.log(data);
+    //Routes.updateRoutes(data);
+    if(data == null){
+
+    }else{
+      for(var i = 0; i < data.length; i ++){
+        //console.log(data[i]);
+        Routes.buildRouteBox(data[i]);
+
+      }
+      $(".deleteroute").click(function(){
+        if ($(this).html() == "sure?"){
+          $.ajax({
+            url: '/routes/' + $(this).attr("routeId"),
+            type: 'DELETE',
+            success: function(result) {
+              //Routes.populateRoutesPanel(data);
+              $.get( "/routes", Routes.populateRoutesPanel);
+            }
+          });
+        }else{
+          $(this).html("sure?")
+        }
+      });
+      $(".stops").click(function(){
+        var a = $(this).attr("routeId");
+        $.get( "/stops", function(e){
+          /*Routes.showStopsPanel();
+          Routes.populateStopsForm(e,a);
+          Routes.bindStopButtons();*/
+        });
+
+      });
+    }
+  },
+  buildRouteBox: function(routeInfo){
+    var box = "";
+    box += "<div id = " + routeInfo.id +" class = 'route-description-box'>";
+    box += "<span class = 'emphasis'>name:</span><span class ='content'> " + routeInfo.name + "</span><br>";
+    box += "<span class = 'emphasis'>description:</span><span class ='content'>" + routeInfo.description + "</span><br>"
+    box += "<span class = 'emphasis'>enabled:</span><span class='content'>"+routeInfo.enabled + "</span><br>";
+    box += "<span class = 'emphasis'>color:</span><span class='content'>" + routeInfo.color + "</span><br>";
+    box += "<span class = 'emphasis'>time:</span><span class='content'>"+routeInfo.startTime + "-" + routeInfo.endTime + "</span><br>";
+    box += "<span class = 'emphasis'>id:</span><span class='content'>"+ routeInfo.id + "</span><br>";
+    box += "<div style='float: right;width:auto;'><button class='button cbutton stops' routeId="+routeInfo.id +">stops</button><button id='delete' routeId="+routeInfo.id +" class='button cbutton deleteroute'>delete</button></div><br></div>"
+    $(".routePanel").append(box);
+
+  },
+  initMap: function(){
+    Routes.RoutesMap = L.map('mapid', {
+      zoomControl: false,
+      attributionControl: false
+    });
+
+    Routes.RoutesMap.setView([42.728172, -73.678803], 15.3);
+    Routes.RoutesMap.addControl(L.control.attribution({
+      position: 'bottomright',
+      prefix: ''
+    }));
+
+    L.tileLayer('http://tile.stamen.com/toner-lite/{z}/{x}/{y}{r}.png', {
+      attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
+      minZoom: 13
+    }).addTo(Routes.RoutesMap);
+
+    Routes.RoutingControl = L.Routing.control({
+      waypoints: [
+
+      ],
+      routeWhileDragging: true
+    });
+
+    Routes.RoutingControl.on('routeselected', function(e) {
+      if (Routes.drawnRoute != null){
+        Routes.RoutesMap.removeLayer(Routes.drawnRoute);
+      }
+      Routes.drawnRoute = L.polyline(e.route.coordinates, {color: 'blue'});
+      Routes.drawnRoute.addTo(Routes.RoutesMap)
+
+    });
+    Routes.RoutingControl.addTo(Routes.RoutesMap);
+    Routes.RoutingWaypoints =[
+
+    ];
+
+    Routes.RoutesMap.on('click', function(e) {
+      Routes.RoutingWaypoints.push(e.latlng);
+      Routes.RoutingControl.setWaypoints(Routes.RoutingWaypoints);
+    });
+
+  },
+  removeLastPoint: function(){
+    Routes.RoutingWaypoints = Routes.RoutingWaypoints.slice(0, -1);
+    Routes.RoutingControl.setWaypoints(Routes.RoutingWaypoints);
+  },
+  pullForm: function(){
+    var coords = [];
+    coords = Routes.drawnRoute.getLatLngs();
+
+    var toSend = {
+      "name":$("#name").val(),
+      "description":$("#desc").val(),
+      "startTime":$("#startTimeDay").val() +";"+ $("#startTimeTime").val(),
+      "endTime":$("#endTimeDay").val() +";"+ $("#endTimeTime").val(),
+      "enabled":$("#en").val(),
+      "color":$("#color").val(),
+      "width":$("#width").val(),
+      "coords":JSON.stringify(coords)};
+      Admin.hideMapPanel();
+      return toSend;
+
+    },
+
+    submitChange: function(){
+      Routes.submitForm($('#jsonField').val());
+      console.log($('#jsonField').val());
+      $('.prompt').css('display','none');
+    },
+
+    getJson: function(){
+      var toSend = Routes.pullForm()
+      var wnd = window.open("about:blank", "", "_blank");
+      wnd.document.write(JSON.stringify(toSend));
+
+    },
+
+    submitForm: function(toSend){
+      $.ajax({
+        url: "/routes/create",
+        type: "POST",
+        data: toSend,
+        contentType: "application/json",
+        complete: function(data){
+          $.get( "/routes", Routes.populateRoutesPanel);
+        }
+      });
+    },
+
+}
+
+var Stops = {
+
+}
+
+var Admin = {
+  StopMap: null,
+  addStopMarker: null,
 
   bindStopButtons: function(){
     $(".stopDelete").click(function(e){
@@ -79,55 +226,40 @@ var Admin = {
     });
     /*{"routeId":"asdf","name":"Test","description":"asdf","address":"aSDFASD","startTime":"asd","endTime":"asdf","enabled":"true","id":"","lat":"42.73074227479951","lng":"-73.67736339569092","toDelete":"false"}*/
     $(".stopSubmit").click(function(e){
-      console.log($(this).parent().find('#name').val());
+      var toSend = {
+        "id":"",
+        "name":$(this).parent().find("#name").val(),
+        "description":$(this).parent().find("#desc").val(),
+        "startTime":"",
+        "endTime":"",
+        "routeId":$(this).parent().find("#route").find(":selected").val(),
+        "enabled":true,
+        "toDelete":false,
+        "lat":"",
+        "lng":"",
+      };
+      if(Admin.addStopMarker != null){
+        toSend.lat = Admin.addStopMarker.getLatLng().lat;
+        toSend.lng = Admin.addStopMarker.getLatLng().lng;
+        console.log(toSend.lat);
+      }
+
+      if($(this).parent().attr("stopid") != ""){
+        toSend.toDelete = true;
+        toSend.id = $(this).parent().attr("stopid");
+        toSend.lat = $(this).parent().attr("lat");
+        toSend.lng = $(this).parent().attr("lng");
+
+      }
+      Admin.submitStopForm(toSend);
 
     });
   },
 
   populateRoutesPanel: function(data){
-    Admin.RouteData = data;
-    $(".routePanel").html("");
-
-    //console.log(data);
-    //Admin.updateRoutes(data);
-    if(data == null){
-
-    }else{
-      for(var i = 0; i < data.length; i ++){
-        //console.log(data[i]);
-        Admin.buildRouteBox(data[i]);
-
-      }
-      $(".deleteroute").click(function(){
-        if ($(this).html() == "sure?"){
-          $.ajax({
-            url: '/routes/' + $(this).attr("routeId"),
-            type: 'DELETE',
-            success: function(result) {
-              //Admin.populateRoutesPanel(data);
-              $.get( "/routes", Admin.populateRoutesPanel);
-            }
-          });
-        }else{
-          $(this).html("sure?")
-        }
-      });
-      $(".stops").click(function(){
-        var a = $(this).attr("routeId");
-        $.get( "/stops", function(e){
-          Admin.showStopsPanel();
-          Admin.populateStopsForm(e,a);
-          Admin.bindStopButtons();
-        });
-
-      });
-
-
-    }
+    Routes.populateRoutesPanel(data);
   },
-  populateRouteForm: function(data){
 
-  },
   initStopMap: function(){
     if(Admin.StopsMap == null){
       Admin.StopsMap = L.map('newStopMap', {
@@ -167,23 +299,23 @@ var Admin = {
     for (var i = -1; i < data.length; i ++){
       if (i != -1 && data[i].routeId == routeId){
         var box = "";
-        box += "<div id=" + data[i].routeId + " stopid='"+data[i].id+"' class = 'route-description-box'>";
+        box += "<div id=" + data[i].routeId + " lat="+data[i].lat+" lng="+data[i].lng+" stopid='"+data[i].id+"' class = 'route-description-box'>";
         box += "<span class = 'emphasis'>Name:</span><input id='name' type='text' value='" + data[i].name + "'></input><br>";
-        box += "<span class = 'emphasis'>Description:</span><input type='text' value='" + data[i].description + "'></input><br>";
-        box += "<span class = 'emphasis'>Route:</span><select>";
+        box += "<span class = 'emphasis'>Description:</span><input id='desc' type='text' value='" + data[i].description + "'></input><br>";
+        box += "<span class = 'emphasis'>Route:</span><select id='route'>";
 
         for (var j = 0 ; j < Admin.RouteData.length; j++){
-          if(Admin.RouteData[j].routeId == data[i].routeId){
-            box += "<option value="+ Admin.RouteData[j].routeId + " selected>" + Admin.RouteData[j].name + "</option>"
+          if(Admin.RouteData[j].id == data[i].routeId){
+            box += "<option value='"+ Admin.RouteData[j].id + "' selected>" + Admin.RouteData[j].name + "</option>"
           }else{
-            box += "<option value="+ Admin.RouteData[j].routeId + ">" + Admin.RouteData[j].name + "</option>"
+            box += "<option value='"+ Admin.RouteData[j].id + "'>" + Admin.RouteData[j].name + "</option>"
           }
 
           //console.log(box);
         }
 
         box += "</select><br>"
-        box += "<span class = 'emphasis'>Enabled:</span><input type='textbox' value="+data[i].enabled+"></input>"
+        box += "<span class = 'emphasis'>Enabled:</span><input id='enabled' type='textbox' value="+data[i].enabled+"></input>"
         box += "<span class='button stopSubmit' style='float:right;'>submit</span><span class='button stopDelete' style='float:right;'>delete</span></div>"
 
         $(".stopPanel").append(box);
@@ -194,16 +326,16 @@ var Admin = {
         box += "<div id='newStopMap'style='height: 50%;position: inherit;width: 50%;background-color:black;z-index:0;border-style: solid; border-width:1px; border-color:black; float: inherit;'; background-color:black;z-index:0;'></div>";
 
         box += "<br><span class = 'emphasis'>Name:</span><input id='name' input type='text' value='New stop' ></input><br>";
-        box += "<span class = 'emphasis'>Description:</span><input type='text' value=></input><br>";
-        box += "<span class = 'emphasis'>Route:</span><select>";
+        box += "<span class = 'emphasis'>Description:</span><input id='desc' type='text' value=></input><br>";
+        box += "<span class = 'emphasis'>Route:</span><select id='route'>";
 
         for (var j = 0 ; j < Admin.RouteData.length; j++){
-          box += "<option value="+ Admin.RouteData[j].routeId + ">" + Admin.RouteData[j].name + "</option>"
+          box += "<option value='"+ Admin.RouteData[j].id + "'>" + Admin.RouteData[j].name + "</option>"
           //console.log(box);
         }
 
         box += "</select><br>"
-        box += "<span class = 'emphasis'>Enabled:</span><input type='textbox' value=></input>"
+        box += "<span class = 'emphasis'>Enabled:</span><input id='enabled' type='textbox' value=></input>"
         box += "<span class='button stopSubmit' style='float:right;'>submit</span></div>"
         $(".stopPanel").append(box);
         Admin.initStopMap();
@@ -212,40 +344,17 @@ var Admin = {
     }
   },
 
-  loadRoute: function(id){
-
-  },
-
-  buildRouteBox: function(routeInfo){
-    var box = "";
-    box += "<div id = " + routeInfo.id +" class = 'route-description-box'>";
-    box += "<span class = 'emphasis'>name:</span><span class ='content'> " + routeInfo.name + "</span><br>";
-    box += "<span class = 'emphasis'>description:</span><span class ='content'>" + routeInfo.description + "</span><br>"
-    box += "<span class = 'emphasis'>enabled:</span><span class='content'>"+routeInfo.enabled + "</span><br>";
-    box += "<span class = 'emphasis'>color:</span><span class='content'>" + routeInfo.color + "</span><br>";
-    box += "<span class = 'emphasis'>time:</span><span class='content'>"+routeInfo.startTime + "-" + routeInfo.endTime + "</span><br>";
-    box += "<span class = 'emphasis'>id:</span><span class='content'>"+ routeInfo.id + "</span><br>";
-    box += "<div style='float: right;width:auto;'><button class='button cbutton stops' routeId="+routeInfo.id +">stops</button><button id='delete' routeId="+routeInfo.id +" class='button cbutton deleteroute'>delete</button></div><br></div>"
-    $(".routePanel").append(box);
-
-  },
-
-  routeDeleteHandler: function(info){
-    //console.log(info);
-  },
-
   showMapPanel: function(){
     Admin.hideStopsPanel();
     $('.mapPanel').css('display','block');
-    Admin.RoutesMap.invalidateSize();
+    Routes.RoutesMap.invalidateSize();
   },
   hideMapPanel: function(){
     $('.mapPanel').css('display','none');
-    Admin.RoutesMap.invalidateSize();
+    Routes.RoutesMap.invalidateSize();
   },
   hideStopsPanel: function(){
     $('.stopPanel').css('display','none');
-
   },
   showStopsPanel: function(){
     Admin.hideMapPanel();
@@ -255,98 +364,24 @@ var Admin = {
     }
 
   },
-
   initMap: function(){
-    Admin.RoutesMap = L.map('mapid', {
-        zoomControl: false,
-        attributionControl: false
-    });
-
-    Admin.RoutesMap.setView([42.728172, -73.678803], 15.3);
-    Admin.RoutesMap.addControl(L.control.attribution({
-        position: 'bottomright',
-        prefix: ''
-    }));
-
-    L.tileLayer('http://tile.stamen.com/toner-lite/{z}/{x}/{y}{r}.png', {
-      attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
-      minZoom: 13
-    }).addTo(Admin.RoutesMap);
-
-    Admin.RoutingControl = L.Routing.control({
-      waypoints: [
-
-      ],
-      routeWhileDragging: true
-    });
-
-    Admin.RoutingControl.on('routeselected', function(e) {
-      if (Admin.drawnRoute != null){
-        Admin.RoutesMap.removeLayer(Admin.drawnRoute);
-      }
-      Admin.drawnRoute = L.polyline(e.route.coordinates, {color: 'blue'});
-      Admin.drawnRoute.addTo(Admin.RoutesMap)
-
-    });
-    Admin.RoutingControl.addTo(Admin.RoutesMap);
-    Admin.RoutingWaypoints =[
-
-    ];
-
-    Admin.RoutesMap.on('click', function(e) {
-      Admin.RoutingWaypoints.push(e.latlng);
-      Admin.RoutingControl.setWaypoints(Admin.RoutingWaypoints);
-    });
-
+    Routes.initMap();
   },
 
   removeLastPoint: function(){
-    Admin.RoutingWaypoints = Admin.RoutingWaypoints.slice(0, -1);
-    Admin.RoutingControl.setWaypoints(Admin.RoutingWaypoints);
-
-  },
-  pullForm: function(){
-    var coords = [];
-    coords = Admin.drawnRoute.getLatLngs();
-
-    var toSend = {
-      "name":$("#name").val(),
-      "description":$("#desc").val(),
-      "startTime":$("#startTimeDay").val() +";"+ $("#startTimeTime").val(),
-      "endTime":$("#endTimeDay").val() +";"+ $("#endTimeTime").val(),
-      "enabled":$("#en").val(),
-      "color":$("#color").val(),
-      "width":$("#width").val(),
-      "coords":JSON.stringify(coords)};
-    Admin.hideMapPanel();
-    return toSend;
-
+    Routes.removeLastPoint();
   },
 
-  submitChange: function(){
-      Admin.submitForm($('#jsonField').val());
-      console.log($('#jsonField').val());
-      $('.prompt').css('display','none');
-  },
-
-  getJson: function(){
-    var toSend = Admin.pullForm()
-    var wnd = window.open("about:blank", "", "_blank");
-    wnd.document.write(JSON.stringify(toSend));
-
-  },
-
-  submitForm: function(toSend){
+  submitStopForm: function(toSend){
     $.ajax({
-      url: "/routes/create",
+      url: "/stops/create",
       type: "POST",
-      data: toSend,
+      data: JSON.stringify(toSend),
       contentType: "application/json",
       complete: function(data){
-        $.get( "/routes", Admin.populateRoutesPanel);
+        $.get( "/stops", Admin.populateStopsForm);
       }
     });
-
   }
 
 };
