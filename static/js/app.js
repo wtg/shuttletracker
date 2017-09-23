@@ -180,6 +180,35 @@ var App ={
     App.grabVehicleInfo();
 
   },
+  
+  showUserLocation: function(){
+    var userIcon = L.icon({
+      iconUrl: 'static/images/stop.png',
+      
+      iconSize:     [12, 12], // size of the icon
+      iconAnchor:   [6, 6], // point of the icon which will correspond to marker's location
+      shadowAnchor: [6, 6],  // the same for the shadow
+      popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
+    });
+    
+     if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+      } else { 
+        console.log("Geolocation is either not supported by this browser, or geolocation permissions were not given by the user.");
+      }
+    
+    function showPosition (position) {
+      var marker = {
+            name: "Current Location",
+            marker: L.marker([position.coords.latitude, position.coords.longitude], {
+                icon: userIcon,
+                zIndexOffset: 1000
+            }),
+      }
+      marker['marker'].bindPopup(marker.name)
+      marker['marker'].addTo(App.ShuttleMap);
+    }
+  },
 
   stopClicked: function(e){
   },
@@ -219,5 +248,6 @@ var App ={
 $(document).ready(function(){
   App.initMap();
   App.grabStops();
+  App.showUserLocation();
   var a = setInterval(App.grabVehicles, 1000);
 });
