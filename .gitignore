@@ -3,4 +3,3 @@ conf.json
 *.swp
 /vendor/*/
 /coverage.txt
-.idea/*
