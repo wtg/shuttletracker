@@ -60,7 +60,7 @@ html, body {
 }
 
 .logo img {
-    height: 100%;
+  height: 100%;
 }
 
 #navheader {
@@ -84,18 +84,18 @@ html, body {
 }
 
 .dropdown-schedule {
-  display: block;
   color: #333;
-  text-decoration: none;
+  display: block;
   font-weight: 700;
   font-size: 12px;
   line-height: 32px;
   padding: 0px 15px;
+  text-decoration: none;
 }
 
 a.dropdown-schedule {
-  padding: 0px 3px;
   height: 34px;
+  padding: 0px 3px;
 }
 
 a.dropdown-schedule > img{
@@ -104,10 +104,10 @@ a.dropdown-schedule > img{
 }
 
 .dropdown li {
-  position: relative;
   float: left;
-  margin: 0px;
+  position: relative;
   padding: 0px;
+  margin: 0px;
 }
 
 .dropdown > li {
@@ -119,11 +119,11 @@ a.dropdown-schedule > img{
 }
 
 .dropdown-menu {
+  background: rgba(238, 238, 238, 0.90);
   display: none;
   position: absolute;
   top: 100%;
   left: 0px;
-  background: rgba(238, 238, 238, 0.90);
   padding: 0px;
 }
 
@@ -138,15 +138,15 @@ a.dropdown-schedule > img{
 }
 
 .dropdown-menu a {
-  text-decoration: none;
-  padding: 3px 5px 3px 20px;
   box-sizing: border-box;
   color: #333333;
+  padding: 3px 5px 3px 20px;
+  text-decoration: none;
 }
 
 .dropdown-menu a:visited {
-  text-decoration: none;
   color: #333333;
+  text-decoration: none;
 }
 
 .dropdown-menu ul {
