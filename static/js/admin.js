@@ -71,7 +71,11 @@ var Routes = {
         Routes.buildRouteBox(data[i]);
 
       }
-      $(".deleteroute").click(function(){
+      $('html').click(function() {
+        $(".deleteroute").html("Delete");
+      });
+      $(".deleteroute").click(function(e){
+        e.stopPropagation()
         if ($(this).html() == "Confirm deletion"){
           $.ajax({
             url: '/routes/' + $(this).attr("routeId"),
