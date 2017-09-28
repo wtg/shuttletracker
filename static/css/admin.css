@@ -162,6 +162,7 @@ html, body {
   width: 50%;
   float: right;
   height: 100%;
+  overflow:scroll;
   display: none;
 }
 .stopPanel{
