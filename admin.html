@@ -28,13 +28,13 @@
     <div class ="navbar">
       <p class="title">RPI Shuttle Tracker</p>
       <a class ="logout button" href="/admin/logout/">Logout</a>
-      <div class ="button logout" onclick="Admin.showMapPanel();">Create rotue</div>
+      <div class ="button logout" onclick="Admin.showMapPanel();">Create Route</div>
     </div>
     <div class="docBody">
       <div class = "routePanel">
       </div>
       <div class = "mapPanel">
-        <div class="button undoButton" onclick="Admin.removeLastPoint()">undo</div>
+        <div class="button undoButton" onclick="Admin.removeLastPoint()">Undo</div>
         <div id="mapid" style="height: 70%;float: left; width: 100%; background-color:black;z-index:0;"></div>
         <div class="mapform">
           <form id="routeform" action="/routes/create" method="post" content-type="application/json">

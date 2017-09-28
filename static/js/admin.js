@@ -72,7 +72,7 @@ var Routes = {
 
       }
       $(".deleteroute").click(function(){
-        if ($(this).html() == "sure?"){
+        if ($(this).html() == "Confirm deletion"){
           $.ajax({
             url: '/routes/' + $(this).attr("routeId"),
             type: 'DELETE',
@@ -82,7 +82,7 @@ var Routes = {
             }
           });
         }else{
-          $(this).html("sure?");
+          $(this).html("Confirm deletion");
         }
       });
       $(".stops").click(function(){
@@ -99,13 +99,13 @@ var Routes = {
   buildRouteBox: function(routeInfo){
     var box = "";
     box += "<div id = " + routeInfo.id +" class = 'route-description-box'>";
-    box += "<span class = 'emphasis'>name:</span><span class ='content'> " + routeInfo.name + "</span><br>";
-    box += "<span class = 'emphasis'>description:</span><span class ='content'>" + routeInfo.description + "</span><br>";
-    box += "<span class = 'emphasis'>enabled:</span><span class='content'>"+routeInfo.enabled + "</span><br>";
-    box += "<span class = 'emphasis'>color:</span><span class='content'>" + routeInfo.color + "</span><br>";
-    box += "<span class = 'emphasis'>time:</span><span class='content'>"+routeInfo.startTime + "-" + routeInfo.endTime + "</span><br>";
-    box += "<span class = 'emphasis'>id:</span><span class='content'>"+ routeInfo.id + "</span><br>";
-    box += "<div style='float: right;width:auto;'><button class='button cbutton stops' routeId="+routeInfo.id +">stops</button><button id='delete' routeId="+routeInfo.id +" class='button cbutton deleteroute'>delete</button></div><br></div>";
+    box += "<span class = 'emphasis'>Name:</span><span class ='content'> " + routeInfo.name + "</span><br>";
+    box += "<span class = 'emphasis'>Description: </span><span class ='content'>" + routeInfo.description + "</span><br>";
+    box += "<span class = 'emphasis'>Enabled: </span><span class='content'>"+routeInfo.enabled + "</span><br>";
+    box += "<span class = 'emphasis'>Color: </span><span class='content'>" + routeInfo.color + "</span><br>";
+    box += "<span class = 'emphasis'>Time: </span><span class='content'>"+routeInfo.startTime + "-" + routeInfo.endTime + "</span><br>";
+    box += "<span class = 'emphasis'>ID: </span><span class='content'>"+ routeInfo.id + "</span><br>";
+    box += "<div style='float: right;width:auto;'><button class='button cbutton stops' routeId="+routeInfo.id +">Stops</button><button id='delete' routeId="+routeInfo.id +" class='button cbutton deleteroute'>Delete</button></div><br></div>";
     $(".routePanel").append(box);
 
   },
