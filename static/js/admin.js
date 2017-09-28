@@ -290,6 +290,28 @@ var Admin = {
 
   }
 },
+  generateStopUIElement: function(data, i){
+    let tmp = "";
+    let box = "";
+    box += "<div id=" + data[i].routeId + " lat="+data[i].lat+" lng="+data[i].lng+" stopid='"+data[i].id+"' class = 'route-description-box'>";
+    box += "<span class = 'emphasis'>Name:</span><input id='name' type='text' value='" + data[i].name + "'></input><br>";
+    box += "<span class = 'emphasis'>Description:</span><input id='desc' type='text' value='" + data[i].description + "'></input><br>";
+    box += "<span class = 'emphasis'>Route:</span><select id='route'>";
+
+    for (j = 0 ; j < Routes.RouteData.length; j++){
+      if(Routes.RouteData[j].id == data[i].routeId){
+        box += "<option value='"+ Routes.RouteData[j].id + "' selected>" + Routes.RouteData[j].name + "</option>";
+      }else{
+        tmp += "<option value='"+ Routes.RouteData[j].id + "'>" + Routes.RouteData[j].name + "</option>";
+      }
+      box += tmp;
+    }
+
+    box += "</select><br>";
+    box += "<span class = 'emphasis'>Enabled:</span><input id='enabled' type='textbox' value="+data[i].enabled+"></input>";
+    box += "<span class='button stopSubmit' style='float:right;'>submit</span><span class='button stopDelete' style='float:right;'>delete</span></div>";
+    return box;
+  },
 
   populateStopsForm: function(data,routeId){
     $(".stopPanel").html("");
@@ -302,30 +324,7 @@ var Admin = {
     }
     for (var i = -1; i < data.length; i ++){
       if (i != -1 && data[i].routeId == routeId){
-        tmp = "";
-        box = "";
-        box += "<div id=" + data[i].routeId + " lat="+data[i].lat+" lng="+data[i].lng+" stopid='"+data[i].id+"' class = 'route-description-box'>";
-        box += "<span class = 'emphasis'>Name:</span><input id='name' type='text' value='" + data[i].name + "'></input><br>";
-        box += "<span class = 'emphasis'>Description:</span><input id='desc' type='text' value='" + data[i].description + "'></input><br>";
-        box += "<span class = 'emphasis'>Route:</span><select id='route'>";
-
-        for (j = 0 ; j < Routes.RouteData.length; j++){
-          if(Routes.RouteData[j].id == data[i].routeId){
-            box += "<option value='"+ Routes.RouteData[j].id + "' selected>" + Routes.RouteData[j].name + "</option>";
-          }else{
-            tmp += "<option value='"+ Routes.RouteData[j].id + "'>" + Routes.RouteData[j].name + "</option>";
-          }
-          box += tmp;
-
-          //console.log(box);
-        }
-
-        box += "</select><br>";
-        box += "<span class = 'emphasis'>Enabled:</span><input id='enabled' type='textbox' value="+data[i].enabled+"></input>";
-        box += "<span class='button stopSubmit' style='float:right;'>submit</span><span class='button stopDelete' style='float:right;'>delete</span></div>";
-
-        $(".stopPanel").append(box);
-
+        $(".stopPanel").append(Admin.generateStopUIElement(data,i));
       }else if(i == -1){
         tmp = "";
         box = "";
