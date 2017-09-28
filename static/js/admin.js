@@ -291,8 +291,8 @@ var Admin = {
   }
 },
   generateStopUIElement: function(data, i){
-    let tmp = "";
-    let box = "";
+    tmp = "";
+    box = "";
     box += "<div id=" + data[i].routeId + " lat="+data[i].lat+" lng="+data[i].lng+" stopid='"+data[i].id+"' class = 'route-description-box'>";
     box += "<span class = 'emphasis'>Name:</span><input id='name' type='text' value='" + data[i].name + "'></input><br>";
     box += "<span class = 'emphasis'>Description:</span><input id='desc' type='text' value='" + data[i].description + "'></input><br>";
