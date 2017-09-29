@@ -1,3 +1,12 @@
+var key = "";
+
+function initializeAPIKeys(data){
+  key = data;
+  $.get( "/routes", Admin.populateRoutesPanel);
+  Admin.initMap();
+
+};
+
 var Routes = {
   RoutesMap: null,
   ShuttleRoutes: [],
@@ -57,6 +66,7 @@ var Routes = {
     }
 
   },
+
   populateRoutesPanel: function(data){
     Routes.RouteData = data;
     $(".routePanel").html("");
@@ -134,6 +144,7 @@ var Routes = {
       waypoints: [
 
       ],
+      router: new L.Routing.mapbox(key),
       routeWhileDragging: true
     });
 
@@ -405,8 +416,7 @@ var Admin = {
 
 };
 $(document).ready(function(){
-  Admin.initMap();
-  $.get( "/routes", Admin.populateRoutesPanel);
+  $.get("/getKey/", initializeAPIKeys);
 
 
 });
