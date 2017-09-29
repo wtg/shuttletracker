@@ -23,6 +23,7 @@ type Config struct {
 	CasURL               string
 	Authenticate         bool
 	ListenURL            string
+	MapboxAPIKey				 string
 }
 
 // App holds references to Mongo resources.
@@ -69,6 +70,7 @@ func New(cfg Config, db database.Database) (*API, error) {
 	// Admin
 	r.Handle("/admin/", api.CasAUTH.HandleFunc(api.AdminHandler)).Methods("GET")
 	r.Handle("/admin", api.CasAUTH.HandleFunc(api.AdminHandler)).Methods("GET")
+	r.Handle("/getKey/", api.CasAUTH.HandleFunc(api.KeyHandler)).Methods("GET")
 	r.Handle("/admin/success/", api.CasAUTH.HandleFunc(api.AdminPageServer)).Methods("GET")
 	r.Handle("/admin/success", api.CasAUTH.HandleFunc(api.AdminPageServer)).Methods("GET")
 	r.Handle("/admin/logout/", api.CasAUTH.HandleFunc(api.AdminLogout)).Methods("GET")
@@ -150,6 +152,14 @@ func (api *API) AdminHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+}
+//KeyHandler sends Mapbox api key to authenticated user
+func (api *API) KeyHandler(w http.ResponseWriter, r *http.Request){
+	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
+		http.Redirect(w, r, "/admin/", 301)
+	} else {
+		WriteJSON(w, api.cfg.MapboxAPIKey)
+	}
 }
 
 func (api *API) AdminPageServer(w http.ResponseWriter, r *http.Request) {
