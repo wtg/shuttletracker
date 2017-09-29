@@ -153,13 +153,12 @@ func (api *API) AdminHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
-//Send Mapbox api key to authenticated user
+//KeyHandler sends Mapbox api key to authenticated user
 func (api *API) KeyHandler(w http.ResponseWriter, r *http.Request){
 	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		http.Redirect(w, r, "/admin/", 301)
-		return
 	} else {
-		WriteJSON(w, api.cfg.MapboxAPIKey);
+		WriteJSON(w, api.cfg.MapboxAPIKey)
 	}
 }
 
