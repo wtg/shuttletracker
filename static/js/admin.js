@@ -81,6 +81,12 @@ var Routes = {
         Routes.buildRouteBox(data[i]);
 
       }
+      Routes.buildSubmitBox();
+
+      $(".addStopJson").click(function(){
+        Routes.submitForm($(".json").val());
+      });
+
       $('html').click(function() {
         $(".deleteroute").html("Delete");
       });
@@ -123,6 +129,17 @@ var Routes = {
     $(".routePanel").append(box);
 
   },
+  buildSubmitBox: function(){
+    var box = "";
+    box += "<div style='padding-bottom: 30px;' class ='route-description-box'>";
+    box += "<span class = 'emphasis'>Submit Route Json</span><br>";
+    box += "<textarea class='json' style='width:100%; height: 100px;'></textarea>";
+
+    box += "<button id='delete' style='float:right;' class='button cbutton addStopJson'>Add</button><br></div>";
+
+    $(".routePanel").append(box);
+  },
+
   initMap: function(){
     Routes.RoutesMap = L.map('mapid', {
       zoomControl: false,
@@ -374,10 +391,12 @@ var Admin = {
     $('.mapPanel').css('display','block');
     Routes.RoutesMap.invalidateSize();
   },
+
   hideMapPanel: function(){
     $('.mapPanel').css('display','none');
     Routes.RoutesMap.invalidateSize();
   },
+
   hideStopsPanel: function(){
     $('.stopPanel').css('display','none');
   },
