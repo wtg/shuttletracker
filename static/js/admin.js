@@ -5,7 +5,7 @@ function initializeAPIKeys(data){
   $.get( "/routes", Admin.populateRoutesPanel);
   Admin.initMap();
 
-};
+}
 
 var Routes = {
   RoutesMap: null,
