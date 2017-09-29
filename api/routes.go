@@ -55,7 +55,7 @@ func ComputeDistanceMapPoint(c1 model.MapPoint, c2 model.MapPoint) float64 {
 
 // RoutesCreateHandler adds a new route to the database
 func (App *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
-	// Create a new route object using reques`t fields
+	// Create a new route object using request fields
 	if App.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
 	}
@@ -82,9 +82,7 @@ func (App *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Here do the interpolation
 	// now we get the Segment for each segment ( this should be stored in database, just store it inside route for god sake)
-
-	//segments := ComputeSegments(coords, App.cfg.GoogleMapAPIKey, App.cfg.GoogleMapMinDistance)
-	fmt.Printf("Size of coordinates = %d", len(coords))
+  fmt.Printf("Size of coordinates = %d", len(coords))
 	// Type conversions
 	enabled, _ := strconv.ParseBool(routeData["enabled"])
 	width, _ := strconv.Atoi(routeData["width"])
