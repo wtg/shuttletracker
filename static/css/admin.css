@@ -4,103 +4,193 @@ html, body {
   width: 100%;
   margin: 0px;
   padding: 0px;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
 }
 
-.tab{
-  font-size: 1rem;
-  float:left;
-  border-width: 0px;
-  padding-left: 0px;
-  padding-right: 0px;
-  margin: 0px;
-  width: 33.33%;
-
-  border-right-color: gray;
-  height: 100%;
+.undoButton{
+  float: none;
+  position: absolute;
+  z-index: 10;
+  top: 10;
+  left: 50%;
+  width: auto;
+  background-color: white;
 }
 
-.tabcontent {
-  text-align: center;
-    display: none;
-    padding: 6px 12px;
-    border: 1px solid #ccc;
-    border: none;
-}
-
-.tabcontent{
-}
-
-.tab:hover{
-  cursor: pointer;
-}
-
-.active{
-  background-color: #d9534f;
-  color: #ffffff;
-}
-
-.page-container {
-  height: 100%;
+.navbar{
+  background-color: #eee;
   width: 100%;
-  margin: 0px;
+  height: 34px;
+  float: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.prompttext{
+  color: black;
+  text-align: center;
+  font-size: 25px;
+}
+
+.pbutton{
+  width: 100%;
+  height: 20%;
+  margin: auto;
+  text-align: center;
+}
+
+.title{
   padding: 0px;
+  margin-top: 6px;
+  margin-left: 5px;
+  font-size: 22px;
+  float:left;
 }
-
-.titleBar{
-  height:50px;
-  background-color:#ffffff;
-}
-
-.stop{
-  float: center;
-  width: 15rem;
-  height: 15rem;
-  display: inline-block;
-  background-color: #fff;
-  padding: 10px;
+.formtext{
+  float:left;
   margin: 10px;
-  border-style: solid;
-  border-radius: .25rem;
-  border-width: 1px;
-  border-color: rgba(0, 0, 0, 0.25);
-  -webkit-transition: all .2s ease-in-out;
-  -o-transition: all .2s ease-in-out;
-  transition: all .2s ease-in-out;
+  padding: 5px;
 }
 
-.stop:hover{
-  background-color: rgba(255, 255, 255, .1);
+.mapform{
+  height: 25%;
+  width: 100%;
+  float: right;
+  margin-top: 10px;
+}
+.textbox{
+  float: right;
+  border-style: none;;
+  border-width: 0px;
+  height: 15px;
+
+  background-color: rgba(255,255,255,.5);
+  box-shadow: inset 1px 1px 2px 0 #707070;
+}
+.center{
+  width: 300px;
+  height: auto;
+  margin: auto;
+  height: 300px;
+  left: 0;
+  right: 0;
+  float: none;
 }
 
-.rbtn{
-  float:fixed;
-  bottom: 1px;
-  right:1px;
-  margin: 1px;
-  border-style: solid;
-  border-radius: 50%;
-  width:30px;
-  height: 30px;
-  border-color: rgba(0, 0, 0, 0.25);
-  border-width: 1px;
-  background-color: transparent;
-  -webkit-transition: all .2s ease-in-out;
-  -o-transition: all .2s ease-in-out;
-  transition: all .2s ease-in-out;
+.prompt{
+  display: none;
+  z-index: 19;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
-.floating-logo{
+.prompt-box{
   float:none;
-  height: 40px;
-  bottom: 20px;
-  right: 5px;
-  width:auto;
-  position: fixed;
-  z-index: 1;
+  position: absolute;
+  z-index: 20;
+  margin: auto;
+  text-align: center;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  width: 50%;
+  height: 50%;
+  background-color: #ecf0f1;
+  border-radius: 20px;
+}
+.cbutton{
+  float:left;
+  bottom: 10px;
+  background-color: transparent;
+}
+.button{
+  margin: 2px;
+  padding: 5px;
+  font-size: 12px;
+  text-decoration: none;
+  background-color: none;
+  border-style: solid;
+  border-color: #e74c3c;
+  border-width: 1px;
+  transition: background-color 0.5s ease;
+  color: #e74c3c;
+}
+.button:hover{
+  background-color: #e74c3c;
+  color: #eee;
+  cursor: pointer;
+
 }
 
-.rbtn:hover{
-  background-color: #d9534f;
-  color: #ffffff;
-  cursor: pointer;
+.logout{
+  margin-right: 10px;
+  margin: 3px;
+  float: right;
+
+}
+.routePanel{
+  position: fixed;
+  height: auto;
+  float: none;
+  top: 34px;
+}
+
+.logout:hover{
+  background-color: #e74c3c;
+  color: #eee;
+
+}
+.docBody{
+  position: absolute;
+  float:none;
+  top:34px;
+  bottom: 0;
+  height: auto;
+  width: 100%;
+}
+.routePanel{
+  width: 50%;
+  height: 100%;
+  overflow: scroll;
+  float: left;
+}
+.mapPanel{
+  width: 50%;
+  float: right;
+  height: 100%;
+  overflow:scroll;
+  display: none;
+}
+.stopPanel{
+  width: 50%;
+  float: right;
+  height: 100%;
+  overflow: scroll;
+}
+.stopInfo{
+  height: 50%;
+}
+.route-description-box{
+  padding: 20px;
+  margin-top:10px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 20px;
+  width: 90%;
+  background-color: white;
+  height: auto;
+}
+.emphasis{
+  padding: 0px;
+  margin: 0px;
+  font-weight: bold;
+}
+
+.content{
+  padding: 0px;
+  margin: 0px;
 }
