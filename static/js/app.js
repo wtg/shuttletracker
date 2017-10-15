@@ -205,9 +205,9 @@ var App ={
                 zIndexOffset: 1000
             }),
       }
-      locationMarker.marker.bindPopup(locationMarker.name)
+      locationMarker.marker.bindPopup(locationMarker.name);
       locationMarker.marker.addTo(App.ShuttleMap);
-    };
+    }
   },
 
   stopClicked: function(e){
