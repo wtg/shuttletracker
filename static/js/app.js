@@ -198,16 +198,16 @@ var App ={
       }
     
     function showPosition (position) {
-      var marker = {
+      var locationMarker = {
             name: "Current Location",
             marker: L.marker([position.coords.latitude, position.coords.longitude], {
                 icon: userIcon,
                 zIndexOffset: 1000
             }),
       }
-      marker['marker'].bindPopup(marker.name)
-      marker['marker'].addTo(App.ShuttleMap);
-    }
+      locationMarker.marker.bindPopup(locationMarker.name)
+      locationMarker.marker.addTo(App.ShuttleMap);
+    };
   },
 
   stopClicked: function(e){
