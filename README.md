@@ -10,20 +10,22 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 2. Ensure your `$GOPATH` is set correctly, and is apart of your `$PATH`
 3. Run `go get github.com/wtg/shuttletracker`
 4. Install `govendor`  by running `go get -u github.com/kardianos/govendor`
-5. Run `govendor sync`
-6. Ensure you have NPM, Bower, and MongoDB installed.
-7. Run `bower install` inside the Shuttle Tracker directory (`$GOPATH/src/github.com/wtg/shuttletracker`) to install dependencies listed in bower.json
-8. Rename `conf.json.sample` to `conf.json`
-9. Edit conf.json with the following:
+5. Switch to the Shuttle Tracker directory (`$GOPATH/src/github.com/wtg/shuttletracker`)
+6. Run `govendor sync`
+7. Ensure you have NPM, Bower, and MongoDB installed.
+8. Run `bower install` inside the Shuttle Tracker directory (`$GOPATH/src/github.com/wtg/shuttletracker`) to install dependencies listed in bower.json
+9. Rename `conf.json.sample` to `conf.json`
+10. Edit conf.json with the following:
    * `DataFeed`: API with tracking information from iTrak... For RPI, this is a unique API URL that we can get data from. It's currently private, and we will only share it with authorized members for now.
    * `UpdateInterval`: Number of seconds between each request to the data feed
-   * `MongoUrl`: Url where MongoDB is located
+   * `MongoUrl`: URL where MongoDB is located
    * `MongoPort`: Port where MongoDB is bound (default is 27017)
-10. Start MongoDB, and ensure it is running, and listening on port 27017 (or whichever port you defined in `MongoPort` within `conf.json`)
-11. Add data to your database. Example DBs are provided in `example_database`, as well as a simple import/export script to setup the database for you.
+11. Start MongoDB, and ensure it is running, and listening on port 27017 (or whichever port you defined in `MongoPort` within `conf.json`)
+12. Add data to your database. Example DBs are provided in `example_database`, as well as a simple import/export script to setup the database for you.
     - If using an example database, you might need to check the name of the imported database, and change `MongoUrl` accordingly.
-12. Start the app by running `go run main.go` in the project root directory.
-13. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel
+13. Start the app by running `go run main.go` in the project root directory.
+14. You can optionally add yourself as an administrator by using the `make-admin` script in the example_database folder, passing it your RCS ID as the first argument.
+14. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel
 
 ## Configuration
 
