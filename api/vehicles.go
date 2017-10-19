@@ -62,7 +62,18 @@ func (api *API) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
+	//vehicle := model.Vehicle{}
+	vars := mux.Vars(r)
+	fmt.Printf("%v", vars);
 
+/*
+	err := App.db.Updates.Find(bson.M{"vehicleID": vars.VehicleID}).Sort("-created").Limit(1).One(&update)
+
+	err := api.db.Vehicles.Find(bson.M{"vehicleID": vars["id"]}, &vehicle)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return;
+	}*/
 }
 
 func (api *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
