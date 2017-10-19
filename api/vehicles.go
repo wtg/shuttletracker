@@ -75,14 +75,13 @@ func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
 	err = api.db.Vehicles.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(1).One(&vehicle)
 	vehicle.VehicleName = name
 	vehicle.Active = active
-	
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return;
 	}
 	vehicle.Updated = time.Now()
-	err = api.db.Vehicles.Remove(bson.M{"vehicleID": vehicle.VehicleID})
-	err = api.db.Vehicles.Insert(&vehicle)
+	err = api.db.Vehicles.Update(bson.M{"vehicleID": vehicle.VehicleID}, vehicle)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return;

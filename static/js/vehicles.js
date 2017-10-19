@@ -10,6 +10,7 @@ Vue.component('vehicle-create',{
     <b>name</b>:<input type="textbox" v-model="name" placeholder="Joey's Really cool vehicle"></input> <br>
     <b>active</b>:<input type="checkbox" v-model="active"></input><br>
     <div class = "button" @click="send" style="width: 50px;">add</div>
+
     </div>`,
     data (){
       return{
@@ -41,12 +42,13 @@ Vue.component('vehicle-card', {
   props: ['info'],
   template:
   `<div class="vehicle-card route-description-box">
-    <b>id</b>: <input type="textbox" v-model="info.vehicleID"></input><br>
+    <b>id</b>: {{info.vehicleID}}<br>
     <b>name</b>: <input type="textbox" v-model="info.vehicleName"></input> <br>
     <b>active</b>: <input type="checkbox" v-model="info.active"></input>{{info.active}}<br>
     <b>Created</b>: {{info.Created}} <br>
     <div @click="editVehicle" class = "button" style="width: auto; float:left;">change</div>
     <div @click="deleteVehicle" class = "button" style="width: auto; float:left;">delete</div>
+    <br>
   </div>`,
   data (){
     return{
@@ -111,7 +113,6 @@ Vue.component('vehicle-panel', {
           el.shuttleData = data;
           refresh = false;
         })
-
       }
     },100)
 
