@@ -36,7 +36,7 @@ Vue.component('vehicle-create',{
         this.name = ""
       }
     }
-})
+});
 
 Vue.component('vehicle-card', {
   props: ['info'],
@@ -53,7 +53,7 @@ Vue.component('vehicle-card', {
   data (){
     return{
       myData: {}
-    }
+    };
   },
   methods: {
     deleteVehicle: function(){
@@ -70,8 +70,7 @@ Vue.component('vehicle-card', {
     editVehicle: function(){
       var el = this;
 
-      var pkg = {"vehicleID":this.info.vehicleID, "vehicleName":this.info.vehicleName, "active":this.info.active}
-      console.log(pkg)
+      var pkg = {"vehicleID":this.info.vehicleID, "vehicleName":this.info.vehicleName, "active":this.info.active};
       $.ajax({
         url: "/vehicles/edit",
         type: "POST",
@@ -85,7 +84,7 @@ Vue.component('vehicle-card', {
     }
   }
 
-})
+});
 
 Vue.component('vehicle-panel', {
   template:
@@ -98,7 +97,7 @@ Vue.component('vehicle-panel', {
   data (){
     return{
       shuttleData: [{shuttleID:22}]
-    }
+    };
   },
   mounted(){
     var el = this;
@@ -106,22 +105,23 @@ Vue.component('vehicle-panel', {
       console.log(data);
       el.shuttleData = data;
       refresh = false;
-    })
+    });
     setInterval(function(){
       if(refresh){
         $.get("/vehicles",function(data){
           el.shuttleData = data;
           refresh = false;
-        })
+        });
       }
-    },100)
+    },100);
 
   }
 
-})
+});
 
 var ShuttleTracker = new Vue({
   el: '#document-vue',
   data: {
   }
-})
+
+});
