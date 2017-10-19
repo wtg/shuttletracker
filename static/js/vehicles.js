@@ -17,11 +17,11 @@ Vue.component('vehicle-create',{
         id: "",
         name: "",
         active: true
-      }
+      };
     },
     methods: {
       send: function(){
-        var pkg = {"vehicleID":this.id, "vehicleName":this.name, "active":this.active}
+        var pkg = {"vehicleID":this.id, "vehicleName":this.name, "active":this.active};
         pkg = JSON.stringify(pkg);
         $.ajax({
           url: "/vehicles/create",
@@ -32,8 +32,8 @@ Vue.component('vehicle-create',{
             refresh = true;
           }
         });
-        this.id = ""
-        this.name = ""
+        this.id = "";
+        this.name = "";
       }
     }
 });
