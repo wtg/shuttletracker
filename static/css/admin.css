@@ -133,9 +133,18 @@ html, body {
 
 }
 .routePanel{
+  display: none;
   position: fixed;
   height: auto;
   float: none;
+  top: 34px;
+}
+.vehicle-panel{
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  float: none;
+  background-color: transparent;;
   top: 34px;
 }
 

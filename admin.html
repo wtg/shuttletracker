@@ -11,6 +11,7 @@
     <script src="/static/dist/leaflet-routing/leaflet-routing-machine.js"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/vue"></script>
     <script src="/static/js/admin.js"></script>
 
   </head>
@@ -21,7 +22,9 @@
       <a class ="logout button" href="/admin/logout/">Logout</a>
       <div class ="button logout" onclick="Admin.showMapPanel();">Create Route</div>
     </div>
-    <div class="docBody">
+
+    <div class="docBody" id="document-vue">
+      <vehicle-panel></vehicle-panel>
       <div class = "routePanel">
       </div>
       <div class = "mapPanel">
@@ -48,5 +51,6 @@
 
       </div>
     </div>
+    <script src="/static/js/vehicles.js"></script>
   </body>
 </html>
