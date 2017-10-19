@@ -204,7 +204,7 @@ var App ={
                 icon: userIcon,
                 zIndexOffset: 1000
             }),
-      }
+      };
       locationMarker.marker.bindPopup(locationMarker.name);
       locationMarker.marker.addTo(App.ShuttleMap);
     }
@@ -248,6 +248,6 @@ var App ={
 $(document).ready(function(){
   App.initMap();
   App.grabStops();
-  App.showUserLocation();
   var a = setInterval(App.grabVehicles, 1000);
+  App.showUserLocation();
 });
