@@ -45,12 +45,12 @@ Vue.component('vehicle-card', {
     <b>name</b>: <input type="textbox" v-model="info.vehicleName"></input> <br>
     <b>active</b>: <input type="checkbox" v-model="info.active"></input>{{info.active}}<br>
     <b>Created</b>: {{info.Created}} <br>
-    <div @click="editVehicle" class = "button" style="width: 50px;">change</div>
-    <div @click="deleteVehicle" class = "button" style="width: 50px;">delete</div>
+    <div @click="editVehicle" class = "button" style="width: auto; float:left;">change</div>
+    <div @click="deleteVehicle" class = "button" style="width: auto; float:left;">delete</div>
   </div>`,
   data (){
     return{
-
+      myData: {}
     }
   },
   methods: {
@@ -67,15 +67,15 @@ Vue.component('vehicle-card', {
     },
     editVehicle: function(){
       var el = this;
-      var pkg = {"vehicleID":this.info.id, "vehicleName":this.info.name, "active":this.info.active}
+
+      var pkg = {"vehicleID":this.info.vehicleID, "vehicleName":this.info.vehicleName, "active":this.info.active}
       console.log(pkg)
       $.ajax({
-        url: '/vehicles/edit',
-        type: 'POST',
-        dataType:'json',
-        data: pkg,
-
-        success: function(result) {
+        url: "/vehicles/edit",
+        type: "POST",
+        data: JSON.stringify(pkg),
+        contentType: "application/json",
+        complete: function(data){
           refresh = true;
 
         }

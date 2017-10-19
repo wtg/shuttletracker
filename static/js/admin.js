@@ -429,7 +429,6 @@ var Admin = {
       data: JSON.stringify(toSend),
       contentType: "application/json",
       complete: function(data){
-
         $.get( "/stops", function(e){
           Admin.populateStopsForm(e,toSend.routeId);
           Admin.bindStopButtons();

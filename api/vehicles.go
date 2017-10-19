@@ -62,25 +62,38 @@ func (api *API) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
-	//vehicle := model.Vehicle{}
-	vars := mux.Vars(r)
-	fmt.Printf("%v", vars);
+	vehicle := model.Vehicle{}
+	// vars := mux.Vars(r)
+	err := json.NewDecoder(r.Body).Decode(&vehicle)
+	if(err != nil){
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 
-/*
-	err := App.db.Updates.Find(bson.M{"vehicleID": vars.VehicleID}).Sort("-created").Limit(1).One(&update)
+	}
+	name := vehicle.VehicleName
+	active := vehicle.Active
 
-	err := api.db.Vehicles.Find(bson.M{"vehicleID": vars["id"]}, &vehicle)
+	err = api.db.Vehicles.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(1).One(&vehicle)
+	vehicle.VehicleName = name
+	vehicle.Active = active
+	
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return;
-	}*/
+	}
+	vehicle.Updated = time.Now()
+	err = api.db.Vehicles.Remove(bson.M{"vehicleID": vehicle.VehicleID})
+	err = api.db.Vehicles.Insert(&vehicle)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return;
+	}
+
 }
 
 func (api *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
 	}
-
 	// Delete vehicle from Vehicles collection
 	vars := mux.Vars(r)
 	log.Debugf("deleting", vars["id"])
