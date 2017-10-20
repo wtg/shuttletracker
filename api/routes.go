@@ -114,7 +114,6 @@ func (App *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if App.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
 	}
-
 	vars := mux.Vars(r)
 	fmt.Printf(vars["id"])
 	log.Debugf("deleting", vars["id"])
@@ -123,6 +122,33 @@ func (App *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func (api *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
+	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
+		return
+	}
+	route := model.Route{}
+
+	err := json.NewDecoder(r.Body).Decode(&route)
+	en = route.enabled
+	if(err != nil){
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	err = api.db.Routes.Find(bson.M{"id": route.ID}).Sort("-created").Limit(1).One(&route)
+	route.enabled = en
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return;
+	}
+
+	err = api.db.Routes.Update(bson.M{"id": route.ID}, route)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return;
+	}
+
 }
 
 // StopsCreateHandler adds a new route stop to the database
