@@ -180,23 +180,23 @@ var App ={
     App.grabVehicleInfo();
 
   },
-  
+
   showUserLocation: function(){
     var userIcon = L.icon({
       iconUrl: 'static/images/stop.png',
-      
+
       iconSize:     [12, 12], // size of the icon
       iconAnchor:   [6, 6], // point of the icon which will correspond to marker's location
       shadowAnchor: [6, 6],  // the same for the shadow
       popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
     });
-    
+
      if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition);
-      } else { 
+      } else {
         console.log("Geolocation is either not supported by this browser, or geolocation permissions were not given by the user.");
       }
-    
+
     function showPosition (position) {
       var locationMarker = {
             name: "Current Location",
@@ -225,7 +225,11 @@ var App ={
     }
     $.get( "/updates/message", function(data){
       for(var i = 0 ; i < data.length; i ++){
-        ShuttleMessages[nameToId[data[i].substring(3,9)]] = data[i];
+
+        var start_pos = data[i].indexOf('>') + 1;
+        var end_pos = data[i].indexOf('<',start_pos);
+        ShuttleMessages[nameToId[data[i].substring(start_pos,end_pos)]] = data[i];
+        
       }
       App.updateMessages();
     });

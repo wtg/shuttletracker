@@ -90,6 +90,7 @@ var Routes = {
       $('html').click(function() {
         $(".deleteroute").html("Delete");
       });
+
       $(".deleteroute").click(function(e){
         e.stopPropagation()
         if ($(this).html() == "Confirm deletion"){
@@ -242,6 +243,11 @@ var Admin = {
   addStopMarker: null,
   StopsMap: null,
 
+  toggleDisplay: function(){
+    $(".vehicle-panel").toggle();
+    $(".routePanel").toggle();
+    $(".rtb").toggle();
+  },
   bindStopButtons: function(){
     $(".stopDelete").click(function(e){
       var routeId = $(this).parent().attr("id");
@@ -423,7 +429,6 @@ var Admin = {
       data: JSON.stringify(toSend),
       contentType: "application/json",
       complete: function(data){
-
         $.get( "/stops", function(e){
           Admin.populateStopsForm(e,toSend.routeId);
           Admin.bindStopButtons();

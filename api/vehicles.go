@@ -62,6 +62,32 @@ func (api *API) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
+	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
+		return
+	}
+	vehicle := model.Vehicle{}
+	err := json.NewDecoder(r.Body).Decode(&vehicle)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+
+	}
+	name := vehicle.VehicleName
+	active := vehicle.Active
+
+	err = api.db.Vehicles.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(1).One(&vehicle)
+	vehicle.VehicleName = name
+	vehicle.Active = active
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	vehicle.Updated = time.Now()
+	err = api.db.Vehicles.Update(bson.M{"vehicleID": vehicle.VehicleID}, vehicle)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 }
 
@@ -69,7 +95,6 @@ func (api *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
 	}
-
 	// Delete vehicle from Vehicles collection
 	vars := mux.Vars(r)
 	log.Debugf("deleting", vars["id"])
@@ -113,6 +138,8 @@ func (App *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 			if count > 0 && speed/count > 5 {
 				updates = append(updates, update)
 			}
+		}else{
+			
 		}
 	}
 
