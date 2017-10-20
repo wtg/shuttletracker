@@ -6,22 +6,22 @@ refresh = true;
 
 Vue.component('vehicle-create',{
   template:`<div class="vehicle-card route-description-box">
-    <b>id</b>: <input type="textbox" v-model="id" placeholder="1123454125"></input> (must be same as itrak vehicle id) <br>
-    <b>name</b>:<input type="textbox" v-model="name" placeholder="Joey's Really cool vehicle"></input> <br>
+    <b>id</b>: <input type="textbox" v-model="ID" placeholder="1123454125"></input> (must be same as itrak vehicle ID) <br>
+    <b>name</b>:<input type="textbox" v-model="name" placeholder="Vehicle Name"></input> <br>
     <b>active</b>:<input type="checkbox" v-model="active"></input><br>
     <div class = "button" @click="send" style="width: 50px;">add</div>
 
     </div>`,
     data (){
       return{
-        id: "",
+        ID: "",
         name: "",
         active: true
       };
     },
     methods: {
       send: function(){
-        var pkg = {"vehicleID":this.id, "vehicleName":this.name, "active":this.active};
+        var pkg = {"vehicleID":this.ID, "vehicleName":this.name, "active":this.active};
         pkg = JSON.stringify(pkg);
         $.ajax({
           url: "/vehicles/create",
