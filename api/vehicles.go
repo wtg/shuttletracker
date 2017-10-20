@@ -62,7 +62,7 @@ func (api *API) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
-	if App.cfg.Authenticate && !cas.IsAuthenticated(r) {
+	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
 	}
 	vehicle := model.Vehicle{}
