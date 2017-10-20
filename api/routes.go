@@ -133,11 +133,12 @@ func (api *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&route)
 	en := route.Enabled
 	if(err != nil){
+		fmt.Printf("lelel: %v",err);
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
 	err = api.db.Routes.Find(bson.M{"id": route.ID}).Sort("-created").Limit(1).One(&route)
 	route.Enabled = en
-
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return;
