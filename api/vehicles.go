@@ -138,6 +138,8 @@ func (App *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 			if count > 0 && speed/count > 5 {
 				updates = append(updates, update)
 			}
+		}else{
+			
 		}
 	}
 
