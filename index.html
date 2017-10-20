@@ -6,7 +6,7 @@
     <link rel="icon" href="/static/images/favicon.ico">
     <link rel="stylesheet" href="/static/css/application.css">
 
-    <link rel="stylesheet" href="static/dist/leaflet/leaflet.css"></link>
+    <link rel="stylesheet" href="static/dist/leaflet/leaflet.css">
     <script src="static/dist/leaflet/leaflet.js"></script>
     <script src="static/dist/leaflet/leaflet.rotatedMarker.js"></script>
 
@@ -27,6 +27,36 @@
 <body>
     <div class="titleBar">
         <div class="titleContent">
+            <div>
+                <ul class="dropdown">
+                    <li>
+                        <a href="#" class="dropdown-schedule">
+                            <img src="static/images/menu.svg">
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <p id="schedule-menu">Shuttle Schedules</p>
+                                <!-- http://www.rpi.edu/dept/parking/shuttle/ -->
+                            </li>
+                            <li>
+                                <p><a target="_blank" rel="noopener noreferrer" href="http://www.rpi.edu/dept/parking/shuttle/2017-2018CampusShuttleScheduleEastRoute.pdf">East: Monday-Thursday</a></p>
+                            </li>
+                            <li>
+                                <p><a target="_blank" rel="noopener noreferrer" href="http://www.rpi.edu/dept/parking/shuttle/2017-2018FridayOnlyEastShuttleSchedule.pdf">East: Friday</a></p>
+                            </li>
+                            <li>
+                                <p><a target="_blank" rel="noopener noreferrer" href="http://www.rpi.edu/dept/parking/shuttle/2017-2018CampusShuttleScheduleWestRoute.pdf">West: Monday-Thursday</a></p>
+                            </li>
+                            <li>
+                                <p><a target="_blank" rel="noopener noreferrer" href="http://www.rpi.edu/dept/parking/shuttle/2017-2018FridayOnlyWestShuttleSchedule.pdf">West: Friday</a></p>
+                            </li>
+                            <li>
+                                <p><a target="_blank" rel="noopener noreferrer" href="http://www.rpi.edu/dept/parking/shuttle/2017-2018Weekend-LateNightShuttleSchedule.pdf">Weekend Late Night</a></p>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
             <p class="title">RPI Shuttle Tracker</p>
             <a href="https://webtech.union.rpi.edu" class="logo">
                 <img src="static/images/wtg.svg">

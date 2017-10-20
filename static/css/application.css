@@ -43,6 +43,12 @@ html, body {
   width: 100%;
   background-color: rgba(255, 255, 255, 0.88);
   box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.8);
+  
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .titleContent {
@@ -60,7 +66,7 @@ html, body {
 }
 
 .logo img {
-    height: 100%;
+  height: 100%;
 }
 
 #navheader {
@@ -73,3 +79,100 @@ html, body {
   color: white;
   text-decoration: none;
 }
+
+
+/* CSS for dropdown menus */
+.dropdown {
+  list-style: none;
+  position: relative;
+  margin: 0px;
+  padding: 0px;
+  
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.dropdown-schedule {
+  color: #333;
+  display: block;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 32px;
+  padding: 0px 15px;
+  text-decoration: none;
+}
+
+a.dropdown-schedule {
+  height: 34px;
+  padding: 0px 3px;
+}
+
+a.dropdown-schedule > img{
+  box-sizing: border-box;
+  padding: 5px;
+}
+
+.dropdown li {
+  float: left;
+  position: relative;
+  padding: 0px;
+  margin: 0px;
+}
+
+.dropdown > li {
+  background: #ddd;
+}
+
+.dropdown li:hover {
+  background: rgba(226, 226, 226, 0.85);
+}
+
+.dropdown-menu {
+  background: rgba(238, 238, 238, 0.90);
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0px;
+  padding: 0px;
+}
+
+.dropdown-menu li {
+  float: none;
+  width: 225px;
+}
+
+.dropdown-menu p {
+  height: 24px;
+  margin: 3px 5px;
+}
+
+.dropdown-menu a {
+  box-sizing: border-box;
+  color: #333333;
+  padding: 3px 5px 3px 20px;
+  text-decoration: none;
+}
+
+.dropdown-menu a:visited {
+  color: #333333;
+  text-decoration: none;
+}
+
+.dropdown-menu ul {
+  top: 0px;
+  left: 100%;
+}
+
+.dropdown li:hover > ul {
+  display: block;
+  /* makes menu visible */
+}
+
+#schedule-menu {
+  font-size: large;
+  font-weight: 500;
+}
+/* ===================== */
