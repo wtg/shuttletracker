@@ -43,6 +43,12 @@ html, body {
   width: 100%;
   background-color: rgba(255, 255, 255, 0.88);
   box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.8);
+  
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .titleContent {
@@ -81,6 +87,12 @@ html, body {
   position: relative;
   margin: 0px;
   padding: 0px;
+  
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .dropdown-schedule {
