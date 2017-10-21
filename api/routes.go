@@ -82,7 +82,7 @@ func (App *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Here do the interpolation
 	// now we get the Segment for each segment ( this should be stored in database, just store it inside route for god sake)
-  fmt.Printf("Size of coordinates = %d", len(coords))
+	fmt.Printf("Size of coordinates = %d", len(coords))
 	// Type conversions
 	enabled, _ := strconv.ParseBool(routeData["enabled"])
 	width, _ := strconv.Atoi(routeData["width"])
@@ -114,7 +114,6 @@ func (App *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if App.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
 	}
-
 	vars := mux.Vars(r)
 	fmt.Printf(vars["id"])
 	log.Debugf("deleting", vars["id"])
@@ -123,6 +122,35 @@ func (App *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+//RoutesEditHandler Only handles editing enabled flag for now
+func (App *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
+	if App.cfg.Authenticate && !cas.IsAuthenticated(r) {
+		return
+	}
+	route := model.Route{}
+
+	err := json.NewDecoder(r.Body).Decode(&route)
+	en := route.Enabled
+	if err != nil {
+		fmt.Printf("lelel: %v", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	err = App.db.Routes.Find(bson.M{"id": route.ID}).Sort("-created").Limit(1).One(&route)
+	route.Enabled = en
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = App.db.Routes.Update(bson.M{"id": route.ID}, route)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 }
 
 // StopsCreateHandler adds a new route stop to the database

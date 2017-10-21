@@ -53,6 +53,9 @@ var App ={
   updateRoutes: function(data){
     var updatedRoute = [];
     for(var i = 0; i < data.length; i ++){
+      if(data[i].enabled === false){
+        continue;
+      }
       var points = [];
       for(var j = 0; j < data[i].coords.length; j ++){
         points.push(new L.LatLng(data[i].coords[j].lat,data[i].coords[j].lng));
@@ -280,6 +283,9 @@ var App ={
 $(document).ready(function(){
   App.initMap();
   App.grabStops();
+
   var a = setInterval(App.grabVehicles, 1000);
+
   App.showUserLocation();
+
 });
