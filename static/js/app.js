@@ -91,7 +91,7 @@ var App ={
 
     }
     for(i = 0; i < App.ShuttleRoutes.length; i ++){
-      App.ShuttleMap.removeLayer(App.ShuttleRoutes[i].line)
+      App.ShuttleMap.removeLayer(App.ShuttleRoutes[i].line);
     }
     App.ShuttleRoutes = updatedRoute;
     App.drawRoutes();
@@ -210,7 +210,7 @@ var App ={
           };
           ShuttlesArray[data[j].vehicleID].marker.addTo(App.ShuttleMap);
         }else{
-          console.log(data[j].color)
+          console.log(data[j].color);
           shuttleIcon.options.iconUrl = App.getShuttleIcon(data[j].color);
           ShuttlesArray[data[j].vehicleID].marker.setIcon(shuttleIcon);
           ShuttlesArray[data[j].vehicleID].marker.setLatLng([data[j].lat,data[j].lng]);
@@ -296,7 +296,7 @@ $(document).ready(function(){
   App.grabStops();
 
   var a = setInterval(App.grabVehicles, 1000);
-  var a = setInterval(App.grabRoutes, 1000);
+  var b = setInterval(App.grabRoutes, 1000);
 
 
   App.showUserLocation();

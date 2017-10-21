@@ -167,19 +167,20 @@ func kphToMPH(kmh float64) float64 {
 	return kmh * 0.621371192
 }
 
-
-func (api *Updater) LastUpdatesForVehicle(vehicle *model.Vehicle, count int) (updates []model.VehicleUpdate) {
-	err := api.db.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(count).All(&updates)
+//LastUpdatesForVehicle returns the last n updates for a vehicle
+func (u *Updater) LastUpdatesForVehicle(vehicle *model.Vehicle, count int) (updates []model.VehicleUpdate) {
+	err := u.db.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(count).All(&updates)
 	if err != nil {
 		log.Error(err)
 	}
 	return
 }
 
-func (api *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Route) {
+//GuessRouteForVehicle returns a guess at what route the vehicle is on
+func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Route) {
 	samples := 100
 	var routes []model.Route
-	err := api.db.Routes.Find(bson.M{}).All(&routes)
+	err := u.db.Routes.Find(bson.M{}).All(&routes)
 	if err != nil {
 		log.Error(err)
 	}
@@ -189,7 +190,7 @@ func (api *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Ro
 		routeDistances[route.ID] = 0
 	}
 
-	updates := api.LastUpdatesForVehicle(vehicle, samples)
+	updates := u.LastUpdatesForVehicle(vehicle, samples)
 
 	for _, update := range updates {
 		updateLatitude, err := strconv.ParseFloat(update.Lat, 64)
@@ -225,7 +226,7 @@ func (api *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Ro
 		}
 	}
 
-	err = api.db.Routes.Find(bson.M{"id": minRouteID}).One(&route)
+	err = u.db.Routes.Find(bson.M{"id": minRouteID}).One(&route)
 	if err != nil {
 		log.Error(err)
 	}
