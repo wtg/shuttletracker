@@ -8,6 +8,8 @@ var App ={
   Shuttles: {},
   MapBoundPoints: [],
   ShuttleUpdateCounter: 0,
+  first: true,
+
   ShuttleSVG: `<?xml version="1.0" encoding="UTF-8"?>
       <svg width="52px" height="52px" viewBox="0 0 52 52" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
           <title>shuttle</title>
@@ -101,19 +103,22 @@ var App ={
     for(i = 0; i < App.ShuttleRoutes.length; i ++){
       App.ShuttleMap.removeLayer(App.ShuttleRoutes[i].line)
     }
-    for(i = 0; i < App.ShuttleRoutes.length; i ++){
-      for(var j = 0; j < App.ShuttleRoutes[i].points.length; j ++){
-        App.MapBoundPoints.push(App.ShuttleRoutes[i].points[j]);
+    if(App.first){
+      for(i = 0; i < App.ShuttleRoutes.length; i ++){
+        for(var j = 0; j < App.ShuttleRoutes[i].points.length; j ++){
+          App.MapBoundPoints.push(App.ShuttleRoutes[i].points[j]);
+        }
       }
-    }
 
-    var polylineOptions = {
-      color: 'blue',
-      weight: 1,
-      opacity: 1
-    };
-    var polyline = new L.Polyline(App.MapBoundPoints, polylineOptions);
-    App.ShuttleMap.fitBounds(polyline.getBounds());
+      var polylineOptions = {
+        color: 'blue',
+        weight: 1,
+        opacity: 1
+      };
+      var polyline = new L.Polyline(App.MapBoundPoints, polylineOptions);
+      App.ShuttleMap.fitBounds(polyline.getBounds());
+      App.first = false;
+    }
     for(i = 0; i < App.ShuttleRoutes.length; i ++){
       App.ShuttleMap.addLayer(App.ShuttleRoutes[i].line);
     }
