@@ -124,8 +124,8 @@ func (App *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (api *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
-	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
+func (App *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
+	if App.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
 	}
 	route := model.Route{}
@@ -137,14 +137,14 @@ func (api *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	err = api.db.Routes.Find(bson.M{"id": route.ID}).Sort("-created").Limit(1).One(&route)
+	err = App.db.Routes.Find(bson.M{"id": route.ID}).Sort("-created").Limit(1).One(&route)
 	route.Enabled = en
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return;
 	}
 
-	err = api.db.Routes.Update(bson.M{"id": route.ID}, route)
+	err = App.db.Routes.Update(bson.M{"id": route.ID}, route)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return;

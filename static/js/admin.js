@@ -133,7 +133,7 @@ var Routes = {
     $("#" + routeInfo.id + "checkbox").prop("checked", routeInfo.enabled == "true");
 
     $("#" + routeInfo.id + "checkbox").click(function(el){
-      el.target.checked;
+      //el.target.checked;
       toSend = {id: el.target.getAttribute("routeid"), enabled: el.target.checked.toString()};
 
       $.ajax({
