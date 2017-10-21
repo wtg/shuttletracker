@@ -130,11 +130,11 @@ var Routes = {
 
     box += "<div style='float: right;width:auto;'><button class='button cbutton stops' routeId="+routeInfo.id +">Stops</button><button id='delete' routeId="+routeInfo.id +" class='button cbutton deleteroute'>Delete</button></div><br></div>";
     $(".routePanel").append(box);
-    $("#" + routeInfo.id + "checkbox").prop("checked", routeInfo.enabled == "true");
+    $("#" + routeInfo.id + "checkbox").prop("checked", routeInfo.enabled);
 
     $("#" + routeInfo.id + "checkbox").click(function(el){
       //el.target.checked;
-      toSend = {id: el.target.getAttribute("routeid"), enabled: el.target.checked.toString()};
+      toSend = {id: el.target.getAttribute("routeid"), enabled: el.target.checked};
 
       $.ajax({
         url: "/routes/edit",

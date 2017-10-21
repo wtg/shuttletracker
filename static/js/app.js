@@ -35,7 +35,7 @@ var App ={
   updateRoutes: function(data){
     var updatedRoute = [];
     for(var i = 0; i < data.length; i ++){
-      if(data[i].enabled == "false"){
+      if(data[i].enabled == false){
         continue;
       }
       var points = [];
@@ -232,7 +232,7 @@ var App ={
         var start_pos = data[i].indexOf('>') + 1;
         var end_pos = data[i].indexOf('<',start_pos);
         ShuttleMessages[nameToId[data[i].substring(start_pos,end_pos)]] = data[i];
-        
+
       }
       App.updateMessages();
     });

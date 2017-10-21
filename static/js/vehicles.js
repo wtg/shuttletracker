@@ -18,7 +18,6 @@ Vue.component('vehicle-create',{
       return{
 
         ID: "",
-
         name: "",
         active: true
       };
