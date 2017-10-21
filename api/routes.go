@@ -124,7 +124,7 @@ func (App *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//Only handles editing enabled flag for now
+//RoutesEditHandler Only handles editing enabled flag for now
 func (App *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
 	if App.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return

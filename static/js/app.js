@@ -35,7 +35,7 @@ var App ={
   updateRoutes: function(data){
     var updatedRoute = [];
     for(var i = 0; i < data.length; i ++){
-      if(data[i].enabled == false){
+      if(data[i].enabled === false){
         continue;
       }
       var points = [];
