@@ -22,10 +22,10 @@ var (
 
 // VehiclesHandler finds all the vehicles in the database.
 func (api *API) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
-
 	// Find all vehicles in database
 	var vehicles []model.Vehicle
 	err := api.db.Vehicles.Find(bson.M{}).All(&vehicles)
+
 	// Handle query errors
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -139,7 +139,7 @@ func (App *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 				updates = append(updates, update)
 			}
 		}else{
-			
+
 		}
 	}
 

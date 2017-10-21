@@ -7,11 +7,14 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"math"
 
 	"github.com/spf13/viper"
 	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/model"
+	"gopkg.in/mgo.v2/bson"
+
 )
 
 var (
@@ -119,6 +122,13 @@ func (u *Updater) update() {
 		}
 		speedMPH := kphToMPH(speedKMH)
 		speedMPHString := strconv.FormatFloat(speedMPH, 'f', 5, 64)
+		vehicle := model.Vehicle{}
+		route := model.Route{}
+
+		error := u.db.Vehicles.Find(bson.M{"vehicleID": strings.Replace(result["id"], "Vehicle ID:", "", -1)}).One(&vehicle)
+		if (error == nil){
+			 route = u.GuessRouteForVehicle(&vehicle)
+		}
 
 		update := model.VehicleUpdate{
 			VehicleID: strings.Replace(result["id"], "Vehicle ID:", "", -1),
@@ -130,7 +140,8 @@ func (u *Updater) update() {
 			Time:      strings.Replace(result["time"], "time:", "", -1),
 			Date:      strings.Replace(result["date"], "date:", "", -1),
 			Status:    strings.Replace(result["status"], "trig:", "", -1),
-			Created:   time.Now()}
+			Created:   time.Now(),
+			Route:		 route.ID}
 
 		// convert updated time to local time
 		loc, err := time.LoadLocation("America/New_York")
@@ -154,4 +165,69 @@ func (u *Updater) update() {
 // Convert kmh to mph
 func kphToMPH(kmh float64) float64 {
 	return kmh * 0.621371192
+}
+
+
+func (api *Updater) LastUpdatesForVehicle(vehicle *model.Vehicle, count int) (updates []model.VehicleUpdate) {
+	err := api.db.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(count).All(&updates)
+	if err != nil {
+		log.Error(err)
+	}
+	return
+}
+
+func (api *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Route) {
+	samples := 50
+	var routes []model.Route
+	err := api.db.Routes.Find(bson.M{}).All(&routes)
+	if err != nil {
+		log.Error(err)
+	}
+
+	routeDistances := make(map[string]float64)
+	for _, route := range routes {
+		routeDistances[route.ID] = 0
+	}
+
+	updates := api.LastUpdatesForVehicle(vehicle, samples)
+
+	for _, update := range updates {
+		updateLatitude, err := strconv.ParseFloat(update.Lat, 64)
+		if err != nil {
+			log.Error(err)
+		}
+		updateLongitude, err := strconv.ParseFloat(update.Lng, 64)
+		if err != nil {
+			log.Error(err)
+		}
+
+		for _, route := range routes {
+			nearestDistance := math.Inf(0)
+			for _, coord := range route.Coords {
+				distance := math.Sqrt(math.Pow(updateLatitude - coord.Lat, 2) +
+					math.Pow(updateLongitude - coord.Lng, 2))
+				if distance < nearestDistance {
+					nearestDistance = distance
+				}
+			}
+			routeDistances[route.ID] += nearestDistance
+		}
+	}
+
+	minDistance := math.Inf(0)
+	var minRouteID string
+	for id := range routeDistances {
+		distance := routeDistances[id] / float64(samples)
+		if distance < minDistance {
+			minDistance = distance
+			minRouteID = id
+		}
+	}
+
+	err = api.db.Routes.Find(bson.M{"id": minRouteID}).One(&route)
+	if err != nil {
+		log.Error(err)
+	}
+
+	return
 }
