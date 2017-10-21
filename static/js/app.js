@@ -210,7 +210,7 @@ var App ={
           };
           ShuttlesArray[data[j].vehicleID].marker.addTo(App.ShuttleMap);
         }else{
-          console.log(data[j].color);
+          //console.log(data[j].color);
           shuttleIcon.options.iconUrl = App.getShuttleIcon(data[j].color);
           ShuttlesArray[data[j].vehicleID].marker.setIcon(shuttleIcon);
           ShuttlesArray[data[j].vehicleID].marker.setLatLng([data[j].lat,data[j].lng]);
