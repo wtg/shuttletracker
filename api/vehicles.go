@@ -66,9 +66,10 @@ func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vehicle := model.Vehicle{}
-	// vars := mux.Vars(r)
+
 	err := json.NewDecoder(r.Body).Decode(&vehicle)
-	if(err != nil){
+	if err != nil {
+
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 
 	}
@@ -81,13 +82,17 @@ func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return;
+
+		return
+
 	}
 	vehicle.Updated = time.Now()
 	err = api.db.Vehicles.Update(bson.M{"vehicleID": vehicle.VehicleID}, vehicle)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return;
+
+		return
+
 	}
 
 }
@@ -139,6 +144,8 @@ func (App *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 			if count > 0 && speed/count > 5 {
 				updates = append(updates, update)
 			}
+		}else{
+			
 		}
 	}
 
