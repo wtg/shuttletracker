@@ -177,7 +177,7 @@ func (api *Updater) LastUpdatesForVehicle(vehicle *model.Vehicle, count int) (up
 }
 
 func (api *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Route) {
-	samples := 50
+	samples := 100
 	var routes []model.Route
 	err := api.db.Routes.Find(bson.M{}).All(&routes)
 	if err != nil {
