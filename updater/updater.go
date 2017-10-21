@@ -202,6 +202,7 @@ func (api *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Ro
 		}
 
 		for _, route := range routes {
+			if !route.Enabled {routeDistances[route.ID] += math.Inf(0)}
 			nearestDistance := math.Inf(0)
 			for _, coord := range route.Coords {
 				distance := math.Sqrt(math.Pow(updateLatitude - coord.Lat, 2) +
