@@ -103,7 +103,7 @@ type Route struct {
 	Description    string    `json:"description"    bson:"description"`
 	StartTime      string    `json:"startTime"      bson:"startTime"`
 	EndTime        string    `json:"endTime"        bson:"endTime"`
-	Enabled        bool      `json:"enabled,string" bson:"enabled"`
+	Enabled        bool      `json:"enabled,bool"	  bson:"enabled"`
 	Color          string    `json:"color"          bson:"color"`
 	Width          int       `json:"width,string"   bson:"width"`
 	Coords         []Coord   `json:"coords"         bson:"coords"`
