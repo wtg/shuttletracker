@@ -25,7 +25,7 @@ var App ={
 
   getShuttleIcon: function(color){
 
-    var url = encodeURI("data:image/svg+xml," + App.ShuttleSVG).replace("COLOR",color).replace('#','%23');
+    var url = "data:image/svg+xml;base64," + btoa(App.ShuttleSVG.replace("COLOR", color));
     return url;
   },
 
