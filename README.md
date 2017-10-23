@@ -45,6 +45,7 @@ Shuttle Tracker reads from a `conf.json` file. It can look like this:
     "ListenURL": "127.0.0.1:8080"
   },
   "Database": {
+    "MongoURL": "127.0.0.1:27017"
   },
   "Log": {
     "Level": "debug"
