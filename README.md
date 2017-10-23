@@ -41,16 +41,14 @@ Shuttle Tracker reads from a `conf.json` file. It can look like this:
     "GoogleMapAPIKey": "",
     "GoogleMapMinDistance": 1,
     "CasURL": "https://cas-auth.rpi.edu/cas/",
-    "Authenticate": true
+    "Authenticate": true,
+    "ListenURL": "127.0.0.1:8080"
   },
   "Database": {
-    "MongoURL": "localhost:27017"
+    "MongoURL": "127.0.0.1:27017"
   },
   "Log": {
     "Level": "debug"
-  },
-  "Server": {
-    "ListenURL": "localhost:8080"
   }
 }
 ```

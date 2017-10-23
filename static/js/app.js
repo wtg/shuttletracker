@@ -8,6 +8,26 @@ var App ={
   Shuttles: {},
   MapBoundPoints: [],
   ShuttleUpdateCounter: 0,
+  first: true,
+
+  ShuttleSVG: `<?xml version="1.0" encoding="UTF-8"?>
+      <svg width="52px" height="52px" viewBox="0 0 52 52" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+          <title>shuttle</title>
+          <defs></defs>
+          <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+              <g id="shuttle">
+                  <path d="M51.353,0.914 C51.648,1.218 51.72,1.675 51.532,2.054 L27.532,50.469 C27.362,50.814 27.011,51.025 26.636,51.025 C26.58,51.025 26.524,51.02 26.467,51.01 C26.032,50.936 25.697,50.583 25.643,50.145 L23.098,29.107 L0.835,25.376 C0.402,25.304 0.067,24.958 0.009,24.522 C-0.049,24.086 0.184,23.665 0.583,23.481 L50.218,0.701 C50.603,0.524 51.058,0.609 51.353,0.914 Z" id="Background" fill="COLOR"></path>
+                  <path d="M51.353,0.914 C51.058,0.609 50.603,0.524 50.218,0.701 L0.583,23.481 C0.184,23.665 -0.049,24.086 0.009,24.522 C0.067,24.958 0.402,25.304 0.835,25.376 L23.098,29.107 L25.643,50.145 C25.697,50.583 26.032,50.936 26.467,51.01 C26.524,51.02 26.58,51.025 26.636,51.025 C27.011,51.025 27.362,50.814 27.532,50.469 L51.532,2.054 C51.72,1.675 51.648,1.218 51.353,0.914 Z M27.226,46.582 L24.994,28.125 C24.94,27.685 24.603,27.332 24.166,27.259 L4.374,23.941 L48.485,3.697 L27.226,46.582 Z" id="Shape" fill="#000"></path>
+              </g>
+          </g>
+      </svg>
+      `,
+
+  getShuttleIcon: function(color){
+
+    var url = "data:image/svg+xml;base64," + btoa(App.ShuttleSVG.replace("COLOR", color));
+    return url;
+  },
 
   initMap: function(){
     App.ShuttleMap = L.map('mapid', {
@@ -70,7 +90,9 @@ var App ={
       updatedRoute.push(r);
 
     }
-
+    for(i = 0; i < App.ShuttleRoutes.length; i ++){
+      App.ShuttleMap.removeLayer(App.ShuttleRoutes[i].line);
+    }
     App.ShuttleRoutes = updatedRoute;
     App.drawRoutes();
 
@@ -81,19 +103,22 @@ var App ={
     for(i = 0; i < App.ShuttleRoutes.length; i ++){
       App.ShuttleMap.removeLayer(App.ShuttleRoutes[i].line)
     }
-    for(i = 0; i < App.ShuttleRoutes.length; i ++){
-      for(var j = 0; j < App.ShuttleRoutes[i].points.length; j ++){
-        App.MapBoundPoints.push(App.ShuttleRoutes[i].points[j]);
+    if(App.first){
+      for(i = 0; i < App.ShuttleRoutes.length; i ++){
+        for(var j = 0; j < App.ShuttleRoutes[i].points.length; j ++){
+          App.MapBoundPoints.push(App.ShuttleRoutes[i].points[j]);
+        }
       }
-    }
 
-    var polylineOptions = {
-      color: 'blue',
-      weight: 1,
-      opacity: 1
-    };
-    var polyline = new L.Polyline(App.MapBoundPoints, polylineOptions);
-    App.ShuttleMap.fitBounds(polyline.getBounds());
+      var polylineOptions = {
+        color: 'blue',
+        weight: 1,
+        opacity: 1
+      };
+      var polyline = new L.Polyline(App.MapBoundPoints, polylineOptions);
+      App.ShuttleMap.fitBounds(polyline.getBounds());
+      App.first = false;
+    }
     for(i = 0; i < App.ShuttleRoutes.length; i ++){
       App.ShuttleMap.addLayer(App.ShuttleRoutes[i].line);
     }
@@ -133,9 +158,9 @@ var App ={
   },
 
   updateVehicles: function(data){
-    //console.log(data.length + " shuttles updated");
+
     var shuttleIcon = L.icon({
-      iconUrl: 'static/images/shuttle.svg',
+      iconUrl: App.getShuttleIcon("#FFF"),
 
       iconSize:     [32, 32], // size of the icon
       iconAnchor:   [16, 16], // point of the icon which will correspond to marker's location
@@ -159,10 +184,21 @@ var App ={
 
       App.ShuttleUpdateCounter = 0;
     }
+
     if(data !== null){
       for(var j = 0; j < data.length; j ++){
-        //console.log(parseInt(data[i]['heading']));
+        for(var k = 0; k < App.ShuttleRoutes.length; k ++){
+          if (App.ShuttleRoutes[k].id === data[j].RouteID){
+            data[j].color = App.ShuttleRoutes[k].color;
+            break;
+          }
+        }
+        if(data[j].color === undefined){
+          data[j].color = "#FFF";
+        }
+
         if(ShuttlesArray[data[j].vehicleID] == null){
+          shuttleIcon.options.iconUrl = App.getShuttleIcon(data[j].color);
           ShuttlesArray[data[j].vehicleID] = {
             data: data[j],
             marker: L.marker([data[j].lat,data[j].lng], {
@@ -174,6 +210,9 @@ var App ={
           };
           ShuttlesArray[data[j].vehicleID].marker.addTo(App.ShuttleMap);
         }else{
+          //console.log(data[j].color);
+          shuttleIcon.options.iconUrl = App.getShuttleIcon(data[j].color);
+          ShuttlesArray[data[j].vehicleID].marker.setIcon(shuttleIcon);
           ShuttlesArray[data[j].vehicleID].marker.setLatLng([data[j].lat,data[j].lng]);
           ShuttlesArray[data[j].vehicleID].marker.setRotationAngle(parseInt(data[j].heading)-45);
         }
@@ -186,7 +225,7 @@ var App ={
 
   showUserLocation: function(){
     var userIcon = L.icon({
-      iconUrl: 'static/images/stop.png',
+      iconUrl: 'static/images/user.svg',
 
       iconSize:     [12, 12], // size of the icon
       iconAnchor:   [6, 6], // point of the icon which will correspond to marker's location
@@ -202,7 +241,7 @@ var App ={
 
     function showPosition (position) {
       var locationMarker = {
-            name: "Current Location",
+            name: "You are here",
             marker: L.marker([position.coords.latitude, position.coords.longitude], {
                 icon: userIcon,
                 zIndexOffset: 1000
@@ -257,6 +296,8 @@ $(document).ready(function(){
   App.grabStops();
 
   var a = setInterval(App.grabVehicles, 1000);
+  var b = setInterval(App.grabRoutes, 1000);
+
 
   App.showUserLocation();
 
