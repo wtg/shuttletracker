@@ -1,7 +1,6 @@
 package updater
 
 import (
-	"fmt"
 	"io/ioutil"
 	"math"
 	"net/http"
@@ -11,10 +10,12 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
+	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
+
 	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/model"
-	"gopkg.in/mgo.v2/bson"
 )
 
 var (
@@ -125,9 +126,20 @@ func (u *Updater) update() {
 		vehicle := model.Vehicle{}
 		route := model.Route{}
 
-		error := u.db.Vehicles.Find(bson.M{"vehicleID": strings.Replace(result["id"], "Vehicle ID:", "", -1)}).One(&vehicle)
-		if error == nil {
-			route = u.GuessRouteForVehicle(&vehicle)
+		vehicleID := strings.Replace(result["id"], "Vehicle ID:", "", -1)
+		err = u.db.Vehicles.Find(bson.M{"vehicleID": vehicleID}).One(&vehicle)
+		if err == mgo.ErrNotFound {
+			log.Warnf("Unknown vehicle ID \"%s\" returned by iTrak. Make sure all vehicles have been added.", vehicleID)
+		} else if err != nil {
+			log.WithError(err).Error("Unable to fetch vehicle.")
+			continue
+		} else {
+			// vehicle found and no error
+			route, err = u.GuessRouteForVehicle(&vehicle)
+			if err != nil {
+				log.WithError(err).Error("Unable to guess route for vehicle.")
+				continue
+			}
 		}
 
 		update := model.VehicleUpdate{
@@ -177,10 +189,10 @@ func (u *Updater) LastUpdatesForVehicle(vehicle *model.Vehicle, count int) (upda
 }
 
 //GuessRouteForVehicle returns a guess at what route the vehicle is on
-func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Route) {
+func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Route, err error) {
 	samples := 100
 	var routes []model.Route
-	err := u.db.Routes.Find(bson.M{}).All(&routes)
+	err = u.db.Routes.Find(bson.M{}).All(&routes)
 	if err != nil {
 		log.Error(err)
 	}
@@ -229,20 +241,21 @@ func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Rout
 		if distance < minDistance {
 			minDistance = distance
 			minRouteID = id
-			//If more than ~ 5% of the last 100 samples were far away from a route, say the shuttle is not on a route
-			//This is extemly aggressive and requires a shuttle to be on a route for ~5 minutes before it registers as on the route
+			// If more than ~5% of the last 100 samples were far away from a route, say the shuttle is not on a route
+			// This is extremely aggressive and requires a shuttle to be on a route for ~5 minutes before it registers as on the route
 			if minDistance > 5 {
 				minRouteID = ""
 			}
-			fmt.Printf("%v: %v\n", vehicle.VehicleName, minDistance)
+			log.Debugf("%v distance from nearest route: %v\n", vehicle.VehicleName, minDistance)
 
 		}
 	}
 
-	_ = u.db.Routes.Find(bson.M{"id": minRouteID}).One(&route)
-	/*if err != nil {
-		log.Error(err)
-	}*/
+	// not on a route
+	if minRouteID == "" {
+		return model.Route{}, nil
+	}
 
-	return
+	err = u.db.Routes.Find(bson.M{"id": minRouteID}).One(&route)
+	return route, err
 }
