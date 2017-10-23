@@ -7,14 +7,12 @@
     "GoogleMapAPIKey": "",
     "GoogleMapMinDistance": 1,
     "CasURL": "https://cas-auth.rpi.edu/cas/",
-    "Authenticate": true
+    "Authenticate": true,
+    "ListenURL": "127.0.0.1:8080"
   },
   "Database": {
   },
   "Log": {
     "Level": "debug"
-  },
-  "Server": {
-    "ListenURL": "localhost:8080"
   }
 }
