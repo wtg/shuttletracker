@@ -225,7 +225,7 @@ var App ={
 
   showUserLocation: function(){
     var userIcon = L.icon({
-      iconUrl: 'static/images/stop.png',
+      iconUrl: 'static/images/user.svg',
 
       iconSize:     [12, 12], // size of the icon
       iconAnchor:   [6, 6], // point of the icon which will correspond to marker's location
@@ -241,7 +241,7 @@ var App ={
 
     function showPosition (position) {
       var locationMarker = {
-            name: "Current Location",
+            name: "You are here",
             marker: L.marker([position.coords.latitude, position.coords.longitude], {
                 icon: userIcon,
                 zIndexOffset: 1000
