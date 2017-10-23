@@ -90,6 +90,7 @@ var Routes = {
       $('html').click(function() {
         $(".deleteroute").html("Delete");
       });
+
       $(".deleteroute").click(function(e){
         e.stopPropagation()
         if ($(this).html() == "Confirm deletion"){
@@ -125,9 +126,25 @@ var Routes = {
     box += "<span class = 'emphasis'>Color: </span><span class='content'>" + routeInfo.color + "</span><br>";
     box += "<span class = 'emphasis'>Time: </span><span class='content'>"+routeInfo.startTime + "-" + routeInfo.endTime + "</span><br>";
     box += "<span class = 'emphasis'>ID: </span><span class='content'>"+ routeInfo.id + "</span><br>";
+    box += "<span class = 'emphasis'>Enabled:</span> <input class='enbox' routeId='"+routeInfo.id+"' id='" + routeInfo.id + "checkbox' type='checkbox'>enabled</input><br>";
+
     box += "<div style='float: right;width:auto;'><button class='button cbutton stops' routeId="+routeInfo.id +">Stops</button><button id='delete' routeId="+routeInfo.id +" class='button cbutton deleteroute'>Delete</button></div><br></div>";
     $(".routePanel").append(box);
+    $("#" + routeInfo.id + "checkbox").prop("checked", routeInfo.enabled);
 
+    $("#" + routeInfo.id + "checkbox").click(function(el){
+      //el.target.checked;
+      toSend = {id: el.target.getAttribute("routeid"), enabled: el.target.checked};
+
+      $.ajax({
+        url: "/routes/edit",
+        type: "POST",
+        data: JSON.stringify(toSend),
+        contentType: "application/json",
+        complete: function(data){
+        }
+      });
+    });
   },
   buildSubmitBox: function(){
     var box = "";
@@ -242,6 +259,11 @@ var Admin = {
   addStopMarker: null,
   StopsMap: null,
 
+  toggleDisplay: function(){
+    $(".vehicle-panel").toggle();
+    $(".routePanel").toggle();
+    $(".rtb").toggle();
+  },
   bindStopButtons: function(){
     $(".stopDelete").click(function(e){
       var routeId = $(this).parent().attr("id");
@@ -303,7 +325,7 @@ var Admin = {
         prefix: ''
       }));
 
-      L.tileLayer('http://tile.stamen.com/toner-lite/{z}/{x}/{y}{r}.png', {
+      L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png', {
         attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
         minZoom: 13
       }).addTo(Admin.StopsMap);
@@ -423,7 +445,6 @@ var Admin = {
       data: JSON.stringify(toSend),
       contentType: "application/json",
       complete: function(data){
-
         $.get( "/stops", function(e){
           Admin.populateStopsForm(e,toSend.routeId);
           Admin.bindStopButtons();
