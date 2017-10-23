@@ -1,21 +1,20 @@
 package updater
 
 import (
+	"fmt"
 	"io/ioutil"
+	"math"
 	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-	"math"
-	"fmt"
 
 	"github.com/spf13/viper"
 	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/model"
 	"gopkg.in/mgo.v2/bson"
-
 )
 
 var (
@@ -127,8 +126,8 @@ func (u *Updater) update() {
 		route := model.Route{}
 
 		error := u.db.Vehicles.Find(bson.M{"vehicleID": strings.Replace(result["id"], "Vehicle ID:", "", -1)}).One(&vehicle)
-		if (error == nil){
-			 route = u.GuessRouteForVehicle(&vehicle)
+		if error == nil {
+			route = u.GuessRouteForVehicle(&vehicle)
 		}
 
 		update := model.VehicleUpdate{
@@ -142,7 +141,7 @@ func (u *Updater) update() {
 			Date:      strings.Replace(result["date"], "date:", "", -1),
 			Status:    strings.Replace(result["status"], "trig:", "", -1),
 			Created:   time.Now(),
-			Route:		 route.ID}
+			Route:     route.ID}
 
 		// convert updated time to local time
 		loc, err := time.LoadLocation("America/New_York")
@@ -204,18 +203,20 @@ func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Rout
 		}
 
 		for _, route := range routes {
-			if !route.Enabled {routeDistances[route.ID] += math.Inf(0)}
+			if !route.Enabled {
+				routeDistances[route.ID] += math.Inf(0)
+			}
 			nearestDistance := math.Inf(0)
 			for _, coord := range route.Coords {
-				distance := math.Sqrt(math.Pow(updateLatitude - coord.Lat, 2) +
-					math.Pow(updateLongitude - coord.Lng, 2))
+				distance := math.Sqrt(math.Pow(updateLatitude-coord.Lat, 2) +
+					math.Pow(updateLongitude-coord.Lng, 2))
 				if distance < nearestDistance {
 					nearestDistance = distance
 
 				}
 			}
-			if(nearestDistance > .003){
-				nearestDistance += 50;
+			if nearestDistance > .003 {
+				nearestDistance += 50
 			}
 			routeDistances[route.ID] += nearestDistance
 		}
@@ -230,10 +231,10 @@ func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Rout
 			minRouteID = id
 			//If more than ~ 5% of the last 100 samples were far away from a route, say the shuttle is not on a route
 			//This is extemly aggressive and requires a shuttle to be on a route for ~5 minutes before it registers as on the route
-			if(minDistance > 5){
-				minRouteID = "";
+			if minDistance > 5 {
+				minRouteID = ""
 			}
-			fmt.Printf("%v: %v\n", vehicle.VehicleName, minDistance);
+			fmt.Printf("%v: %v\n", vehicle.VehicleName, minDistance)
 
 		}
 	}
