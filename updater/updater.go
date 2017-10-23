@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 	"math"
+	"fmt"
 
 	"github.com/spf13/viper"
 	"github.com/wtg/shuttletracker/database"
@@ -210,7 +211,11 @@ func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Rout
 					math.Pow(updateLongitude - coord.Lng, 2))
 				if distance < nearestDistance {
 					nearestDistance = distance
+
 				}
+			}
+			if(nearestDistance > .003){
+				nearestDistance += 50;
 			}
 			routeDistances[route.ID] += nearestDistance
 		}
@@ -223,13 +228,20 @@ func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Rout
 		if distance < minDistance {
 			minDistance = distance
 			minRouteID = id
+			//If more than ~ 5% of the last 100 samples were far away from a route, say the shuttle is not on a route
+			//This is extemly aggressive and requires a shuttle to be on a route for ~5 minutes before it registers as on the route
+			if(minDistance > 5){
+				minRouteID = "";
+			}
+			fmt.Printf("%v: %v\n", vehicle.VehicleName, minDistance);
+
 		}
 	}
 
-	err = u.db.Routes.Find(bson.M{"id": minRouteID}).One(&route)
-	if err != nil {
+	_ = u.db.Routes.Find(bson.M{"id": minRouteID}).One(&route)
+	/*if err != nil {
 		log.Error(err)
-	}
+	}*/
 
 	return
 }
