@@ -71,10 +71,10 @@ func (u *Updater) Run() {
 	}
 }
 
-// Send a request to iTrak API, get updated shuttle info, and
-// finally store updated records in the database.
+// Send a request to iTrak API, get updated shuttle info,
+// store updated records in the database, and remove old records.
 func (u *Updater) update() {
-	// Make request to our tracking data feed
+	// Make request to iTrak data feed
 	client := http.Client{Timeout: time.Second * 5}
 	resp, err := client.Get(u.cfg.DataFeed)
 	if err != nil {
@@ -97,7 +97,7 @@ func (u *Updater) update() {
 
 	// TODO: Figure out if this handles == 1 vehicle correctly or always assumes > 1.
 	if len(vehiclesData) <= 1 {
-		log.Warnf("found no vehicles delineated by '%s'", delim)
+		log.Warnf("Found no vehicles delineated by '%s'.", delim)
 	}
 
 	wg := sync.WaitGroup{}
@@ -163,6 +163,14 @@ func (u *Updater) update() {
 	}
 	wg.Wait()
 	log.Debugf("Updated %d vehicles.", len(vehiclesData))
+
+	// Prune updates older than one month
+	info, err := u.db.Updates.RemoveAll(bson.M{"created": bson.M{"$lt": time.Now().AddDate(0, -1, 0)}})
+	if err != nil {
+		log.WithError(err).Error("Unable to remove old updates.")
+		return
+	}
+	log.Debugf("Removed %d old updates.", info.Removed)
 }
 
 // Convert kmh to mph
