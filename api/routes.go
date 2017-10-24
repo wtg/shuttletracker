@@ -36,10 +36,10 @@ func (App *API) GetAllStops() (stops []model.Stop) {
 }
 
 //GetStopById finds a stop in the database by it's id
-func (App *API) GetStopById(id string) (stop model.Stop){
+func (App *API) GetStopById(id string) (stop model.Stop) {
 
 	err := App.db.Stops.Find(bson.M{"id": id}).One(&stop)
-	if err != nil{
+	if err != nil {
 		log.Error(err)
 	}
 	return stop
@@ -47,10 +47,10 @@ func (App *API) GetStopById(id string) (stop model.Stop){
 }
 
 //GetStopByName finds a stop by its name
-func (App *API) GetStopById(name string) (stop model.Stop){
+func (App *API) GetStopById(name string) (stop model.Stop) {
 
 	err := App.db.Stops.Find(bson.M{"name": name}).One(&stop)
-	if err != nil{
+	if err != nil {
 		log.Error(err)
 	}
 	return stop
@@ -70,7 +70,6 @@ func (App *API) StopsHandler(w http.ResponseWriter, r *http.Request) {
 
 	WriteJSON(w, stops)
 }
-
 
 // RoutesCreateHandler adds a new route to the database
 func (App *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
