@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/spf13/viper"
@@ -102,76 +103,77 @@ func (u *Updater) update() {
 		log.Warnf("found no vehicles delineated by '%s'", delim)
 	}
 
-	updated := 0
+	wg := sync.WaitGroup{}
 	// for parsed data, update each vehicle
-	for i := 0; i < len(vehiclesData)-1; i++ {
-		match := dataRe.FindAllStringSubmatch(vehiclesData[i], -1)[0]
-		// Store named capturing group and matching expression as a key value pair
-		result := map[string]string{}
-		for i, item := range match {
-			result[dataNames[i]] = item
-		}
-
-		// Create new vehicle update & insert update into database
-		// add computation of segment that the shuttle resides on and the arrival time to next N stops [here]
-
-		// convert KPH to MPH
-		speedKMH, err := strconv.ParseFloat(strings.Replace(result["speed"], "spd:", "", -1), 64)
-		if err != nil {
-			log.Error(err)
-			continue
-		}
-		speedMPH := kphToMPH(speedKMH)
-		speedMPHString := strconv.FormatFloat(speedMPH, 'f', 5, 64)
-		vehicle := model.Vehicle{}
-		route := model.Route{}
-
-		vehicleID := strings.Replace(result["id"], "Vehicle ID:", "", -1)
-		err = u.db.Vehicles.Find(bson.M{"vehicleID": vehicleID}).One(&vehicle)
-		if err == mgo.ErrNotFound {
-			log.Warnf("Unknown vehicle ID \"%s\" returned by iTrak. Make sure all vehicles have been added.", vehicleID)
-		} else if err != nil {
-			log.WithError(err).Error("Unable to fetch vehicle.")
-			continue
-		} else {
-			// vehicle found and no error
-			route, err = u.GuessRouteForVehicle(&vehicle)
-			if err != nil {
-				log.WithError(err).Error("Unable to guess route for vehicle.")
-				continue
+	for _, vehicleData := range vehiclesData[:len(vehiclesData)-1] {
+		wg.Add(1)
+		go func(vehicleData string) {
+			defer wg.Done()
+			match := dataRe.FindAllStringSubmatch(vehicleData, -1)[0]
+			// Store named capturing group and matching expression as a key value pair
+			result := map[string]string{}
+			for i, item := range match {
+				result[dataNames[i]] = item
 			}
-		}
 
-		update := model.VehicleUpdate{
-			VehicleID: strings.Replace(result["id"], "Vehicle ID:", "", -1),
-			Lat:       strings.Replace(result["lat"], "lat:", "", -1),
-			Lng:       strings.Replace(result["lng"], "lon:", "", -1),
-			Heading:   strings.Replace(result["heading"], "dir:", "", -1),
-			Speed:     speedMPHString,
-			Lock:      strings.Replace(result["lock"], "lck:", "", -1),
-			Time:      strings.Replace(result["time"], "time:", "", -1),
-			Date:      strings.Replace(result["date"], "date:", "", -1),
-			Status:    strings.Replace(result["status"], "trig:", "", -1),
-			Created:   time.Now(),
-			Route:     route.ID}
+			// Create new vehicle update & insert update into database
+			// add computation of segment that the shuttle resides on and the arrival time to next N stops [here]
 
-		// convert updated time to local time
-		loc, err := time.LoadLocation("America/New_York")
-		if err != nil {
-			log.WithError(err).Error("Could not load time zone information.")
-			continue
-		}
-		lastUpdate = time.Now().In(loc)
+			// convert KPH to MPH
+			speedKMH, err := strconv.ParseFloat(strings.Replace(result["speed"], "spd:", "", -1), 64)
+			if err != nil {
+				log.Error(err)
+				return
+			}
+			speedMPH := kphToMPH(speedKMH)
+			speedMPHString := strconv.FormatFloat(speedMPH, 'f', 5, 64)
+			vehicle := model.Vehicle{}
+			route := model.Route{}
 
-		if err := u.db.Updates.Insert(&update); err != nil {
-			log.WithError(err).Errorf("Could not insert vehicle update.")
-		} else {
-			updated++
-		}
+			vehicleID := strings.Replace(result["id"], "Vehicle ID:", "", -1)
+			err = u.db.Vehicles.Find(bson.M{"vehicleID": vehicleID}).One(&vehicle)
+			if err == mgo.ErrNotFound {
+				log.Warnf("Unknown vehicle ID \"%s\" returned by iTrak. Make sure all vehicles have been added.", vehicleID)
+			} else if err != nil {
+				log.WithError(err).Error("Unable to fetch vehicle.")
+				return
+			} else {
+				// vehicle found and no error
+				route, err = u.GuessRouteForVehicle(&vehicle)
+				if err != nil {
+					log.WithError(err).Error("Unable to guess route for vehicle.")
+					return
+				}
+			}
 
-		// here if parsing error, updated will be incremented, wait, the whole thing will crash, isn't it?
+			update := model.VehicleUpdate{
+				VehicleID: strings.Replace(result["id"], "Vehicle ID:", "", -1),
+				Lat:       strings.Replace(result["lat"], "lat:", "", -1),
+				Lng:       strings.Replace(result["lng"], "lon:", "", -1),
+				Heading:   strings.Replace(result["heading"], "dir:", "", -1),
+				Speed:     speedMPHString,
+				Lock:      strings.Replace(result["lock"], "lck:", "", -1),
+				Time:      strings.Replace(result["time"], "time:", "", -1),
+				Date:      strings.Replace(result["date"], "date:", "", -1),
+				Status:    strings.Replace(result["status"], "trig:", "", -1),
+				Created:   time.Now(),
+				Route:     route.ID}
+
+			// convert updated time to local time
+			loc, err := time.LoadLocation("America/New_York")
+			if err != nil {
+				log.WithError(err).Error("Could not load time zone information.")
+				return
+			}
+			lastUpdate = time.Now().In(loc)
+
+			if err := u.db.Updates.Insert(&update); err != nil {
+				log.WithError(err).Errorf("Could not insert vehicle update.")
+			}
+		}(vehicleData)
 	}
-	log.Debugf("Successfully updated %d/%d vehicles.", updated, len(vehiclesData)-1)
+	wg.Wait()
+	log.Debugf("Updated %d vehicles.", len(vehiclesData))
 }
 
 // Convert kmh to mph
