@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"math"
 	"net/http"
 	"strconv"
 	"time"
@@ -18,40 +17,38 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// RoutesHandler finds all of the routes in the database
-func (App *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
-	// Find all routes in database
-	var routes []model.Route
+//GetAllRoutes returns all of the routes in the routes collection
+func (App *API) GetAllRoutes() (routes []model.Route) {
 	err := App.db.Routes.Find(bson.M{}).All(&routes)
-	// Handle query errors
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Error(err)
 	}
-	// Send each route to client as JSON
+	return
+}
+
+//GetAllStops returns all of the stops in the stops collection
+func (App *API) GetAllStops() (stops []model.Stop) {
+	err := App.db.Stops.Find(bson.M{}).All(&stops)
+	if err != nil {
+		log.Error(err)
+	}
+	return
+}
+
+// RoutesHandler sends a json of all of the routes in the database to the user
+func (App *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
+	routes := App.GetAllRoutes()
+
 	WriteJSON(w, routes)
 }
 
 // StopsHandler finds all of the route stops in the database
 func (App *API) StopsHandler(w http.ResponseWriter, r *http.Request) {
-	// Find all stops in databases
-	var stops []model.Stop
-	err := App.db.Stops.Find(bson.M{}).All(&stops)
-	// Handle query errors
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-	// Send each stop to client as JSON
+	stops := App.GetAllStops()
+
 	WriteJSON(w, stops)
 }
 
-// compute distance between two coordinates and return a value
-func ComputeDistance(c1 model.Coord, c2 model.Coord) float64 {
-	return float64(math.Sqrt(math.Pow(c1.Lat-c2.Lat, 2) + math.Pow(c1.Lng-c2.Lng, 2)))
-}
-
-func ComputeDistanceMapPoint(c1 model.MapPoint, c2 model.MapPoint) float64 {
-	return float64(math.Sqrt(math.Pow(c1.Latitude-c2.Latitude, 2) + math.Pow(c1.Longitude-c2.Longitude, 2)))
-}
 
 // RoutesCreateHandler adds a new route to the database
 func (App *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
