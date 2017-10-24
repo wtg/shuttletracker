@@ -190,8 +190,14 @@ func (App *API) UpdateMessageHandler(w http.ResponseWriter, r *http.Request) {
 
 			err = App.db.Routes.Find(bson.M{"id": update.Route}).Limit(1).One(&currentRoute)
 
+			routeString := ""
+
+			if currentRoute.Name != "" {
+				routeString += fmt.Sprintf("on the %s route", currentRoute.Name)
+			}
+
 			lastUpdate := update.Created.In(loc).Format("3:04:05pm")
-			message = fmt.Sprintf("<b>%s</b><br/>Traveling %s on the %s route at<br/> %s mph as of %s", vehicle.VehicleName, CardinalDirection(&update.Heading), currentRoute.Name, speed, lastUpdate)
+			message = fmt.Sprintf("<b>%s</b><br/>Traveling %s %s at<br/> %s mph as of %s", vehicle.VehicleName, CardinalDirection(&update.Heading), routeString, speed, lastUpdate)
 			messages = append(messages, message)
 		}
 	}
