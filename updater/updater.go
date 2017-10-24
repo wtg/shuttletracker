@@ -19,19 +19,11 @@ import (
 	"github.com/wtg/shuttletracker/model"
 )
 
-var (
-	// Match each API field with any number (+)
-	//   of the previous expressions (\d digit, \. escaped period, - negative number)
-	//   Specify named capturing groups to store each field from data feed
-	dataRe     = regexp.MustCompile(`(?P<id>Vehicle ID:([\d\.]+)) (?P<lat>lat:([\d\.-]+)) (?P<lng>lon:([\d\.-]+)) (?P<heading>dir:([\d\.-]+)) (?P<speed>spd:([\d\.-]+)) (?P<lock>lck:([\d\.-]+)) (?P<time>time:([\d]+)) (?P<date>date:([\d]+)) (?P<status>trig:([\d]+))`)
-	dataNames  = dataRe.SubexpNames()
-	lastUpdate time.Time
-)
-
 type Updater struct {
 	cfg            Config
 	updateInterval time.Duration
 	db             database.Database
+	dataRegexp     *regexp.Regexp
 }
 
 type Config struct {
@@ -47,6 +39,11 @@ func New(cfg Config, db database.Database) (*Updater, error) {
 		return nil, err
 	}
 	updater.updateInterval = interval
+
+	// Match each API field with any number (+)
+	//   of the previous expressions (\d digit, \. escaped period, - negative number)
+	//   Specify named capturing groups to store each field from data feed
+	updater.dataRegexp = regexp.MustCompile(`(?P<id>Vehicle ID:([\d\.]+)) (?P<lat>lat:([\d\.-]+)) (?P<lng>lon:([\d\.-]+)) (?P<heading>dir:([\d\.-]+)) (?P<speed>spd:([\d\.-]+)) (?P<lock>lck:([\d\.-]+)) (?P<time>time:([\d]+)) (?P<date>date:([\d]+)) (?P<status>trig:([\d]+))`)
 
 	return updater, nil
 }
@@ -96,7 +93,7 @@ func (u *Updater) update() {
 	delim := "eof"
 	// split the body of response by delimiter
 	vehiclesData := strings.Split(string(body), delim)
-	// BUG: if the request fails, it will give undefined result
+	vehiclesData = vehiclesData[:len(vehiclesData)-1] // last element is EOF
 
 	// TODO: Figure out if this handles == 1 vehicle correctly or always assumes > 1.
 	if len(vehiclesData) <= 1 {
@@ -105,19 +102,18 @@ func (u *Updater) update() {
 
 	wg := sync.WaitGroup{}
 	// for parsed data, update each vehicle
-	for _, vehicleData := range vehiclesData[:len(vehiclesData)-1] {
+	for _, vehicleData := range vehiclesData {
 		wg.Add(1)
 		go func(vehicleData string) {
 			defer wg.Done()
-			match := dataRe.FindAllStringSubmatch(vehicleData, -1)[0]
+			match := u.dataRegexp.FindAllStringSubmatch(vehicleData, -1)[0]
 			// Store named capturing group and matching expression as a key value pair
 			result := map[string]string{}
 			for i, item := range match {
-				result[dataNames[i]] = item
+				result[u.dataRegexp.SubexpNames()[i]] = item
 			}
 
 			// Create new vehicle update & insert update into database
-			// add computation of segment that the shuttle resides on and the arrival time to next N stops [here]
 
 			// convert KPH to MPH
 			speedKMH, err := strconv.ParseFloat(strings.Replace(result["speed"], "spd:", "", -1), 64)
@@ -127,6 +123,7 @@ func (u *Updater) update() {
 			}
 			speedMPH := kphToMPH(speedKMH)
 			speedMPHString := strconv.FormatFloat(speedMPH, 'f', 5, 64)
+
 			vehicle := model.Vehicle{}
 			route := model.Route{}
 
@@ -159,14 +156,6 @@ func (u *Updater) update() {
 				Created:   time.Now(),
 				Route:     route.ID}
 
-			// convert updated time to local time
-			loc, err := time.LoadLocation("America/New_York")
-			if err != nil {
-				log.WithError(err).Error("Could not load time zone information.")
-				return
-			}
-			lastUpdate = time.Now().In(loc)
-
 			if err := u.db.Updates.Insert(&update); err != nil {
 				log.WithError(err).Errorf("Could not insert vehicle update.")
 			}
@@ -190,7 +179,8 @@ func (u *Updater) LastUpdatesForVehicle(vehicle *model.Vehicle, count int) (upda
 	return
 }
 
-//GuessRouteForVehicle returns a guess at what route the vehicle is on
+// GuessRouteForVehicle returns a guess at what route the vehicle is on.
+// It may return an empty route if it does not believe a vehicle is on any route.
 func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Route, err error) {
 	samples := 100
 	var routes []model.Route
