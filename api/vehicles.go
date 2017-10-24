@@ -144,7 +144,7 @@ func (App *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 			if count > 0 && speed/count > 5 {
 				updates = append(updates, update)
 			}
-		}else{
+		} else {
 
 		}
 	}
@@ -160,6 +160,7 @@ func (App *API) UpdateMessageHandler(w http.ResponseWriter, r *http.Request) {
 	var message string
 	var vehicles []model.Vehicle
 	var update model.VehicleUpdate
+	var currentRoute model.Route
 
 	// Query all Vehicles
 	err := App.db.Vehicles.Find(bson.M{}).All(&vehicles)
@@ -184,9 +185,13 @@ func (App *API) UpdateMessageHandler(w http.ResponseWriter, r *http.Request) {
 				log.WithError(err).Error("Could not load time zone information.")
 				continue
 			}
-			lastUpdate := update.Created.In(loc).Format("3:04:05pm")
 
-			message = fmt.Sprintf("<b>%s</b><br/>Traveling %s at<br/> %s mph as of %s", vehicle.VehicleName, CardinalDirection(&update.Heading), speed, lastUpdate)
+			// Query Routes that matches the update's RouteID
+
+			err = App.db.Routes.Find(bson.M{"id": update.Route}).Limit(1).One(&currentRoute)
+
+			lastUpdate := update.Created.In(loc).Format("3:04:05pm")
+			message = fmt.Sprintf("<b>%s</b><br/>Traveling %s on the %s route at<br/> %s mph as of %s", vehicle.VehicleName, CardinalDirection(&update.Heading), currentRoute.Name, speed, lastUpdate)
 			messages = append(messages, message)
 		}
 	}
