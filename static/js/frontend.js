@@ -33,7 +33,7 @@ Vue.component('shuttle-map',{
               </g>
           </svg>
           `,
-    }
+    };
   },
   methods:{
     getShuttleIcon: function(color){
@@ -116,7 +116,7 @@ Vue.component('shuttle-map',{
 
     drawRoutes: function(){
       for(i = 0; i < this.ShuttleRoutes.length; i ++){
-        this.ShuttleMap.removeLayer(this.ShuttleRoutes[i].line)
+        this.ShuttleMap.removeLayer(this.ShuttleRoutes[i].line);
       }
       if(this.first){
         for(i = 0; i < this.ShuttleRoutes.length; i ++){
@@ -162,8 +162,8 @@ Vue.component('shuttle-map',{
           latlng: [data[i].lat, data[i].lng],
           marker: L.marker([data[i].lat,data[i].lng], {icon: stopIcon})
         };
-        stop['marker'].bindPopup(stop.name);
-        stop['marker'].addTo(this.ShuttleMap).on('click', this.stopClicked);
+        stop.marker.bindPopup(stop.name);
+        stop.marker.addTo(this.ShuttleMap).on('click', this.stopClicked);
       }
 
     },
@@ -212,7 +212,7 @@ Vue.component('shuttle-map',{
             data[j].color = "#FFF";
           }
 
-          if(this.ShuttlesArray[data[j].vehicleID] == null){
+          if(this.ShuttlesArray[data[j].vehicleID] === null){
             shuttleIcon.options.iconUrl = this.getShuttleIcon(data[j].color);
             this.ShuttlesArray[data[j].vehicleID] = {
               data: data[j],
@@ -337,7 +337,7 @@ Vue.component('dropdown-menu',{
           {name: "Weekend Late Night", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018Weekend-LateNightShuttleSchedule.pdf"}
         ],
 
-    }
+    };
   }
 });
 
@@ -355,7 +355,7 @@ Vue.component('title-bar', {
     data (){
       return {
         title: "RPI Shuttle Tracker"
-      }
+      };
     }
 
 });
