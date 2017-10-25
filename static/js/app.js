@@ -305,9 +305,9 @@ var App ={
         });
         var time = parseInt(data[i].time);
         var t2 =  parseInt(lastTime);
-        var t = t2 - time
+        var t = time-t2
         var locationMarker = {
-            name: t.toString(),
+            name: i.toString() + ": " + t.toString(),
               marker: L.marker([data[i].lat, data[i].lng], {
                   icon: userIcon,
                   zIndexOffset: 1000

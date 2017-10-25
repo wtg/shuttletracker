@@ -121,7 +121,7 @@ type HeatmapPoint struct{
 
 func(App *API) GetPoints(w http.ResponseWriter, r *http.Request){
 	var vehicleUpdates []model.VehicleUpdate
-	App.db.Updates.Find(bson.M{"vehicleID": "1831394663"}).Sort("-created").Limit(3000).All(&vehicleUpdates) // We're testing with one vehicle now past 200 updates
+	App.db.Updates.Find(bson.M{"vehicleID": "1831394663"}).Limit(3000).All(&vehicleUpdates) // We're testing with one vehicle now past 200 updates
 	var heatmapPoints []HeatmapPoint
 
 	for _,update := range vehicleUpdates{
