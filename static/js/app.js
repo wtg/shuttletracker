@@ -42,8 +42,7 @@ var App ={
     }));
     L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png', {
       attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
-      maxZoom: 17,
-      minZoom: 14
+
     }).addTo(App.ShuttleMap);
     App.grabRoutes();
   },
@@ -287,6 +286,50 @@ var App ={
       }
     }
 
+  },
+  getPts: function(){
+    $.get("/pts",function(data){
+      var lastTime = data[0].time
+      for (var i  = 1; i < data.length; i ++){
+        if(data[i].time == lastTime){
+          lastTime = data[i].time;
+          continue;
+        }
+        var userIcon = L.icon({
+          iconUrl: 'static/images/pt.svg',
+
+          iconSize:     [6, 6], // size of the icon
+          iconAnchor:   [3, 3], // point of the icon which will correspond to marker's location
+          shadowAnchor: [3, 3],  // the same for the shadow
+          popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
+        });
+        var time = parseInt(data[i].time);
+        var t2 =  parseInt(lastTime);
+        var t = t2 - time
+        var locationMarker = {
+            name: t.toString(),
+              marker: L.marker([data[i].lat, data[i].lng], {
+                  icon: userIcon,
+                  zIndexOffset: 1000
+              }),
+        };
+        var pointA = new L.LatLng(data[i].lat, data[i].lng);
+        var pointB = new L.LatLng(data[i-1].lat, data[i-1].lng);
+        var pointList = [pointA, pointB];
+        var lineToLast = new L.Polyline(pointList, {
+          color: 'hsl(' + (i/11) + ',100%,50%)',
+          weight: 3,
+          opacity: 1,
+          smoothFactor: 1
+        });
+
+        lineToLast.addTo(App.ShuttleMap)
+        locationMarker.marker.bindPopup(locationMarker.name);
+        locationMarker.marker.addTo(App.ShuttleMap);
+        lastTime = data[i].time
+      }
+
+    })
   }
 
 };

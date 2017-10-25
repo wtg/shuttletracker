@@ -255,7 +255,7 @@ func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Rout
 			if minDistance > 5 {
 				minRouteID = ""
 			}
-			log.Debugf("%v distance from nearest route: %v\n", vehicle.VehicleName, minDistance)
+			//log.Debugf("%v distance from nearest route: %v\n", vehicle.VehicleName, minDistance)
 
 		}
 	}

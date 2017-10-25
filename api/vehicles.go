@@ -111,6 +111,34 @@ func (api *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type HeatmapPoint struct{
+	VehicleID string    `json:"vehicleID"   bson:"vehicleID,omitempty"`
+	Lat       string    `json:"lat"         bson:"lat"`
+	Lng       string    `json:"lng"         bson:"lng"`
+	Time      string    `json:"time"        bson:"time"`
+
+}
+
+func(App *API) GetPoints(w http.ResponseWriter, r *http.Request){
+	var vehicleUpdates []model.VehicleUpdate
+	App.db.Updates.Find(bson.M{"vehicleID": "1831394663"}).Sort("-created").Limit(3000).All(&vehicleUpdates) // We're testing with one vehicle now past 200 updates
+	var heatmapPoints []HeatmapPoint
+
+	for _,update := range vehicleUpdates{
+		var pt HeatmapPoint
+		pt.VehicleID = update.VehicleID
+		pt.Lat = update.Lat
+		pt.Lng = update.Lng
+		pt.Time = update.Time
+
+		heatmapPoints = append(heatmapPoints, pt);
+	}
+
+
+  WriteJSON(w, heatmapPoints)
+
+}
+
 // Here's my view, keep every name the same meaning, otherwise, choose another.
 // UpdatesHandler get the most recent update for each vehicle in the vehicles collection.
 func (App *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
