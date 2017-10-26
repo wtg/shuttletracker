@@ -226,7 +226,6 @@ Vue.component('shuttle-map',{
             this.ShuttlesArray[data[j].vehicleID].marker.addTo(this.ShuttleMap);
           }else{
             //console.log(data[j].color);
-            console.log(this.ShuttlesArray[data[j].vehicleID]);
             shuttleIcon.options.iconUrl = this.getShuttleIcon(data[j].color);
             this.ShuttlesArray[data[j].vehicleID].marker.setIcon(shuttleIcon);
             this.ShuttlesArray[data[j].vehicleID].marker.setLatLng([data[j].lat,data[j].lng]);
