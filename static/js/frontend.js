@@ -212,7 +212,7 @@ Vue.component('shuttle-map',{
             data[j].color = "#FFF";
           }
 
-          if(this.ShuttlesArray[data[j].vehicleID] === null){
+          if(this.ShuttlesArray[data[j].vehicleID] === undefined){
             shuttleIcon.options.iconUrl = this.getShuttleIcon(data[j].color);
             this.ShuttlesArray[data[j].vehicleID] = {
               data: data[j],
