@@ -138,15 +138,16 @@ func (u *Updater) update() {
 			}
 
 			// determine if this is a new update from itrak by comparing timestamps
-			itrakTimestamp := strings.Replace(result["time"], "time:", "", -1)
 			lastUpdate := model.VehicleUpdate{}
 			err = u.db.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").One(&lastUpdate)
 			if err != nil && err != mgo.ErrNotFound {
 				log.WithError(err).Error("Unable to retrieve last update.")
 				return
 			}
+			itrakTime := strings.Replace(result["time"], "time:", "", -1)
+			itrakDate := strings.Replace(result["date"], "date:", "", -1)
 			if err == nil {
-				if lastUpdate.Time == itrakTimestamp {
+				if lastUpdate.Time == itrakTime && lastUpdate.Date == itrakDate {
 					// Timestamp is not new; don't store update.
 					return
 				}
@@ -167,8 +168,8 @@ func (u *Updater) update() {
 				Heading:   strings.Replace(result["heading"], "dir:", "", -1),
 				Speed:     speedMPHString,
 				Lock:      strings.Replace(result["lock"], "lck:", "", -1),
-				Time:      itrakTimestamp,
-				Date:      strings.Replace(result["date"], "date:", "", -1),
+				Time:      itrakTime,
+				Date:      itrakDate,
 				Status:    strings.Replace(result["status"], "trig:", "", -1),
 				Created:   time.Now(),
 				Route:     route.ID,
