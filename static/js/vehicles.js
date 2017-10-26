@@ -1,5 +1,5 @@
 $(document).ready(function(){
-  console.log("asdf");
+
 });
 
 refresh = true;
@@ -10,7 +10,7 @@ Vue.component('vehicle-create',{
     <b>id</b>: <input type="textbox" v-model="ID" placeholder="1123454125"></input> (must be same as itrak vehicle ID) <br>
     <b>name</b>:<input type="textbox" v-model="name" placeholder="Vehicle Name"></input> <br>
 
-    <b>active</b>:<input type="checkbox" v-model="active"></input><br>
+    <b>enabled</b>:<input type="checkbox" v-model="enabled"></input><br>
     <div class = "button" @click="send" style="width: 50px;">add</div>
 
     </div>`,
@@ -25,7 +25,7 @@ Vue.component('vehicle-create',{
     methods: {
       send: function(){
 
-        var pkg = {"vehicleID":this.ID, "vehicleName":this.name, "active":this.active};
+        var pkg = {"vehicleID":this.ID, "vehicleName":this.name, "enabled":this.enabled};
 
         pkg = JSON.stringify(pkg);
         $.ajax({
@@ -49,7 +49,7 @@ Vue.component('vehicle-card', {
   `<div class="vehicle-card route-description-box">
     <b>id</b>: {{info.vehicleID}}<br>
     <b>name</b>: <input type="textbox" v-model="info.vehicleName"></input> <br>
-    <b>active</b>: <input type="checkbox" v-model="info.active"></input>{{info.active}}<br>
+    <b>enabled</b>: <input type="checkbox" v-model="info.enabled"></input>{{info.enabled}}<br>
     <b>Created</b>: {{info.Created}} <br>
     <div @click="editVehicle" class = "button" style="width: auto; float:left;">change</div>
     <div @click="deleteVehicle" class = "button" style="width: auto; float:left;">delete</div>
@@ -75,7 +75,7 @@ Vue.component('vehicle-card', {
     editVehicle: function(){
       var el = this;
 
-      var pkg = {"vehicleID":this.info.vehicleID, "vehicleName":this.info.vehicleName, "active":this.info.active};
+      var pkg = {"vehicleID":this.info.vehicleID, "vehicleName":this.info.vehicleName, "enabled":this.info.enabled};
       $.ajax({
         url: "/vehicles/edit",
         type: "POST",

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"gopkg.in/cas.v1"
+	mgo "gopkg.in/mgo.v2"
 
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/model"
@@ -74,17 +75,15 @@ func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
 
 	}
 	name := vehicle.VehicleName
-	active := vehicle.Active
+	enabled := vehicle.Enabled
 
 	err = api.db.Vehicles.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(1).One(&vehicle)
 	vehicle.VehicleName = name
-	vehicle.Active = active
+	vehicle.Enabled = enabled
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-
 		return
-
 	}
 	vehicle.Updated = time.Now()
 	err = api.db.Vehicles.Update(bson.M{"vehicleID": vehicle.VehicleID}, vehicle)
@@ -113,40 +112,34 @@ func (api *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 // Here's my view, keep every name the same meaning, otherwise, choose another.
 // UpdatesHandler get the most recent update for each vehicle in the vehicles collection.
-func (App *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
-	// Store updates for each vehicle
+func (api *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 	var vehicles []model.Vehicle
-	var updates []model.VehicleUpdate
-	var update model.VehicleUpdate
-	var vehicleUpdates []model.VehicleUpdate
-	// Query all Vehicles
-	err := App.db.Vehicles.Find(bson.M{}).All(&vehicles)
-	// Handle errors
+
+	// Query active and enabled vehicles
+	err := api.db.Vehicles.Find(bson.M{"enabled": true}).All(&vehicles)
 	if err != nil {
+		log.WithError(err).Error("Unable to get enabled vehicles.")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	// Find recent updates for each vehicle
+
+	// allocate slice of capacity len(vehicles) and size zero
+	updates := make([]model.VehicleUpdate, 0, len(vehicles))
+
+	// Find most recent update in the last five minutes for each vehicle
 	for _, vehicle := range vehicles {
 		// here, huge waste of computational power, you record every shit inside the Updates table and using sort, I don't know what the hell is going on
-		err := App.db.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(20).All(&vehicleUpdates)
-		update = vehicleUpdates[0]
-
-		if err == nil {
-			count := 0.0
-			speed := 0.0
-			for i, elem := range vehicleUpdates {
-				if time.Since(elem.Created).Minutes() < 5 {
-					val, _ := strconv.ParseFloat(vehicleUpdates[i].Speed, 64)
-					speed += val
-					count += 1
-				}
-			}
-			if count > 0 && speed/count > 5 {
-				updates = append(updates, update)
-			}
-		}else{
-
+		update := model.VehicleUpdate{}
+		since := time.Now().Add(time.Minute * -5)
+		err = api.db.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID, "created": bson.M{"$gt": since}}).Sort("-created").One(&update)
+		if err == mgo.ErrNotFound {
+			continue
+		} else if err != nil {
+			log.WithError(err).Error("Unable to get vehicle update.")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
+		updates = append(updates, update)
 	}
 
 	// Convert updates to JSON
