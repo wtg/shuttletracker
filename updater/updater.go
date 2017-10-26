@@ -131,16 +131,33 @@ func (u *Updater) update() {
 			err = u.db.Vehicles.Find(bson.M{"vehicleID": vehicleID}).One(&vehicle)
 			if err == mgo.ErrNotFound {
 				log.Warnf("Unknown vehicle ID \"%s\" returned by iTrak. Make sure all vehicles have been added.", vehicleID)
+				return
 			} else if err != nil {
 				log.WithError(err).Error("Unable to fetch vehicle.")
 				return
-			} else {
-				// vehicle found and no error
-				route, err = u.GuessRouteForVehicle(&vehicle)
-				if err != nil {
-					log.WithError(err).Error("Unable to guess route for vehicle.")
+			}
+
+			// determine if this is a new update from itrak by comparing timestamps
+			itrakTimestamp := strings.Replace(result["time"], "time:", "", -1)
+			lastUpdate := model.VehicleUpdate{}
+			err = u.db.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").One(&lastUpdate)
+			if err != nil && err != mgo.ErrNotFound {
+				log.WithError(err).Error("Unable to retrieve last update.")
+				return
+			}
+			if err == nil {
+				if lastUpdate.Time == itrakTimestamp {
+					// Timestamp is not new; don't store update.
 					return
 				}
+			}
+			log.Debugf("Updating %s.", vehicle.VehicleName)
+
+			// vehicle found and no error
+			route, err = u.GuessRouteForVehicle(&vehicle)
+			if err != nil {
+				log.WithError(err).Error("Unable to guess route for vehicle.")
+				return
 			}
 
 			update := model.VehicleUpdate{
@@ -150,11 +167,12 @@ func (u *Updater) update() {
 				Heading:   strings.Replace(result["heading"], "dir:", "", -1),
 				Speed:     speedMPHString,
 				Lock:      strings.Replace(result["lock"], "lck:", "", -1),
-				Time:      strings.Replace(result["time"], "time:", "", -1),
+				Time:      itrakTimestamp,
 				Date:      strings.Replace(result["date"], "date:", "", -1),
 				Status:    strings.Replace(result["status"], "trig:", "", -1),
 				Created:   time.Now(),
-				Route:     route.ID}
+				Route:     route.ID,
+			}
 
 			if err := u.db.Updates.Insert(&update); err != nil {
 				log.WithError(err).Errorf("Could not insert vehicle update.")
@@ -162,7 +180,7 @@ func (u *Updater) update() {
 		}(vehicleData)
 	}
 	wg.Wait()
-	log.Debugf("Updated %d vehicles.", len(vehiclesData))
+	log.Debugf("Updated vehicles.")
 
 	// Prune updates older than one month
 	info, err := u.db.Updates.RemoveAll(bson.M{"created": bson.M{"$lt": time.Now().AddDate(0, -1, 0)}})
@@ -170,7 +188,9 @@ func (u *Updater) update() {
 		log.WithError(err).Error("Unable to remove old updates.")
 		return
 	}
-	log.Debugf("Removed %d old updates.", info.Removed)
+	if info.Removed > 0 {
+		log.Debugf("Removed %d old updates.", info.Removed)
+	}
 }
 
 // Convert kmh to mph
@@ -187,10 +207,18 @@ func (u *Updater) LastUpdatesForVehicle(vehicle *model.Vehicle, count int) (upda
 	return
 }
 
+// RecentUpdatesForVehicle returns updates for a vehicle since the provided time.
+func (u *Updater) RecentUpdatesForVehicle(vehicle *model.Vehicle, since time.Time) (updates []model.VehicleUpdate) {
+	err := u.db.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID, "created": bson.M{"$gt": since}}).All(&updates)
+	if err != nil {
+		log.Error(err)
+	}
+	return
+}
+
 // GuessRouteForVehicle returns a guess at what route the vehicle is on.
 // It may return an empty route if it does not believe a vehicle is on any route.
 func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Route, err error) {
-	samples := 100
 	var routes []model.Route
 	err = u.db.Routes.Find(bson.M{}).All(&routes)
 	if err != nil {
@@ -202,7 +230,12 @@ func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Rout
 		routeDistances[route.ID] = 0
 	}
 
-	updates := u.LastUpdatesForVehicle(vehicle, samples)
+	updates := u.RecentUpdatesForVehicle(vehicle, time.Now().Add(time.Minute*-15))
+	if len(updates) < 5 {
+		// Can't make a guess with fewer than 5 updates.
+		log.Debugf("%v has too few recent updates (%d) to guess route.", vehicle.VehicleName, len(updates))
+		return
+	}
 
 	for _, update := range updates {
 		updateLatitude, err := strconv.ParseFloat(update.Lat, 64)
@@ -237,7 +270,7 @@ func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Rout
 	minDistance := math.Inf(0)
 	var minRouteID string
 	for id := range routeDistances {
-		distance := routeDistances[id] / float64(samples)
+		distance := routeDistances[id] / float64(len(updates))
 		if distance < minDistance {
 			minDistance = distance
 			minRouteID = id
@@ -246,16 +279,19 @@ func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Rout
 			if minDistance > 5 {
 				minRouteID = ""
 			}
-			log.Debugf("%v distance from nearest route: %v\n", vehicle.VehicleName, minDistance)
-
 		}
 	}
 
 	// not on a route
 	if minRouteID == "" {
+		log.Debugf("%v not on route; distance from nearest: %v", vehicle.VehicleName, minDistance)
 		return model.Route{}, nil
 	}
 
 	err = u.db.Routes.Find(bson.M{"id": minRouteID}).One(&route)
+	if err != nil {
+		return route, err
+	}
+	log.Debugf("%v on %s route.", vehicle.VehicleName, route.Name)
 	return route, err
 }
