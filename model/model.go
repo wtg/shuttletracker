@@ -18,8 +18,7 @@ type VehicleUpdate struct {
 	Date      string    `json:"date"        bson:"date"`
 	Status    string    `json:"status"      bson:"status"`
 	Created   time.Time `json:"created"     bson:"created"`
-	Segment   string    `json:"segment"     bson:"segment"` // the segment that a vehicle resides on
-	Route			string		`json:"RouteID"			bson:"rotueID"`		
+	Route     string    `json:"RouteID"     bson:"routeID"`
 }
 
 // Vehicle represents an object being tracked.
@@ -28,7 +27,7 @@ type Vehicle struct {
 	VehicleName string    `json:"vehicleName" bson:"vehicleName"`
 	Created     time.Time `bson:"created"`
 	Updated     time.Time `bson:"updated"`
-	Active      bool      `json:"active"`
+	Enabled     bool      `json:"enabled"     bson:"enabled"`
 }
 
 // Status contains a detailed message on the tracked object's status.
