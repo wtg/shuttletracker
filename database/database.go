@@ -43,6 +43,9 @@ func New(cfg Config) (*Database, error) {
 	// Create index on update create time to quickly find the most recent updates
 	db.Updates.EnsureIndexKey("created")
 
+	// Index on update vehicle ID to quickly find updates for specific vehicles.
+	db.Updates.EnsureIndexKey("vehicleID")
+
 	return db, nil
 }
 
