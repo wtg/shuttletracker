@@ -40,11 +40,13 @@ func New(cfg Config) (*Database, error) {
 		DropDups: true}
 	db.Vehicles.EnsureIndex(vehicleIndex)
 
-	// Create index on update create time to quickly find the most recent updates
+	// Create index on update vehicle ID and creation time to quickly find the most recent updates for specific vehicles.
 	db.Updates.EnsureIndexKey("created")
-
-	// Index on update vehicle ID to quickly find updates for specific vehicles.
 	db.Updates.EnsureIndexKey("vehicleID")
+	db.Updates.EnsureIndexKey("vehicleID", "created")
+
+	// Index on enabled vehicles
+	db.Vehicles.EnsureIndexKey("enabled")
 
 	return db, nil
 }
