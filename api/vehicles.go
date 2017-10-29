@@ -43,7 +43,7 @@ func ComputeDistance(c1 model.Coord, c2 model.Coord) float64 {
 
 func (api *API) GetCurrentStopForVehicle(vehicle model.Vehicle) (stop *model.Stop) {
 	var update model.VehicleUpdate
-	err := api.db.Updates.Find(bson.M{"vehicleID": "1831394614"}).Sort("-created").Limit(1).One(&update)
+	err := api.db.Updates.Find(bson.M{"vehicleID": vehicle.vehicleID}).Sort("-created").Limit(1).One(&update)
 	if err != nil {
 		log.WithError(err).Error("Unable to get vehicle update.")
 		return nil
