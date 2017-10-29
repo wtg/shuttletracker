@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"math"
 	"net/http"
 	"strconv"
 	"time"
@@ -44,14 +43,6 @@ func (App *API) StopsHandler(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, stops)
 }
 
-// compute distance between two coordinates and return a value
-func ComputeDistance(c1 model.Coord, c2 model.Coord) float64 {
-	return float64(math.Sqrt(math.Pow(c1.Lat-c2.Lat, 2) + math.Pow(c1.Lng-c2.Lng, 2)))
-}
-
-func ComputeDistanceMapPoint(c1 model.MapPoint, c2 model.MapPoint) float64 {
-	return float64(math.Sqrt(math.Pow(c1.Latitude-c2.Latitude, 2) + math.Pow(c1.Longitude-c2.Longitude, 2)))
-}
 
 // RoutesCreateHandler adds a new route to the database
 func (App *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {

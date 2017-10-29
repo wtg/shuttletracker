@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
 	"strconv"
 	"time"
@@ -21,12 +22,64 @@ var (
 	lastUpdate time.Time
 )
 
+//DegreeToRadian converts degrees to radians.
+func DegreeToRadian(val float64) float64 {
+	ret := val * math.Pi / 180
+	return ret
+}
+
+//ComputeDistance uses The Haversine Formula to return a distance between two coords in meters
+func ComputeDistance(c1 model.Coord, c2 model.Coord) float64 {
+	rad := 6371.0
+	dLat := DegreeToRadian(c1.Lat - c2.Lat)
+	dLng := DegreeToRadian(c1.Lat - c2.Lat)
+	a := math.Sin(dLat/2)*math.Sin(dLat/2) +
+		math.Cos(DegreeToRadian(c1.Lat))*math.Cos(DegreeToRadian(c2.Lat))*
+			math.Sin(dLng/2)*math.Sin(dLng/2)
+	c := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
+	d := rad * c * 1000 //distance in meters
+	return d
+}
+
+func (api *API) GetCurrentStopForVehicle(vehicle model.Vehicle) (stop *model.Stop) {
+	var update model.VehicleUpdate
+	err := api.db.Updates.Find(bson.M{"vehicleID": "1831394614"}).Sort("-created").Limit(1).One(&update)
+	if err != nil {
+		log.WithError(err).Error("Unable to get vehicle update.")
+		return nil
+	}
+	var stops []model.Stop
+	err = api.db.Stops.Find(bson.M{}).All(&stops)
+
+	var potentialStops []model.Stop
+
+	for _, stop := range stops {
+		clat, _ := strconv.ParseFloat(update.Lat,64)
+		clng, _ := strconv.ParseFloat(update.Lng,64)
+		stopCoord := model.Coord{
+			Lat: stop.Lat,
+			Lng: stop.Lng,
+		}
+		updateCoord := model.Coord{
+			Lat: clat,
+			Lng: clng,
+		}
+		fmt.Printf("%v\n",ComputeDistance(stopCoord,updateCoord))
+		if(ComputeDistance(stopCoord,updateCoord) < 100){ // Closer than 100 meters
+			potentialStops = append(potentialStops, stop);
+		}
+	}
+	fmt.Printf("%v\n",potentialStops)
+
+	return nil
+}
+
 // VehiclesHandler finds all the vehicles in the database.
 func (api *API) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all vehicles in database
 	var vehicles []model.Vehicle
 	err := api.db.Vehicles.Find(bson.M{}).All(&vehicles)
-
+	api.GetCurrentStopForVehicle(vehicles[0])
 	// Handle query errors
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
