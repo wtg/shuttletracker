@@ -309,49 +309,68 @@ Vue.component('shuttle-map',{
 });
 
 Vue.component('dropdown-menu',{
-  template: `<div>
-      <ul class="dropdown">
-          <li>
-              <a href="#" class="dropdown-schedule">
-                  <img src="static/images/menu.svg">
-              </a>
-              <ul class="dropdown-menu">
-                  <li>
-                      <p id="schedule-menu">Shuttle Schedules</p>
-                      <!-- http://www.rpi.edu/dept/parking/shuttle/ -->
-                  </li>
-                  <li v-for="item in list_data">
-                      <p><a target="_blank" rel="noopener noreferrer" :href="item.link">{{item.name}}</a></p>
-                  </li>
-              </ul>
-          </li>
+  template: `
+<div class="dropdown">
+  <ul class="dropdown-main">
+    <li class="dropdown-main-item">
+      <a href="#" class="dropdown-icon">
+        <img src="static/images/menu.svg">
+      </a>
+      <ul class="dropdown-menu">
+        <li class="dropdown-menu-item" id="dropdown-menu-item_shuttle-schedule">
+          <p>Shuttle Schedules</p>
+          <!-- http://www.rpi.edu/dept/parking/shuttle/ -->
+          <ul class="dropdown-submenu" id="dropdown-submenu_shuttle-schedule">
+            <li class="dropdown-submenu-item" id="dropdown-submenu-item_shuttle-schedule" v-for="item in list_data">
+              <p><a target="_blank" rel="noopener noreferrer" :href="item.link">{{item.name}}</a></p>
+            </li>
+          </ul>
+        </li>
       </ul>
-  </div>`,
+    </li>
+  </ul>
+</div>
+`,
   data (){
     return{
-        list_data: [
+      list_data: [
           {name: "East: Monday-Thursday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018CampusShuttleScheduleEastRoute.pdf"},
           {name: "East: Friday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018FridayOnlyEastShuttleSchedule.pdf"},
           {name: "West: Monday-Thursday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018CampusShuttleScheduleWestRoute.pdf"},
           {name: "West: Friday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018FridayOnlyWestShuttleSchedule.pdf"},
           {name: "Weekend Late Night", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018Weekend-LateNightShuttleSchedule.pdf"}
-        ],
+      ],
 
     };
   }
 });
 
 Vue.component('title-bar', {
-  template:
-  `  <div class="titleBar">
-        <div class="titleContent">
-            <dropdown-menu></dropdown-menu>
-            <p class="title">{{title}}</p>
-            <a href="https://webtech.union.rpi.edu" class="logo">
-                <img src="static/images/wtg.svg">
-            </a>
+  template: `  
+  <div class="titleBar">
+    <!-- left side of tile bar -->
+    <ul class="titleContent" id="titleContent-left">
+      <li>
+        <dropdown-menu></dropdown-menu>
+      </li>
+      <li>
+        <p class="title">{{title}}</p>
+      </li>
+    </ul>
+    <!-- right side of title bar -->
+    <ul class="titleContent" id="titleContent-right">
+      <li>
+        <div id="darkmode-icon">
+          <img src="static/images/moon.svg">
         </div>
-    </div>`,
+      </li>
+      <li>
+        <a href="https://webtech.union.rpi.edu" class="logo">
+          <img src="static/images/wtg.svg">
+        </a>
+      </li>
+    </ul>
+  </div>`,
     data (){
       return {
         title: "RPI Shuttle Tracker"

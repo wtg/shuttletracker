@@ -14,11 +14,8 @@ html, body {
 
 .title {
   font-size: 22px;
-  padding-top: 0px;
-  margin-top: 3px;
-  margin-left: 10px;
-  padding-bottom: 0px;
-  margin-bottom: 0px;
+  padding: 0px;
+  margin: 3px 6px 0px;
   float: left;
 }
 
@@ -54,8 +51,25 @@ html, body {
 .titleContent {
   height: 100%;
   z-index: 1;
-  width: 100%;
-  position: absolute;
+  width: auto;
+  list-style: none;
+  position: relative;
+  top: 0px;
+  margin: 0px;
+  padding: 0px;
+}
+
+#titleContent-left {
+  float: left;
+}
+
+#titleContent-right {
+  float: right;
+}
+
+.titleContent > li {
+  display: inline-block;
+  height: 100%;
 }
 
 .logo {
@@ -69,24 +83,25 @@ html, body {
   height: 100%;
 }
 
-#navheader {
-  background-color: #686868;
-  margin: 0px;
-  padding: 0px;
+#darkmode-icon {
+  height: 100%;
 }
 
-#navheader > span > a {
-  color: white;
-  text-decoration: none;
+#darkmode-icon img {
+  height: 24px;
+  margin: 5px 10px;
 }
 
 
 /* CSS for dropdown menus */
-.dropdown {
-  list-style: none;
+div.dropdown ul {
+  list-style: none none;
+}
+
+ul.dropdown-main {
   position: relative;
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
   
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -95,84 +110,97 @@ html, body {
   user-select: none;
 }
 
-.dropdown-schedule {
-  color: #333;
+li.dropdown-main-item {
+  background-color: rgb(221, 221, 221);
+}
+
+li.dropdown-main-item:hover {
+  background-color: rgba(226, 226, 226, 0.85);
+}
+
+a.dropdown-icon {
+  color: rgb(51, 51, 51);
   display: block;
   font-weight: 700;
   font-size: 12px;
   line-height: 32px;
-  padding: 0px 15px;
   text-decoration: none;
-}
-
-a.dropdown-schedule {
   height: 34px;
-  padding: 0px 3px;
+  padding: 0 3px;
 }
 
-a.dropdown-schedule > img{
+a.dropdown-icon > img {
   box-sizing: border-box;
   padding: 5px;
 }
 
-.dropdown li {
-  float: left;
-  position: relative;
-  padding: 0px;
-  margin: 0px;
-}
-
-.dropdown > li {
-  background: #ddd;
-}
-
-.dropdown li:hover {
-  background: rgba(226, 226, 226, 0.85);
-}
-
-.dropdown-menu {
-  background: rgba(238, 238, 238, 0.90);
+ul.dropdown-menu {
+  background-color: rgba(238, 238, 238, 0.90);
   display: none;
   position: absolute;
   top: 100%;
-  left: 0px;
-  padding: 0px;
+  left: 0;
+  padding: 0;
+  width: auto;
+  white-space: nowrap;
 }
 
-.dropdown-menu li {
+li.dropdown-menu-item {
   float: none;
-  width: 225px;
 }
 
-.dropdown-menu p {
+li.dropdown-menu-item > p {
   height: 24px;
-  margin: 3px 5px;
+  margin: 3px 0;
+  padding: 0 7px;
 }
 
-.dropdown-menu a {
-  box-sizing: border-box;
-  color: #333333;
-  padding: 3px 5px 3px 20px;
-  text-decoration: none;
+li.dropdown-menu-item > p:hover {
+  background-color: rgba(226, 226, 226, 0.85);
 }
 
-.dropdown-menu a:visited {
-  color: #333333;
-  text-decoration: none;
-}
-
-.dropdown-menu ul {
-  top: 0px;
+ul.dropdown-submenu {
+  background-color: rgba(238, 238, 238, 0.90);
+  display: none;
+  position: absolute;
+  top: 0;
   left: 100%;
+  padding: 0;
 }
 
-.dropdown li:hover > ul {
-  display: block;
-  /* makes menu visible */
+li.dropdown-submenu-item > p {
+  height: 24px;
+  margin: 3px 0;
+  padding: 0 7px;
 }
 
-#schedule-menu {
+li.dropdown-submenu-item > p > a {
+  box-sizing: border-box;
+  color: rgb(51, 51, 51);
+  padding: auto;
+  width: 100%;
+  text-decoration: none;
+}
+
+li.dropdown-submenu-item > a:visited {
+  color: rgb(51, 51, 51);
+  text-decoration: none;
+}
+
+li.dropdown-submenu-item > p:hover {
+  background-color: rgba(226, 226, 226, 0.85);
+}
+
+li#dropdown-menu-item_shuttle-schedule > p {
   font-size: large;
   font-weight: 500;
 }
-/* ===================== */
+
+/* Visibility Control for the menu */
+li.dropdown-main-item:hover > ul.dropdown-menu {
+  display: block;
+}
+
+li.dropdown-menu-item:hover > ul.dropdown-submenu {
+  display: inline-block;
+}
