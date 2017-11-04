@@ -27,7 +27,7 @@ func Run() {
 	log.SetLevel(cfg.Log.Level)
 
 	// Database
-	db, err := database.New(*cfg.Database)
+	db, err := database.NewMongoDB(*cfg.Database)
 	if err != nil {
 		log.WithError(err).Errorf("MongoDB connection to \"%v\" failed.", cfg.Database.MongoURL)
 		return

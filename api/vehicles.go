@@ -8,13 +8,11 @@ import (
 	"time"
 
 	"gopkg.in/cas.v1"
-	mgo "gopkg.in/mgo.v2"
 
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/model"
 
 	"github.com/gorilla/mux"
-	"gopkg.in/mgo.v2/bson"
 )
 
 var (
@@ -24,8 +22,7 @@ var (
 // VehiclesHandler finds all the vehicles in the database.
 func (api *API) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all vehicles in database
-	var vehicles []model.Vehicle
-	err := api.db.Vehicles.Find(bson.M{}).All(&vehicles)
+	vehicles, err := api.db.GetVehicles()
 
 	// Handle query errors
 	if err != nil {
@@ -55,7 +52,7 @@ func (api *API) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Store new vehicle under vehicles collection
-	err = api.db.Vehicles.Insert(&vehicle)
+	err = api.db.CreateVehicle(&vehicle)
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -66,34 +63,30 @@ func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
 	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
 	}
-	vehicle := model.Vehicle{}
 
+	vehicle := model.Vehicle{}
 	err := json.NewDecoder(r.Body).Decode(&vehicle)
 	if err != nil {
-
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-
 	}
+
 	name := vehicle.VehicleName
 	enabled := vehicle.Enabled
 
-	err = api.db.Vehicles.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(1).One(&vehicle)
+	vehicle, err = api.db.GetVehicle(vehicle.VehicleID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	vehicle.VehicleName = name
 	vehicle.Enabled = enabled
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
 	vehicle.Updated = time.Now()
-	err = api.db.Vehicles.Update(bson.M{"vehicleID": vehicle.VehicleID}, vehicle)
+
+	err = api.db.ModifyVehicle(&vehicle)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-
 		return
-
 	}
-
 }
 
 func (api *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
@@ -103,7 +96,7 @@ func (api *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	// Delete vehicle from Vehicles collection
 	vars := mux.Vars(r)
 	log.Debugf("deleting", vars["id"])
-	err := api.db.Vehicles.Remove(bson.M{"vehicleID": vars["id"]})
+	err := api.db.DeleteVehicle(vars["id"])
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -113,33 +106,11 @@ func (api *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 // Here's my view, keep every name the same meaning, otherwise, choose another.
 // UpdatesHandler get the most recent update for each vehicle in the vehicles collection.
 func (api *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
-	var vehicles []model.Vehicle
-
-	// Query active and enabled vehicles
-	err := api.db.Vehicles.Find(bson.M{"enabled": true}).All(&vehicles)
+	updates, err := api.db.GetLastUpdatesForEnabledVehicles()
 	if err != nil {
-		log.WithError(err).Error("Unable to get enabled vehicles.")
+		log.WithError(err).Error("Unable to get vehicle updates.")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-	}
-
-	// allocate slice of capacity len(vehicles) and size zero
-	updates := make([]model.VehicleUpdate, 0, len(vehicles))
-
-	// Find most recent update in the last five minutes for each vehicle
-	for _, vehicle := range vehicles {
-		// here, huge waste of computational power, you record every shit inside the Updates table and using sort, I don't know what the hell is going on
-		update := model.VehicleUpdate{}
-		since := time.Now().Add(time.Minute * -5)
-		err = api.db.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID, "created": bson.M{"$gt": since}}).Sort("-created").One(&update)
-		if err == mgo.ErrNotFound {
-			continue
-		} else if err != nil {
-			log.WithError(err).Error("Unable to get vehicle update.")
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		updates = append(updates, update)
 	}
 
 	// Convert updates to JSON
@@ -147,15 +118,13 @@ func (api *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateMessageHandler generates a message about an update for a vehicle
-func (App *API) UpdateMessageHandler(w http.ResponseWriter, r *http.Request) {
+func (api *API) UpdateMessageHandler(w http.ResponseWriter, r *http.Request) {
 	// For each vehicle/update, store message as a string
 	var messages []string
 	var message string
-	var vehicles []model.Vehicle
-	var update model.VehicleUpdate
 
 	// Query all Vehicles
-	err := App.db.Vehicles.Find(bson.M{}).All(&vehicles)
+	vehicles, err := api.db.GetVehicles()
 	// Handle errors
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -163,7 +132,7 @@ func (App *API) UpdateMessageHandler(w http.ResponseWriter, r *http.Request) {
 	// Find recent updates and generate message
 	for _, vehicle := range vehicles {
 		// find 10 most recent records
-		err := App.db.Updates.Find(bson.M{"vehicleID": vehicle.VehicleID}).Sort("-created").Limit(1).One(&update)
+		update, err := api.db.GetLastUpdateForVehicle(vehicle.VehicleID)
 		if err == nil {
 			// Use first 4 char substring of update.Speed
 			speed := update.Speed
