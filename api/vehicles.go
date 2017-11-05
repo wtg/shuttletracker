@@ -106,11 +106,28 @@ func (api *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 // Here's my view, keep every name the same meaning, otherwise, choose another.
 // UpdatesHandler get the most recent update for each vehicle in the vehicles collection.
 func (api *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
-	updates, err := api.db.GetLastUpdatesForEnabledVehicles()
+	vehicles, err := api.db.GetEnabledVehicles()
 	if err != nil {
-		log.WithError(err).Error("Unable to get vehicle updates.")
+		log.WithError(err).Error("Unable to get enabled vehicles.")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+
+	// slice of capacity len(vehicles) and size zero
+	updates := make([]model.VehicleUpdate, 0, len(vehicles))
+	for _, vehicle := range vehicles {
+		since := time.Now().Add(time.Minute * -5)
+		vehicleUpdates, err := api.db.GetUpdatesForVehicleSince(vehicle.VehicleID, since)
+		if err != nil {
+			log.WithError(err).Error("Unable to get last vehicle update.")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// if there is an update since the time, append it to all updates
+		if len(vehicleUpdates) > 0 {
+			updates = append(updates, vehicleUpdates[0])
+		}
 	}
 
 	// Convert updates to JSON

@@ -34,7 +34,7 @@ func Run() {
 	}
 
 	// Make shuttle position updater
-	updater, err := updater.New(*cfg.Updater, *db)
+	updater, err := updater.New(*cfg.Updater, db)
 	if err != nil {
 		log.WithError(err).Error("Could not create updater.")
 		return
@@ -42,7 +42,7 @@ func Run() {
 	runner.Add(updater)
 
 	// Make API server
-	api, err := api.New(*cfg.API, *db)
+	api, err := api.New(*cfg.API, db)
 	if err != nil {
 		log.WithError(err).Error("Could not create API server.")
 		return
