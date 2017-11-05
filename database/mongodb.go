@@ -152,12 +152,12 @@ func (m *MongoDB) CreateVehicle(vehicle *model.Vehicle) error {
 }
 
 func (m *MongoDB) DeleteVehicle(vehicleID string) error {
-	return m.vehicles.Remove(bson.M{"id": vehicleID})
+	return m.vehicles.Remove(bson.M{"vehicleID": vehicleID})
 }
 
 func (m *MongoDB) GetVehicle(vehicleID string) (model.Vehicle, error) {
 	var vehicle model.Vehicle
-	err := m.vehicles.Find(bson.M{"id": vehicleID}).One(&vehicle)
+	err := m.vehicles.Find(bson.M{"vehicleID": vehicleID}).One(&vehicle)
 	return vehicle, err
 }
 
@@ -174,5 +174,5 @@ func (m *MongoDB) GetEnabledVehicles() ([]model.Vehicle, error) {
 }
 
 func (m *MongoDB) ModifyVehicle(vehicle *model.Vehicle) error {
-	return m.vehicles.Update(bson.M{"id": vehicle.VehicleID}, vehicle)
+	return m.vehicles.Update(bson.M{"vehicleID": vehicle.VehicleID}, vehicle)
 }
