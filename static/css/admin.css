@@ -8,47 +8,73 @@ html, body {
 
 }
 
-.undoButton{
-  float: none;
-  position: absolute;
-  z-index: 10;
-  top: 10;
-  left: 50%;
-  width: auto;
-  background-color: white;
-}
 
-.navbar{
-  background-color: #eee;
+.title-bar{
+  background-color: white;
   width: 100%;
-  height: 34px;
+  height: 50px;
   float: none;
   position: absolute;
+  line-height: 50px;
+  vertical-align: center;
+  box-shadow: 0 3px 7px rgba(0,0,0,0.25);
   top: 0;
   left: 0;
   user-select:none;
 }
-.prompttext{
-  color: black;
-  text-align: center;
-  font-size: 25px;
+.main{
+  width: 100%;
+  height: auto;
+  top: 50px;
+  bottom: 0px;
+  position: fixed;
 }
 
-.pbutton{
+ul{
+  padding: 0;
+}
+li{
   width: 100%;
-  height: 20%;
-  margin: auto;
+  padding-top: 5px;
+  padding-bottom: 5px;
   text-align: center;
+  padding-left: 0px;
+  height: 20px;
+  margin-top: 0px;
+  text-decoration: none;
+  background-color: #white;
+  list-style-type: none;
+  margin-left: 0;
 }
-.rtb{
-  display:none;
+li:hover{
+  cursor: pointer;
+  background-color: #eee
 }
+
+.red{
+  color: #e74c3c;
+}
+
+.sidebar{
+  padding-top: 40px;
+  width: 15%;
+  height: 100%;
+  background-color: white;
+  box-shadow: 0 3px 7px rgba(0,0,0,0.25);
+
+}
+
 .title{
   padding: 0px;
-  margin-top: 6px;
-  margin-left: 5px;
+  margin-top: 10px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 10%;
+  position: absolute;
   font-size: 22px;
   float:left;
+  text-align: center;
 }
 .formtext{
   float:left;
@@ -158,14 +184,7 @@ html, body {
   color: #eee;
 
 }
-.docBody{
-  position: absolute;
-  float:none;
-  top:34px;
-  bottom: 0;
-  height: auto;
-  width: 100%;
-}
+
 .routePanel{
   width: 50%;
   height: 100%;
