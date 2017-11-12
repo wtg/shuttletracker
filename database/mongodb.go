@@ -42,17 +42,25 @@ func NewMongoDB(cfg MongoDBConfig) (*MongoDB, error) {
 		Key:      []string{"vehicleID"},
 		Unique:   true,
 		DropDups: true}
-	db.vehicles.EnsureIndex(vehicleIndex)
+	if err = db.vehicles.EnsureIndex(vehicleIndex); err != nil {
+		return nil, err
+	}
 
 	// Create index on update vehicle ID and creation time to quickly find the most recent updates for specific vehicles.
-	db.updates.EnsureIndexKey("created")
-	db.updates.EnsureIndexKey("vehicleID")
-	db.updates.EnsureIndexKey("vehicleID", "created")
+	if err = db.updates.EnsureIndexKey("created"); err != nil {
+		return nil, err
+	}
+	if err = db.updates.EnsureIndexKey("vehicleID"); err != nil {
+		return nil, err
+	}
+	if err = db.updates.EnsureIndexKey("vehicleID", "created"); err != nil {
+		return nil, err
+	}
 
 	// Index on enabled vehicles
-	db.vehicles.EnsureIndexKey("enabled")
+	err = db.vehicles.EnsureIndexKey("enabled")
 
-	return db, nil
+	return db, err
 }
 
 func NewMongoDBConfig(v *viper.Viper) *MongoDBConfig {
