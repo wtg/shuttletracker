@@ -190,6 +190,7 @@ func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, stop)
 }
 
+// StopsDeleteHandler deletes a Stop.
 func (api *API) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
