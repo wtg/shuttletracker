@@ -18,6 +18,7 @@ import (
 	"github.com/wtg/shuttletracker/model"
 )
 
+// Updater handles periodically grabbing the latest vehicle location data from iTrak.
 type Updater struct {
 	cfg            Config
 	updateInterval time.Duration
@@ -30,6 +31,7 @@ type Config struct {
 	UpdateInterval string
 }
 
+// New creates an Updater.
 func New(cfg Config, db database.Database) (*Updater, error) {
 	updater := &Updater{cfg: cfg, db: db}
 
