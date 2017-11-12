@@ -29,14 +29,14 @@ func Run() {
 	log.SetLevel(cfg.Log.Level)
 
 	// Database
-	db, err := database.New(*cfg.Database)
+	db, err := database.NewMongoDB(*cfg.Database)
 	if err != nil {
 		log.WithError(err).Errorf("MongoDB connection to \"%v\" failed.", cfg.Database.MongoURL)
 		return
 	}
 
 	// Make shuttle position updater
-	updater, err := updater.New(*cfg.Updater, *db)
+	updater, err := updater.New(*cfg.Updater, db)
 	if err != nil {
 		log.WithError(err).Error("Could not create updater.")
 		return
@@ -44,7 +44,7 @@ func Run() {
 	runner.Add(updater)
 
 	// Make API server
-	api, err := api.New(*cfg.API, *db)
+	api, err := api.New(*cfg.API, db)
 	if err != nil {
 		log.WithError(err).Error("Could not create API server.")
 		return
