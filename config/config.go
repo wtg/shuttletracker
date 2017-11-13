@@ -13,7 +13,7 @@ import (
 
 // Config is the global configuration struct.
 type Config struct {
-	Database *database.Config
+	Database *database.MongoDBConfig
 	Updater  *updater.Config
 	API      *api.Config
 	Log      *log.Config
@@ -30,7 +30,7 @@ func New() (*Config, error) {
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	cfg.API = api.NewConfig(v)
-	cfg.Database = database.NewConfig(v)
+	cfg.Database = database.NewMongoDBConfig(v)
 	cfg.Updater = updater.NewConfig(v)
 	cfg.Log = log.NewConfig()
 
