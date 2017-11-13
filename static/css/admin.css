@@ -21,19 +21,43 @@ html, body {
   top: 0;
   left: 0;
   user-select:none;
+  z-index: 2;
 }
 .main{
-  width: 100%;
+  width: 90%;
   height: auto;
   top: 50px;
+  left: 10%;
   bottom: 0px;
+  background-color: #eee;
   position: fixed;
 }
 
-ul{
+.route-description-box{
+  padding: 10px;
+  margin-top:20px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 20px;
+  width: 70%;
+  background-color: white;
+  height: auto;
+}
+.emphasis{
+  padding: 0px;
+  margin: 0px;
+  font-weight: bold;
+}
+
+.content{
+  padding: 0px;
+  margin: 0px;
+}
+
+.nav-list{
   padding: 0;
 }
-li{
+.nav-item{
   width: 100%;
   padding-top: 5px;
   padding-bottom: 5px;
@@ -46,9 +70,15 @@ li{
   list-style-type: none;
   margin-left: 0;
 }
-li:hover{
+.nav-item:hover{
   cursor: pointer;
-  background-color: #eee
+  color: white;
+  background-color: #e74c3c
+}
+
+.selected{
+  color: white;
+  background-color: #e74c3c;
 }
 
 .red{
@@ -56,9 +86,14 @@ li:hover{
 }
 
 .sidebar{
-  padding-top: 40px;
-  width: 15%;
-  height: 100%;
+  top: 40px;
+  padding-top: 10px;
+  width: 10%;
+  z-index: 1;
+  height: auto;
+  bottom: 0;
+  position: fixed;
+
   background-color: white;
   box-shadow: 0 3px 7px rgba(0,0,0,0.25);
 
@@ -170,13 +205,16 @@ li:hover{
   top: 34px;
 }
 .vehicle-panel{
-  position: fixed;
-  height: 100%;
-  width: 100%;
+  position: inherit;
+  height: auto;
+  bottom: 0;
+  width: inherit;
   float: none;
   background-color: transparent;
   overflow: scroll;
-  top: 34px;
+  grid-template-columns: 40px 50px auto 50px 40px;
+  grid-template-rows: 25% 100px auto;
+  top:50px;
 }
 
 .logout:hover{
@@ -208,11 +246,10 @@ li:hover{
   height: 50%;
 }
 .route-description-box{
-  padding: 20px;
-  margin-top:10px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-bottom: 20px;
+  grid-column-start: 1;
+  grid-column-end: span col4-start;
+  grid-row-start: 2
+  grid-row-end: span 2
   width: 90%;
   background-color: white;
   height: auto;
