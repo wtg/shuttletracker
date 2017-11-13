@@ -371,6 +371,17 @@ Vue.component('title-bar', {
       </li>
     </ul>
   </div>`,
+    mounted(){
+        var darkVal = 0;
+        document.querySelector('div#darkmode-icon').onclick = function() {
+            if(darkVal === 0){
+                darkVal = 1;
+                document.getElementById('mapid').style.filter='invert(1)';}
+            else {
+                darkVal = 0;
+                document.getElementById('mapid').style.filter='invert(0)';}
+        };
+    },
     data (){
       return {
         title: "RPI Shuttle Tracker"
