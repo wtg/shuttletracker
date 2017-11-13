@@ -2,7 +2,6 @@
 package model
 
 import (
-	"math/big"
 	"time"
 )
 
@@ -46,48 +45,6 @@ type LatestPosition struct {
 	Heading       int       `json:"heading"`
 	Cardinal      string    `json:"cardinal_point"`
 	StatusMessage *string   `json:"public_status_message"` // this is a pointer so it defaults to null
-}
-
-type LegacyVehicle struct {
-	Name           string         `json:"name"`
-	ID             int            `json:"id"`
-	LatestPosition LatestPosition `json:"latest_position"`
-	Icon           map[string]int `json:"icon"`
-}
-
-type LegacyVehicleContainer struct {
-	Vehicle LegacyVehicle `json:"vehicle"`
-}
-
-type LegacyCoordinate struct {
-	Latitude  string `json:"latitude"`
-	Longitude string `json:"longitude"`
-}
-
-type LegacyRoute struct {
-	Name        string             `json:"name"`
-	Width       int                `json:"width"`
-	ID          big.Int            `json:"id"`
-	Color       string             `json:"color"`
-	Coordinates []LegacyCoordinate `json:"coords"`
-}
-
-type LegacyStopRoute struct {
-	Name string  `json:"name"`
-	ID   big.Int `json:"id"`
-}
-
-type LegacyStop struct {
-	Name      string            `json:"name"`
-	Longitude string            `json:"longitude"`
-	Latitude  string            `json:"latitude"`
-	ShortName string            `json:"short_name"`
-	Routes    []LegacyStopRoute `json:"routes"`
-}
-
-type LegacyRoutesAndStopsContainer struct {
-	Routes []LegacyRoute `json:"routes"`
-	Stops  []LegacyStop  `json:"stops"`
 }
 
 // Coord represents a single lat/lng point used to draw routes
