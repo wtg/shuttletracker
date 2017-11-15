@@ -86,7 +86,6 @@ func New(cfg Config, db database.Database) (*API, error) {
 
 	// Static files
 	r.HandleFunc("/", IndexHandler).Methods("GET")
-	r.PathPrefix("/bower_components/").Handler(http.StripPrefix("/bower_components/", http.FileServer(http.Dir("bower_components/"))))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
 
 	// Serve requests

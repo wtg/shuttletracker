@@ -3,6 +3,8 @@
 package cmd
 
 import (
+	"github.com/kochman/runner"
+
 	"github.com/wtg/shuttletracker/api"
 	"github.com/wtg/shuttletracker/config"
 	"github.com/wtg/shuttletracker/database"
@@ -21,7 +23,7 @@ func Run() {
 		return
 	}
 
-	runner := NewRunner()
+	runner := runner.New()
 
 	// Log
 	log.SetLevel(cfg.Log.Level)
