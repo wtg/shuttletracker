@@ -97,6 +97,12 @@
 			"revisionTime": "2017-05-05T08:58:37Z"
 		},
 		{
+			"checksumSHA1": "apvoHcksrwebj02FX32DEURlzlE=",
+			"path": "github.com/kochman/runner",
+			"revision": "307fc031d7792ec0c307f69a1d360c6f37650a7f",
+			"revisionTime": "2017-08-14T05:04:56Z"
+		},
+		{
 			"checksumSHA1": "UvboqgDDSAbGORdtr5tBpkwYR0A=",
 			"path": "github.com/magiconair/properties",
 			"revision": "51463bfca2576e06c62a8504b5c0f06d61312647",
