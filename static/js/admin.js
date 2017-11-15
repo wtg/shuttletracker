@@ -92,7 +92,6 @@ Vue.component("main-pane",{
     setInterval(function(){
       if(el.state != state){
         el.state = state;
-        console.log(el.state)
       }
     },10);
   },

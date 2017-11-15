@@ -2,7 +2,7 @@ var refresh = false;
 Vue.component('route-panel', {
   template:
   `<div class ="vehicle-panel">
-    <div v-for="route in routeData" class="vehicle-info">  
+    <div v-for="route in routeData" class="vehicle-info">
     <route-card v-bind:info="route"></route-card>
 
     </div>
@@ -128,7 +128,6 @@ Vue.component('route-create',{
         name: "",
         description: "",
         color: "",
-        enabled: "",
         width: 4,
         active: true,
         enabled: true,

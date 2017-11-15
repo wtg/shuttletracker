@@ -127,7 +127,6 @@ Vue.component('stop-create',{
         name: "",
         description: "",
         color: "",
-        enabled: "",
         width: 4,
         active: true,
         enabled: true,
@@ -156,7 +155,7 @@ Vue.component('stop-create',{
         });
       },
       getJSON: function(){
-        var el = this
+        var el = this;
         console.log(this.addStopMarker.getLatLng().lat);
         //coords = this.drawnRoute.getLatLngs();
         var toSend = {
@@ -167,7 +166,7 @@ Vue.component('stop-create',{
           "enabled":this.enabled.toString(),
           "routeId":this.myRouteId.toString(),
           "lat": this.addStopMarker.getLatLng().lat.toString(),
-          "lng": this.addStopMarker.getLatLng().lng.toString()}
+          "lng": this.addStopMarker.getLatLng().lng.toString()};
           return toSend;
       },
       showJSON: function(data){
