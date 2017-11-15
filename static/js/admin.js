@@ -44,7 +44,7 @@ Vue.component('sidebar',{
   `,
   data (){
     return{
-      elements: [{text: "Routes",id: 0},{text: "Stops",id: 1},{text: "Vehicles",id: 2},{text: "Users",id: 3},{text: "Messages",id: 4},{text: "Logout",id:5}],
+      elements: [{text: "Routes",id: 0},{text: "Stops",id: 1},{text: "Vehicles",id: 2},{text: "Users",id: 3},{text: "Messages",id: 4}],
 
       titlebarStyle: {
         backgroundColor:"white",
@@ -63,11 +63,38 @@ Vue.component('sidebar',{
   methods:{
     setState(id){
       state = id;
-      keepState = id;
+      this.keepState = id;
     },
 
   },
   mounted(){
+  },
+});
+
+Vue.component("main-pane",{
+  template:`
+  <div v-bind:style="mainStyle">
+    <transition name="slide-fade">
+    <route-panel v-if="state == 0"></route-panel>
+    <stops-panel v-if="state == 1"></stops-panel>
+    <vehicle-panel v-if="state == 2"></vehicle-panel>
+    </transition>
+  </div>
+  `,
+  data (){
+    return {
+      state: 0,
+      mainStyle: {position: "fixed",width: "90%",top:"50px",height: "auto", overflow: "scroll", bottom: "0",left: "10%"}
+    }
+  },
+  mounted (){
+    let el = this;
+    setInterval(function(){
+      if(el.state != state){
+        el.state = state;
+        console.log(el.state)
+      }
+    },10);
   },
 });
 

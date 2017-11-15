@@ -45,6 +45,18 @@ html, body {
   color: #e74c3c;
 }
 
+.slide-fade-enter-active {
+  transition: all .5s ease;
+}
+.slide-fade-leave-active {
+  transition: all 0.1s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+  transform: translateX(-100px);
+  opacity: 0;
+}
+
 .title{
   padding: 0px;
   margin-top: 10px;
@@ -56,4 +68,25 @@ html, body {
   font-size: 22px;
   float:left;
   text-align: center;
+}
+
+.button{
+  user-select: none;
+  margin: 2px;
+  background-color: white;
+  padding: 5px;
+  font-size: 12px;
+  text-decoration: none;
+  background-color: none;
+  border-style: solid;
+  border-color: #e74c3c;
+  border-width: 1px;
+  transition: background-color 0.5s ease;
+  color: #e74c3c;
+}
+.button:hover{
+  background-color: #e74c3c;
+  color: #eee;
+  cursor: pointer;
+
 }
