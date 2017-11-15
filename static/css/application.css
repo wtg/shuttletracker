@@ -163,8 +163,8 @@ ul.dropdown-submenu {
   background-color: rgba(238, 238, 238, 0.90);
   display: none;
   position: absolute;
-  top: 0;
-  left: 100%;
+  top: 100%;
+  left: 0;
   padding: 0;
 }
 
@@ -196,7 +196,7 @@ li#dropdown-menu-item_shuttle-schedule > p {
   font-weight: 500;
 }
 
-/* Visibility Control for the menu */
+/* Visibility Control for the menu
 li.dropdown-main-item:hover > ul.dropdown-menu {
   display: block;
 }
@@ -204,3 +204,4 @@ li.dropdown-main-item:hover > ul.dropdown-menu {
 li.dropdown-menu-item:hover > ul.dropdown-submenu {
   display: inline-block;
 }
+*/

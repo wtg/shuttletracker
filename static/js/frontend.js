@@ -371,16 +371,42 @@ Vue.component('title-bar', {
       </li>
     </ul>
   </div>`,
-    mounted(){
+    mounted() {
         var darkVal = 0;
-        document.querySelector('div#darkmode-icon').onclick = function() {
-            if(darkVal === 0){
+        var moonicon = "static/images/moon.svg";
+        var sunicon = "static/images/sun.svg";
+        document.querySelector('div#darkmode-icon').addEventListener('click', function() {
+            if (darkVal === 0) {
                 darkVal = 1;
-                document.getElementById('mapid').style.filter='invert(1)';}
-            else {
+                document.querySelector('div#darkmode-icon>img').src = sunicon;
+                document.getElementById('mapid').style.filter = 'invert(1)';
+            } else {
                 darkVal = 0;
-                document.getElementById('mapid').style.filter='invert(0)';}
-        };
+                document.querySelector('div#darkmode-icon>img').src = moonicon;
+                document.getElementById('mapid').style.filter = 'invert(0)';
+            }
+        });
+        document.querySelector('a.dropdown-icon>img').addEventListener('click', function() {
+            for (var i = 0; i < 1; i++) {
+                if (document.getElementsByClassName('dropdown-menu')[i].style.display === 'none') {
+                    document.getElementsByClassName('dropdown-menu')[i].style.display = 'block';
+                } else {
+                    document.getElementsByClassName('dropdown-menu')[i].style.display = 'none';
+                }
+                if (document.getElementsByClassName('dropdown-submenu')[i].style.display === 'inline-block') {
+                    document.getElementsByClassName('dropdown-submenu')[i].style.display = 'none';
+                }
+            }
+        });
+        document.querySelector('.dropdown-menu-item').addEventListener('click', function() {
+            for (var i = 0; i < 1; i++) {
+                if (document.getElementsByClassName('dropdown-submenu')[i].style.display === 'none') {
+                    document.getElementsByClassName('dropdown-submenu')[i].style.display = 'inline-block';
+                } else {
+                    document.getElementsByClassName('dropdown-submenu')[i].style.display = 'none';
+                }
+            }
+        });
     },
     data (){
       return {
