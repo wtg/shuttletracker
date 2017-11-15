@@ -118,7 +118,7 @@ Vue.component('stop-create',{
               <b>Description</b>: <input v-model="description" placeholder="Stop Description"></input><br>
               <b>Enabled</b>:  <input type="checkbox" v-model="enabled"></input>{{enabled}}<br>
               <b>Route</b>: <select v-model="myRouteId"><option v-for="routeId in routeIDS" v-bind:value="routeId">{{routeId}}</option></select><br>
-            <button class="button" @click="submitForm(JSON.stringify(getJSON()))">Submit</button>
+            <button class="button" @click="send(JSON.stringify(getJSON()))">Submit</button>
             <button class="button" @click="showJSON(JSON.stringify(getJSON()))">GetJSON</button>
     </div></div>`,
     data (){
@@ -143,18 +143,31 @@ Vue.component('stop-create',{
       };
     },
     methods: {
+      send: function(data){
+        $.ajax({
+          url: "/stops/create",
+          type: "POST",
+          data: data,
+          contentType: "application/json",
+          complete: function(data){
+            refresh=true;
+
+          }
+        });
+      },
       getJSON: function(){
-        coords = this.drawnRoute.getLatLngs();
+        var el = this
+        console.log(this.addStopMarker.getLatLng().lat);
+        //coords = this.drawnRoute.getLatLngs();
         var toSend = {
           "name":this.name,
           "description":this.description,
           "startTime":"",
           "endTime":"",
           "enabled":this.enabled.toString(),
-          "color":this.color,
-          "width":this.width.toString(),
-          "coords":JSON.stringify(coords)};
-          // console.log(toSend)
+          "routeId":this.myRouteId.toString(),
+          "lat": this.addStopMarker.getLatLng().lat.toString(),
+          "lng": this.addStopMarker.getLatLng().lng.toString()}
           return toSend;
       },
       showJSON: function(data){
