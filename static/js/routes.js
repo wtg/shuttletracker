@@ -57,7 +57,7 @@ Vue.component('route-card', {
       if(this.deleteCount == 1){
         this.deleteRoute(id);
       }else{
-        this.buttonText = "Are you Sure?";
+        this.buttonText = "Are you sure?";
         this.deleteCount++;
       }
     },

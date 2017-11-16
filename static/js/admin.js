@@ -19,6 +19,7 @@ Vue.component('titlebar', {
         float:"left",
         position: "absolute",
         lineHeight:"50px",
+        zIndex: "20",
         verticalAlign:"center",
         boxShadow: '0 3px 7px rgba(0,0,0,0.25)'},
       logoutStyle: {
@@ -44,13 +45,14 @@ Vue.component('sidebar',{
   `,
   data (){
     return{
-      elements: [{text: "Routes",id: 0},{text: "Stops",id: 1},{text: "Vehicles",id: 2},{text: "Users",id: 3},{text: "Messages",id: 4}],
+      elements: [{text: "Routes",id: 0},{text: "Stops",id: 1},{text: "Vehicles",id: 2}],
 
       titlebarStyle: {
         backgroundColor:"white",
         width: "10%",
         height:"auto",
         bottom: "0",
+        zIndex: "10",
         top:"40",
         float:"left",
         position: "absolute",

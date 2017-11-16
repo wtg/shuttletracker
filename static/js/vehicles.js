@@ -44,8 +44,8 @@ Vue.component('vehicle-card', {
     <b>name</b>: <input type="textbox" v-model="info.vehicleName"></input> <br>
     <b>enabled</b>: <input type="checkbox" @click="editVehicle" v-model="info.enabled"></input>{{info.enabled}}<br>
     <b>Created</b>: {{info.Created}} <br>
-    <div @click="editVehicle" class = "button" style="width: auto; float:left;">change</div>
-    <div @click="deleteVehicle" class = "button" style="width: auto; float:left;">delete</div>
+    <div @click="editVehicle" class = "button" style="width: auto; float:left;">Change</div>
+    <div @click="deleteVehicle" class = "button" style="width: auto; float:left;">Delete</div>
     <br>
   </div>`,
   data (){
