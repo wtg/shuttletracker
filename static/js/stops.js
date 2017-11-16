@@ -9,7 +9,7 @@ Vue.component('stop-card', {
     <b>name</b>: {{info.name}}<br>
     <b>Description</b>: {{info.description}}<br>
     <b>enabled</b>: <input type="checkbox" v-model="info.enabled"></input>{{info.enabled}}<br>
-    <b>Route</b>: <select v-model="myRouteId"><option v-for="routeId in routeids" v-bind:value="routeId" v-bind:selected="info.routeId == routeId">{{routeId}}</option></select><br>
+    <b>Route</b>: <select v-model="myRouteId" v-bind:id="'sel' + info.routeId"><option v-for="routeId in routeids" v-bind:value="routeId.id" v-bind:selected="info.routeId == routeId.id">{{routeId.name}}</option></select><br>
     <br>
     <button class=" button delete" @click="shouldDelete(info.id)">{{deleteText}}</button>
     <button class=" button delete" @click="update(info.id)">{{updateText}}</button>
@@ -21,8 +21,11 @@ Vue.component('stop-card', {
       deleteCount: 0,
       deleteText: "Delete",
       updateText: "Update",
-      myRouteId: "",
+      myRouteId: "58d9b6af43162227cf364cce",
     };
+  },
+  mounted (){
+    this.myRouteId = this.info.routeId;
   },
   methods: {
     shouldDelete: function(id){
@@ -92,7 +95,7 @@ Vue.component('stops-panel', {
     });
     $.get("/routes",function(data){
       for (let i = 0; i < data.length; i ++){
-        el.routeIDS.push(data[i].id);
+        el.routeIDS.push({id: data[i].id, name: data[i].name});
 
       }
       refresh = false;
@@ -116,7 +119,7 @@ Vue.component('stop-create',{
               <b>name</b>: <input v-model="name" placeholder="Stop Name"></input><br>
               <b>Description</b>: <input v-model="description" placeholder="Stop Description"></input><br>
               <b>Enabled</b>:  <input type="checkbox" v-model="enabled"></input>{{enabled}}<br>
-              <b>Route</b>: <select v-model="myRouteId"><option v-for="routeId in routeIDS" v-bind:value="routeId">{{routeId}}</option></select><br>
+              <b>Route</b>: <select v-model="myRouteId"><option v-for="routeId in routeIDS" v-bind:value="routeId.id">{{routeId.name}}</option></select><br>
             <button class="button" @click="send(JSON.stringify(getJSON()))">Submit</button>
             <button class="button" @click="showJSON(JSON.stringify(getJSON()))">GetJSON</button>
     </div></div>`,
@@ -206,7 +209,7 @@ Vue.component('stop-create',{
       this.initMap();
       $.get("/routes",function(data){
         for (let i = 0; i < data.length; i ++){
-          el.routeIDS.push(data[i].id);
+          el.routeIDS.push({id: data[i].id,name: data[i].name});
 
         }
         refresh = false;
