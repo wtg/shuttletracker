@@ -69,7 +69,7 @@ html, body {
   left: 0;
   right: 0;
   margin: 0 auto;
-  width: 10%;
+  width: auto;
   position: absolute;
   font-size: 22px;
   float:left;
