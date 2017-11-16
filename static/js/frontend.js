@@ -6,7 +6,7 @@ Vue.component('live-indicator',{
     return{
       liveStyle: {color:"black",padding:"1px",borderRadius:"3px",fontSize:"15px", backgroundColor:"#27ae60"},
       text: "Connected",
-    }
+    };
   },
   methods: {
     update: function(){
@@ -23,7 +23,7 @@ Vue.component('live-indicator',{
     setInterval(this.update,1000);
   }
 
-})
+});
 
 Vue.component('shuttle-map',{
   template: `<div id="mapid" style="height: 100%; z-index:0;"></div>`,
