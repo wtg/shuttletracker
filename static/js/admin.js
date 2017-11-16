@@ -36,7 +36,7 @@ Vue.component('titlebar', {
 
 Vue.component('sidebar',{
   template: `
-    <div v-bind:style="titlebarStyle" class="sidebar">
+    <div v-bind:style="sidebarStyle" class="sidebar">
       <ul class ="nav-list">
         <li v-for="elem in elements" @click="setState(elem.id)" class="nav-item" v-bind:class="{ selected: (keepState == elem.id) }">{{elem.text}}</li>
 
@@ -47,11 +47,11 @@ Vue.component('sidebar',{
     return{
       elements: [{text: "Routes",id: 0},{text: "Stops",id: 1},{text: "Vehicles",id: 2}],
 
-      titlebarStyle: {
+      sidebarStyle: {
         backgroundColor:"white",
-        width: "10%",
         height:"auto",
         bottom: "0",
+        fontSize: "16px",
         zIndex: "10",
         top:"40",
         float:"left",
@@ -86,7 +86,7 @@ Vue.component("main-pane",{
   data (){
     return {
       state: 0,
-      mainStyle: {position: "fixed",width: "90%",top:"50px",height: "auto", overflow: "scroll", bottom: "0",left: "10%"}
+      mainStyle: {position: "fixed",width: "auto",right:"0px",top:"50px",height: "auto", overflow: "scroll", bottom: "0",left: "150px"}
     }
   },
   mounted (){

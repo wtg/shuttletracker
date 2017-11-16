@@ -8,7 +8,6 @@ Vue.component('vehicle-create',{
     </div>`,
     data (){
       return{
-
         ID: "",
         name: "",
         enabled: true,
@@ -29,7 +28,7 @@ Vue.component('vehicle-create',{
             refresh = true;
           }
         });
-        this.id = "";
+        this.ID = "";
         this.name = "";
       }
     }
