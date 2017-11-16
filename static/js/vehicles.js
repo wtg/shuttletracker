@@ -11,7 +11,6 @@ Vue.component('vehicle-create',{
 
         ID: "",
         name: "",
-        // active: true,
         enabled: true,
       };
     },

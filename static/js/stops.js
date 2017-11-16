@@ -52,7 +52,7 @@ Vue.component('stop-card', {
         "endTime":"",
         "routeId":this.myRouteId.toString(),
         "enabled":this.info.enabled.toString(),
-        "toDelete":false,
+        "toDelete":true,
         "lat":this.info.lat,
         "lng":this.info.lng,
       };
@@ -199,11 +199,6 @@ Vue.component('stop-create',{
           el.addStopMarker.addTo(el.StopsMap);
 
         });
-        // this.StopsMap.on('click', function(e) {
-        //   el.RoutingWaypoints.push(e.latlng);
-        //   el.RoutingControl.setWaypoints(el.RoutingWaypoints);
-        // });
-
       }
     },
     mounted (){
