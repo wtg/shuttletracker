@@ -1,20 +1,25 @@
-var live = false;
+var live = true;
+var routeSuccess = true;
+var stopsSuccess = true;
+var vehicleUpdateSuccess = true;
+var vehicleMessageSuccess = true;
 
 Vue.component('live-indicator',{
   template: `<div style="position:fixed;top:40px;right:10px;"><p class="pulsate title" v-bind:style="liveStyle">{{text}}</p></div>`,
   data (){
     return{
-      liveStyle: {color:"black",padding:"1px",borderRadius:"3px",fontSize:"15px", backgroundColor:"#27ae60"},
-      text: "Connected",
+      liveStyle: {color:"black",padding:"3px",borderRadius:"3px",fontSize:"15px", backgroundColor:"#27ae60"},
+      text: "Live",
     };
   },
   methods: {
     update: function(){
+      live = routeSuccess && stopsSuccess && vehicleUpdateSuccess && vehicleMessageSuccess;
       if(live === false){
-        this.text="Disconnected";
+        this.text="Not live";
         this.liveStyle.backgroundColor = "#e74c3c";
       }else{
-        this.text="Connected";
+        this.text="Live";
         this.liveStyle.backgroundColor = "#27ae60";
       }
     }
@@ -89,11 +94,11 @@ Vue.component('shuttle-map',{
     },
 
     grabRoutes: function(){
-      $.get( "/routes", this.updateRoutes).fail(function(){live = false;});
+      $.get( "/routes", this.updateRoutes).fail(function(){routeSuccess = false;});
     },
 
     updateRoutes: function(data){
-      live = true;
+      routeSuccess = true;
       var updatedRoute = [];
       for(var i = 0; i < data.length; i ++){
         if(data[i].enabled === false){
@@ -167,12 +172,12 @@ Vue.component('shuttle-map',{
     },
 
     grabStops: function(){
-      $.get( "/stops", this.updateStops).fail(function(){live = false;});
+      $.get( "/stops", this.updateStops).fail(function(){stopsSuccess = false;});
 
     },
 
     updateStops: function(data){
-      live = true;
+      stopsSuccess = true;
       var stopIcon = L.icon({
         iconUrl: 'static/images/circle.svg',
 
@@ -196,11 +201,11 @@ Vue.component('shuttle-map',{
     },
 
     grabVehicles: function(){
-      $.get( "/updates", this.updateVehicles).fail(function(){live = false;});
+      $.get( "/updates", this.updateVehicles).fail(function(){vehicleUpdateSuccess = false;});
     },
 
     updateVehicles: function(data){
-      live = true;
+      vehicleUpdateSuccess = true;
       var shuttleIcon = L.icon({
         iconUrl: this.getShuttleIcon("#FFF"),
 
@@ -299,7 +304,7 @@ Vue.component('shuttle-map',{
     },
 
     grabVehicleInfo: function(){
-      $.get( "/vehicles", this.grabMessages).fail(function(){live = false;});
+      $.get( "/vehicles", this.grabMessages).fail(function(){vehicleMessageSuccess = false;});
 
     },
     updateMessages: function(){
@@ -314,14 +319,14 @@ Vue.component('shuttle-map',{
     },
 
     grabMessages: function(data){
-      live = true;
+      vehicleMessageSuccess = true;
       var nameToId = {};
       for(var i = 0; i < data.length; i ++){
         nameToId[data[i].vehicleName] = data[i].vehicleID;
       }
       var el = this;
       $.get( "/updates/message", function(data){
-        live = true;
+        vehicleMessageSuccess = true;
         for(var i = 0 ; i < data.length; i ++){
 
           var start_pos = data[i].indexOf('>') + 1;
@@ -330,7 +335,7 @@ Vue.component('shuttle-map',{
 
         }
         el.updateMessages();
-      }).fail(function(){live = false;});
+      }).fail(function(){vehicleMessageSuccess = false;});
 
     },
 
