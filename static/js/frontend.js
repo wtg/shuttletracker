@@ -1,4 +1,5 @@
 var live = true;
+var partial = false;
 var routeSuccess = true;
 var stopsSuccess = true;
 var vehicleUpdateSuccess = true;
@@ -15,9 +16,16 @@ Vue.component('live-indicator',{
   methods: {
     update: function(){
       live = routeSuccess && stopsSuccess && vehicleUpdateSuccess && vehicleMessageSuccess;
+      partial = routeSuccess || stopsSuccess || vehicleUpdateSuccess || vehicleMessageSuccess;
       if(live === false){
-        this.text="Not live";
-        this.liveStyle.backgroundColor = "#e74c3c";
+        if(partial){
+          this.text="Potential outages";
+          this.liveStyle.backgroundColor = "#f1c40f";
+        }else{
+          this.text="Not live";
+          this.liveStyle.backgroundColor = "#e74c3c";
+
+        }
       }else{
         this.text="Live";
         this.liveStyle.backgroundColor = "#27ae60";
