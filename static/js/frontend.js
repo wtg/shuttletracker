@@ -1,4 +1,29 @@
+var live = false;
 
+Vue.component('live-indicator',{
+  template: `<div style="position:fixed;top:40px;right:10px;"><p class="pulsate title" v-bind:style="liveStyle">{{text}}</p></div>`,
+  data (){
+    return{
+      liveStyle: {color:"black",padding:"1px",borderRadius:"3px",fontSize:"15px", backgroundColor:"#27ae60"},
+      text: "Connected",
+    }
+  },
+  methods: {
+    update: function(){
+      if(live === false){
+        this.text="Disconnected";
+        this.liveStyle.backgroundColor = "#e74c3c";
+      }else{
+        this.text="Connected";
+        this.liveStyle.backgroundColor = "#27ae60";
+      }
+    }
+  },
+  mounted (){
+    setInterval(this.update,1000);
+  }
+
+})
 
 Vue.component('shuttle-map',{
   template: `<div id="mapid" style="height: 100%; z-index:0;"></div>`,
@@ -64,10 +89,11 @@ Vue.component('shuttle-map',{
     },
 
     grabRoutes: function(){
-      $.get( "/routes", this.updateRoutes);
+      $.get( "/routes", this.updateRoutes).fail(function(){live = false;});
     },
 
     updateRoutes: function(data){
+      live = true;
       var updatedRoute = [];
       for(var i = 0; i < data.length; i ++){
         if(data[i].enabled === false){
@@ -141,11 +167,12 @@ Vue.component('shuttle-map',{
     },
 
     grabStops: function(){
-      $.get( "/stops", this.updateStops);
+      $.get( "/stops", this.updateStops).fail(function(){live = false;});
 
     },
 
     updateStops: function(data){
+      live = true;
       var stopIcon = L.icon({
         iconUrl: 'static/images/circle.svg',
 
@@ -169,11 +196,11 @@ Vue.component('shuttle-map',{
     },
 
     grabVehicles: function(){
-      $.get( "/updates", this.updateVehicles);
+      $.get( "/updates", this.updateVehicles).fail(function(){live = false;});
     },
 
     updateVehicles: function(data){
-
+      live = true;
       var shuttleIcon = L.icon({
         iconUrl: this.getShuttleIcon("#FFF"),
 
@@ -272,7 +299,7 @@ Vue.component('shuttle-map',{
     },
 
     grabVehicleInfo: function(){
-      $.get( "/vehicles", this.grabMessages);
+      $.get( "/vehicles", this.grabMessages).fail(function(){live = false;});
 
     },
     updateMessages: function(){
@@ -287,12 +314,14 @@ Vue.component('shuttle-map',{
     },
 
     grabMessages: function(data){
+      live = true;
       var nameToId = {};
       for(var i = 0; i < data.length; i ++){
         nameToId[data[i].vehicleName] = data[i].vehicleID;
       }
       var el = this;
       $.get( "/updates/message", function(data){
+        live = true;
         for(var i = 0 ; i < data.length; i ++){
 
           var start_pos = data[i].indexOf('>') + 1;
@@ -301,7 +330,7 @@ Vue.component('shuttle-map',{
 
         }
         el.updateMessages();
-      });
+      }).fail(function(){live = false;});
 
     },
 
@@ -347,6 +376,7 @@ Vue.component('title-bar', {
         <div class="titleContent">
             <dropdown-menu></dropdown-menu>
             <p class="title">{{title}}</p>
+            <live-indicator></live-indicator>
             <a href="https://webtech.union.rpi.edu" class="logo">
                 <img src="static/images/wtg.svg">
             </a>
