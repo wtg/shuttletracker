@@ -17,7 +17,6 @@ Vue.component('route-panel', {
   mounted(){
     var el = this;
     $.get("/routes",function(data){
-      console.log(data);
       el.routeData = data;
       refresh = false;
     });
@@ -68,7 +67,6 @@ Vue.component('route-card', {
            type: 'DELETE',
            success: function(result) {
              refresh = true;
-             console.log("lel");
            }
          });
     }
@@ -94,7 +92,6 @@ Vue.component('route-json',{
     methods: {
       submitForm: function(){
         toSend = $("#jsontxt").val();
-        // console.log("val" + toSend)
         $.ajax({
           url: "/routes/create",
           type: "POST",
@@ -151,7 +148,6 @@ Vue.component('route-create',{
           "color":this.color,
           "width":this.width.toString(),
           "coords":JSON.stringify(coords)};
-          // console.log(toSend)
           return toSend;
       },
       showJSON: function(data){

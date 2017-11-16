@@ -87,7 +87,6 @@ Vue.component('stops-panel', {
   mounted(){
     var el = this;
     $.get("/stops",function(data){
-      //console.log(data);
       el.stopData = data;
       refresh = false;
     });
@@ -156,8 +155,6 @@ Vue.component('stop-create',{
       },
       getJSON: function(){
         var el = this;
-        console.log(this.addStopMarker.getLatLng().lat);
-        //coords = this.drawnRoute.getLatLngs();
         var toSend = {
           "name":this.name,
           "description":this.description,
