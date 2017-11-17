@@ -1,3 +1,4 @@
+
 var live = true;
 var partial = false;
 var routeSuccess = true;
@@ -6,29 +7,31 @@ var vehicleUpdateSuccess = true;
 var vehicleMessageSuccess = true;
 
 Vue.component('live-indicator',{
-  template: `<div style="position:fixed;top:40px;right:10px;"><p class="pulsate title" v-bind:style="liveStyle">{{text}}</p></div>`,
+  template: `<div class = "pulsate" v-bind:style="liveStyle"></div>`,
   data (){
     return{
-      liveStyle: {color:"black",padding:"3px",borderRadius:"3px",fontSize:"15px", backgroundColor:"#27ae60"},
-      text: "Live",
+      liveStyle: {color:"black",width: "5px", marginTop:"10px", marginLeft:"5px", height:"5px",padding:"5px",borderRadius:"50%",fontSize:"15px", backgroundColor:"#27ae60", display:"inline-block"},
+      text: "",
     };
   },
   methods: {
     update: function(){
-      live = routeSuccess && stopsSuccess && vehicleUpdateSuccess && vehicleMessageSuccess;
-      partial = routeSuccess || stopsSuccess || vehicleUpdateSuccess || vehicleMessageSuccess;
+      live = routeSuccess && vehicleUpdateSuccess && vehicleMessageSuccess;
+      partial = routeSuccess || vehicleUpdateSuccess;
       if(live === false){
         if(partial){
-          this.text="Potential outages";
-          this.liveStyle.backgroundColor = "#f1c40f";
+          //this.text="Potential outages";
+          this.liveStyle.display = "none";
         }else{
-          this.text="Not live";
-          this.liveStyle.backgroundColor = "#e74c3c";
+          //this.text="Not live";
+          this.liveStyle.display = "none";
 
         }
       }else{
-        this.text="Live";
-        this.liveStyle.backgroundColor = "#27ae60";
+        //this.text="Live";
+        this.liveStyle.backgroundColor = "#3498db";
+        this.liveStyle.display = "inline-block";
+
       }
     }
   },
@@ -312,7 +315,7 @@ Vue.component('shuttle-map',{
     },
 
     grabVehicleInfo: function(){
-      $.get( "/vehicles", this.grabMessages).fail(function(){vehicleMessageSuccess = false;});
+      $.get( "/vehicles", this.grabMessages).fail(function(){vehicleUpdateSuccess = false;});
 
     },
     updateMessages: function(){
@@ -327,7 +330,7 @@ Vue.component('shuttle-map',{
     },
 
     grabMessages: function(data){
-      vehicleMessageSuccess = true;
+      vehicleUpdateSuccess = true;
       var nameToId = {};
       for(var i = 0; i < data.length; i ++){
         nameToId[data[i].vehicleName] = data[i].vehicleID;
