@@ -1,25 +1,16 @@
-$(document).ready(function(){
-
-});
-
-refresh = true;
 
 Vue.component('vehicle-create',{
   template:`<div class="vehicle-card route-description-box">
-
     <b>id</b>: <input type="textbox" v-model="ID" placeholder="1123454125"></input> (must be same as itrak vehicle ID) <br>
     <b>name</b>:<input type="textbox" v-model="name" placeholder="Vehicle Name"></input> <br>
-
     <b>enabled</b>:<input type="checkbox" v-model="enabled"></input><br>
     <div class = "button" @click="send" style="width: 50px;">add</div>
-
     </div>`,
     data (){
       return{
-
         ID: "",
         name: "",
-        active: true
+        enabled: true,
       };
     },
     methods: {
@@ -37,7 +28,7 @@ Vue.component('vehicle-create',{
             refresh = true;
           }
         });
-        this.id = "";
+        this.ID = "";
         this.name = "";
       }
     }
@@ -49,10 +40,10 @@ Vue.component('vehicle-card', {
   `<div class="vehicle-card route-description-box">
     <b>id</b>: {{info.vehicleID}}<br>
     <b>name</b>: <input type="textbox" v-model="info.vehicleName"></input> <br>
-    <b>enabled</b>: <input type="checkbox" v-model="info.enabled"></input>{{info.enabled}}<br>
+    <b>enabled</b>: <input type="checkbox" @click="editVehicle" v-model="info.enabled"></input>{{info.enabled}}<br>
     <b>Created</b>: {{info.Created}} <br>
-    <div @click="editVehicle" class = "button" style="width: auto; float:left;">change</div>
-    <div @click="deleteVehicle" class = "button" style="width: auto; float:left;">delete</div>
+    <div @click="editVehicle" class = "button" style="width: auto; float:left;">Change</div>
+    <div @click="deleteVehicle" class = "button" style="width: auto; float:left;">Delete</div>
     <br>
   </div>`,
   data (){
@@ -74,8 +65,7 @@ Vue.component('vehicle-card', {
     },
     editVehicle: function(){
       var el = this;
-
-      var pkg = {"vehicleID":this.info.vehicleID, "vehicleName":this.info.vehicleName, "enabled":this.info.enabled};
+      var pkg = {"vehicleID":this.info.vehicleID, "vehicleName":this.info.vehicleName, "enabled":!this.info.enabled};
       $.ajax({
         url: "/vehicles/edit",
         type: "POST",
@@ -120,13 +110,6 @@ Vue.component('vehicle-panel', {
       }
     },100);
 
-  }
-
-});
-
-var ShuttleTracker = new Vue({
-  el: '#document-vue',
-  data: {
   }
 
 });
