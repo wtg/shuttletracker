@@ -20,31 +20,20 @@ Vue.component('live-indicator',{
   template: `<div class = "pulsate" v-bind:style="liveStyle">Updated: {{text}}</div>`,
   data (){
     return{
-      liveStyle: {color:"black",width: "auto", height:"auto",padding:"5px",borderRadius:"5px",fontSize:"15px", backgroundColor:"#27ae60", display:"none", position: "absolute", right:"10px",top:"42px"},
-      text: "",
+      liveStyle: {color:"black",width: "auto", height:"auto",padding:"5px",borderRadius:"5px",fontSize:"15px", backgroundColor:"rgba(255, 255, 255, 0.88)", boxShadow: "0 1px 1px rgba(0, 0, 0, 0.8)", display:"none", position: "absolute", right:"10px",top:"42px"},
+      text: ""
       };
   },
   methods: {
     update: function(){
       live = routeSuccess && vehicleUpdateSuccess && vehicleMessageSuccess;
       partial = routeSuccess || vehicleUpdateSuccess;
-      this.text = window.lastUpdateTime;
       if(live === false){
-        if(partial){
-          //this.text="Potential outages";
-          this.liveStyle.display = "none";
-          this.liveStyle.backgroundColor = "#f1c40f";
 
-        }else{
-          //this.text="Not live";
-          this.liveStyle.display = "none";
-          this.liveStyle.backgroundColor = "#e74c3c";
-
-
-        }
       }else{
         //this.text="Live";
-        this.liveStyle.backgroundColor = "#3498db";
+        this.text = window.lastUpdateTime;
+        this.liveStyle.backgroundColor = "rgba(255, 255, 255, 0.88)";
         this.liveStyle.display = "inline-block";
 
       }
