@@ -1,3 +1,36 @@
+Vue.component('message-display',{
+  template:`<div class="message" v-bind:style=messageStyle>
+  <div @click="hide" v-bind:style="buttonStyle">x</div>
+  {{text}}
+  </div>`,
+  data (){
+    return{
+      buttonStyle: {position: "inherit",top:"2px",right:"5px",cursor:"pointer",color:"grey"},
+      messageStyle: {textAlign:"center",backgroundColor:"#e74c3c",position:"absolute",bottom:"50px",left:"30px",right:"30px",height:"40px",width:"auto",opacity:".8",overflowY:"hide",display:"none"},
+      text: ""
+    };
+  },
+  methods:{
+    hide: function(){
+      this.messageStyle.display = "none";
+    },
+    getMessage: function(){
+      let el = this
+      $.get("/message",function(data){
+        if(data == ''){
+          el.messageStyle.display = "none";
+        }else{
+          el.messageStyle.display = "inline-block";
+        }
+        el.text=data;
+      })
+    },
+
+  },
+  mounted (){
+    this.getMessage();
+  }
+});
 
 
 Vue.component('shuttle-map',{

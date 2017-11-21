@@ -65,6 +65,8 @@ func New(cfg Config, db database.Database) (*API, error) {
 	r.HandleFunc("/updates/message", api.UpdateMessageHandler).Methods("GET")
 	r.HandleFunc("/routes", api.RoutesHandler).Methods("GET")
 	r.HandleFunc("/stops", api.StopsHandler).Methods("GET")
+	r.HandleFunc("/message", api.MessageGetHandler).Methods("GET")
+
 
 	// Admin
 	r.Handle("/admin/", api.CasAUTH.HandleFunc(api.AdminHandler)).Methods("GET")
