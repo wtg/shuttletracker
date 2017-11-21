@@ -5,26 +5,41 @@ var routeSuccess = true;
 var stopsSuccess = true;
 var vehicleUpdateSuccess = true;
 var vehicleMessageSuccess = true;
+var lastUpdateTime = ""
+
+var d = new Date();
+
+function checkTime(i) {
+    if (i < 10) {
+        i = "0" + i;
+    }
+    return i;
+}
 
 Vue.component('live-indicator',{
-  template: `<div class = "pulsate" v-bind:style="liveStyle"></div>`,
+  template: `<div class = "pulsate" v-bind:style="liveStyle">Updated: {{text}}</div>`,
   data (){
     return{
-      liveStyle: {color:"black",width: "5px", marginTop:"10px", marginLeft:"5px", height:"5px",padding:"5px",borderRadius:"50%",fontSize:"15px", backgroundColor:"#27ae60", display:"inline-block"},
+      liveStyle: {color:"black",width: "auto", height:"auto",padding:"5px",borderRadius:"5px",fontSize:"15px", backgroundColor:"#27ae60", display:"none", position: "absolute", right:"10px",top:"42px"},
       text: "",
-    };
+      };
   },
   methods: {
     update: function(){
       live = routeSuccess && vehicleUpdateSuccess && vehicleMessageSuccess;
       partial = routeSuccess || vehicleUpdateSuccess;
+      this.text = window.lastUpdateTime;
       if(live === false){
         if(partial){
           //this.text="Potential outages";
           this.liveStyle.display = "none";
+          this.liveStyle.backgroundColor = "#f1c40f";
+
         }else{
           //this.text="Not live";
           this.liveStyle.display = "none";
+          this.liveStyle.backgroundColor = "#e74c3c";
+
 
         }
       }else{
@@ -46,8 +61,8 @@ Vue.component('shuttle-map',{
   mounted(){
     this.initMap();
     this.grabStops();
-    var a = setInterval(this.grabVehicles, 1000);
-    var b = setInterval(this.grabRoutes, 1000);
+    var a = setInterval(this.grabVehicles, 3000);
+    var b = setInterval(this.grabRoutes, 3000);
 
   },
   data (){
@@ -216,6 +231,15 @@ Vue.component('shuttle-map',{
     },
 
     updateVehicles: function(data){
+      window.d = new Date();
+      var hours = window.d.getHours();
+      hours = checkTime(hours);
+      var mins = window.d.getMinutes();
+      mins = checkTime(mins);
+      var secs = window.d.getSeconds();
+      secs = checkTime(secs);
+
+      window.lastUpdateTime = (hours) + ":" + (mins) + ":" + (secs);
       vehicleUpdateSuccess = true;
       var shuttleIcon = L.icon({
         iconUrl: this.getShuttleIcon("#FFF"),
@@ -268,7 +292,6 @@ Vue.component('shuttle-map',{
             };
             this.ShuttlesArray[data[j].vehicleID].marker.addTo(this.ShuttleMap);
           }else{
-            //console.log(data[j].color);
             shuttleIcon.options.iconUrl = this.getShuttleIcon(data[j].color);
             this.ShuttlesArray[data[j].vehicleID].marker.setIcon(shuttleIcon);
             this.ShuttlesArray[data[j].vehicleID].marker.setLatLng([data[j].lat,data[j].lng]);
