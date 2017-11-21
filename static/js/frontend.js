@@ -5,7 +5,7 @@ var routeSuccess = true;
 var stopsSuccess = true;
 var vehicleUpdateSuccess = true;
 var vehicleMessageSuccess = true;
-var lastUpdateTime = ""
+var lastUpdateTime = "";
 
 var d = new Date();
 
