@@ -17,11 +17,13 @@ function checkTime(i) {
 }
 
 Vue.component('live-indicator',{
-  template: `<div class = "pulsate" v-bind:style="liveStyle">Updated: {{text}}</div>`,
+  template: `<div v-bind:style="liveStyle">{{lv}} <div v-if="live" class="pulsate" style="position:absolute;float:right; width:10px;height:10px;background-color:blue;border-radius:50%;top:9px;right:3px;"></div>{{text}}</div>`,
   data (){
     return{
-      liveStyle: {color:"black",width: "auto", height:"auto",padding:"5px",borderRadius:"5px",fontSize:"15px", backgroundColor:"rgba(255, 255, 255, 0.88)", boxShadow: "0 1px 1px rgba(0, 0, 0, 0.8)", display:"none", position: "absolute", right:"10px",top:"42px"},
-      text: ""
+      liveStyle: {color:"black",width: "40px", height:"18px",padding:"5px",borderRadius:"5px",fontSize:"15px", backgroundColor:"rgba(255, 255, 255, 0.88)", boxShadow: "0 1px 1px rgba(0, 0, 0, 0.8)", display:"none", position: "absolute", right:"10px",top:"42px"},
+      text: "",
+      lv:"Live",
+      live: false
       };
   },
   methods: {
@@ -29,12 +31,18 @@ Vue.component('live-indicator',{
       live = routeSuccess && vehicleUpdateSuccess && vehicleMessageSuccess;
       partial = routeSuccess || vehicleUpdateSuccess;
       if(live === false){
-
+        this.text = window.lastUpdateTime;
+        this.liveStyle.width="auto"
+        this.live=false;
+        this.lv = "Last Updated";
       }else{
         //this.text="Live";
-        this.text = window.lastUpdateTime;
-        this.liveStyle.backgroundColor = "rgba(255, 255, 255, 0.88)";
+        this.live = true;
+        this.lv = "Live";
+        this.text = "";
+        this.liveStyle.width = "40px"
         this.liveStyle.display = "inline-block";
+
 
       }
     }

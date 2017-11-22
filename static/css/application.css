@@ -181,7 +181,22 @@ a.dropdown-schedule > img{
     -webkit-animation-iteration-count: infinite;
     opacity: 1;
 }
+@-webkit-keyframes pulsate {
+    0% {
+        opacity: 100%;
+        -webkit-transform:scale(.75);
 
+    }
+    50% {
+        opacity: 70%;
+        -webkit-transform:scale(1);
+    }
+    100% {
+        opacity: 100%;
+        -webkit-transform:scale(.75);
+
+    }
+}
 
 
 .pulsating-circle {
