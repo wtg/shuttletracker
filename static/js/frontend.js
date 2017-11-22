@@ -32,7 +32,7 @@ Vue.component('live-indicator',{
       partial = routeSuccess || vehicleUpdateSuccess;
       if(live === false){
         this.text = window.lastUpdateTime;
-        this.liveStyle.width="auto"
+        this.liveStyle.width="auto";
         this.live=false;
         this.lv = "Last Updated";
       }else{
@@ -40,7 +40,7 @@ Vue.component('live-indicator',{
         this.live = true;
         this.lv = "Live";
         this.text = "";
-        this.liveStyle.width = "40px"
+        this.liveStyle.width = "40px";
         this.liveStyle.display = "inline-block";
 
 
