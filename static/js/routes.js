@@ -63,7 +63,6 @@ Vue.component('route-card', {
     },
     toggleRoute: function(id){
       data = {id: id, enabled: !this.info.enabled};
-      console.log(data);
       $.ajax({
         url: "/routes/edit",
         type: "POST",
