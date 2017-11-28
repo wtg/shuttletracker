@@ -39,7 +39,7 @@ Vue.component('route-card', {
     <b>id</b>: {{info.id}}<br>
     <b>name</b>: {{info.name}}<br>
     <b>Description</b>: {{info.description}}<br>
-    <b>enabled</b>: <input type="checkbox" v-model="info.enabled"></input>{{info.enabled}}<br>
+    <b>enabled</b>: <input type="checkbox" v-model="info.enabled" @click="toggleRoute(info.id)"></input>{{info.enabled}}<br>
     <b>Color</b>: {{info.color}}<br>
     <b>Created</b>: {{info.created}} <br>
     <br>
@@ -61,6 +61,18 @@ Vue.component('route-card', {
         this.deleteCount++;
       }
     },
+    toggleRoute: function(id){
+      data = {id: id, enabled: !this.info.enabled};
+      $.ajax({
+        url: "/routes/edit",
+        type: "POST",
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        complete: function(data){
+        }
+      });
+    },
+
     deleteRoute: function(id){
       $.ajax({
            url: '/routes/' + id,
