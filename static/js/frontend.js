@@ -102,7 +102,7 @@ Vue.component('shuttle-map',{
 
     getLegendIcon: function(color) {
 		var url = "data:image/svg+xml;base64," + btoa(this.ShuttleSVG.replace("COLOR",color));
-		return url
+		return url;
 	},
 	
 	initMap: function(){
@@ -139,20 +139,20 @@ Vue.component('shuttle-map',{
 			for (i = 0; i < app.ShuttleRoutes.length; i++){
 				let route = app.ShuttleRoutes[i];
 				console.log(route);
-			  legendstring += `<li><img src=` + app.getLegendIcon(route.color)
-				+` width="12" height="12"> `
-				+ route.name;
+			  legendstring += `<li><img src=` + app.getLegendIcon(route.color)+` 
+				width="12" height="12"> `+ 
+				route.name;
 		  }
 
 		  div.innerHTML = `<ul style="list-style:none">
-					<li><img src="static/images/user.svg" width="12" height="12"> You</li>`
-					+ legendstring +
+					<li><img src="static/images/user.svg" width="12" height="12"> You</li>`+ 
+					legendstring +
 					`<li><img src="static/images/circle.svg" width="12" height="12"> Shuttle Stop</li>
 				</ul>`;
-		return div
+		return div;
 		
-	  }
-	  app.legend.addTo(app.ShuttleMap)
+	  };
+	  app.legend.addTo(app.ShuttleMap);
 	},
 
     updateRoutes: function(data){
