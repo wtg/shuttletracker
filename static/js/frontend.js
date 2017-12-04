@@ -73,7 +73,7 @@ Vue.component('shuttle-map',{
       MapBoundPoints: [],
       ShuttleUpdateCounter: 0,
       first: true,
-	  legend: L.control({position: 'bottomleft'}),
+      legend: L.control({position: 'bottomleft'}),
 
       ShuttleSVG: `<?xml version="1.0" encoding="UTF-8"?>
           <svg width="52px" height="52px" viewBox="0 0 52 52" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -89,7 +89,7 @@ Vue.component('shuttle-map',{
           `,
 		CircleSVG: `<?xml version="1.0"?>
 			<svg height="600" width="600" xmlns="http://www.w3.org/2000/svg">
-				<circle cx="50%" cy="50%" r="50%" fill="COLOR" />
+			<circle cx="50%" cy="50%" r="50%" fill="COLOR" />
 			</svg>`
     };
   },
@@ -110,8 +110,8 @@ Vue.component('shuttle-map',{
           zoomControl: false,
           attributionControl: false // hide Leaflet
       });
-	  
-	  this.ShuttleMap.setView([42.728172, -73.678803], 15.3);
+      
+      this.ShuttleMap.setView([42.728172, -73.678803], 15.3);
       // show attribution without Leaflet
       this.ShuttleMap.addControl(L.control.attribution({
           position: 'bottomright',
@@ -136,12 +136,12 @@ Vue.component('shuttle-map',{
 	  app.legend.onAdd = function(map) {
 		  var div = L.DomUtil.create('div','info legend');
 		  var legendstring = "";
-			for (i = 0; i < app.ShuttleRoutes.length; i++){
-				let route = app.ShuttleRoutes[i];
-				console.log(route);
+		    for (i = 0; i < app.ShuttleRoutes.length; i++){
+			  let route = app.ShuttleRoutes[i];
+			  console.log(route);
 			  legendstring += `<li><img src=` + app.getLegendIcon(route.color)+` 
-				width="12" height="12"> `+ 
-				route.name;
+			  width="12" height="12"> `+ 
+			  route.name;
 		  }
 
 		  div.innerHTML = `<ul style="list-style:none">
@@ -151,7 +151,7 @@ Vue.component('shuttle-map',{
 				</ul>`;
 		return div;
 		
-	  };
+		};
 	  app.legend.addTo(app.ShuttleMap);
 	},
 
@@ -199,7 +199,7 @@ Vue.component('shuttle-map',{
       }
       this.ShuttleRoutes = updatedRoute;
       this.drawRoutes();
-	  this.updateLegend();
+      this.updateLegend();
     },
 
 
