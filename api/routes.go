@@ -15,7 +15,6 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/wtg/shuttletracker/model"
-	"gopkg.in/mgo.v2/bson"
 )
 
 // RoutesHandler finds all of the routes in the database
@@ -87,7 +86,6 @@ func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	currentTime := time.Now()
 	// Create a new route
 	route := model.Route{
-		ID:          bson.NewObjectId().Hex(),
 		Name:        routeData["name"],
 		Description: routeData["description"],
 		StartTime:   routeData["startTime"],
@@ -161,31 +159,32 @@ func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Create a new stop object using request fields
 	stop := model.Stop{}
 	err := json.NewDecoder(r.Body).Decode(&stop)
-	stop.ID = bson.NewObjectId().Hex()
-	route, err1 := api.db.GetRoute(stop.RouteID)
-	// Error handling
-
-	if err1 != nil {
-		http.Error(w, err1.Error(), http.StatusInternalServerError)
-	}
 	if err != nil {
+		log.WithError(err).Error("Unable to decode stop.")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	// We have to know the order of the stop and store a velocity vector into duration for the prediction
-	route.StopsID = append(route.StopsID, stop.ID) // THIS REQUIRES the front end to have correct order << to be improved
-	fmt.Println(route.StopsID)
-
+	route, err := api.db.GetRoute(stop.RouteID)
+	if err != nil {
+		log.WithError(err).Error("Unable to get route.")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	// Store new stop under stops collection
 	err = api.db.CreateStop(&stop)
 	// Error handling
 	if err != nil {
-		fmt.Println(err.Error())
+		log.WithError(err).Error("Unable to create stop.")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-
+	// We have to know the order of the stop and store a velocity vector into duration for the prediction
+	route.StopsID = append(route.StopsID, stop.ID) // THIS REQUIRES the front end to have correct order << to be improved
 	err = api.db.ModifyRoute(&route)
 	if err != nil {
-		fmt.Println(err.Error())
+		log.WithError(err).Error("Unable to modify route.")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	WriteJSON(w, stop)
 }

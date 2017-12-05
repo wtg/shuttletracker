@@ -77,6 +77,7 @@ func NewMongoDBConfig(v *viper.Viper) *MongoDBConfig {
 
 // CreateRoute creates a Route.
 func (m *MongoDB) CreateRoute(route *model.Route) error {
+	route.ID = bson.NewObjectId().Hex()
 	return m.routes.Insert(&route)
 }
 
@@ -106,6 +107,7 @@ func (m *MongoDB) ModifyRoute(route *model.Route) error {
 
 // CreateStop creates a Stop.
 func (m *MongoDB) CreateStop(stop *model.Stop) error {
+	stop.ID = bson.NewObjectId().Hex()
 	return m.stops.Insert(&stop)
 }
 
