@@ -43,6 +43,8 @@ type Database interface {
 }
 
 var (
-	ErrVehicleNotFound = errors.New("Vehicle not found.")
-	ErrUpdateNotFound  = errors.New("Update not found.")
+	// ErrVehicleNotFound indicates that a Vehicle is not in the database.
+	ErrVehicleNotFound = errors.New("Vehicle not found")
+	// ErrUpdateNotFound indicates that an Update is not in the database.
+	ErrUpdateNotFound = errors.New("Update not found")
 )
