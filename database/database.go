@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"time"
 
 	"github.com/wtg/shuttletracker/model"
@@ -40,3 +41,8 @@ type Database interface {
 	// Users
 	GetUsers() ([]model.User, error)
 }
+
+var (
+	ErrVehicleNotFound = errors.New("Vehicle not found.")
+	ErrUpdateNotFound  = errors.New("Update not found.")
+)

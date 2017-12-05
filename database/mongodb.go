@@ -146,6 +146,9 @@ func (m *MongoDB) DeleteUpdatesBefore(before time.Time) (int, error) {
 func (m *MongoDB) GetLastUpdateForVehicle(vehicleID string) (model.VehicleUpdate, error) {
 	var update model.VehicleUpdate
 	err := m.updates.Find(bson.M{"vehicleID": vehicleID}).Sort("-created").One(&update)
+	if err == mgo.ErrNotFound {
+		return update, ErrUpdateNotFound
+	}
 	return update, err
 }
 
@@ -177,6 +180,9 @@ func (m *MongoDB) DeleteVehicle(vehicleID string) error {
 func (m *MongoDB) GetVehicle(vehicleID string) (model.Vehicle, error) {
 	var vehicle model.Vehicle
 	err := m.vehicles.Find(bson.M{"vehicleID": vehicleID}).One(&vehicle)
+	if err == mgo.ErrNotFound {
+		return vehicle, ErrVehicleNotFound
+	}
 	return vehicle, err
 }
 
