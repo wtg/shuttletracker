@@ -1,7 +1,52 @@
 var refresh = false;
+
+Vue.component('active-selector',{
+  template: `<div class="route-description-box">
+  <select v-model=selected>
+    <option v-for="day in days" v-bind:value=day>{{day}}</option>
+  </select>
+  <input type="time" v-model=tod></input>
+  <input type="checkbox" v-model=on></input>
+  <input type="button" value="+" @click="add"></input>
+  <div style="width:auto;background-color:#eee;margin:10px;">
+
+  <div v-for="item in times">{{item.day}} - {{item.time}} - {{item.on}} - {{item.id}} <input type="button" value="delete" @click="del(item.id)"></input></div>
+  </div>
+  </div>`,
+  data (){
+    return {
+      selected: "Monday",
+      times: [],
+      on: false,
+      tod: "20:00:00",
+      days: {Monday: "Monday",Tuesday: "Tuesday",Wednesday: "Wednesday",Thursday: "Thursday",Friday: "Friday",Saturday: "Saturday",Sunday: "Sunday"},
+
+    }
+  },
+  methods: {
+    add: function(){
+
+      let obj = {on: this.on, day: this.selected, time: this.tod, id: this.times.length}
+      this.times.push(obj);
+    },
+    del: function(id){
+      if(this.times != undefined){
+        for (let i =0; i < this.times.length; i ++){
+          if(this.times[i].id == id){
+             this.times.splice(i, 1);
+            break;
+          }
+        }
+
+      }
+    }
+  }
+});
+
 Vue.component('route-panel', {
   template:
   `<div class ="vehicle-panel">
+    <active-selector></active-selector>
     <div v-for="route in routeData" class="vehicle-info">
     <route-card v-bind:info="route"></route-card>
 
