@@ -176,6 +176,25 @@ a.dropdown-schedule > img{
   font-weight: 500;
 }
 /* ===================== */
+.legend {
+  background: 0,12,12;
+  position: relative;
+  bottom: 30px;
+  opacity: 1;
+  filter: alpha(opacity=50)
+  color: black;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.88);
+  box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
+  display: inline-block;
+    ;
+}
+
+.legend ul {
+  padding-left: 6px;
+  padding-right: 5px;
+}
+
 .pulsate {
     -webkit-animation: pulsate 5s ease-out;
     -webkit-animation-iteration-count: infinite;
