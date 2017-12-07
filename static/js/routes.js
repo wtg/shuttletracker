@@ -1,16 +1,20 @@
 var refresh = false;
 
 Vue.component('active-selector',{
-  template: `<div class="route-description-box">
+  props: ['routeId'],
+  template: `<div>
   <select v-model=selected>
     <option v-for="day in days" v-bind:value=day>{{day}}</option>
   </select>
   <input type="time" v-model=tod></input>
   <input type="checkbox" v-model=on></input>
   <input type="button" value="+" @click="add"></input>
+  <input type="button" value="Submit"></input>
+
   <div style="width:auto;background-color:#eee;margin:10px;">
 
-  <div v-for="item in times">{{item.day}} - {{item.time}} - {{item.on}} - {{item.id}} <input type="button" value="delete" @click="del(item.id)"></input></div>
+  <div v-for="item in times">{{item.day}} - {{item.time}} - {{item.on}}<input type="button" value="delete" @click="del(item.id)"></input></div>
+
   </div>
   </div>`,
   data (){
@@ -26,7 +30,7 @@ Vue.component('active-selector',{
   methods: {
     add: function(){
 
-      let obj = {on: this.on, day: this.selected, time: this.tod, id: this.times.length}
+      let obj = {on: this.on, day: this.selected, time: this.tod}
       this.times.push(obj);
     },
     del: function(id){
@@ -46,7 +50,6 @@ Vue.component('active-selector',{
 Vue.component('route-panel', {
   template:
   `<div class ="vehicle-panel">
-    <active-selector></active-selector>
     <div v-for="route in routeData" class="vehicle-info">
     <route-card v-bind:info="route"></route-card>
 
@@ -81,6 +84,7 @@ Vue.component('route-card', {
   props: ['info'],
   template:
   `<div class="vehicle-card route-description-box">
+
     <b>id</b>: {{info.id}}<br>
     <b>name</b>: {{info.name}}<br>
     <b>Description</b>: {{info.description}}<br>
@@ -88,6 +92,7 @@ Vue.component('route-card', {
     <b>Color</b>: {{info.color}}<br>
     <b>Created</b>: {{info.created}} <br>
     <br>
+    <active-selector></active-selector>
     <button class=" button delete" @click="shouldDelete(info.id)">{{buttonText}}</button>
   </div>`,
   data (){
