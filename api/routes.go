@@ -86,18 +86,18 @@ func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	width, _ := strconv.Atoi(routeData["width"])
 	currentTime := time.Now()
 	// Create a new route
+	var intervals []model.Interval
 	route := model.Route{
-		ID:          bson.NewObjectId().Hex(),
-		Name:        routeData["name"],
-		Description: routeData["description"],
-		StartTime:   routeData["startTime"],
-		EndTime:     routeData["endTime"],
-		Enabled:     enabled,
-		Color:       routeData["color"],
-		Width:       width,
-		Coords:      coords,
-		Created:     currentTime,
-		Updated:     currentTime}
+		ID:            bson.NewObjectId().Hex(),
+		Name:          routeData["name"],
+		Description:   routeData["description"],
+		TimeIntervals: intervals,
+		Enabled:       enabled,
+		Color:         routeData["color"],
+		Width:         width,
+		Coords:        coords,
+		Created:       currentTime,
+		Updated:       currentTime}
 	// Store new route under routes collection
 	err = api.db.CreateRoute(&route)
 	// Error handling
