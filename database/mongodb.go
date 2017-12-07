@@ -77,6 +77,7 @@ func NewMongoDBConfig(v *viper.Viper) *MongoDBConfig {
 
 // CreateRoute creates a Route.
 func (m *MongoDB) CreateRoute(route *model.Route) error {
+	route.ID = bson.NewObjectId().Hex()
 	return m.routes.Insert(&route)
 }
 
@@ -106,6 +107,7 @@ func (m *MongoDB) ModifyRoute(route *model.Route) error {
 
 // CreateStop creates a Stop.
 func (m *MongoDB) CreateStop(stop *model.Stop) error {
+	stop.ID = bson.NewObjectId().Hex()
 	return m.stops.Insert(&stop)
 }
 
@@ -146,6 +148,9 @@ func (m *MongoDB) DeleteUpdatesBefore(before time.Time) (int, error) {
 func (m *MongoDB) GetLastUpdateForVehicle(vehicleID string) (model.VehicleUpdate, error) {
 	var update model.VehicleUpdate
 	err := m.updates.Find(bson.M{"vehicleID": vehicleID}).Sort("-created").One(&update)
+	if err == mgo.ErrNotFound {
+		return update, ErrUpdateNotFound
+	}
 	return update, err
 }
 
@@ -177,6 +182,9 @@ func (m *MongoDB) DeleteVehicle(vehicleID string) error {
 func (m *MongoDB) GetVehicle(vehicleID string) (model.Vehicle, error) {
 	var vehicle model.Vehicle
 	err := m.vehicles.Find(bson.M{"vehicleID": vehicleID}).One(&vehicle)
+	if err == mgo.ErrNotFound {
+		return vehicle, ErrVehicleNotFound
+	}
 	return vehicle, err
 }
 

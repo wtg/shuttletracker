@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	mgo "gopkg.in/mgo.v2"
 
 	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/log"
@@ -129,7 +128,7 @@ func (u *Updater) update() {
 
 			vehicleID := strings.Replace(result["id"], "Vehicle ID:", "", -1)
 			vehicle, err := u.db.GetVehicle(vehicleID)
-			if err == mgo.ErrNotFound {
+			if err == database.ErrVehicleNotFound {
 				log.Warnf("Unknown vehicle ID \"%s\" returned by iTrak. Make sure all vehicles have been added.", vehicleID)
 				return
 			} else if err != nil {
@@ -139,7 +138,7 @@ func (u *Updater) update() {
 
 			// determine if this is a new update from itrak by comparing timestamps
 			lastUpdate, err := u.db.GetLastUpdateForVehicle(vehicle.VehicleID)
-			if err != nil && err != mgo.ErrNotFound {
+			if err != nil && err != database.ErrUpdateNotFound {
 				log.WithError(err).Error("Unable to retrieve last update.")
 				return
 			}
