@@ -1,9 +1,11 @@
 package updater
 
 import (
+	//"fmt"				// added for Gmail API
 	"io/ioutil"
 	"math"
-	"net/http"
+	"net/http"			// added for email notifications
+	//"net/smtp"
 	"regexp"
 	"strconv"
 	"strings"
@@ -28,6 +30,7 @@ type Updater struct {
 type Config struct {
 	DataFeed       string
 	UpdateInterval string
+	// smtp url server
 }
 
 // New creates an Updater.
@@ -68,6 +71,7 @@ func (u *Updater) Run() {
 	// Call update() every updateInterval.
 	for range ticker {
 		u.update()
+
 	}
 }
 
@@ -101,6 +105,10 @@ func (u *Updater) update() {
 	}
 
 	wg := sync.WaitGroup{}
+
+	// create array to hold notifications to send
+	//var notifications_to_send []model.Notification 
+
 	// for parsed data, update each vehicle
 	for _, vehicleData := range vehiclesData {
 		wg.Add(1)
@@ -176,10 +184,59 @@ func (u *Updater) update() {
 			if err := u.db.CreateUpdate(&update); err != nil {
 				log.WithError(err).Errorf("Could not insert vehicle update.")
 			}
+
+			// Notifications 
+			// Convert lat and lng to floats
+			lat, err := strconv.ParseFloat(update.Lat, 64)
+			if err != nil {
+				log.WithError(err).Error("Unable to convert lat to float.")
+			}
+
+			lng, err := strconv.ParseFloat(update.Lng, 64)
+			if err != nil {
+				log.WithError(err).Error("Unable to convert lng to float.")
+			}
+
+			// Check if vehicle is at a stop
+			current_stop, next_stop, at_stop := u.AtStop(lat, lng, update.Route)
+
+			if !at_stop{
+				log.Debugf("Vechile is not at a stop")
+				return
+			} 
+			
+			log.Debugf("Current stop: %s   Next stop: %s", current_stop.Name, next_stop.Name)
+			
+			// Request notifications for next stop
+			var notifications []model.Notification
+			notifications, err = u.db.GetNotificationsForStop(next_stop.ID, update.Route);
+			
+			if err != nil{
+				log.WithError(err).Error("Unable to get notifications.")
+				return
+			} 
+
+			// Send notifications
+			sent := Send(notifications, current_stop.Name, next_stop.Name)
+			log.Debugf("Sent %d notification(s).", sent)
+
+
+			// Delete notifications for correct stop on correct route
+			deleted, err := u.db.DeleteNotificationsForStop(next_stop.ID, update.Route)
+			if err != nil {
+				log.WithError(err).Error("Unable to remove notifications.")
+				return
+			}
+
+			if deleted > 0 {
+				log.Debugf("Removed %d notifications.", deleted)
+			}
+
 		}(vehicleData)
 	}
 	wg.Wait()
 	log.Debugf("Updated vehicles.")
+
 
 	// Prune updates older than one month
 	deleted, err := u.db.DeleteUpdatesBefore(time.Now().AddDate(0, -1, 0))
@@ -274,4 +331,60 @@ func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Rout
 	}
 	log.Debugf("%v on %s route.", vehicle.VehicleName, route.Name)
 	return route, err
+}
+
+func (u *Updater) AtStop (lat float64, lng float64, routeID string) (model.Stop, model.Stop, bool) {
+	var stops []model.Stop 
+	var current_stop model.Stop
+	var next_stop model.Stop
+	var at_stop bool = false
+	var set_next_stop = false
+
+	// If route cannot be determined, don't try to determine stop.
+	if routeID == ""{
+		return current_stop, next_stop, at_stop
+	} 
+		
+	stops, err := u.db.GetStopsForRoute(routeID)
+
+	if err != nil {
+		log.Error(err)
+		return current_stop, next_stop, at_stop
+	}
+
+	// Account for negative coordinates
+	lat = math.Abs(lat)
+	lng = math.Abs(lng)
+
+
+	for _, stop := range stops {
+
+		// TODO: fix stops on route to reflect the correct order of the shuttle stops
+		// i.e: East Campus route
+		if at_stop{
+			next_stop = stop
+			set_next_stop = true
+			break;
+		}
+
+		stopLat := math.Abs(stop.Lat)
+		stopLng := math.Abs(stop.Lng)
+
+		//log.Debugf("stop %s \tlat: %f \tlng: %f", stop.Name, stopLat, stopLng)
+		//log.Debugf("vehicle \t\tlat: %f \tlng: %f\n", lat, lng)
+		
+		// If current lat, lng of a vehicle is within +-0.001 of any stops lat, lng return that stop
+		// TODO: add tests to check this interval
+		if (lat >= (stopLat - 0.001) && lat < stopLat + 0.001) && (lng >= (stopLng - 0.001) && lng <= (stopLng + 0.001)){
+			current_stop = stop
+			at_stop = true
+		}
+	}
+	
+	// Handle edge case -- vehicle is at the last stop in the array
+	if at_stop && !set_next_stop{
+		next_stop = stops[0]
+	}
+
+	return current_stop, next_stop, at_stop
 }

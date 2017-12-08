@@ -20,7 +20,7 @@ type Database interface {
 	CreateStop(stop *model.Stop) error
 	DeleteStop(stopID string) error
 	GetStops() ([]model.Stop, error)
-	// GetStopsForRoute(routeID string) ([]model.Stop, error)
+	GetStopsForRoute(routeID string) ([]model.Stop, error)
 	// ModifyStop(stop *model.Stop) error
 
 	// Vehicles
@@ -40,6 +40,12 @@ type Database interface {
 
 	// Users
 	GetUsers() ([]model.User, error)
+
+	// Notifications
+	CreateNotification(notification *model.Notification) error
+	GetNotificationsForStop(stopID string, routeID string) ([]model.Notification, error)
+	DeleteNotificationsForStop(stopID string, routeID string) (int, error)
+
 }
 
 var (
