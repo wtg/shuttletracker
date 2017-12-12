@@ -314,7 +314,7 @@ Vue.component('dropdown-menu',{
   <ul class="dropdown-main">
     <li class="dropdown-main-item">
       <a href="#" class="dropdown-icon">
-        <img v-on:click="toggleDropdownMenuVisibility" src="static/images/menu.svg">
+        <img v-on:click="toggleDropdownMenuVisibility()" src="static/images/menu.svg"></button>
       </a>
       <ul class="dropdown-menu">
         <li class="dropdown-menu-item" id="dropdown-menu-item_shuttle-schedule">
@@ -331,7 +331,7 @@ Vue.component('dropdown-menu',{
           <!-- for changing the view of the page -->
           <ul class="dropdown-submenu" id="dropdown-submenu_styling">
             <li class="dropdown-submenu-item" id="dropdown-submenu-item_styling">
-              <div v-on:click="toggleDarkmode" id="darkmode-icon">
+              <div id="darkmode-icon">
                 <img src="static/images/moon.svg">
               </div>
             </li>
@@ -360,7 +360,7 @@ Vue.component('dropdown-menu',{
 
     };
   },
-    method: {
+    methods: {
         toggleDarkmode: function () {
             if (this.darkmodeOn === 0) {
                 this.darkmodeOn = 1;
@@ -373,6 +373,7 @@ Vue.component('dropdown-menu',{
             }
         },
         toggleDropdownMenuVisibility: function() {
+          alert("TESTING");
             for (var i = 0; i < this.dropdownMenuList.length; i++) {
                 if (this.dropdownMenuList[i].style.display === 'inline-block') {
                     this.dropdownMenuList[i].style.display = 'none';
@@ -412,8 +413,8 @@ Vue.component('title-bar', {
         this.dropdownMenuList = document.getElementsByClassName('dropdown-menu');
         this.dropdownSubmenuList = document.getElementsByClassName('dropdown-submenu');
         console.log(document.getElementsByClassName('dropdown-menu').length);
-        document.querySelector('div#darkmode-icon').addEventListener('click', this.toggleDarkmode);
-        document.querySelector('a.dropdown-icon>img').addEventListener('click', this.toggleDropdownMenuVisibility);
+        //document.querySelector('div#darkmode-icon').addEventListener('click', this.toggleDarkmode);
+        //document.querySelector('a.dropdown-icon>img').addEventListener('click', this.toggleDropdownMenuVisibility);
         for (var i = 0; i < this.dropdownMenuList.length; i++) {
           for (var j = 0; j < this.dropdownMenuList[i].getElementsByClassName('dropdown-menu-item').length; j++) {
               this.dropdownMenuList[i].getElementsByClassName('dropdown-menu-item')[j].addEventListener('click', this.toggleDropdownSubmenuVisibility(i));
@@ -440,19 +441,6 @@ Vue.component('title-bar', {
               this.darkmodeOn = 0;
               document.querySelector('div#darkmode-icon>img').src = this.moonicon;
               document.getElementById('mapid').style.filter = 'invert(0)';
-          }
-        },
-
-        toggleDropdownMenuVisibility: function() {
-          for (var i = 0; i < this.dropdownMenuList.length; i++) {
-            if (this.dropdownMenuList[i].style.display === 'inline-block') {
-                this.dropdownMenuList[i].style.display = 'none';
-            } else {
-                this.dropdownMenuList[i].style.display = 'inline-block';
-            }
-            if (this.dropdownSubmenuList[i].style.display === 'inline-block') {
-                this.dropdownSubmenuList[i].style.display = 'none';
-            }
           }
         },
 
