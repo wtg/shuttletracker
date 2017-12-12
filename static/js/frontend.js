@@ -1,12 +1,65 @@
 
+var live = true;
+var partial = false;
+var routeSuccess = true;
+var stopsSuccess = true;
+var vehicleUpdateSuccess = true;
+var vehicleMessageSuccess = true;
+var lastUpdateTime = "";
+
+var d = new Date();
+
+function checkTime(i) {
+    if (i < 10) {
+        i = "0" + i;
+    }
+    return i;
+}
+
+Vue.component('live-indicator',{
+  template: `<div v-bind:style="liveStyle">{{lv}} <div v-if="live" class="pulsate" style="position:absolute;float:right; width:10px;height:10px;background-color:blue;border-radius:50%;top:9px;right:3px;"></div>{{text}}</div>`,
+  data (){
+    return{
+      liveStyle: {color:"black",width: "40px", height:"18px",padding:"5px",borderRadius:"5px",fontSize:"15px", backgroundColor:"rgba(255, 255, 255, 0.88)", boxShadow: "0 1px 1px rgba(0, 0, 0, 0.8)", display:"none", position: "absolute", right:"10px",top:"42px"},
+      text: "",
+      lv:"Live",
+      live: false
+      };
+  },
+  methods: {
+    update: function(){
+      live = routeSuccess && vehicleUpdateSuccess && vehicleMessageSuccess;
+      partial = routeSuccess || vehicleUpdateSuccess;
+      if(live === false){
+        this.text = window.lastUpdateTime;
+        this.liveStyle.width="auto";
+        this.live=false;
+        this.lv = "Last Updated";
+      }else{
+        //this.text="Live";
+        this.live = true;
+        this.lv = "Live";
+        this.text = "";
+        this.liveStyle.width = "40px";
+        this.liveStyle.display = "inline-block";
+
+
+      }
+    }
+  },
+  mounted (){
+    setInterval(this.update,1000);
+  }
+
+});
 
 Vue.component('shuttle-map',{
   template: `<div id="mapid" style="height: 100%; z-index:0; filter: invert(0)"></div>`,
   mounted(){
     this.initMap();
     this.grabStops();
-    var a = setInterval(this.grabVehicles, 1000);
-    var b = setInterval(this.grabRoutes, 1000);
+    var a = setInterval(this.grabVehicles, 3000);
+    var b = setInterval(this.grabRoutes, 3000);
 
   },
   data (){
@@ -20,6 +73,7 @@ Vue.component('shuttle-map',{
       MapBoundPoints: [],
       ShuttleUpdateCounter: 0,
       first: true,
+      legend: L.control({position: 'bottomleft'}),
 
       ShuttleSVG: `<?xml version="1.0" encoding="UTF-8"?>
           <svg width="52px" height="52px" viewBox="0 0 52 52" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -33,6 +87,10 @@ Vue.component('shuttle-map',{
               </g>
           </svg>
           `,
+		CircleSVG: `<?xml version="1.0"?>
+			<svg height="600" width="600" xmlns="http://www.w3.org/2000/svg">
+			<circle cx="50%" cy="50%" r="50%" fill="COLOR" />
+			</svg>`
     };
   },
   methods:{
@@ -42,11 +100,17 @@ Vue.component('shuttle-map',{
       return url;
     },
 
-    initMap: function(){
+    getLegendIcon: function(color) {
+		var url = "data:image/svg+xml;base64," + btoa(this.ShuttleSVG.replace("COLOR",color));
+		return url;
+	},
+
+	initMap: function(){
       this.ShuttleMap = L.map('mapid', {
           zoomControl: false,
           attributionControl: false // hide Leaflet
       });
+
       this.ShuttleMap.setView([42.728172, -73.678803], 15.3);
       // show attribution without Leaflet
       this.ShuttleMap.addControl(L.control.attribution({
@@ -64,10 +128,35 @@ Vue.component('shuttle-map',{
     },
 
     grabRoutes: function(){
-      $.get( "/routes", this.updateRoutes);
+      $.get( "/routes", this.updateRoutes).fail(function(){routeSuccess = false;});
     },
 
+	updateLegend () {
+	  let app = this;
+	  app.legend.onAdd = function(map) {
+		  var div = L.DomUtil.create('div','info legend');
+		  var legendstring = "";
+		    for (i = 0; i < app.ShuttleRoutes.length; i++){
+			  let route = app.ShuttleRoutes[i];
+			  console.log(route);
+			  legendstring += `<li><img src=` + app.getLegendIcon(route.color)+` 
+			  width="12" height="12"> `+
+			  route.name;
+		  }
+
+		  div.innerHTML = `<ul style="list-style:none">
+					<li><img src="static/images/user.svg" width="12" height="12"> You</li>`+
+					legendstring +
+					`<li><img src="static/images/circle.svg" width="12" height="12"> Shuttle Stop</li>
+				</ul>`;
+		return div;
+
+		};
+	  app.legend.addTo(app.ShuttleMap);
+	},
+
     updateRoutes: function(data){
+      routeSuccess = true;
       var updatedRoute = [];
       for(var i = 0; i < data.length; i ++){
         if(data[i].enabled === false){
@@ -110,7 +199,7 @@ Vue.component('shuttle-map',{
       }
       this.ShuttleRoutes = updatedRoute;
       this.drawRoutes();
-
+      this.updateLegend();
     },
 
 
@@ -141,11 +230,12 @@ Vue.component('shuttle-map',{
     },
 
     grabStops: function(){
-      $.get( "/stops", this.updateStops);
+      $.get( "/stops", this.updateStops).fail(function(){stopsSuccess = false;});
 
     },
 
     updateStops: function(data){
+      stopsSuccess = true;
       var stopIcon = L.icon({
         iconUrl: 'static/images/circle.svg',
 
@@ -169,11 +259,20 @@ Vue.component('shuttle-map',{
     },
 
     grabVehicles: function(){
-      $.get( "/updates", this.updateVehicles);
+      $.get( "/updates", this.updateVehicles).fail(function(){vehicleUpdateSuccess = false;});
     },
 
     updateVehicles: function(data){
+      window.d = new Date();
+      var hours = window.d.getHours();
+      hours = checkTime(hours);
+      var mins = window.d.getMinutes();
+      mins = checkTime(mins);
+      var secs = window.d.getSeconds();
+      secs = checkTime(secs);
 
+      window.lastUpdateTime = (hours) + ":" + (mins) + ":" + (secs);
+      vehicleUpdateSuccess = true;
       var shuttleIcon = L.icon({
         iconUrl: this.getShuttleIcon("#FFF"),
 
@@ -225,7 +324,6 @@ Vue.component('shuttle-map',{
             };
             this.ShuttlesArray[data[j].vehicleID].marker.addTo(this.ShuttleMap);
           }else{
-            //console.log(data[j].color);
             shuttleIcon.options.iconUrl = this.getShuttleIcon(data[j].color);
             this.ShuttlesArray[data[j].vehicleID].marker.setIcon(shuttleIcon);
             this.ShuttlesArray[data[j].vehicleID].marker.setLatLng([data[j].lat,data[j].lng]);
@@ -272,7 +370,7 @@ Vue.component('shuttle-map',{
     },
 
     grabVehicleInfo: function(){
-      $.get( "/vehicles", this.grabMessages);
+      $.get( "/vehicles", this.grabMessages).fail(function(){vehicleUpdateSuccess = false;});
 
     },
     updateMessages: function(){
@@ -287,12 +385,14 @@ Vue.component('shuttle-map',{
     },
 
     grabMessages: function(data){
+      vehicleUpdateSuccess = true;
       var nameToId = {};
       for(var i = 0; i < data.length; i ++){
         nameToId[data[i].vehicleName] = data[i].vehicleID;
       }
       var el = this;
       $.get( "/updates/message", function(data){
+        vehicleMessageSuccess = true;
         for(var i = 0 ; i < data.length; i ++){
 
           var start_pos = data[i].indexOf('>') + 1;
@@ -301,7 +401,7 @@ Vue.component('shuttle-map',{
 
         }
         el.updateMessages();
-      });
+      }).fail(function(){vehicleMessageSuccess = false;});
 
     },
 
@@ -406,6 +506,9 @@ Vue.component('title-bar', {
         <a href="https://webtech.union.rpi.edu" class="logo">
           <img src="static/images/wtg.svg">
         </a>
+      </li>
+      <li>
+        <live-indicator></live-indicator>
       </li>
     </ul>
   </div>`,
