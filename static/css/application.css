@@ -85,6 +85,7 @@ html, body {
 
 #darkmode-icon {
   height: 100%;
+  cursor: pointer;
 }
 
 #darkmode-icon img {
@@ -147,6 +148,7 @@ ul.dropdown-menu {
 
 li.dropdown-menu-item {
   float: none;
+  width: auto;
 }
 
 li.dropdown-menu-item > p {
@@ -159,13 +161,20 @@ li.dropdown-menu-item > p:hover {
   background-color: rgba(226, 226, 226, 0.85);
 }
 
+li.dropdown-menu-item > p::before {
+  content: url("/static/images/triangular-arrow.svg");
+  display: inline-block;
+  width: 10px;
+  padding: 0 7px 0 0;
+}
+
 ul.dropdown-submenu {
   background-color: rgba(238, 238, 238, 0.90);
   display: none;
-  position: absolute;
+  position: static;
   top: 100%;
   left: 0;
-  padding: 0;
+  padding: 0 0 0 24px;
 }
 
 li.dropdown-submenu-item > p {

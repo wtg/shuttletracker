@@ -1,7 +1,7 @@
 
 
 Vue.component('shuttle-map',{
-  template: `<div id="mapid" style="height: 100%; z-index:0;"></div>`,
+  template: `<div id="mapid" style="height: 100%; z-index:0; filter: invert(0)"></div>`,
   mounted(){
     this.initMap();
     this.grabStops();
@@ -314,7 +314,7 @@ Vue.component('dropdown-menu',{
   <ul class="dropdown-main">
     <li class="dropdown-main-item">
       <a href="#" class="dropdown-icon">
-        <img src="static/images/menu.svg">
+        <img v-on:click="toggleDropdownMenuVisibility" src="static/images/menu.svg">
       </a>
       <ul class="dropdown-menu">
         <li class="dropdown-menu-item" id="dropdown-menu-item_shuttle-schedule">
@@ -323,6 +323,17 @@ Vue.component('dropdown-menu',{
           <ul class="dropdown-submenu" id="dropdown-submenu_shuttle-schedule">
             <li class="dropdown-submenu-item" id="dropdown-submenu-item_shuttle-schedule" v-for="item in list_data">
               <p><a target="_blank" rel="noopener noreferrer" :href="item.link">{{item.name}}</a></p>
+            </li>
+          </ul>
+        </li>
+        <li class="dropdown-menu-item" id="dropdown-menu-item_styling">
+          <p>Styling</p>
+          <!-- for changing the view of the page -->
+          <ul class="dropdown-submenu" id="dropdown-submenu_styling">
+            <li class="dropdown-submenu-item" id="dropdown-submenu-item_styling">
+              <div v-on:click="toggleDarkmode" id="darkmode-icon">
+                <img src="static/images/moon.svg">
+              </div>
             </li>
           </ul>
         </li>
@@ -340,9 +351,40 @@ Vue.component('dropdown-menu',{
           {name: "West: Friday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018FridayOnlyWestShuttleSchedule.pdf"},
           {name: "Weekend Late Night", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018Weekend-LateNightShuttleSchedule.pdf"}
       ],
+        title: "RPI Shuttle Tracker",
+        moonicon: "static/images/moon.svg",
+        sunicon: "static/images/sun.svg",
+        darkmodeOn: 0,
+        dropdownMenuList: [],
+        dropdownSubmenuList: [],
 
     };
-  }
+  },
+    method: {
+        toggleDarkmode: function () {
+            if (this.darkmodeOn === 0) {
+                this.darkmodeOn = 1;
+                document.querySelector('div#darkmode-icon>img').src = this.sunicon;
+                document.getElementById('mapid').style.filter = 'invert(1)';
+            } else {
+                this.darkmodeOn = 0;
+                document.querySelector('div#darkmode-icon>img').src = this.moonicon;
+                document.getElementById('mapid').style.filter = 'invert(0)';
+            }
+        },
+        toggleDropdownMenuVisibility: function() {
+            for (var i = 0; i < this.dropdownMenuList.length; i++) {
+                if (this.dropdownMenuList[i].style.display === 'inline-block') {
+                    this.dropdownMenuList[i].style.display = 'none';
+                } else {
+                    this.dropdownMenuList[i].style.display = 'inline-block';
+                }
+                if (this.dropdownSubmenuList[i].style.display === 'inline-block') {
+                    this.dropdownSubmenuList[i].style.display = 'none';
+                }
+            }
+        },
+    }
 });
 
 Vue.component('title-bar', {
@@ -360,11 +402,6 @@ Vue.component('title-bar', {
     <!-- right side of title bar -->
     <ul class="titleContent" id="titleContent-right">
       <li>
-        <div id="darkmode-icon">
-          <img src="static/images/moon.svg">
-        </div>
-      </li>
-      <li>
         <a href="https://webtech.union.rpi.edu" class="logo">
           <img src="static/images/wtg.svg">
         </a>
@@ -372,46 +409,63 @@ Vue.component('title-bar', {
     </ul>
   </div>`,
     mounted() {
-        var darkVal = 0;
-        var moonicon = "static/images/moon.svg";
-        var sunicon = "static/images/sun.svg";
-        document.querySelector('div#darkmode-icon').addEventListener('click', function() {
-            if (darkVal === 0) {
-                darkVal = 1;
-                document.querySelector('div#darkmode-icon>img').src = sunicon;
-                document.getElementById('mapid').style.filter = 'invert(1)';
-            } else {
-                darkVal = 0;
-                document.querySelector('div#darkmode-icon>img').src = moonicon;
-                document.getElementById('mapid').style.filter = 'invert(0)';
-            }
-        });
-        document.querySelector('a.dropdown-icon>img').addEventListener('click', function() {
-            for (var i = 0; i < 1; i++) {
-                if (document.getElementsByClassName('dropdown-menu')[i].style.display === 'none') {
-                    document.getElementsByClassName('dropdown-menu')[i].style.display = 'block';
-                } else {
-                    document.getElementsByClassName('dropdown-menu')[i].style.display = 'none';
-                }
-                if (document.getElementsByClassName('dropdown-submenu')[i].style.display === 'inline-block') {
-                    document.getElementsByClassName('dropdown-submenu')[i].style.display = 'none';
-                }
-            }
-        });
-        document.querySelector('.dropdown-menu-item').addEventListener('click', function() {
-            for (var i = 0; i < 1; i++) {
-                if (document.getElementsByClassName('dropdown-submenu')[i].style.display === 'none') {
-                    document.getElementsByClassName('dropdown-submenu')[i].style.display = 'inline-block';
-                } else {
-                    document.getElementsByClassName('dropdown-submenu')[i].style.display = 'none';
-                }
-            }
-        });
+        this.dropdownMenuList = document.getElementsByClassName('dropdown-menu');
+        this.dropdownSubmenuList = document.getElementsByClassName('dropdown-submenu');
+        console.log(document.getElementsByClassName('dropdown-menu').length);
+        document.querySelector('div#darkmode-icon').addEventListener('click', this.toggleDarkmode);
+        document.querySelector('a.dropdown-icon>img').addEventListener('click', this.toggleDropdownMenuVisibility);
+        for (var i = 0; i < this.dropdownMenuList.length; i++) {
+          for (var j = 0; j < this.dropdownMenuList[i].getElementsByClassName('dropdown-menu-item').length; j++) {
+              this.dropdownMenuList[i].getElementsByClassName('dropdown-menu-item')[j].addEventListener('click', this.toggleDropdownSubmenuVisibility(i));
+          }
+        }
     },
     data (){
       return {
-        title: "RPI Shuttle Tracker"
+          title: "RPI Shuttle Tracker",
+          moonicon: "static/images/moon.svg",
+          sunicon: "static/images/sun.svg",
+          darkmodeOn: 0,
+          dropdownMenuList: [],
+          dropdownSubmenuList: [],
       };
+    },
+    methods: {
+        toggleDarkmode: function () {
+          if (this.darkmodeOn === 0) {
+            this.darkmodeOn = 1;
+              document.querySelector('div#darkmode-icon>img').src = this.sunicon;
+              document.getElementById('mapid').style.filter = 'invert(1)';
+          } else {
+              this.darkmodeOn = 0;
+              document.querySelector('div#darkmode-icon>img').src = this.moonicon;
+              document.getElementById('mapid').style.filter = 'invert(0)';
+          }
+        },
+
+        toggleDropdownMenuVisibility: function() {
+          for (var i = 0; i < this.dropdownMenuList.length; i++) {
+            if (this.dropdownMenuList[i].style.display === 'inline-block') {
+                this.dropdownMenuList[i].style.display = 'none';
+            } else {
+                this.dropdownMenuList[i].style.display = 'inline-block';
+            }
+            if (this.dropdownSubmenuList[i].style.display === 'inline-block') {
+                this.dropdownSubmenuList[i].style.display = 'none';
+            }
+          }
+        },
+
+        toggleDropdownSubmenuVisibility: function(i) {
+          var dropdownChildren = this.dropdownMenuList[i].getElementsByClassName('dropdown-submenu');
+          for (var k = 0; k < dropdownChildren.length; k++) {
+            if (dropdownChildren[k].style.display === 'inline-block') {
+              dropdownChildren[k].style.display = 'none';
+            } else {
+              dropdownChildren[k].style.display = 'inline-block';
+            }
+          }
+        },
     }
 
 });
