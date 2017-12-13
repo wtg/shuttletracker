@@ -410,29 +410,29 @@ Vue.component('shuttle-map',{
 
 Vue.component('dropdown-menu',{
   template: `
-<div class="dropdown">
+<div class="dropdown" >
   <ul class="dropdown-main">
     <li class="dropdown-main-item">
       <a href="#" class="dropdown-icon">
-        <img v-on:click="toggleDropdownMenuVisibility()" src="static/images/menu.svg"></button>
+        <img v-on:click="toggleDropdownMenuVisibility()" class="dropdown-icon" src="static/images/menu.svg">
       </a>
       <ul class="dropdown-menu">
         <li class="dropdown-menu-item" id="dropdown-menu-item_shuttle-schedule">
-          <p>Shuttle Schedules</p>
+          <p class="dropdown-menu-item_p">Shuttle Schedules</p>
           <!-- http://www.rpi.edu/dept/parking/shuttle/ -->
           <ul class="dropdown-submenu" id="dropdown-submenu_shuttle-schedule">
             <li class="dropdown-submenu-item" id="dropdown-submenu-item_shuttle-schedule" v-for="item in list_data">
-              <p><a target="_blank" rel="noopener noreferrer" :href="item.link">{{item.name}}</a></p>
+              <p class="dropdown-submenu-item_p"><a class="dropdown-submenu-item_link" target="_blank" rel="noopener noreferrer" :href="item.link">{{item.name}}</a></p>
             </li>
           </ul>
         </li>
         <li class="dropdown-menu-item" id="dropdown-menu-item_styling">
-          <p>Styling</p>
+          <p class="dropdown-menu-item_p">Styling</p>
           <!-- for changing the view of the page -->
           <ul class="dropdown-submenu" id="dropdown-submenu_styling">
             <li class="dropdown-submenu-item" id="dropdown-submenu-item_styling">
-              <div v-on:click="toggleDarkmode()" id="darkmode-icon">
-                <img :src="moonicon">
+              <div class="dropdown-submenu-item_div" id="darkmode-icon">
+                <img v-on:click="toggleDarkmode" class="dropdown-submenu-item_div-icon" :src="moonicon">
               </div>
             </li>
           </ul>
@@ -443,13 +443,18 @@ Vue.component('dropdown-menu',{
 </div>
 `,
     mounted() {
+        var vm = this;
+
+        window.addEventListener('touchstart', function (event) {vm.dropdownWindowclick(event)});
+        window.addEventListener('mousedown', function (event) {vm.dropdownWindowclick(event)});
+
     },
   data (){
     return{
       list_data: [
           {name: "East: Monday-Thursday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018CampusShuttleScheduleEastRoute.pdf"},
-          {name: "West: Monday-Thursday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018CampusShuttleScheduleWestRoute.pdf"},
           {name: "East: Friday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018FridayOnlyEastShuttleSchedule.pdf"},
+          {name: "West: Monday-Thursday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018CampusShuttleScheduleWestRoute.pdf"},
           {name: "West: Friday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018FridayOnlyWestShuttleSchedule.pdf"},
           {name: "Weekend Late Night", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018Weekend-LateNightShuttleSchedule.pdf"}
       ],
@@ -488,6 +493,20 @@ Vue.component('dropdown-menu',{
 
 
         // following functions involve manipulating the dropdown menu
+        dropdownWindowclick: function (event) {
+            // check two parents up in case some don't have a class starting with dropdown
+            if ((typeof event.target.className !== 'undefined'
+                && event.target.className.substr(0, 8) === "dropdown")
+                || (typeof event.target.parentElement.className !== 'undefined'
+                && event.target.parentElement.className.substr(0, 8) === "dropdown")
+                || (typeof event.target.parentElement.parentElement.className !== 'undefined'
+                && event.target.parentElement.parentElement.className.substr(0, 8) === "dropdown"))
+            {
+                // menu was clicked so do nothing
+            } else {
+                this.closeDropdownMenu();
+            }
+        },
         toggleDropdownMenuVisibility: function() {
             // 0 is closed, 1 is open
             if (this.menuVisibility === 0) {
