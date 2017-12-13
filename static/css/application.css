@@ -161,13 +161,6 @@ li.dropdown-menu-item > p:hover {
   background-color: rgba(226, 226, 226, 0.85);
 }
 
-li.dropdown-menu-item > p::before {
-  content: url("/static/images/triangular-arrow.svg");
-  display: inline-block;
-  width: 10px;
-  padding: 0 7px 0 0;
-}
-
 ul.dropdown-submenu {
   background-color: rgba(238, 238, 238, 0.90);
   display: none;
@@ -178,6 +171,7 @@ ul.dropdown-submenu {
 }
 
 li.dropdown-submenu-item > p {
+  background-color: rgba(238, 238, 238, 0.90);
   height: 24px;
   margin: 3px 0;
   padding: 0 7px;

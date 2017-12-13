@@ -431,8 +431,8 @@ Vue.component('dropdown-menu',{
           <!-- for changing the view of the page -->
           <ul class="dropdown-submenu" id="dropdown-submenu_styling">
             <li class="dropdown-submenu-item" id="dropdown-submenu-item_styling">
-              <div id="darkmode-icon">
-                <img src="static/images/moon.svg">
+              <div v-on:click="toggleDarkmode()" id="darkmode-icon">
+                <img :src="moonicon">
               </div>
             </li>
           </ul>
@@ -442,12 +442,14 @@ Vue.component('dropdown-menu',{
   </ul>
 </div>
 `,
+    mounted() {
+    },
   data (){
     return{
       list_data: [
           {name: "East: Monday-Thursday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018CampusShuttleScheduleEastRoute.pdf"},
-          {name: "East: Friday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018FridayOnlyEastShuttleSchedule.pdf"},
           {name: "West: Monday-Thursday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018CampusShuttleScheduleWestRoute.pdf"},
+          {name: "East: Friday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018FridayOnlyEastShuttleSchedule.pdf"},
           {name: "West: Friday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018FridayOnlyWestShuttleSchedule.pdf"},
           {name: "Weekend Late Night", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018Weekend-LateNightShuttleSchedule.pdf"}
       ],
@@ -455,36 +457,82 @@ Vue.component('dropdown-menu',{
         moonicon: "static/images/moon.svg",
         sunicon: "static/images/sun.svg",
         darkmodeOn: 0,
-        dropdownMenuList: [],
-        dropdownSubmenuList: [],
+        menuVisibility: 0,
+        dropdownMenuList: document.getElementsByClassName('dropdown-menu'),
+        dropdownSubmenuList: document.getElementsByClassName('dropdown-submenu'),
 
     };
   },
     methods: {
+
+        // following functions involve changing the dark mode state
         toggleDarkmode: function () {
+            // toggles dark mode for the map portion of the site by applying the 'filter: invert' property
             if (this.darkmodeOn === 0) {
-                this.darkmodeOn = 1;
-                document.querySelector('div#darkmode-icon>img').src = this.sunicon;
-                document.getElementById('mapid').style.filter = 'invert(1)';
+                this.enableDarkmode();
             } else {
-                this.darkmodeOn = 0;
-                document.querySelector('div#darkmode-icon>img').src = this.moonicon;
-                document.getElementById('mapid').style.filter = 'invert(0)';
+                this.disableDarkmode();
             }
         },
+        enableDarkmode: function () {
+            this.darkmodeOn = 1;
+            document.querySelector('div#darkmode-icon>img').src = this.sunicon;
+            document.getElementById('mapid').style.filter = 'invert(1)';
+        },
+        disableDarkmode: function () {
+            this.darkmodeOn = 0;
+            document.querySelector('div#darkmode-icon>img').src = this.moonicon;
+            document.getElementById('mapid').style.filter = 'invert(0)';
+        },
+        // ====================================================================
+
+
+        // following functions involve manipulating the dropdown menu
         toggleDropdownMenuVisibility: function() {
-          alert("TESTING");
-            for (var i = 0; i < this.dropdownMenuList.length; i++) {
-                if (this.dropdownMenuList[i].style.display === 'inline-block') {
-                    this.dropdownMenuList[i].style.display = 'none';
-                } else {
-                    this.dropdownMenuList[i].style.display = 'inline-block';
-                }
-                if (this.dropdownSubmenuList[i].style.display === 'inline-block') {
-                    this.dropdownSubmenuList[i].style.display = 'none';
-                }
+            // 0 is closed, 1 is open
+            if (this.menuVisibility === 0) {
+                this.openDropdownMenu();
+            } else {
+                this.closeDropdownMenu();
             }
         },
+        toggleDropdownSubmenuVisibility: function() {
+        },
+        closeDropdownMenu: function () {
+            this.menuVisibility = 0;
+            this.disableDropdownMenuVisibility();
+            this.disableDropdownSubmenuVisibility();
+        },
+        openDropdownMenu: function () {
+            this.menuVisibility = 1;
+            this.enableDropdownMenuVisibility();
+            this.enableDropdownSubmenuVisibility();
+        },
+        disableDropdownMenuVisibility: function() {
+            // close the menu by changing the visibility of all main dropdown menu entries
+            for (var i = 0; i < this.dropdownMenuList.length; i++) {
+                this.dropdownMenuList[i].style.display = 'none';
+            }
+        },
+        disableDropdownSubmenuVisibility: function () {
+            // close the menu by changing the visibility of all the submenu entries for each entry in the main menu
+            for (var i = 0; i < this.dropdownSubmenuList.length; i++) {
+                this.dropdownSubmenuList[i].style.display = 'none';
+            }
+        },
+        enableDropdownMenuVisibility: function () {
+            // close the menu by changing the visibility of all main dropdown menu entries
+            for (var i = 0; i < this.dropdownMenuList.length; i++) {
+                this.dropdownMenuList[i].style.display = 'inline-block';
+            }
+        },
+        enableDropdownSubmenuVisibility: function () {
+            // close the menu by changing the visibility of all the submenu entries for each entry in the main menu
+            for (var i = 0; i < this.dropdownSubmenuList.length; i++) {
+                this.dropdownSubmenuList[i].style.display = 'inline-block';
+            }
+        },
+        // ====================================================================
     }
 });
 
@@ -512,53 +560,13 @@ Vue.component('title-bar', {
       </li>
     </ul>
   </div>`,
-    mounted() {
-        this.dropdownMenuList = document.getElementsByClassName('dropdown-menu');
-        this.dropdownSubmenuList = document.getElementsByClassName('dropdown-submenu');
-        console.log(document.getElementsByClassName('dropdown-menu').length);
-        //document.querySelector('div#darkmode-icon').addEventListener('click', this.toggleDarkmode);
-        //document.querySelector('a.dropdown-icon>img').addEventListener('click', this.toggleDropdownMenuVisibility);
-        for (var i = 0; i < this.dropdownMenuList.length; i++) {
-          for (var j = 0; j < this.dropdownMenuList[i].getElementsByClassName('dropdown-menu-item').length; j++) {
-              this.dropdownMenuList[i].getElementsByClassName('dropdown-menu-item')[j].addEventListener('click', this.toggleDropdownSubmenuVisibility(i));
-          }
-        }
-    },
+    mounted() {},
     data (){
       return {
           title: "RPI Shuttle Tracker",
-          moonicon: "static/images/moon.svg",
-          sunicon: "static/images/sun.svg",
-          darkmodeOn: 0,
-          dropdownMenuList: [],
-          dropdownSubmenuList: [],
       };
     },
-    methods: {
-        toggleDarkmode: function () {
-          if (this.darkmodeOn === 0) {
-            this.darkmodeOn = 1;
-              document.querySelector('div#darkmode-icon>img').src = this.sunicon;
-              document.getElementById('mapid').style.filter = 'invert(1)';
-          } else {
-              this.darkmodeOn = 0;
-              document.querySelector('div#darkmode-icon>img').src = this.moonicon;
-              document.getElementById('mapid').style.filter = 'invert(0)';
-          }
-        },
-
-        toggleDropdownSubmenuVisibility: function(i) {
-          var dropdownChildren = this.dropdownMenuList[i].getElementsByClassName('dropdown-submenu');
-          for (var k = 0; k < dropdownChildren.length; k++) {
-            if (dropdownChildren[k].style.display === 'inline-block') {
-              dropdownChildren[k].style.display = 'none';
-            } else {
-              dropdownChildren[k].style.display = 'inline-block';
-            }
-          }
-        },
-    }
-
+    methods: {},
 });
 
 var ShuttleTracker = new Vue({
