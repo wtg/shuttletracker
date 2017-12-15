@@ -482,12 +482,21 @@ Vue.component('dropdown-menu',{
         enableDarkmode: function () {
             this.darkmodeOn = 1;
             document.querySelector('div#darkmode-icon>img').src = this.sunicon;
-            document.getElementById('mapid').style.filter = 'invert(1)';
+            document.querySelector('div.leaflet-tile-pane').style.filter = 'invert(1)';
+            document.querySelector('div.titleBar').style.filter = 'invert(1)';
+            // invert specific colors twice to make them normal
+            document.querySelector('div.pulsate').style.filter = 'invert(1)';
+            document.querySelector('a.logo').style.filter = 'invert(1)';
         },
         disableDarkmode: function () {
             this.darkmodeOn = 0;
             document.querySelector('div#darkmode-icon>img').src = this.moonicon;
-            document.getElementById('mapid').style.filter = 'invert(0)';
+            document.querySelector('div.leaflet-tile-pane').style.filter = 'invert(0)';
+            document.querySelector('div.titleBar').style.filter = 'invert(0)';
+            // reset specific colors to make normal
+            document.querySelector('div.pulsate').style.filter = 'invert(0)';
+            document.querySelector('a.logo').style.filter = 'invert(0)';
+
         },
         // ====================================================================
 
