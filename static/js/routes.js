@@ -49,10 +49,11 @@ Vue.component('active-selector',{
 
 Vue.component('route-panel', {
   template:
-  `<div class ="vehicle-panel">
-    <div v-for="route in routeData" class="vehicle-info">
-    <route-card v-bind:info="route"></route-card>
-
+  `<div class ="column">
+    <div v-for="route in routeData" class="tile is-parent">
+      <div class="tile is-parent">
+        <route-card v-bind:info="route"></route-card>
+      </div>
     </div>
     <route-create></route-create>
     <route-json></route-json>
@@ -83,8 +84,8 @@ Vue.component('route-panel', {
 Vue.component('route-card', {
   props: ['info'],
   template:
-  `<div class="vehicle-card route-description-box">
-
+  `<div class="tile box">
+    <div class="column">
     <b>id</b>: {{info.id}}<br>
     <b>name</b>: {{info.name}}<br>
     <b>Description</b>: {{info.description}}<br>
@@ -92,8 +93,11 @@ Vue.component('route-card', {
     <b>Color</b>: {{info.color}}<br>
     <b>Created</b>: {{info.created}} <br>
     <br>
+    <button class="button" @click="shouldDelete(info.id)">{{buttonText}}</button>
+    </div>
+    <div class="column">
     <active-selector></active-selector>
-    <button class=" button delete" @click="shouldDelete(info.id)">{{buttonText}}</button>
+    </div>
   </div>`,
   data (){
     return{
@@ -139,12 +143,10 @@ Vue.component('route-card', {
 
 Vue.component('route-json',{
   template:`
-  <div class="route-description-box">
-      <div style='padding-bottom: 30px;' class ='route-description-box'>
+  <div class="tile box">
       <span class = 'emphasis'>Submit Route Json</span><br>
       <textarea id="jsontxt" class='json' style='width:100%; height: 100px;'></textarea>
       <button id='submitRouteJson' @click="submitForm" style='float:right;' class='button cbutton addStopJson'>Add</button><br></div>
-      </div>
     </div>`,
     data (){
       return{
@@ -170,7 +172,7 @@ Vue.component('route-json',{
 
 Vue.component('route-create',{
   template:`
-  <div><div class="route-description-box" style="height: 800px; padding-bottom: 10px;">
+  <div><div class="route-description-box box" style="padding-bottom: 20px;" >
               <div id="mapid" style="height: 650px;float: left; width: 100%; background-color:black;z-index:0;"></div>
               <div class="mapcontrols"><button class="button" @click="removeLastPoint">undo</button></div>
               <b>name</b>: <input v-model="name" placeholder="Route Name"></input><br>
