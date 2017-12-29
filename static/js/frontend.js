@@ -432,7 +432,8 @@ Vue.component('dropdown-menu',{
           <ul class="dropdown-submenu" id="dropdown-submenu_styling">
             <li class="dropdown-submenu-item" id="dropdown-submenu-item_styling">
               <div class="dropdown-submenu-item_div" id="darkmode-icon">
-                <img v-on:click="toggleDarkmode" class="dropdown-submenu-item_div-icon" :src="moonicon">
+                <img v-on:click="toggleDarkmode" class="dropdown-submenu-subitem" :src="moonicon">
+                <p v-on:click="toggleDarkmode" class="dropdown-submenu-subitem">Darkmode</p>
               </div>
             </li>
           </ul>
