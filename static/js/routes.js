@@ -84,8 +84,17 @@ Vue.component('route-panel', {
 Vue.component('route-card', {
   props: ['info'],
   template:
-  `<div class="tile box">
-    <div class="column">
+  `
+  <div class="box container">
+  <div class="tabs">
+  <ul>
+  <li v-bind:class="{'is-active':state==0}"><a @click="state = 0">Route</a></li>
+  <li v-bind:class="{'is-active':state==1}"><a @click="state = 1">Schedule</a></li>
+  </ul>
+  </div>
+  <div >
+    <div class="columns">
+    <div v-if="state==0" class="column">
     <b>id</b>: {{info.id}}<br>
     <b>name</b>: {{info.name}}<br>
     <b>Description</b>: {{info.description}}<br>
@@ -95,15 +104,17 @@ Vue.component('route-card', {
     <br>
     <button class="button" @click="shouldDelete(info.id)">{{buttonText}}</button>
     </div>
-    <div class="column">
+    <div v-if="state==1" class="column">
     <active-selector></active-selector>
     </div>
-  </div>`,
+    </div>
+  </div></div>`,
   data (){
     return{
       myData: {},
       deleteCount: 0,
       buttonText: "Delete",
+      state: 0,
     };
   },
   methods: {
