@@ -3,16 +3,14 @@ var refresh = false;
 Vue.component('active-selector',{
   props: ['routeId'],
   template: `<div>
-  <select v-model=selected>
+  <select class="dropdown" v-model=selected>
     <option v-for="day in days" v-bind:value=day>{{day}}</option>
   </select>
-  <input type="time" v-model=tod></input>
-  <input type="checkbox" v-model=on></input>
-  <input type="button" value="+" @click="add"></input>
-  <input type="button" value="Submit"></input>
-
+  <input class="field" type="time" v-model=tod></input>
+  <input class="button" type="button" @click="on = !on" v-model="on"></input>
+  <input class="button" type="button" value="+" @click="add"></input>
+  <input class="button" type="button" value="Submit"></input>
   <div style="width:auto;background-color:#eee;margin:10px;">
-
   <div v-for="item in times">{{item.day}} - {{item.time}} - {{item.on}}<input type="button" value="delete" @click="del(item.id)"></input></div>
 
   </div>
