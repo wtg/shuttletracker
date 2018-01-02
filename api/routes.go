@@ -17,10 +17,41 @@ import (
 	"github.com/wtg/shuttletracker/model"
 )
 
+//TODO: Move this to updater
+//RouteIsActive determines if the current time means a route should be active or not
+func (api *API) RouteIsActive(r *model.Route) (bool){
+	return false
+}
+
 // RoutesHandler finds all of the routes in the database
 func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all routes in database
 	routes, err := api.db.GetRoutes()
+	//This will never have an error
+
+	for idx,_ := range routes{
+		timeIntervals := []model.WeekTime{}
+		//This will never have an error
+		//form := "3:04pm";
+		on := time.Now()
+		off := time.Now().Add(1*time.Minute)
+
+		testTime := model.WeekTime{
+			Day: time.Monday,
+			Time: on,
+			State: 1,
+		}
+		testTime2 := model.WeekTime{
+			Day: time.Monday,
+			Time: off,
+			State: 2,
+		}
+
+		timeIntervals = append(timeIntervals,testTime)
+		timeIntervals = append(timeIntervals,testTime2)
+
+		routes[idx].TimeInterval = timeIntervals
+	}
 	// Handle query errors
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -84,12 +115,26 @@ func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	enabled, _ := strconv.ParseBool(routeData["enabled"])
 	width, _ := strconv.Atoi(routeData["width"])
 	currentTime := time.Now()
+	timeIntervals := []model.WeekTime{}
+
+	//This will never have an error
+  form := "3:04pm";
+	midnight,_ := time.Parse(form,"12:00am")
+
+	testTime := model.WeekTime{
+		Day: time.Monday,
+		Time: midnight,
+		State: 1,
+	}
+
+	timeIntervals = append(timeIntervals,testTime)
+
+
 	// Create a new route
 	route := model.Route{
 		Name:        routeData["name"],
 		Description: routeData["description"],
-		StartTime:   routeData["startTime"],
-		EndTime:     routeData["endTime"],
+		TimeInterval:     timeIntervals,
 		Enabled:     enabled,
 		Color:       routeData["color"],
 		Width:       width,
