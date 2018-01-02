@@ -1,10 +1,57 @@
 var refresh = false;
+
+Vue.component('active-selector',{
+  props: ['routeId'],
+  template: `<div>
+  <select class="dropdown" v-model=selected>
+    <option v-for="day in days" v-bind:value=day>{{day}}</option>
+  </select>
+  <input class="field" type="time" v-model=tod></input>
+  <input class="button" type="button" @click="on = !on" v-model="on"></input>
+  <input class="button" type="button" value="+" @click="add"></input>
+  <input class="button" type="button" value="Submit"></input>
+  <div style="width:auto;background-color:#eee;margin:10px;">
+  <div v-for="item in times">{{item.day}} - {{item.time}} - {{item.on}}<input type="button" value="delete" @click="del(item.id)"></input></div>
+
+  </div>
+  </div>`,
+  data (){
+    return {
+      selected: "Monday",
+      times: [],
+      on: false,
+      tod: "20:00:00",
+      days: {Monday: "Monday",Tuesday: "Tuesday",Wednesday: "Wednesday",Thursday: "Thursday",Friday: "Friday",Saturday: "Saturday",Sunday: "Sunday"},
+
+    }
+  },
+  methods: {
+    add: function(){
+
+      let obj = {on: this.on, day: this.selected, time: this.tod}
+      this.times.push(obj);
+    },
+    del: function(id){
+      if(this.times != undefined){
+        for (let i =0; i < this.times.length; i ++){
+          if(this.times[i].id == id){
+             this.times.splice(i, 1);
+            break;
+          }
+        }
+
+      }
+    }
+  }
+});
+
 Vue.component('route-panel', {
   template:
-  `<div class ="vehicle-panel">
-    <div v-for="route in routeData" class="vehicle-info">
-    <route-card v-bind:info="route"></route-card>
-
+  `<div class ="column">
+    <div v-for="route in routeData" class="tile is-parent">
+      <div class="tile is-parent">
+        <route-card v-bind:info="route"></route-card>
+      </div>
     </div>
     <route-create></route-create>
     <route-json></route-json>
@@ -35,7 +82,17 @@ Vue.component('route-panel', {
 Vue.component('route-card', {
   props: ['info'],
   template:
-  `<div class="vehicle-card route-description-box">
+  `
+  <div class="box container">
+  <div class="tabs">
+  <ul>
+  <li v-bind:class="{'is-active':state==0}"><a @click="state = 0">Route</a></li>
+  <li v-bind:class="{'is-active':state==1}"><a @click="state = 1">Schedule</a></li>
+  </ul>
+  </div>
+  <div >
+    <div class="columns">
+    <div v-if="state==0" class="column">
     <b>id</b>: {{info.id}}<br>
     <b>name</b>: {{info.name}}<br>
     <b>Description</b>: {{info.description}}<br>
@@ -43,13 +100,19 @@ Vue.component('route-card', {
     <b>Color</b>: {{info.color}}<br>
     <b>Created</b>: {{info.created}} <br>
     <br>
-    <button class=" button delete" @click="shouldDelete(info.id)">{{buttonText}}</button>
-  </div>`,
+    <button class="button" @click="shouldDelete(info.id)">{{buttonText}}</button>
+    </div>
+    <div v-if="state==1" class="column">
+    <active-selector></active-selector>
+    </div>
+    </div>
+  </div></div>`,
   data (){
     return{
       myData: {},
       deleteCount: 0,
       buttonText: "Delete",
+      state: 0,
     };
   },
   methods: {
@@ -89,12 +152,10 @@ Vue.component('route-card', {
 
 Vue.component('route-json',{
   template:`
-  <div class="route-description-box">
-      <div style='padding-bottom: 30px;' class ='route-description-box'>
+  <div class="tile box">
       <span class = 'emphasis'>Submit Route Json</span><br>
       <textarea id="jsontxt" class='json' style='width:100%; height: 100px;'></textarea>
       <button id='submitRouteJson' @click="submitForm" style='float:right;' class='button cbutton addStopJson'>Add</button><br></div>
-      </div>
     </div>`,
     data (){
       return{
@@ -120,7 +181,7 @@ Vue.component('route-json',{
 
 Vue.component('route-create',{
   template:`
-  <div><div class="route-description-box" style="height: 800px; padding-bottom: 10px;">
+  <div><div class="route-description-box box" style="padding-bottom: 20px;" >
               <div id="mapid" style="height: 650px;float: left; width: 100%; background-color:black;z-index:0;"></div>
               <div class="mapcontrols"><button class="button" @click="removeLastPoint">undo</button></div>
               <b>name</b>: <input v-model="name" placeholder="Route Name"></input><br>

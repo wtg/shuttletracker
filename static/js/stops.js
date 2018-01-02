@@ -4,15 +4,15 @@ var refresh = false;
 Vue.component('stop-card', {
   props: ['info','routeids'],
   template:
-  `<div class="vehicle-card route-description-box">
+  `<div class="tile is-child box">
     <b>id</b>: {{info.id}} <b>currentRoute</b>: {{info.routeId}}<br>
     <b>name</b>: {{info.name}}<br>
     <b>Description</b>: {{info.description}}<br>
     <b>enabled</b>: <input type="checkbox" v-model="info.enabled"></input>{{info.enabled}}<br>
     <b>Route</b>: <select v-model="myRouteId" v-bind:id="'sel' + info.routeId"><option v-for="routeId in routeids" v-bind:value="routeId.id" v-bind:selected="info.routeId == routeId.id">{{routeId.name}}</option></select><br>
     <br>
-    <button class=" button delete" @click="shouldDelete(info.id)">{{deleteText}}</button>
-    <button class=" button delete" @click="update(info.id)">{{updateText}}</button>
+    <button class=" button" @click="shouldDelete(info.id)">{{deleteText}}</button>
+    <button class=" button" @click="update(info.id)">{{updateText}}</button>
 
   </div>`,
   data (){
@@ -77,8 +77,10 @@ Vue.component('stop-card', {
 
 Vue.component('stops-panel', {
   template:
-  `<div class ="vehicle-panel">
-    <stop-card v-for="stop in stopData" v-bind:info="stop" v-bind:routeids="routeIDS"></stop-card>
+  `<div class ="column">
+    <div v-for="stop in stopData" class="tile is-parent">
+    <stop-card  v-bind:info="stop" v-bind:routeids="routeIDS"></stop-card>
+    </div>
     <stop-create></stop-create>
   </div>`,
   data (){
