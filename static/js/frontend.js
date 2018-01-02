@@ -53,6 +53,10 @@ Vue.component('live-indicator',{
 
 });
 
+Vue.component('route-time-box',{
+
+})
+
 Vue.component('shuttle-map',{
   template: `<div id="mapid" style="height: 100%; z-index:0;"></div>`,
   mounted(){
@@ -104,13 +108,13 @@ Vue.component('shuttle-map',{
 		var url = "data:image/svg+xml;base64," + btoa(this.ShuttleSVG.replace("COLOR",color));
 		return url;
 	},
-	
+
 	initMap: function(){
       this.ShuttleMap = L.map('mapid', {
           zoomControl: false,
           attributionControl: false // hide Leaflet
       });
-      
+
       this.ShuttleMap.setView([42.728172, -73.678803], 15.3);
       // show attribution without Leaflet
       this.ShuttleMap.addControl(L.control.attribution({
@@ -151,6 +155,30 @@ Vue.component('shuttle-map',{
 				</ul>`;
 		return div;
 		
+		};
+	  app.legend.addTo(app.ShuttleMap);
+	},
+
+	updateLegend () {
+	  let app = this;
+	  app.legend.onAdd = function(map) {
+		  var div = L.DomUtil.create('div','info legend');
+		  var legendstring = "";
+		    for (i = 0; i < app.ShuttleRoutes.length; i++){
+			  let route = app.ShuttleRoutes[i];
+			  console.log(route);
+			  legendstring += `<li><img src=` + app.getLegendIcon(route.color)+`
+			  width="12" height="12"> `+
+			  route.name;
+		  }
+
+		  div.innerHTML = `<ul style="list-style:none">
+					<li><img src="static/images/user.svg" width="12" height="12"> You</li>`+
+					legendstring +
+					`<li><img src="static/images/circle.svg" width="12" height="12"> Shuttle Stop</li>
+				</ul>`;
+		return div;
+
 		};
 	  app.legend.addTo(app.ShuttleMap);
 	},
