@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"sort"
 
 	// MySQL driver
 	"gopkg.in/cas.v1"
@@ -27,7 +28,6 @@ func (api *API) RouteIsActive(r *model.Route) (bool){
 func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all routes in database
 	routes, err := api.db.GetRoutes()
-	//This will never have an error
 
 	for idx,_ := range routes{
 		timeIntervals := []model.WeekTime{}
@@ -47,9 +47,9 @@ func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 			State: 2,
 		}
 
-		timeIntervals = append(timeIntervals,testTime)
 		timeIntervals = append(timeIntervals,testTime2)
-
+		timeIntervals = append(timeIntervals,testTime)
+		sort.Sort(model.ByTime(timeIntervals))
 		routes[idx].TimeInterval = timeIntervals
 	}
 	// Handle query errors

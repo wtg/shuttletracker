@@ -3,6 +3,7 @@ package model
 
 import (
 	"time"
+	"fmt"
 )
 
 // VehicleUpdate represents a single position observed for a Vehicle.
@@ -60,6 +61,26 @@ type WeekTime struct {
 	Time  time.Time    `json:"time"    bson:"time"`
 	State int          `json:"state"   bson:"state"`
 }
+
+type ByTime []WeekTime
+
+func (a ByTime) Len() int           { return len(a) }
+func (a ByTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByTime) Less(i, j int) bool {
+	if (a[i].Day < a[j].Day){
+		fmt.Printf("asdf");
+		return true
+	}else if (a[i].Day > a[j].Day){
+		return false
+	}else{
+		if (a[j].Time.After(a[i].Time)){
+			return true
+		}else{
+			return false
+		}
+	}
+}
+
 
 // Route represents a set of coordinates to draw a path on our tracking map
 type Route struct {
