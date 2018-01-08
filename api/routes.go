@@ -21,6 +21,32 @@ import (
 //TODO: Move this to updater
 //RouteIsActive determines if the current time means a route should be active or not
 func (api *API) RouteIsActive(r *model.Route) (bool){
+	currentTime := time.Now()
+	day := currentTime.Weekday()
+	p := fmt.Println
+	state := -1
+	for idx, val := range r.TimeInterval{
+			if(day == val.Day){
+				if (currentTime.After(val.Time) && !currentTime.After(r.TimeInterval[idx+1].Time)){
+					state = val.State
+					p("state",state)
+				}
+				}else if (day > val.Day){
+					if(r.TimeInterval[idx+1].Day < day){
+						state = val.State
+						p("state",state)
+
+						}else{
+							if(currentTime.After(val.Time)&&r.TimeInterval[idx+1].Time.After(currentTime)){
+								state = val.State
+								p("state",state)
+
+							}
+						}
+					}
+				}
+
+
 	return false
 }
 
@@ -29,18 +55,35 @@ func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all routes in database
 	routes, err := api.db.GetRoutes()
 
+
 	for idx,_ := range routes{
+
 		timeIntervals := []model.WeekTime{}
-		//This will never have an error
-		//form := "3:04pm";
-		on := time.Now()
-		off := time.Now().Add(1*time.Minute)
+
+		//Temp times for testing
+		on := time.Now().AddDate(0,0,-20)
+		off := time.Now().Add(-1*time.Minute)
+
+		//Strip the date from the time by bringing the day up to today - Do this when we add a new range
+		val := -(int(on.Sub(time.Now().Truncate(24*time.Hour)).Hours()/24)-1)
+		on = on.AddDate(0,0,val)
+
+		val = -(int(off.Sub(time.Now().Truncate(24*time.Hour)).Hours()/24)-1)
+		off = off.AddDate(0,0,val)
 
 		testTime := model.WeekTime{
-			Day: time.Monday,
+			Day: time.Sunday,
 			Time: on,
 			State: 1,
 		}
+
+
+		testTime3 := model.WeekTime{
+			Day: time.Monday,
+			Time: on,
+			State: 4,
+		}
+
 		testTime2 := model.WeekTime{
 			Day: time.Monday,
 			Time: off,
@@ -48,9 +91,13 @@ func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		timeIntervals = append(timeIntervals,testTime2)
+		timeIntervals = append(timeIntervals,testTime3)
 		timeIntervals = append(timeIntervals,testTime)
 		sort.Sort(model.ByTime(timeIntervals))
+
 		routes[idx].TimeInterval = timeIntervals
+
+		api.RouteIsActive(&routes[idx])
 	}
 	// Handle query errors
 	if err != nil {
