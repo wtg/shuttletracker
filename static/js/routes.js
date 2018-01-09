@@ -3,33 +3,41 @@ var refresh = false;
 Vue.component('active-selector',{
   props: ['routeId'],
   template: `<div>
+  {{routeId}}
   <select class="dropdown" v-model=selected>
-    <option v-for="day in days" v-bind:value=day>{{day}}</option>
+    <option v-for="day in days" v-bind:value=day.val>{{day.Day}}</option>
   </select>
   <input class="field" type="time" v-model=tod></input>
   <input class="button" type="button" @click="on = !on" v-model="on"></input>
   <input class="button" type="button" value="+" @click="add"></input>
-  <input class="button" type="button" value="Submit"></input>
+  <input class="button" type="button" value="Submit" @click="submit"></input>
   <div style="width:auto;background-color:#eee;margin:10px;">
   <div v-for="item in times">{{item.day}} - {{item.time}} - {{item.on}}<input type="button" value="delete" @click="del(item.id)"></input></div>
-
   </div>
   </div>`,
   data (){
     return {
-      selected: "Monday",
+      selected: 1,
       times: [],
       on: false,
-      tod: "20:00:00",
-      days: {Monday: "Monday",Tuesday: "Tuesday",Wednesday: "Wednesday",Thursday: "Thursday",Friday: "Friday",Saturday: "Saturday",Sunday: "Sunday"},
+      tod: "20:00",
+      days: {Monday: {Day: "Monday",val: 1},Tuesday: {Day: "Tuesday",val: 2},Wednesday: {Day: "Wednesday",val: 3},Thursday: {Day: "Thursday",val: 4},Friday: {Day: "Friday",val: 5},Saturday: {Day: "Saturday",val: 6},Sunday: {Day: "Sunday",val: 0}},
 
     }
   },
   methods: {
     add: function(){
-
-      let obj = {on: this.on, day: this.selected, time: this.tod}
+      let o = (this.on) ? 1 : 0;
+      split = this.tod.split(":")
+      ints = []
+      for (let i = 0; i < split.length; i ++){
+        ints[i] = parseInt(split[i])
+        console.log(ints[i])
+      }
+      let obj = {on: o, day: this.selected, time: (new Date(0,0,0,ints[0],ints[1],0,0)).toISOString()}
+      var i = this.times.length
       this.times.push(obj);
+      console.log(this.times)
     },
     del: function(id){
       if(this.times != undefined){
@@ -39,8 +47,13 @@ Vue.component('active-selector',{
             break;
           }
         }
-
       }
+    },
+    submit: function(){
+      let el = this;
+      var send = {id: el.routeId, times: []}
+      send.times = el.times
+      $.post("/routes/schedule",JSON.stringify(send),function(data){})
     }
   }
 });
@@ -103,7 +116,7 @@ Vue.component('route-card', {
     <button class="button" @click="shouldDelete(info.id)">{{buttonText}}</button>
     </div>
     <div v-if="state==1" class="column">
-    <active-selector></active-selector>
+    <active-selector :routeId=info.id></active-selector>
     </div>
     </div>
   </div></div>`,

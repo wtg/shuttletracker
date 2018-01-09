@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"sort"
 	"strconv"
 	"time"
-	"sort"
 
 	// MySQL driver
 	"gopkg.in/cas.v1"
@@ -20,84 +20,55 @@ import (
 
 //TODO: Move this to updater
 //RouteIsActive determines if the current time means a route should be active or not
-func (api *API) RouteIsActive(r *model.Route) (bool){
+func (api *API) RouteIsActive(r *model.Route) bool {
+
 	currentTime := time.Now()
 	day := currentTime.Weekday()
-	p := fmt.Println
 	state := -1
-	for idx, val := range r.TimeInterval{
-			if(day == val.Day){
-				if (currentTime.After(val.Time) && !currentTime.After(r.TimeInterval[idx+1].Time)){
-					state = val.State
-					p("state",state)
+	for idx, _ := range r.TimeInterval {
+		add := -(int(r.TimeInterval[idx].Time.Sub(time.Now().Truncate(24*time.Hour)).Hours()/24) - 1)
+		r.TimeInterval[idx].Time = r.TimeInterval[idx].Time.AddDate(0, 0, add)
+	}
+	for idx, val := range r.TimeInterval {
+		if idx >= len(r.TimeInterval)-1 {
+			state = val.State
+			break
+		} else {
+			if day < val.Day {
+				continue
+			} else if day == val.Day && !currentTime.After(val.Time) {
+				continue
+			} else if day == val.Day && currentTime.After(r.TimeInterval[idx+1].Time) {
+				continue
+			} else if day > val.Day && day <= r.TimeInterval[idx+1].Day {
+				if currentTime.After(r.TimeInterval[idx+1].Time) {
+					continue
 				}
-				}else if (day > val.Day){
-					if(r.TimeInterval[idx+1].Day < day){
-						state = val.State
-						p("state",state)
+			}
+			state = val.State
+			break
 
-						}else{
-							if(currentTime.After(val.Time)&&r.TimeInterval[idx+1].Time.After(currentTime)){
-								state = val.State
-								p("state",state)
+		}
 
-							}
-						}
-					}
-				}
-
-
-	return false
+	}
+	route := model.Route{}
+	route, err := api.db.GetRoute(r.ID)
+	//If we cannot determine a state for some reason default to active
+	route.Active = (state == 1 || state == -1)
+	if err != nil {
+		return false
+	}
+	err = api.db.ModifyRoute(&route)
+	return (state == 1 || state == -1)
 }
 
 // RoutesHandler finds all of the routes in the database
 func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all routes in database
 	routes, err := api.db.GetRoutes()
-
-
-	for idx,_ := range routes{
-
-		timeIntervals := []model.WeekTime{}
-
-		//Temp times for testing
-		on := time.Now().AddDate(0,0,-20)
-		off := time.Now().Add(-1*time.Minute)
-
-		//Strip the date from the time by bringing the day up to today - Do this when we add a new range
-		val := -(int(on.Sub(time.Now().Truncate(24*time.Hour)).Hours()/24)-1)
-		on = on.AddDate(0,0,val)
-
-		val = -(int(off.Sub(time.Now().Truncate(24*time.Hour)).Hours()/24)-1)
-		off = off.AddDate(0,0,val)
-
-		testTime := model.WeekTime{
-			Day: time.Sunday,
-			Time: on,
-			State: 1,
-		}
-
-
-		testTime3 := model.WeekTime{
-			Day: time.Monday,
-			Time: on,
-			State: 4,
-		}
-
-		testTime2 := model.WeekTime{
-			Day: time.Monday,
-			Time: off,
-			State: 2,
-		}
-
-		timeIntervals = append(timeIntervals,testTime2)
-		timeIntervals = append(timeIntervals,testTime3)
-		timeIntervals = append(timeIntervals,testTime)
-		sort.Sort(model.ByTime(timeIntervals))
-
-		routes[idx].TimeInterval = timeIntervals
-
+	for idx, _ := range routes {
 		api.RouteIsActive(&routes[idx])
+
 	}
 	// Handle query errors
 	if err != nil {
@@ -165,29 +136,28 @@ func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	timeIntervals := []model.WeekTime{}
 
 	//This will never have an error
-  form := "3:04pm";
-	midnight,_ := time.Parse(form,"12:00am")
+	form := "3:04pm"
+	midnight, _ := time.Parse(form, "12:00am")
 
 	testTime := model.WeekTime{
-		Day: time.Monday,
-		Time: midnight,
+		Day:   time.Monday,
+		Time:  midnight,
 		State: 1,
 	}
 
-	timeIntervals = append(timeIntervals,testTime)
-
+	timeIntervals = append(timeIntervals, testTime)
 
 	// Create a new route
 	route := model.Route{
-		Name:        routeData["name"],
-		Description: routeData["description"],
-		TimeInterval:     timeIntervals,
-		Enabled:     enabled,
-		Color:       routeData["color"],
-		Width:       width,
-		Coords:      coords,
-		Created:     currentTime,
-		Updated:     currentTime}
+		Name:         routeData["name"],
+		Description:  routeData["description"],
+		TimeInterval: timeIntervals,
+		Enabled:      enabled,
+		Color:        routeData["color"],
+		Width:        width,
+		Coords:       coords,
+		Created:      currentTime,
+		Updated:      currentTime}
 	// Store new route under routes collection
 	err = api.db.CreateRoute(&route)
 	// Error handling
@@ -210,6 +180,33 @@ func (api *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+type Sched struct {
+	Times []model.WeekTime `json:times`
+	Id    string           `json:id`
+}
+
+// RoutesScheduler Allows for route active times to be set
+func (api *API) RoutesScheduler(w http.ResponseWriter, r *http.Request) {
+	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
+		return
+	}
+	times := Sched{}
+
+	err := json.NewDecoder(r.Body).Decode(&times)
+	if err != nil {
+		log.WithError(err).Error("Unable to decode route")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	sort.Sort(model.ByTime(times.Times))
+
+	route := model.Route{}
+	route, err = api.db.GetRoute(times.Id)
+	route.TimeInterval = times.Times
+	err = api.db.ModifyRoute(&route)
+
 }
 
 // RoutesEditHandler Only handles editing enabled flag for now

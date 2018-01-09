@@ -58,7 +58,7 @@ type Coord struct {
 type WeekTime struct {
 	Day   time.Weekday `json:"day"     bson:"day"`
 	Time  time.Time    `json:"time"    bson:"time"`
-	State int          `json:"state"   bson:"state"`
+	State int          `json:"on"   bson:"on"`
 }
 
 type ByTime []WeekTime
