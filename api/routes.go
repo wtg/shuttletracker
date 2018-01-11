@@ -22,7 +22,8 @@ import (
 //RouteIsActive determines if the current time means a route should be active or not
 func (api *API) RouteIsActive(r *model.Route) bool {
 
-	currentTime := time.Now().Add(3*time.Minute)
+	//This is a time offset, to ensure routes are activated on the minute they are assigned activate
+	currentTime := time.Now().Add(2 * time.Minute)
 	day := currentTime.Weekday()
 	state := -1
 
@@ -32,26 +33,18 @@ func (api *API) RouteIsActive(r *model.Route) bool {
 		r.TimeInterval[idx].Time = r.TimeInterval[idx].Time.AddDate(0, 0, add)
 	}
 	for idx, val := range r.TimeInterval {
-		form := "3:04 PM"
-		fmt.Println("Comparing", val.Time.Format(form),currentTime.Format(form))
-		fmt.Println("Comparing", val.Day, day)
 		if idx >= len(r.TimeInterval)-1 {
-			fmt.Println("special case");
 			state = val.State
 			break
 		} else {
 			if day < val.Day {
-				fmt.Println("nah")
 				continue
 			} else if day == val.Day && !currentTime.After(val.Time) {
-				fmt.Println("nah")
 				continue
 			} else if day == val.Day && currentTime.After(r.TimeInterval[idx+1].Time) {
-				fmt.Println("nah")
 				continue
 			} else if day > val.Day && day <= r.TimeInterval[idx+1].Day {
 				if currentTime.After(r.TimeInterval[idx+1].Time) {
-					fmt.Println("nah",r.TimeInterval[idx+1].Time, currentTime)
 					continue
 				}
 			}
@@ -59,16 +52,24 @@ func (api *API) RouteIsActive(r *model.Route) bool {
 			break
 
 		}
-
 	}
+
 	route := model.Route{}
-	route, err := api.db.GetRoute(r.ID)
+	if(api.db != nil){
+		r, err := api.db.GetRoute(r.ID)
+		route = r
+		if err != nil {
+			return false
+		}
+	}
 	//If we cannot determine a state for some reason default to active
 	route.Active = (state == 1 || state == -1)
-	if err != nil {
-		return false
+	if(api.db != nil){
+		err := api.db.ModifyRoute(&route)
+		if err != nil {
+			return false
+		}
 	}
-	err = api.db.ModifyRoute(&route)
 	return (state == 1 || state == -1)
 }
 
@@ -77,12 +78,7 @@ func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all routes in database
 	routes, err := api.db.GetRoutes()
 	for idx, _ := range routes {
-		p := fmt.Println
 		api.RouteIsActive(&routes[idx])
-		form := "3 04 PM"
-		for _,val := range routes[idx].TimeInterval{
-			p(val.Time.Format(form))
-		}
 	}
 	// Handle query errors
 	if err != nil {
@@ -219,8 +215,8 @@ func (api *API) RoutesScheduler(w http.ResponseWriter, r *http.Request) {
 	route := model.Route{}
 	route, err = api.db.GetRoute(times.Id)
 	route.TimeInterval = times.Times
-	for _, val := range route.TimeInterval{
-		fmt.Println("Intake Time",val)
+	for _, val := range route.TimeInterval {
+		fmt.Println("Intake Time", val)
 	}
 	err = api.db.ModifyRoute(&route)
 

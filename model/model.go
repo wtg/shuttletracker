@@ -63,17 +63,17 @@ type WeekTime struct {
 
 type ByTime []WeekTime
 
-func (a ByTime) Len() int           { return len(a) }
-func (a ByTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByTime) Len() int      { return len(a) }
+func (a ByTime) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 func (a ByTime) Less(i, j int) bool {
-	if (a[i].Day < a[j].Day){
+	if a[i].Day < a[j].Day {
 		return true
-	}else if (a[i].Day > a[j].Day){
+	} else if a[i].Day > a[j].Day {
 		return false
-	}else{
-		if (a[j].Time.After(a[i].Time)){
+	} else {
+		if a[j].Time.After(a[i].Time) {
 			return true
-		}else{
+		} else {
 			return false
 		}
 	}
@@ -86,7 +86,7 @@ type Route struct {
 	Description    string     `json:"description"    bson:"description"`
 	TimeInterval   []WeekTime `json:"intervals"			 bson:"intervals"`
 	Enabled        bool       `json:"enabled,bool"	 bson:"enabled"`
-	Active         bool		    `json:"active,bool"	 bson:"enabled"`
+	Active         bool       `json:"active,bool"	 bson:"enabled"`
 	Color          string     `json:"color"          bson:"color"`
 	Width          int        `json:"width,string"   bson:"width"`
 	Coords         []Coord    `json:"coords"         bson:"coords"`
@@ -96,8 +96,6 @@ type Route struct {
 	Created        time.Time  `json:"created"        bson:"created"`
 	Updated        time.Time  `json:"updated"        bson:"updated"`
 }
-
-
 
 // Stop indicates where a tracked object is scheduled to arrive
 type Stop struct {
