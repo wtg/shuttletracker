@@ -10,9 +10,14 @@ Vue.component('active-selector',{
   <input class="button" type="button" @click="on = !on" v-model="on"></input>
   <input class="button" type="button" value="+" @click="add"></input>
   <input class="button" type="button" value="Submit" @click="submit"></input>
-  <div style="width:auto;background-color:#eee;margin:10px;">
-  <div v-for="item in times">{{item.day}} - {{item.time.getHours()}}:<span v-if="(item.time.getMinutes() < 10)">0</span>{{item.time.getMinutes()}} - {{item.on}}<input type="button" value="delete" @click="del(item.id)"></input></div>
+  <input class="button" type="button" value="Refresh" @click="get"></input>
+
+  <br>
+  <div class = "tile is-parent columns" v-for="item in times">
+  <div class = "column notification is-child is-light"><div class="column has-text-centered">Day: {{item.day}} Time: {{item.time.getHours()}}:<span v-if="(item.time.getMinutes() < 10)">0</span>{{item.time.getMinutes()}} Active: {{item.on}}</div><input class="button is-fullwidth" type="button" value="delete" @click="del(item.id)"></input></div>
   </div>
+  </div>
+  <br>
   </div>`,
   data (){
     return {
@@ -24,19 +29,22 @@ Vue.component('active-selector',{
 
     }
   },
+  mounted (){
+    this.get()
+  },
   methods: {
     add: function(){
       let o = (this.on) ? 1 : 0;
-      split = this.tod.split(":")
-      ints = []
+      split = this.tod.split(":");
+      ints = [];
       for (let i = 0; i < split.length; i ++){
-        ints[i] = parseInt(split[i])
-        console.log(ints[i])
+        ints[i] = parseInt(split[i]);
+        console.log(ints[i]);
       }
-      let obj = {on: o, day: this.selected, time: (new Date(1,1,1,ints[0],ints[1],0,0))}
-      var i = this.times.length
+      let obj = {on: o, day: this.selected, time: (new Date(1,1,1,ints[0],ints[1],0,0))};
+      var i = this.times.length;
       this.times.push(obj);
-      console.log(this.times)
+      console.log(this.times);
     },
     del: function(id){
       if(this.times != undefined){
@@ -50,9 +58,23 @@ Vue.component('active-selector',{
     },
     submit: function(){
       let el = this;
-      var send = {id: el.routeId, times: []}
-      send.times = el.times
-      $.post("/routes/schedule",JSON.stringify(send),function(data){})
+      var send = {id: el.routeId, times: []};
+      send.times = el.times;
+      $.post("/routes/schedule",JSON.stringify(send),function(data){});
+    },
+    get: function(){
+      let el = this;
+      $.get("/routes",function(data){
+        el.times = []
+        for(var i = 0; i < data.length; i ++){
+          if(data[i].id == el.routeId){
+            for (var j = 0; j < data[i].intervals.length; j ++)
+            var obj = {on: data[i].intervals[j].on, day: data[i].intervals[j].day, time: new Date(data[i].intervals[j].time)};
+            el.times.push(obj);
+
+          }
+        }
+      });
     }
   }
 });
