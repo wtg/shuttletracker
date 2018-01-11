@@ -64,13 +64,15 @@ Vue.component('active-selector',{
     },
     get: function(){
       let el = this;
+      el.times = []
       $.get("/routes",function(data){
-        el.times = []
         for(var i = 0; i < data.length; i ++){
           if(data[i].id == el.routeId){
-            for (var j = 0; j < data[i].intervals.length; j ++)
-            var obj = {on: data[i].intervals[j].on, day: data[i].intervals[j].day, time: new Date(data[i].intervals[j].time)};
-            el.times.push(obj);
+            for (var j = 0; j < data[i].intervals.length; j ++){
+              var obj = {on: data[i].intervals[j].on, day: data[i].intervals[j].day, time: new Date(data[i].intervals[j].time)};
+              el.times.push(obj);
+
+            }
 
           }
         }
