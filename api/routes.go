@@ -18,8 +18,8 @@ import (
 	"github.com/wtg/shuttletracker/model"
 )
 
-//TODO: Move this to updater
 //RouteIsActive determines if the current time means a route should be active or not
+//TODO: Move this to updater
 func (api *API) RouteIsActive(r *model.Route) bool {
 
 	//This is a time offset, to ensure routes are activated on the minute they are assigned activate
@@ -77,7 +77,7 @@ func (api *API) RouteIsActive(r *model.Route) bool {
 func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all routes in database
 	routes, err := api.db.GetRoutes()
-	for idx, _ := range routes {
+	for idx := range routes {
 		api.RouteIsActive(&routes[idx])
 	}
 	// Handle query errors
@@ -192,9 +192,9 @@ func (api *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type Sched struct {
+type sched struct {
 	Times []model.WeekTime `json:times`
-	Id    string           `json:id`
+	ID    string           `json:id`
 }
 
 // RoutesScheduler Allows for route active times to be set
@@ -202,7 +202,7 @@ func (api *API) RoutesScheduler(w http.ResponseWriter, r *http.Request) {
 	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
 	}
-	times := Sched{}
+	times := sched{}
 
 	err := json.NewDecoder(r.Body).Decode(&times)
 	if err != nil {
@@ -213,7 +213,7 @@ func (api *API) RoutesScheduler(w http.ResponseWriter, r *http.Request) {
 	sort.Sort(model.ByTime(times.Times))
 
 	route := model.Route{}
-	route, err = api.db.GetRoute(times.Id)
+	route, err = api.db.GetRoute(times.ID)
 	route.TimeInterval = times.Times
 	for _, val := range route.TimeInterval {
 		fmt.Println("Intake Time", val)

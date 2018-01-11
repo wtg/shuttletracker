@@ -61,6 +61,7 @@ type WeekTime struct {
 	State int          `json:"on"   bson:"on"`
 }
 
+//ByTime is an interface used to compare two weektime objects to sort them
 type ByTime []WeekTime
 
 func (a ByTime) Len() int      { return len(a) }

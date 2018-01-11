@@ -27,10 +27,10 @@ Vue.component('active-selector',{
       tod: "20:00",
       days: {Monday: {Day: "Monday",val: 1},Tuesday: {Day: "Tuesday",val: 2},Wednesday: {Day: "Wednesday",val: 3},Thursday: {Day: "Thursday",val: 4},Friday: {Day: "Friday",val: 5},Saturday: {Day: "Saturday",val: 6},Sunday: {Day: "Sunday",val: 0}},
 
-    }
+    };
   },
   mounted (){
-    this.get()
+    this.get();
   },
   methods: {
     add: function(){
@@ -47,7 +47,7 @@ Vue.component('active-selector',{
       console.log(this.times);
     },
     del: function(id){
-      if(this.times != undefined){
+      if(this.times !== undefined){
         for (let i =0; i < this.times.length; i ++){
           if(this.times[i].id == id){
              this.times.splice(i, 1);
@@ -64,7 +64,7 @@ Vue.component('active-selector',{
     },
     get: function(){
       let el = this;
-      el.times = []
+      el.times = [];
       $.get("/routes",function(data){
         for(var i = 0; i < data.length; i ++){
           if(data[i].id == el.routeId){
