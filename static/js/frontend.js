@@ -63,7 +63,7 @@ Vue.component('shuttle-map',{
     this.initMap();
     this.grabStops();
     var a = setInterval(this.grabVehicles, 3000);
-    var b = setInterval(this.grabRoutes, 3000);
+    var b = setInterval(this.grabRoutes, 500);
 
   },
   data (){
@@ -134,7 +134,7 @@ Vue.component('shuttle-map',{
     grabRoutes: function(){
       $.get( "/routes", this.updateRoutes).fail(function(){routeSuccess = false;});
     },
-	
+
 	updateLegend () {
 	  let app = this;
 	  app.legend.onAdd = function(map) {
@@ -143,18 +143,18 @@ Vue.component('shuttle-map',{
 		    for (i = 0; i < app.ShuttleRoutes.length; i++){
 			  let route = app.ShuttleRoutes[i];
 			  console.log(route);
-			  legendstring += `<li><img src=` + app.getLegendIcon(route.color)+` 
-			  width="12" height="12"> `+ 
+			  legendstring += `<li><img src=` + app.getLegendIcon(route.color)+`
+			  width="12" height="12"> `+
 			  route.name;
 		  }
 
 		  div.innerHTML = `<ul style="list-style:none">
-					<li><img src="static/images/user.svg" width="12" height="12"> You</li>`+ 
+					<li><img src="static/images/user.svg" width="12" height="12"> You</li>`+
 					legendstring +
 					`<li><img src="static/images/circle.svg" width="12" height="12"> Shuttle Stop</li>
 				</ul>`;
 		return div;
-		
+
 		};
 	  app.legend.addTo(app.ShuttleMap);
 	},
@@ -187,7 +187,7 @@ Vue.component('shuttle-map',{
       routeSuccess = true;
       var updatedRoute = [];
       for(var i = 0; i < data.length; i ++){
-        if(data[i].enabled === false){
+        if(data[i].enabled === false || data[i].active == false){
           continue;
         }
         var points = [];

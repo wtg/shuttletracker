@@ -3,7 +3,6 @@ var refresh = false;
 Vue.component('active-selector',{
   props: ['routeId'],
   template: `<div>
-  {{routeId}}
   <select class="dropdown" v-model=selected>
     <option v-for="day in days" v-bind:value=day.val>{{day.Day}}</option>
   </select>
@@ -12,7 +11,7 @@ Vue.component('active-selector',{
   <input class="button" type="button" value="+" @click="add"></input>
   <input class="button" type="button" value="Submit" @click="submit"></input>
   <div style="width:auto;background-color:#eee;margin:10px;">
-  <div v-for="item in times">{{item.day}} - {{item.time}} - {{item.on}}<input type="button" value="delete" @click="del(item.id)"></input></div>
+  <div v-for="item in times">{{item.day}} - {{item.time.getHours()}}:<span v-if="(item.time.getMinutes() < 10)">0</span>{{item.time.getMinutes()}} - {{item.on}}<input type="button" value="delete" @click="del(item.id)"></input></div>
   </div>
   </div>`,
   data (){
@@ -34,7 +33,7 @@ Vue.component('active-selector',{
         ints[i] = parseInt(split[i])
         console.log(ints[i])
       }
-      let obj = {on: o, day: this.selected, time: (new Date(0,0,0,ints[0],ints[1],0,0)).toISOString()}
+      let obj = {on: o, day: this.selected, time: (new Date(1,1,1,ints[0],ints[1],0,0))}
       var i = this.times.length
       this.times.push(obj);
       console.log(this.times)
