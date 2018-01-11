@@ -63,7 +63,7 @@ Vue.component('shuttle-map',{
     this.initMap();
     this.grabStops();
     var a = setInterval(this.grabVehicles, 3000);
-    var b = setInterval(this.grabRoutes, 500);
+    var b = setInterval(this.grabRoutes, 15000);
 
   },
   data (){
