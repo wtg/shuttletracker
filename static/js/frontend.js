@@ -136,18 +136,19 @@ Vue.component('shuttle-map',{
 	  app.legend.onAdd = function(map) {
 		  var div = L.DomUtil.create('div','info legend');
 		  var legendstring = "";
+		  var darkModeVal = (document.querySelector('div.titleBar').style.filter === 'invert(0)') ? 0 : 1;
 		    for (i = 0; i < app.ShuttleRoutes.length; i++){
 			  let route = app.ShuttleRoutes[i];
 			  console.log(route);
-			  legendstring += `<li><img src=` + app.getLegendIcon(route.color)+` 
-			  width="12" height="12"> `+
+			  legendstring += `<li><img class="legend-icon" src=` + app.getLegendIcon(route.color)+` 
+			  width="12" height="12" style="filter: invert(`+darkModeVal+`)"> `+
 			  route.name;
 		  }
 
 		  div.innerHTML = `<ul style="list-style:none">
-					<li><img src="static/images/user.svg" width="12" height="12"> You</li>`+
+					<li><img class="legend-icon" src="static/images/user.svg" width="12" height="12" style="filter: invert(`+darkModeVal+`)"> You</li>`+
 					legendstring +
-					`<li><img src="static/images/circle.svg" width="12" height="12"> Shuttle Stop</li>
+					`<li><img class="legend-icon" src="static/images/circle.svg" width="12" height="12" style="filter: invert(`+darkModeVal+`)"> Shuttle Stop</li>
 				</ul>`;
 		return div;
 
@@ -484,20 +485,39 @@ Vue.component('dropdown-menu',{
             this.darkmodeOn = 1;
             document.querySelector('div#darkmode-icon>img').src = this.sunicon;
             document.querySelector('div.leaflet-tile-pane').style.filter = 'invert(1)';
+            document.querySelector('div.leaflet-bottom.leaflet-left').style.filter = 'invert(1)';
+            document.querySelector('div.leaflet-bottom.leaflet-right').style.filter = 'invert(1)';
             document.querySelector('div.titleBar').style.filter = 'invert(1)';
             // invert specific colors twice to make them normal
             document.querySelector('div.pulsate').style.filter = 'invert(1)';
             document.querySelector('a.logo').style.filter = 'invert(1)';
+            var leafletControlLinks = document.querySelectorAll('div.leaflet-control>a');
+            for (var i = 0; i < leafletControlLinks.length; i++) {
+                leafletControlLinks[i].style.filter = 'invert(1)';
+            }
+            var legendIcons = document.querySelectorAll('img.legend-icon');
+            for (var i = 0; i < legendIcons.length; i++) {
+                legendIcons[i].style.filter = 'invert(1)';
+            }
         },
         disableDarkmode: function () {
             this.darkmodeOn = 0;
             document.querySelector('div#darkmode-icon>img').src = this.moonicon;
             document.querySelector('div.leaflet-tile-pane').style.filter = 'invert(0)';
+            document.querySelector('div.leaflet-bottom.leaflet-left').style.filter = 'invert(0)';
+            document.querySelector('div.leaflet-bottom.leaflet-right').style.filter = 'invert(0)';
             document.querySelector('div.titleBar').style.filter = 'invert(0)';
             // reset specific colors to make normal
             document.querySelector('div.pulsate').style.filter = 'invert(0)';
             document.querySelector('a.logo').style.filter = 'invert(0)';
-
+            var leafletControlLinks = document.querySelectorAll('div.leaflet-control>a');
+            for (var i = 0; i < leafletControlLinks.length; i++) {
+                leafletControlLinks[i].style.filter = 'invert(0)';
+            }
+            var legendIcons = document.querySelectorAll('img.legend-icon');
+            for (var i = 0; i < legendIcons.length; i++) {
+                legendIcons[i].style.filter = 'invert(0)';
+            }
         },
         // ====================================================================
 
@@ -567,7 +587,7 @@ Vue.component('dropdown-menu',{
 
 Vue.component('title-bar', {
   template: `  
-  <div class="titleBar">
+  <div class="titleBar" style="filter: invert(0)">
     <!-- left side of tile bar -->
     <ul class="titleContent" id="titleContent-left">
       <li>
