@@ -71,6 +71,13 @@ type Route struct {
 	Updated        time.Time `json:"updated"        bson:"updated"`
 }
 
+// AdminMessage represents a message popup for the user from the site administrator
+type AdminMessage struct {
+	Type    string `json:type`
+	Message string `json:message`
+	Display bool   `json:display`
+}
+
 // Stop indicates where a tracked object is scheduled to arrive
 type Stop struct {
 	ID           string  `json:"id"             bson:"id"`

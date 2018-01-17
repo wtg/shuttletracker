@@ -56,13 +56,24 @@ Vue.component('live-indicator',{
 Vue.component('message-modal',{
   props: ['dim'],
   template:
-  `<div id ="messagebox" v-bind:style="modalStyle" @click="modalStyle.display = 'none'">{{msg}} <span style="color:red">[tap to hide]</span></div>
+  `<div v-if="msg != ''" id ="messagebox" v-bind:style="modalStyle" @click="modalStyle.display = 'none'">{{msg}} <span style="color:red">[tap to hide]</span></div>
   </div>`,
   data (){
     return {
       modalStyle: {display:"block"},
-      msg: "This is an alert",
+      msg: "",
     }
+  },
+  mounted (){
+    let el = this;
+
+    $.get("/adminMessage",function(data){
+      console.log(data)
+      if(data.Display === true){
+        el.msg = data.Message;
+      }
+    });
+
   }
 });
 
