@@ -28,6 +28,28 @@ html, body {
   background-color: black;
 }
 
+#messagebox {
+    position: fixed;
+    z-index: 101;
+    bottom: -510px;
+    left: 0;
+    right: 0;
+    padding-left: 15px;
+    background: #eeeeeeee;
+    color: #ffffff
+    text-align: center;
+    line-height: 2.5;
+    overflow: hidden;
+}
+@keyframes slideUp {
+    0% { transform: translateY(0px); }
+    100% { transform: translateY(-510px); }
+}
+#messagebox {
+    animation: slideUp 2.5s ease forwards;
+}
+
+
 .page-container {
   height: 100%;
   width: 100%;
