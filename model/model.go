@@ -73,9 +73,10 @@ type Route struct {
 
 // AdminMessage represents a message popup for the user from the site administrator
 type AdminMessage struct {
-	Type    string `json:type`
-	Message string `json:message`
-	Display bool   `json:display`
+	ID			int `json:"id" 							bson:"id"`
+	Type    string `json:type								bson:"type"`
+	Message string `json:message						bson:"message"`
+	Display bool   `json:display						bson:"display"`
 }
 
 // Stop indicates where a tracked object is scheduled to arrive

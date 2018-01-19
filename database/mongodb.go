@@ -17,6 +17,8 @@ type MongoDB struct {
 	routes   *mgo.Collection
 	stops    *mgo.Collection
 	users    *mgo.Collection
+	messages    *mgo.Collection
+
 }
 
 // MongoDBConfig contains information on how to connect to a MongoDB server.
@@ -39,6 +41,8 @@ func NewMongoDB(cfg MongoDBConfig) (*MongoDB, error) {
 	db.routes = db.session.DB("").C("routes")
 	db.stops = db.session.DB("").C("stops")
 	db.users = db.session.DB("").C("users")
+	db.messages = db.session.DB("").C("messages")
+
 
 	// Ensure unique vehicle identification
 	vehicleIndex := mgo.Index{
@@ -205,4 +209,26 @@ func (m *MongoDB) GetEnabledVehicles() ([]model.Vehicle, error) {
 // ModifyVehicle updates a Vehicle by its ID.
 func (m *MongoDB) ModifyVehicle(vehicle *model.Vehicle) error {
 	return m.vehicles.Update(bson.M{"vehicleID": vehicle.VehicleID}, vehicle)
+}
+
+// SetMesage sets the current admin message
+func (m *MongoDB) SetMessage(message *model.AdminMessage) error {
+	message.ID = 1
+	m.messages.Remove(bson.M{"id": 1})
+	return m.messages.Insert(bson.M{"id": 1}, message)
+}
+
+// ClearMessage Clears the current message.
+func (m *MongoDB) ClearMessage() error {
+	message := model.AdminMessage{}
+	message.ID = 1
+	return m.messages.Remove(bson.M{"id": 1})
+}
+
+// GetCurrentMessage gets the most recent admin message
+func (m *MongoDB) GetCurrentMessage() (model.AdminMessage, error){
+	message := model.AdminMessage{}
+	message.ID = 1
+	err := m.messages.Find(bson.M{"id": 1}).One(&message)
+	return message, err
 }

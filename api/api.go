@@ -84,6 +84,7 @@ func New(cfg Config, db database.Database) (*API, error) {
 	r.Handle("/stops/create", api.CasAUTH.HandleFunc(api.StopsCreateHandler)).Methods("POST")
 	r.Handle("/stops/{id:.+}", api.CasAUTH.HandleFunc(api.StopsDeleteHandler)).Methods("DELETE")
 	//r.HandleFunc("/import", api.ImportHandler).Methods("GET")
+	r.HandleFunc("/adminMessage", api.SetAdminMessage).Methods("POST")
 
 	// Static files
 	r.HandleFunc("/", IndexHandler).Methods("GET")

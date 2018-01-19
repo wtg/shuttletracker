@@ -40,6 +40,12 @@ type Database interface {
 
 	// Users
 	GetUsers() ([]model.User, error)
+
+	//Messages
+	SetMessage(message *model.AdminMessage) error
+	GetCurrentMessage() (model.AdminMessage, error)
+	ClearMessage() error
+
 }
 
 var (
