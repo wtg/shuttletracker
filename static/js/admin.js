@@ -7,7 +7,7 @@ Vue.component('titlebar', {
   <a v-bind:style="logoutStyle" href="/admin/logout/">Logout</a>
     <div class="container has-text-centered" style="height:50px;">
       <div class="level-center" style="">
-        <p class="subtitle"><span class = "red" >Shuttle</span>Tracker</p>
+        <p class="subtitle" style="padding-top:10px;"><span class = "red" >Shuttle</span>Tracker</p>
       </div>
     </div>
   </div>
@@ -25,7 +25,7 @@ Vue.component('titlebar', {
         lineHeight:"50px",
         zIndex: "20",
         verticalAlign:"center",
-        boxShadow: '0 3px 7px rgba(0,0,0,0.25)'},
+        boxShadow: '0 3px 7px rgba(0,0,0,0.1)'},
 
       logoutStyle: {
         float: "right",
@@ -59,7 +59,7 @@ Vue.component('sidebar',{
         bottom: "0",
         fontSize: "16px",
         zIndex: "10",
-        top:"40",
+        top:"50",
         float:"left",
         position: "absolute",
         lineHeight:"50px",
