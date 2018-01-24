@@ -25,7 +25,7 @@ func (api *API) SetAdminMessage(w http.ResponseWriter, r *http.Request){
 		http.Error(w,err.Error(), http.StatusInternalServerError)
 		return;
 	}
-
+	err = api.db.ClearMessage()
 	err = api.db.SetMessage(&message)
 
 	if err != nil {

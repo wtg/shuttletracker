@@ -214,7 +214,6 @@ func (m *MongoDB) ModifyVehicle(vehicle *model.Vehicle) error {
 // SetMesage sets the current admin message
 func (m *MongoDB) SetMessage(message *model.AdminMessage) error {
 	message.ID = 1
-	m.messages.Remove(bson.M{"id": 1})
 	return m.messages.Insert(bson.M{"id": 1}, message)
 }
 
