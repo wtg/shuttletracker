@@ -212,9 +212,10 @@ func (m *MongoDB) ModifyVehicle(vehicle *model.Vehicle) error {
 }
 
 // SetMesage sets the current admin message
-func (m *MongoDB) SetMessage(message *model.AdminMessage) error {
+func (m *MongoDB) AddMessage(message *model.AdminMessage) error {
 	message.ID = 1
-	return m.messages.Insert(bson.M{"id": 1}, message)
+	message.Created = time.Now();
+	return m.messages.Insert(message)
 }
 
 // ClearMessage Clears the current message.
@@ -228,6 +229,13 @@ func (m *MongoDB) ClearMessage() error {
 func (m *MongoDB) GetCurrentMessage() (model.AdminMessage, error){
 	message := model.AdminMessage{}
 	message.ID = 1
-	err := m.messages.Find(bson.M{"id": 1}).One(&message)
+	err := m.messages.Find(bson.M{}).Sort("-created").One(&message)
 	return message, err
+}
+
+// GetCurrentMessage gets the most recent admin message
+func (m *MongoDB) GetMessages() ([]model.AdminMessage, error){
+	messages := []model.AdminMessage{}
+	err := m.messages.Find(bson.M{}).All(&messages)
+	return messages, err
 }
