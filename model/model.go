@@ -74,9 +74,9 @@ func (a ByTime) Less(i, j int) bool {
 	} else {
 		if a[j].Time.After(a[i].Time) {
 			return true
-		} else {
-			return false
 		}
+		return false
+
 	}
 }
 

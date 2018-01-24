@@ -27,7 +27,7 @@ func (api *API) RouteIsActive(r *model.Route) bool {
 	day := currentTime.Weekday()
 	state := -1
 
-	for idx, _ := range r.TimeInterval {
+	for idx := range r.TimeInterval {
 		//Bring the date to the current day to compare only the time object
 		add := -(int(r.TimeInterval[idx].Time.Sub(time.Now().Truncate(24*time.Hour)).Hours()/24) - 1)
 		r.TimeInterval[idx].Time = r.TimeInterval[idx].Time.AddDate(0, 0, add)
