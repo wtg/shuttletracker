@@ -5,13 +5,8 @@ Vue.component('titlebar', {
   `<div>
   <div v-bind:style="titlebarStyle" class ="hero-head">
   <a v-bind:style="logoutStyle" href="/admin/logout/">Logout</a>
-    <div class="container has-text-centered" style="height:50px;">
-      <div class="level-center" style="">
-        <p class="subtitle" style="padding-top:10px;"><span class = "red" >Shuttle</span>Tracker</p>
-      </div>
-    </div>
-  </div>
-
+  <div class="container has-text-centered" style="height:50px;">
+  <p v-bind:style=""><span class = "red" >Shuttle</span>Tracker</p>
   </div>`,
 
   data (){
