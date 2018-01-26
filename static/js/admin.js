@@ -45,7 +45,7 @@ Vue.component('sidebar',{
   `,
   data (){
     return{
-      elements: [{text: "Routes",id: 0},{text: "Stops",id: 1},{text: "Vehicles",id: 2}],
+      elements: [{text: "Routes",id: 0},{text: "Stops",id: 1},{text: "Vehicles",id: 2},{text: "Messages", id: 3}],
 
       sidebarStyle: {
         backgroundColor:"white",
@@ -80,6 +80,8 @@ Vue.component("main-pane",{
     <route-panel v-if="state == 0"></route-panel>
     <stops-panel v-if="state == 1"></stops-panel>
     <vehicle-panel v-if="state == 2"></vehicle-panel>
+    <message-panel v-if="state == 3"></message-panel>
+
     </transition>
   </div>
   `,
