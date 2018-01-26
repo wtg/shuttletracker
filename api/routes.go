@@ -23,7 +23,7 @@ import (
 func (api *API) RouteIsActive(r *model.Route) bool {
 
 	//This is a time offset, to ensure routes are activated on the minute they are assigned activate
-	currentTime := time.Now().Add(2 * time.Minute)
+	currentTime := time.Now()
 	day := currentTime.Weekday()
 	state := -1
 
