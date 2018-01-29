@@ -85,8 +85,8 @@ func New(cfg Config, db database.Database) (*API, error) {
 	//r.HandleFunc("/import", api.ImportHandler).Methods("GET")
 
 	// Static files
-	r.HandleFunc("/", IndexHandler).Methods("GET")
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
+	r.Handle("/", StaticHandler(http.HandlerFunc(IndexHandler))).Methods("GET")
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", StaticHandler(http.FileServer(http.Dir("static/")))))
 
 	// Serve requests
 	hand := api.CasAUTH.Handle(r)
@@ -115,6 +115,15 @@ func (api *API) Run() {
 // IndexHandler serves the index page.
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "index.html")
+}
+
+// StaticHandler adds a Cache-Control header to all responses to require the
+// client to make sure its cached copy is up to date.
+func StaticHandler(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "no-cache")
+		h.ServeHTTP(w, r)
+	})
 }
 
 // AdminHandler serves the admin page.
