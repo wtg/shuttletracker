@@ -139,7 +139,6 @@ Vue.component('shuttle-map',{
 		  var darkModeVal = (document.querySelector('div.titleBar').style.filter === 'invert(0)') ? 0 : 1;
 		    for (i = 0; i < app.ShuttleRoutes.length; i++){
 			  let route = app.ShuttleRoutes[i];
-			  console.log(route);
 			  legendstring += `<li><img class="legend-icon" src=` + app.getLegendIcon(route.color)+` 
 			  width="12" height="12" style="filter: invert(`+darkModeVal+`)"> `+
 			  route.name;
