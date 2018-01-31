@@ -11,49 +11,19 @@
     <script src="/static/dist/leaflet-routing/leaflet-routing-machine.js"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://unpkg.com/vue"></script>
+    <script src="/static/dist/vue/vue.min.js"></script>
     <script src="/static/js/admin.js"></script>
 
   </head>
   <body>
-
-    <div class="navbar">
-      <p class="title">RPI Shuttle Tracker</p>
-
-      <a class="logout button" href="/admin/logout/">Logout</a>
-      <div class="button logout" onclick="Admin.toggleDisplay();">Toggle Route Display</div>
-      <div class="button logout rtb" onclick="Admin.showMapPanel();">Create Route</div>
-
+    <div class="docBody" id="app-vue">
+      <sidebar></sidebar>
+      <titlebar></titlebar>
+      <main-pane></main-pane>
     </div>
-
-    <div class="docBody" id="document-vue">
-      <vehicle-panel></vehicle-panel>
-      <div class = "routePanel">
-      </div>
-      <div class= "mapPanel">
-        <div class="button undoButton" onclick="Admin.removeLastPoint()">Undo</div>
-        <div id="mapid" style="height: 70%;float: left; width: 100%; background-color:black;z-index:0;"></div>
-        <div class="mapform">
-          <form id="routeform" action="/routes/create" method="post" content-type="application/json">
-            <span class="emphasis formtext">Name: </span><input class="textbox" id="name" type="text"></input><br>
-            <span class="emphasis formtext">Description: </span><input class="textbox" id="desc" type="text"></input><br>
-            <span class="emphasis formtext">Enabled: </span><input class="textbox" id="en" type="text"></input><br>
-            <span class="emphasis formtext">Color: </span><input class="textbox" id="color" type="text"></input><br>
-            <span class="emphasis formtext">StartTime: </span><input class="textbox" id="startTimeTime" type="text" value=""></span><input class="textbox" id="startTimeDay" type="text" value="day"></input><br>
-            <span class="emphasis formtext">EndTime: </span><input class="textbox" id="endTimeTime" type="text" value="time"></span><input class="textbox" id="endTimeDay" type="text" value="day"></input><br>
-
-            <span class="emphasis formtext">Width: </span><input class ="textbox" id="width" type="text"></input><br>
-            <input type="hidden" id="routeCoords" name="coords"></input>
-            <div class="button formtext" onclick="Routes.submitForm(JSON.stringify(Routes.pullForm()))"> Submit</div>
-            <div class="button formtext" onclick="Routes.getJson(JSON.stringify(Routes.pullForm()))"> GetJson</div>
-
-          </form>
-        </div>
-      </div>
-      <div class="stopPanel">
-
-      </div>
-    </div>
+    <script src="/static/js/stops.js"></script>
+    <script src="/static/js/routes.js"></script>
     <script src="/static/js/vehicles.js"></script>
+    <script src="/static/js/admin.js"></script>
   </body>
 </html>

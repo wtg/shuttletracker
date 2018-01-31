@@ -15,14 +15,12 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/wtg/shuttletracker/model"
-	"gopkg.in/mgo.v2/bson"
 )
 
 // RoutesHandler finds all of the routes in the database
-func (App *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
+func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all routes in database
-	var routes []model.Route
-	err := App.db.Routes.Find(bson.M{}).All(&routes)
+	routes, err := api.db.GetRoutes()
 	// Handle query errors
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -32,10 +30,9 @@ func (App *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // StopsHandler finds all of the route stops in the database
-func (App *API) StopsHandler(w http.ResponseWriter, r *http.Request) {
+func (api *API) StopsHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all stops in databases
-	var stops []model.Stop
-	err := App.db.Stops.Find(bson.M{}).All(&stops)
+	stops, err := api.db.GetStops()
 	// Handle query errors
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -54,9 +51,9 @@ func ComputeDistanceMapPoint(c1 model.MapPoint, c2 model.MapPoint) float64 {
 }
 
 // RoutesCreateHandler adds a new route to the database
-func (App *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
+func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Create a new route object using request fields
-	if App.cfg.Authenticate && !cas.IsAuthenticated(r) {
+	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
 	}
 	var routeData map[string]string
@@ -89,7 +86,6 @@ func (App *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	currentTime := time.Now()
 	// Create a new route
 	route := model.Route{
-		ID:          bson.NewObjectId().Hex(),
 		Name:        routeData["name"],
 		Description: routeData["description"],
 		StartTime:   routeData["startTime"],
@@ -101,7 +97,7 @@ func (App *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 		Created:     currentTime,
 		Updated:     currentTime}
 	// Store new route under routes collection
-	err = App.db.Routes.Insert(&route)
+	err = api.db.CreateRoute(&route)
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -109,43 +105,44 @@ func (App *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//Deletes route from database
-func (App *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if App.cfg.Authenticate && !cas.IsAuthenticated(r) {
+// RoutesDeleteHandler deletes a route from database
+func (api *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
 	}
 	vars := mux.Vars(r)
 	fmt.Printf(vars["id"])
 	log.Debugf("deleting", vars["id"])
-	err := App.db.Routes.Remove(bson.M{"id": vars["id"]})
+	err := api.db.DeleteRoute(vars["id"])
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
-//RoutesEditHandler Only handles editing enabled flag for now
-func (App *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
-	if App.cfg.Authenticate && !cas.IsAuthenticated(r) {
+// RoutesEditHandler Only handles editing enabled flag for now
+func (api *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
+	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
 	}
 	route := model.Route{}
 
 	err := json.NewDecoder(r.Body).Decode(&route)
-	en := route.Enabled
 	if err != nil {
-		fmt.Printf("lelel: %v", err)
+		log.WithError(err).Error("Unable to decode route")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
+	en := route.Enabled
 
-	err = App.db.Routes.Find(bson.M{"id": route.ID}).Sort("-created").Limit(1).One(&route)
+	route, err = api.db.GetRoute(route.ID)
 	route.Enabled = en
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = App.db.Routes.Update(bson.M{"id": route.ID}, route)
+	err = api.db.ModifyRoute(&route)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -154,57 +151,54 @@ func (App *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // StopsCreateHandler adds a new route stop to the database
-func (App *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
-	if App.cfg.Authenticate && !cas.IsAuthenticated(r) {
+func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
+	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
 	}
 
-	fmt.Print("Create Stop Handler called")
 	// Create a new stop object using request fields
 	stop := model.Stop{}
 	err := json.NewDecoder(r.Body).Decode(&stop)
-	stop.ID = bson.NewObjectId().Hex()
-	route := model.Route{}
-	err1 := App.db.Routes.Find(bson.M{"id": stop.RouteID}).One(&route)
-	// Error handling
-
-	if err1 != nil {
-		http.Error(w, err1.Error(), http.StatusInternalServerError)
-	}
 	if err != nil {
+		log.WithError(err).Error("Unable to decode stop.")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	route, err := api.db.GetRoute(stop.RouteID)
+	if err != nil {
+		log.WithError(err).Error("Unable to get route.")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	// Store new stop under stops collection
+	err = api.db.CreateStop(&stop)
+	// Error handling
+	if err != nil {
+		log.WithError(err).Error("Unable to create stop.")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	// We have to know the order of the stop and store a velocity vector into duration for the prediction
 	route.StopsID = append(route.StopsID, stop.ID) // THIS REQUIRES the front end to have correct order << to be improved
-	fmt.Println(route.StopsID)
-
-	// Store new stop under stops collection
-	err = App.db.Stops.Insert(&stop)
-	// Error handling
+	err = api.db.ModifyRoute(&route)
 	if err != nil {
-		fmt.Println(err.Error())
+		log.WithError(err).Error("Unable to modify route.")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	query := bson.M{"id": stop.RouteID}
-	change := bson.M{"$set": bson.M{"availableroute": stop.SegmentIndex + 1, "stopsid": route.StopsID}}
-
-	err = App.db.Routes.Update(query, change)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	fmt.Println("Closest Segment ID = " + strconv.Itoa(stop.SegmentIndex))
 	WriteJSON(w, stop)
 }
 
-func (App *API) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if App.cfg.Authenticate && !cas.IsAuthenticated(r) {
+// StopsDeleteHandler deletes a Stop.
+func (api *API) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
 	}
 
 	vars := mux.Vars(r)
 	log.Debugf("deleting", vars["id"])
 	fmt.Printf(vars["id"])
-	err := App.db.Stops.Remove(bson.M{"id": vars["id"]})
+	err := api.db.DeleteStop(vars["id"])
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

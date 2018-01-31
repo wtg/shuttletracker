@@ -10,7 +10,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
 	"gopkg.in/cas.v1"
-	"gopkg.in/mgo.v2/bson"
 
 	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/log"
@@ -23,7 +22,7 @@ type Config struct {
 	CasURL               string
 	Authenticate         bool
 	ListenURL            string
-	MapboxAPIKey				 string
+	MapboxAPIKey         string
 }
 
 // App holds references to Mongo resources.
@@ -85,13 +84,8 @@ func New(cfg Config, db database.Database) (*API, error) {
 	r.Handle("/stops/{id:.+}", api.CasAUTH.HandleFunc(api.StopsDeleteHandler)).Methods("DELETE")
 	//r.HandleFunc("/import", api.ImportHandler).Methods("GET")
 
-	// Legacy routes to support the ancient iOS app
-	r.HandleFunc("/vehicles/current.js", api.LegacyVehiclesHandler).Methods("GET")
-	r.HandleFunc("/displays/netlink.js", api.LegacyRoutesHandler).Methods("GET")
-
 	// Static files
 	r.HandleFunc("/", IndexHandler).Methods("GET")
-	r.PathPrefix("/bower_components/").Handler(http.StripPrefix("/bower_components/", http.FileServer(http.Dir("bower_components/"))))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
 
 	// Serve requests
@@ -123,20 +117,14 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "index.html")
 }
 
-type User struct {
-	Name string
-}
-
 // AdminHandler serves the admin page.
 func (api *API) AdminHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("%u", api.cfg.Authenticate)
 	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		cas.RedirectToLogin(w, r)
 		return
 	} else {
 		valid := false
-		var users []User
-		api.db.Users.Find(bson.M{}).All(&users)
+		users, _ := api.db.GetUsers()
 		for _, u := range users {
 			if u.Name == strings.ToLower(cas.Username(r)) {
 				valid = true
@@ -154,8 +142,9 @@ func (api *API) AdminHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
 //KeyHandler sends Mapbox api key to authenticated user
-func (api *API) KeyHandler(w http.ResponseWriter, r *http.Request){
+func (api *API) KeyHandler(w http.ResponseWriter, r *http.Request) {
 	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		http.Redirect(w, r, "/admin/", 301)
 	} else {
