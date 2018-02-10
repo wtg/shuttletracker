@@ -53,10 +53,6 @@ Vue.component('live-indicator',{
 
 });
 
-Vue.component('route-time-box',{
-
-});
-
 Vue.component('shuttle-map',{
   template: `<div id="mapid" style="height: 100%; z-index:0; filter: invert(0)"></div>`,
   mounted(){
@@ -146,7 +142,7 @@ Vue.component('shuttle-map',{
 		  var darkModeVal = (document.querySelector('div.titleBar').style.filter === 'invert(0)') ? 0 : 1;
 		    for (i = 0; i < app.ShuttleRoutes.length; i++){
 			  let route = app.ShuttleRoutes[i];
-			  legendstring += `<li><img class="legend-icon" src=` + app.getLegendIcon(route.color)+` 
+			  legendstring += `<li><img class="legend-icon" src=` + app.getLegendIcon(route.color)+`
 			  width="12" height="12" style="filter: invert(`+darkModeVal+`)"> `+
 			  route.name;
 		  }
@@ -162,9 +158,6 @@ Vue.component('shuttle-map',{
 	  app.legend.addTo(app.ShuttleMap);
 	},
 
-      };
-      app.legend.addTo(app.ShuttleMap);
-    },
     updateRoutes: function(data){
       routeSuccess = true;
       var updatedRoute = [];
@@ -596,7 +589,7 @@ Vue.component('dropdown-menu',{
 
 Vue.component('title-bar', {
 
-  template: `  
+  template: `
   <div class="titleBar" style="filter: invert(0)">
     <!-- left side of tile bar -->
     <ul class="titleContent" id="titleContent-left">
