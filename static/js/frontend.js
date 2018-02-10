@@ -137,25 +137,30 @@ Vue.component('shuttle-map',{
       $.get( "/routes", this.updateRoutes).fail(function(){routeSuccess = false;});
     },
 
-    updateLegend () {
-      let app = this;
-      app.legend.onAdd = function(map) {
-        var div = L.DomUtil.create('div','info legend');
-        var legendstring = "";
-        for (i = 0; i < app.ShuttleRoutes.length; i++){
-          let route = app.ShuttleRoutes[i];
-          console.log(route);
-          legendstring += `<li><img src=` + app.getLegendIcon(route.color)+`
-          width="12" height="12"> `+
-          route.name;
-        }
 
-        div.innerHTML = `<ul style="list-style:none">
-        <li><img src="static/images/user.svg" width="12" height="12"> You</li>`+
-        legendstring +
-        `<li><img src="static/images/circle.svg" width="12" height="12"> Shuttle Stop</li>
-        </ul>`;
-        return div;
+	updateLegend () {
+	  let app = this;
+	  app.legend.onAdd = function(map) {
+		  var div = L.DomUtil.create('div','info legend');
+		  var legendstring = "";
+		  var darkModeVal = (document.querySelector('div.titleBar').style.filter === 'invert(0)') ? 0 : 1;
+		    for (i = 0; i < app.ShuttleRoutes.length; i++){
+			  let route = app.ShuttleRoutes[i];
+			  legendstring += `<li><img class="legend-icon" src=` + app.getLegendIcon(route.color)+` 
+			  width="12" height="12" style="filter: invert(`+darkModeVal+`)"> `+
+			  route.name;
+		  }
+
+		  div.innerHTML = `<ul style="list-style:none">
+					<li><img class="legend-icon" src="static/images/user.svg" width="12" height="12" style="filter: invert(`+darkModeVal+`)"> You</li>`+
+					legendstring +
+					`<li><img class="legend-icon" src="static/images/circle.svg" width="12" height="12" style="filter: invert(`+darkModeVal+`)"> Shuttle Stop</li>
+				</ul>`;
+		return div;
+
+		};
+	  app.legend.addTo(app.ShuttleMap);
+	},
 
       };
       app.legend.addTo(app.ShuttleMap);
