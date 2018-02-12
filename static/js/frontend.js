@@ -10,10 +10,10 @@ var lastUpdateTime = "";
 var d = new Date();
 
 function checkTime(i) {
-    if (i < 10) {
-        i = "0" + i;
-    }
-    return i;
+  if (i < 10) {
+    i = "0" + i;
+  }
+  return i;
 }
 
 Vue.component('live-indicator',{
@@ -24,7 +24,7 @@ Vue.component('live-indicator',{
       text: "",
       lv:"Live",
       live: false
-      };
+    };
   },
   methods: {
     update: function(){
@@ -59,7 +59,7 @@ Vue.component('shuttle-map',{
     this.initMap();
     this.grabStops();
     var a = setInterval(this.grabVehicles, 3000);
-    var b = setInterval(this.grabRoutes, 3000);
+    var b = setInterval(this.grabRoutes, 15000);
 
   },
   data (){
@@ -76,21 +76,21 @@ Vue.component('shuttle-map',{
       legend: L.control({position: 'bottomleft'}),
 
       ShuttleSVG: `<?xml version="1.0" encoding="UTF-8"?>
-          <svg width="52px" height="52px" viewBox="0 0 52 52" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-              <title>shuttle</title>
-              <defs></defs>
-              <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                  <g id="shuttle">
-                      <path d="M51.353,0.914 C51.648,1.218 51.72,1.675 51.532,2.054 L27.532,50.469 C27.362,50.814 27.011,51.025 26.636,51.025 C26.58,51.025 26.524,51.02 26.467,51.01 C26.032,50.936 25.697,50.583 25.643,50.145 L23.098,29.107 L0.835,25.376 C0.402,25.304 0.067,24.958 0.009,24.522 C-0.049,24.086 0.184,23.665 0.583,23.481 L50.218,0.701 C50.603,0.524 51.058,0.609 51.353,0.914 Z" id="Background" fill="COLOR"></path>
-                      <path d="M51.353,0.914 C51.058,0.609 50.603,0.524 50.218,0.701 L0.583,23.481 C0.184,23.665 -0.049,24.086 0.009,24.522 C0.067,24.958 0.402,25.304 0.835,25.376 L23.098,29.107 L25.643,50.145 C25.697,50.583 26.032,50.936 26.467,51.01 C26.524,51.02 26.58,51.025 26.636,51.025 C27.011,51.025 27.362,50.814 27.532,50.469 L51.532,2.054 C51.72,1.675 51.648,1.218 51.353,0.914 Z M27.226,46.582 L24.994,28.125 C24.94,27.685 24.603,27.332 24.166,27.259 L4.374,23.941 L48.485,3.697 L27.226,46.582 Z" id="Shape" fill="#000"></path>
-                  </g>
-              </g>
-          </svg>
-          `,
-		CircleSVG: `<?xml version="1.0"?>
-			<svg height="600" width="600" xmlns="http://www.w3.org/2000/svg">
-			<circle cx="50%" cy="50%" r="50%" fill="COLOR" />
-			</svg>`
+      <svg width="52px" height="52px" viewBox="0 0 52 52" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <title>shuttle</title>
+      <defs></defs>
+      <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+      <g id="shuttle">
+      <path d="M51.353,0.914 C51.648,1.218 51.72,1.675 51.532,2.054 L27.532,50.469 C27.362,50.814 27.011,51.025 26.636,51.025 C26.58,51.025 26.524,51.02 26.467,51.01 C26.032,50.936 25.697,50.583 25.643,50.145 L23.098,29.107 L0.835,25.376 C0.402,25.304 0.067,24.958 0.009,24.522 C-0.049,24.086 0.184,23.665 0.583,23.481 L50.218,0.701 C50.603,0.524 51.058,0.609 51.353,0.914 Z" id="Background" fill="COLOR"></path>
+      <path d="M51.353,0.914 C51.058,0.609 50.603,0.524 50.218,0.701 L0.583,23.481 C0.184,23.665 -0.049,24.086 0.009,24.522 C0.067,24.958 0.402,25.304 0.835,25.376 L23.098,29.107 L25.643,50.145 C25.697,50.583 26.032,50.936 26.467,51.01 C26.524,51.02 26.58,51.025 26.636,51.025 C27.011,51.025 27.362,50.814 27.532,50.469 L51.532,2.054 C51.72,1.675 51.648,1.218 51.353,0.914 Z M27.226,46.582 L24.994,28.125 C24.94,27.685 24.603,27.332 24.166,27.259 L4.374,23.941 L48.485,3.697 L27.226,46.582 Z" id="Shape" fill="#000"></path>
+      </g>
+      </g>
+      </svg>
+      `,
+      CircleSVG: `<?xml version="1.0"?>
+      <svg height="600" width="600" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50%" cy="50%" r="50%" fill="COLOR" />
+      </svg>`
     };
   },
   methods:{
@@ -101,21 +101,23 @@ Vue.component('shuttle-map',{
     },
 
     getLegendIcon: function(color) {
+
 		var url = "data:image/svg+xml;base64," + btoa(this.ShuttleSVG.replace("COLOR",color));
 		return url;
 	},
 
 	initMap: function(){
+
       this.ShuttleMap = L.map('mapid', {
-          zoomControl: false,
-          attributionControl: false // hide Leaflet
+        zoomControl: false,
+        attributionControl: false // hide Leaflet
       });
 
       this.ShuttleMap.setView([42.728172, -73.678803], 15.3);
       // show attribution without Leaflet
       this.ShuttleMap.addControl(L.control.attribution({
-          position: 'bottomright',
-          prefix: ''
+        position: 'bottomright',
+        prefix: ''
       }));
       L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png', {
         attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
@@ -131,6 +133,7 @@ Vue.component('shuttle-map',{
       $.get( "/routes", this.updateRoutes).fail(function(){routeSuccess = false;});
     },
 
+
 	updateLegend () {
 	  let app = this;
 	  app.legend.onAdd = function(map) {
@@ -139,7 +142,7 @@ Vue.component('shuttle-map',{
 		  var darkModeVal = (document.querySelector('div.titleBar').style.filter === 'invert(0)') ? 0 : 1;
 		    for (i = 0; i < app.ShuttleRoutes.length; i++){
 			  let route = app.ShuttleRoutes[i];
-			  legendstring += `<li><img class="legend-icon" src=` + app.getLegendIcon(route.color)+` 
+			  legendstring += `<li><img class="legend-icon" src=` + app.getLegendIcon(route.color)+`
 			  width="12" height="12" style="filter: invert(`+darkModeVal+`)"> `+
 			  route.name;
 		  }
@@ -159,7 +162,7 @@ Vue.component('shuttle-map',{
       routeSuccess = true;
       var updatedRoute = [];
       for(var i = 0; i < data.length; i ++){
-        if(data[i].enabled === false){
+        if(data[i].enabled === false || data[i].active === false){
           continue;
         }
         var points = [];
@@ -316,9 +319,9 @@ Vue.component('shuttle-map',{
             this.ShuttlesArray[data[j].vehicleID] = {
               data: data[j],
               marker: L.marker([data[j].lat,data[j].lng], {
-                  icon: shuttleIcon,
-                  rotationAngle: parseInt(data[j].heading)-45,rotationOrigin: 'center',
-                  zIndexOffset: 1000
+                icon: shuttleIcon,
+                rotationAngle: parseInt(data[j].heading)-45,rotationOrigin: 'center',
+                zIndexOffset: 1000
               }),
               message: ""
             };
@@ -346,19 +349,19 @@ Vue.component('shuttle-map',{
         popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
       });
 
-       if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(showPosition);
-        } else {
-          console.log("Geolocation is either not supported by this browser, or geolocation permissions were not given by the user.");
-        }
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+      } else {
+        console.log("Geolocation is either not supported by this browser, or geolocation permissions were not given by the user.");
+      }
 
       function showPosition (position) {
         var locationMarker = {
-              name: "You are here",
-              marker: L.marker([position.coords.latitude, position.coords.longitude], {
-                  icon: userIcon,
-                  zIndexOffset: 1000
-              }),
+          name: "You are here",
+          marker: L.marker([position.coords.latitude, position.coords.longitude], {
+            icon: userIcon,
+            zIndexOffset: 1000
+          }),
         };
         locationMarker.marker.bindPopup(locationMarker.name);
 
@@ -585,7 +588,8 @@ Vue.component('dropdown-menu',{
 });
 
 Vue.component('title-bar', {
-  template: `  
+
+  template: `
   <div class="titleBar" style="filter: invert(0)">
     <!-- left side of tile bar -->
     <ul class="titleContent" id="titleContent-left">
@@ -615,6 +619,7 @@ Vue.component('title-bar', {
       };
     },
     methods: {},
+
 });
 
 var ShuttleTracker = new Vue({
