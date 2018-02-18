@@ -68,7 +68,6 @@ Vue.component('message-modal',{
     let el = this;
 
     $.get("/adminMessage",function(data){
-      console.log(data);
       if(data.Display === true){
         el.msg = data.Message;
       }
