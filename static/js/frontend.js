@@ -62,13 +62,13 @@ Vue.component('message-modal',{
     return {
       modalStyle: {display:"block"},
       msg: "",
-    }
+    };
   },
   mounted (){
     let el = this;
 
     $.get("/adminMessage",function(data){
-      console.log(data)
+      console.log(data);
       if(data.Display === true){
         el.msg = data.Message;
       }

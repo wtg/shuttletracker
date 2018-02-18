@@ -35,6 +35,7 @@ html, body {
     background: #eeeeeeee;
     color: #ffffff
     text-align: center;
+    font-size: 12px;
     line-height: 2.5;
     overflow: hidden;
 }
@@ -127,7 +128,7 @@ ul.dropdown-main {
   position: relative;
   margin: 0;
   padding: 0;
-  
+
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -moz-user-select: none;

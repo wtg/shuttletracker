@@ -20,12 +20,12 @@ Vue.component('message-panel', {
       message: "",
       display: false,
       fail: false
-    }
+    };
   },
   methods: {
     send: function(){
       let el = this;
-      toSend = {Message: this.message, Display: this.display}
+      toSend = {Message: this.message, Display: this.display};
       $.post("/adminMessage",JSON.stringify(toSend)).then(resp =>{
         if (resp != "Success"){
           el.fail = true;
@@ -36,16 +36,15 @@ Vue.component('message-panel', {
       }
     ).catch(function(){
       el.fail = true;
-    })
+    });
     }
   },
   mounted (){
     let el = this;
     fetch("/adminMessage").then(
-      ret => {return ret.json()}).then(val =>{
+      ret => {return ret.json();}).then(val =>{
         el.message = val.Message;
         el.display = val.Display;
-      }
-      )
+      });
   }
 });

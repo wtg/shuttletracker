@@ -211,7 +211,7 @@ func (m *MongoDB) ModifyVehicle(vehicle *model.Vehicle) error {
 	return m.vehicles.Update(bson.M{"vehicleID": vehicle.VehicleID}, vehicle)
 }
 
-// SetMesage sets the current admin message
+// AddMessage sets the current admin message
 func (m *MongoDB) AddMessage(message *model.AdminMessage) error {
 	message.ID = 1
 	message.Created = time.Now();
@@ -233,7 +233,7 @@ func (m *MongoDB) GetCurrentMessage() (model.AdminMessage, error){
 	return message, err
 }
 
-// GetCurrentMessage gets the most recent admin message
+// GetMessages gets the most recent admin messages
 func (m *MongoDB) GetMessages() ([]model.AdminMessage, error){
 	messages := []model.AdminMessage{}
 	err := m.messages.Find(bson.M{}).All(&messages)
