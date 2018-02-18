@@ -31,4 +31,5 @@ func (api *API) SetAdminMessage(w http.ResponseWriter, r *http.Request){
 	if err != nil {
 		http.Error(w,err.Error(), http.StatusInternalServerError)
 	}
+	WriteJSON(w,"Success")
 }
