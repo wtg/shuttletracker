@@ -26,6 +26,8 @@ html, body {
 }
 
 #messagebox {
+    max-height: 150px;
+    overflow-y: auto;
     position: fixed;
     z-index: 101;
     bottom: -510px;
@@ -35,9 +37,9 @@ html, body {
     background: #eeeeeeee;
     color: #ffffff
     text-align: center;
-    font-size: 12px;
+    font-size: 15px;
     line-height: 2.5;
-    overflow: hidden;
+    /*overflow: hidden;*/
 }
 @keyframes slideUp {
     0% { transform: translateY(0px); }

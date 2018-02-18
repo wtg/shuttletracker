@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/wtg/shuttletracker/model"
 	"net/http"
+	"strings"
 	"encoding/json"
 )
 
@@ -26,6 +27,9 @@ func (api *API) SetAdminMessage(w http.ResponseWriter, r *http.Request){
 		return;
 	}
 	err = api.db.ClearMessage()
+	message.Message = strings.Replace(message.Message,"<script>","",-1)
+	message.Message = strings.Replace(message.Message,"</script>","",-1)
+
 	err = api.db.AddMessage(&message)
 
 	if err != nil {

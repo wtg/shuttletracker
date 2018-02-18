@@ -56,7 +56,9 @@ Vue.component('live-indicator',{
 Vue.component('message-modal',{
   props: ['dim'],
   template:
-  `<div v-if="msg != ''" id ="messagebox" v-bind:style="modalStyle" @click="modalStyle.display = 'none'">{{msg}} <span style="color:red">[tap to hide]</span></div>
+  `<div id ="messagebox" @click="modalStyle.display = 'none'" v-if="msg != ''" v-bind:style="modalStyle">
+  <div style="width: 85%;float:left;" v-html="msg"></div>
+  <div style="float:right;padding-right:15px;color:#0984e3;width:5%;text-align:right;font-size:20px;margin-top:-10px;">&times;</div>
   </div>`,
   data (){
     return {
