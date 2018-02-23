@@ -451,6 +451,7 @@ Vue.component('dropdown-menu',{
 
         window.addEventListener('touchstart', function (event) {vm.dropdownWindowclick(event)});
         window.addEventListener('mousedown', function (event) {vm.dropdownWindowclick(event)});
+        window.addEventListener('load', function () {vm.loadDarkmode()});
 
     },
   data (){
@@ -492,6 +493,20 @@ Vue.component('dropdown-menu',{
                 if (this.darkmodeOn === 0) {
                     this.enableDarkmode();
                 } else {
+                    this.disableDarkmode();
+                }
+            }
+        },
+        loadDarkmode: function () {
+			// if localStorage is supported, read the value of darkmodeOn (if it exists),
+			// then enable/disable dark mode as needed
+            if (typeof(Storage) !== "undefined") {
+                if (localStorage.darkmodeOn === "0") {
+                    this.disableDarkmode();
+                } else if (localStorage.darkmodeOn === "1") {
+                    this.enableDarkmode();
+                } else {
+                    localStorage.darkmodeOn = 0;
                     this.disableDarkmode();
                 }
             }
