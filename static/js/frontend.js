@@ -498,8 +498,8 @@ Vue.component('dropdown-menu',{
             }
         },
         loadDarkmode: function () {
-			// if localStorage is supported, read the value of darkmodeOn (if it exists),
-			// then enable/disable dark mode as needed
+            // if localStorage is supported, read the value of darkmodeOn (if it exists),
+            // then enable/disable dark mode as needed
             if (typeof(Storage) !== "undefined") {
                 if (localStorage.darkmodeOn === "0") {
                     this.disableDarkmode();
