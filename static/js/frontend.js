@@ -449,9 +449,9 @@ Vue.component('dropdown-menu',{
     mounted() {
         var vm = this;
 
-        window.addEventListener('touchstart', function (event) {vm.dropdownWindowclick(event)});
-        window.addEventListener('mousedown', function (event) {vm.dropdownWindowclick(event)});
-        window.addEventListener('load', function () {vm.loadDarkmode()});
+        window.addEventListener('touchstart', function (event) {vm.dropdownWindowclick(event);});
+        window.addEventListener('mousedown', function (event) {vm.dropdownWindowclick(event);});
+        window.addEventListener('load', function () {vm.loadDarkmode();});
 
     },
   data (){
