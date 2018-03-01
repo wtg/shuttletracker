@@ -523,8 +523,9 @@ Vue.component('dropdown-menu',{
             document.querySelector('div.leaflet-bottom.leaflet-right').style.filter = 'invert(1)';
             document.querySelector('div.titleBar').style.filter = 'invert(1)';
             // invert specific colors twice to make them normal
+            document.querySelector('ul#titleContent-right').style.filter = 'invert(1)';
+            document.querySelector('ul#titleContent-right>li>div').style.filter = 'invert(1)';
             document.querySelector('div.pulsate').style.filter = 'invert(1)';
-            document.querySelector('a.logo').style.filter = 'invert(1)';
             var leafletControlLinks = document.querySelectorAll('div.leaflet-control>a');
             for (var i = 0; i < leafletControlLinks.length; i++) {
                 leafletControlLinks[i].style.filter = 'invert(1)';
@@ -546,8 +547,9 @@ Vue.component('dropdown-menu',{
             document.querySelector('div.leaflet-bottom.leaflet-right').style.filter = 'invert(0)';
             document.querySelector('div.titleBar').style.filter = 'invert(0)';
             // reset specific colors to make normal
+            document.querySelector('ul#titleContent-right').style.filter = 'invert(0)';
+            document.querySelector('ul#titleContent-right>li>div').style.filter = 'invert(0)';
             document.querySelector('div.pulsate').style.filter = 'invert(0)';
-            document.querySelector('a.logo').style.filter = 'invert(0)';
             var leafletControlLinks = document.querySelectorAll('div.leaflet-control>a');
             for (var i = 0; i < leafletControlLinks.length; i++) {
                 leafletControlLinks[i].style.filter = 'invert(0)';
