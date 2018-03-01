@@ -46,7 +46,7 @@ html, body {
     100% { transform: translateY(-510px); }
 }
 #messagebox {
-    animation: slideUp 2.5s ease forwards;
+    animation: slideUp 1s ease forwards;
 }
 
 

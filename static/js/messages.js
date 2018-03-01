@@ -6,7 +6,7 @@ Vue.component('message-panel', {
       <div class="tile box is-parent">
         <div class="tile notification" v-bind:class="{'is-danger':fail, 'is-white':!fail}">
           <div class="container">
-          <p>Message: </p> <input class="textbox" v-model="message"></input> Characters Left: {{45 - message.length}}
+          <p>Message: </p> <input class="textbox" style="width:75%;" v-model="message"></input> Characters: {{message.length}}
           <br>
           <input type="checkbox" v-model="display">Enabled</input><br>
           <button class="button" @click="send">Submit</button>

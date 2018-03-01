@@ -228,7 +228,6 @@ func (m *MongoDB) ClearMessage() error {
 // GetCurrentMessage gets the most recent admin message
 func (m *MongoDB) GetCurrentMessage() (model.AdminMessage, error){
 	message := model.AdminMessage{}
-	message.ID = 1
 	err := m.messages.Find(bson.M{}).Sort("-created").One(&message)
 	return message, err
 }
