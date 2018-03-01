@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/wtg/shuttletracker/model"
 	"net/http"
+	"html/template"
 )
 
 // AdminMessageHandler handles the retrieval of the current administrator message
@@ -25,11 +26,12 @@ func (api *API) SetAdminMessage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = api.db.ClearMessage()
 	if len(message.Message) > 250 {
 		http.Error(w, "Message Too long, must be less than 251 characters", 400)
 		return
 	}
+	err = api.db.ClearMessage()
+	message.Message = template.HTMLEscapeString(message.Message)
 	err = api.db.AddMessage(&message)
 
 	if err != nil {
