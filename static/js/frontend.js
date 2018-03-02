@@ -449,8 +449,9 @@ Vue.component('dropdown-menu',{
     mounted() {
         var vm = this;
 
-        window.addEventListener('touchstart', function (event) {vm.dropdownWindowclick(event)});
-        window.addEventListener('mousedown', function (event) {vm.dropdownWindowclick(event)});
+        window.addEventListener('touchstart', function (event) {vm.dropdownWindowclick(event);});
+        window.addEventListener('mousedown', function (event) {vm.dropdownWindowclick(event);});
+        window.addEventListener('load', function () {vm.loadDarkmode();});
 
     },
   data (){
@@ -477,22 +478,54 @@ Vue.component('dropdown-menu',{
         // following functions involve changing the dark mode state
         toggleDarkmode: function () {
             // toggles dark mode for the map portion of the site by applying the 'filter: invert' property
-            if (this.darkmodeOn === 0) {
-                this.enableDarkmode();
+            // For browsers that implement localStorage, read/write the dark mode toggle from localStorage
+            // LocalStorage only stores keys and values as strings (Thanks JS!)
+            if (typeof(Storage) !== "undefined") {
+                if (localStorage.darkmodeOn === "0") {
+                    this.enableDarkmode();
+                } else if (localStorage.darkmodeOn === "1") {
+                    this.disableDarkmode();
+                } else {
+                    localStorage.darkmodeOn = 1;
+                    this.enableDarkmode();
+                }
             } else {
-                this.disableDarkmode();
+                if (this.darkmodeOn === 0) {
+                    this.enableDarkmode();
+                } else {
+                    this.disableDarkmode();
+                }
+            }
+        },
+        loadDarkmode: function () {
+            // if localStorage is supported, read the value of darkmodeOn (if it exists),
+            // then enable/disable dark mode as needed
+            if (typeof(Storage) !== "undefined") {
+                if (localStorage.darkmodeOn === "0") {
+                    this.disableDarkmode();
+                } else if (localStorage.darkmodeOn === "1") {
+                    this.enableDarkmode();
+                } else {
+                    localStorage.darkmodeOn = 0;
+                    this.disableDarkmode();
+                }
             }
         },
         enableDarkmode: function () {
-            this.darkmodeOn = 1;
+            if (typeof(Storage) !== "undefined") {
+                localStorage.darkmodeOn = 1;
+            } else {
+                this.darkmodeOn = 1;
+            }
             document.querySelector('div#darkmode-icon>img').src = this.sunicon;
             document.querySelector('div.leaflet-tile-pane').style.filter = 'invert(1)';
             document.querySelector('div.leaflet-bottom.leaflet-left').style.filter = 'invert(1)';
             document.querySelector('div.leaflet-bottom.leaflet-right').style.filter = 'invert(1)';
             document.querySelector('div.titleBar').style.filter = 'invert(1)';
             // invert specific colors twice to make them normal
+            document.querySelector('ul#titleContent-right').style.filter = 'invert(1)';
+            document.querySelector('ul#titleContent-right>li>div').style.filter = 'invert(1)';
             document.querySelector('div.pulsate').style.filter = 'invert(1)';
-            document.querySelector('a.logo').style.filter = 'invert(1)';
             var leafletControlLinks = document.querySelectorAll('div.leaflet-control>a');
             for (var i = 0; i < leafletControlLinks.length; i++) {
                 leafletControlLinks[i].style.filter = 'invert(1)';
@@ -503,15 +536,20 @@ Vue.component('dropdown-menu',{
             }
         },
         disableDarkmode: function () {
-            this.darkmodeOn = 0;
+            if (typeof(Storage) !== "undefined") {
+                localStorage.darkmodeOn = 0;
+            } else {
+                this.darkmodeOn = 0;
+            }
             document.querySelector('div#darkmode-icon>img').src = this.moonicon;
             document.querySelector('div.leaflet-tile-pane').style.filter = 'invert(0)';
             document.querySelector('div.leaflet-bottom.leaflet-left').style.filter = 'invert(0)';
             document.querySelector('div.leaflet-bottom.leaflet-right').style.filter = 'invert(0)';
             document.querySelector('div.titleBar').style.filter = 'invert(0)';
             // reset specific colors to make normal
+            document.querySelector('ul#titleContent-right').style.filter = 'invert(0)';
+            document.querySelector('ul#titleContent-right>li>div').style.filter = 'invert(0)';
             document.querySelector('div.pulsate').style.filter = 'invert(0)';
-            document.querySelector('a.logo').style.filter = 'invert(0)';
             var leafletControlLinks = document.querySelectorAll('div.leaflet-control>a');
             for (var i = 0; i < leafletControlLinks.length; i++) {
                 leafletControlLinks[i].style.filter = 'invert(0)';
