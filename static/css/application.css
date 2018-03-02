@@ -25,6 +25,30 @@ html, body {
   background-color: black;
 }
 
+#messagebox {
+    max-height: 150px;
+    overflow-y: auto;
+    position: fixed;
+    z-index: 101;
+    bottom: -510px;
+    left: 0;
+    right: 0;
+    padding: 10px 30px 10px 15px; /* leave some space for the close button */
+    background: #ee2222;
+    color: #ffffff
+    text-align: center;
+    font-size: 15px;
+    /*overflow: hidden;*/
+}
+@keyframes slideUp {
+    0% { transform: translateY(0px); }
+    100% { transform: translateY(-510px); }
+}
+#messagebox {
+    animation: slideUp 1s ease forwards;
+}
+
+
 .page-container {
   height: 100%;
   width: 100%;
@@ -105,7 +129,7 @@ ul.dropdown-main {
   position: relative;
   margin: 0;
   padding: 0;
-  
+
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -moz-user-select: none;

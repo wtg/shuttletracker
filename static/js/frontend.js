@@ -53,8 +53,38 @@ Vue.component('live-indicator',{
 
 });
 
+Vue.component('message-modal',{
+  props: ['dim'],
+  template:
+  `<div id ="messagebox" @click="modalStyle.display = 'none'" v-if="msg != ''" v-bind:style="modalStyle">
+  <div style="width: 100%;float:left;" v-html="msg"></div>
+  <div style="position:absolute;right:10px;top:6px;color:#333;font-size:20px;">&times;</div>
+  </div>`,
+  data (){
+    return {
+      modalStyle: {display:"block"},
+      msg: "",
+    };
+  },
+  mounted (){
+    let el = this;
+
+    $.get("/adminMessage",function(data){
+      if(data.Display === true){
+        el.msg = data.Message;
+      }
+    });
+
+  }
+});
+
 Vue.component('shuttle-map',{
-  template: `<div id="mapid" style="height: 100%; z-index:0; filter: invert(0)"></div>`,
+  template: `
+  <span>
+  <div id="mapid" style="height: 100%; z-index:0; filter: invert(0)"></div>
+  </div>
+  <message-modal dim=100px></message-modal>
+  </span>`,
   mounted(){
     this.initMap();
     this.grabStops();
@@ -74,6 +104,7 @@ Vue.component('shuttle-map',{
       ShuttleUpdateCounter: 0,
       first: true,
       legend: L.control({position: 'bottomleft'}),
+
 
       ShuttleSVG: `<?xml version="1.0" encoding="UTF-8"?>
       <svg width="52px" height="52px" viewBox="0 0 52 52" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -132,7 +163,6 @@ Vue.component('shuttle-map',{
     grabRoutes: function(){
       $.get( "/routes", this.updateRoutes).fail(function(){routeSuccess = false;});
     },
-
 
 	updateLegend () {
 	  let app = this;
