@@ -38,7 +38,7 @@ html, body {
     color: #ffffff
     text-align: center;
     font-size: 15px;
-    line-height: 2.5;
+    line-height: 1.5;
     /*overflow: hidden;*/
 }
 @keyframes slideUp {

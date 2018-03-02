@@ -57,8 +57,8 @@ Vue.component('message-modal',{
   props: ['dim'],
   template:
   `<div id ="messagebox" @click="modalStyle.display = 'none'" v-if="msg != ''" v-bind:style="modalStyle">
-  <div style="width: 85%;float:left;" v-html="msg"></div>
-  <div style="float:right;padding-right:15px;color:#0984e3;width:5%;text-align:right;font-size:20px;margin-top:-10px;">&times;</div>
+  <div style="width: 100%;float:left;" v-html="msg"></div>
+  <div style="position:absolute;right:10px;top:-5px;color:#0984e3;font-size:20px;">&times;</div>
   </div>`,
   data (){
     return {
