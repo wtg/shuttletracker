@@ -62,6 +62,7 @@ func New(cfg Config, db database.Database) (*API, error) {
 	// Public
 	r.HandleFunc("/vehicles", api.VehiclesHandler).Methods("GET")
 	r.HandleFunc("/updates", api.UpdatesHandler).Methods("GET")
+	r.HandleFunc("/adminMessage", api.AdminMessageHandler).Methods("GET")
 	r.HandleFunc("/updates/message", api.UpdateMessageHandler).Methods("GET")
 	r.HandleFunc("/routes", api.RoutesHandler).Methods("GET")
 	r.HandleFunc("/stops", api.StopsHandler).Methods("GET")
@@ -85,6 +86,7 @@ func New(cfg Config, db database.Database) (*API, error) {
 	r.Handle("/stops/create", api.CasAUTH.HandleFunc(api.StopsCreateHandler)).Methods("POST")
 	r.Handle("/stops/{id:.+}", api.CasAUTH.HandleFunc(api.StopsDeleteHandler)).Methods("DELETE")
 	//r.HandleFunc("/import", api.ImportHandler).Methods("GET")
+	r.HandleFunc("/adminMessage", api.SetAdminMessage).Methods("POST")
 
 	// Static files
 	r.HandleFunc("/", IndexHandler).Methods("GET")

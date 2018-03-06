@@ -13,13 +13,15 @@ import (
 
 // MongoDB implements Database with—you guessed it—MongoDB.
 type MongoDB struct {
-	session  		*mgo.Session
-	updates  		*mgo.Collection
-	vehicles 		*mgo.Collection
-	routes   		*mgo.Collection
-	stops    		*mgo.Collection
-	users    		*mgo.Collection
+	session  *mgo.Session
+	updates  *mgo.Collection
+	vehicles *mgo.Collection
+	routes   *mgo.Collection
+	stops    *mgo.Collection
+	users    *mgo.Collection
+	messages *mgo.Collection
 	notifications 	*mgo.Collection
+
 }
 
 // MongoDBConfig contains information on how to connect to a MongoDB server.
@@ -42,7 +44,9 @@ func NewMongoDB(cfg MongoDBConfig) (*MongoDB, error) {
 	db.routes = db.session.DB("").C("routes")
 	db.stops = db.session.DB("").C("stops")
 	db.users = db.session.DB("").C("users")
+	db.messages = db.session.DB("").C("messages")
 	db.notifications = db.session.DB("").C("notifications")
+
 
 	// Ensure unique vehicle identification
 	vehicleIndex := mgo.Index{
@@ -140,10 +144,10 @@ func (m *MongoDB) GetStopsForRoute(routeID string) ([]model.Stop, error){
 
 	err := m.stops.Find(bson.M{"routeId": routeID}).All(&stops)
 
-	// Make sure stops on both routes are included. 
+	// Make sure stops on both routes are included.
 	// Union has RouteID for East Route, but it's on both routes.
 	// Not a very good solution to the problem -- FIXME
-	
+
 	// TODO: change RouteID for stops on multiple routes to be unique, empty,
 	// or have all ID's for the routes they are on
 
@@ -161,7 +165,7 @@ func (m *MongoDB) GetStopsForRoute(routeID string) ([]model.Stop, error){
 		stops = append(stops, union)
 	}
 
-	return stops, err	
+	return stops, err
 }
 
 
@@ -242,6 +246,34 @@ func (m *MongoDB) ModifyVehicle(vehicle *model.Vehicle) error {
 	return m.vehicles.Update(bson.M{"vehicleID": vehicle.VehicleID}, vehicle)
 }
 
+// AddMessage sets the current admin message
+func (m *MongoDB) AddMessage(message *model.AdminMessage) error {
+	message.ID = 1
+	message.Created = time.Now()
+	return m.messages.Insert(message)
+}
+
+// ClearMessage Clears the current message.
+func (m *MongoDB) ClearMessage() error {
+	message := model.AdminMessage{}
+	message.ID = 1
+	return m.messages.Remove(bson.M{"id": 1})
+}
+
+// GetCurrentMessage gets the most recent admin message
+func (m *MongoDB) GetCurrentMessage() (model.AdminMessage, error) {
+	message := model.AdminMessage{}
+	err := m.messages.Find(bson.M{}).Sort("-created").One(&message)
+	return message, err
+}
+
+// GetMessages gets the most recent admin messages
+func (m *MongoDB) GetMessages() ([]model.AdminMessage, error) {
+	messages := []model.AdminMessage{}
+	err := m.messages.Find(bson.M{}).All(&messages)
+	return messages, err
+}
+
 // Creates a notification.
 func (m *MongoDB) CreateNotification(notification *model.Notification) error {
 	return m.notifications.Insert(&notification)
@@ -250,7 +282,7 @@ func (m *MongoDB) CreateNotification(notification *model.Notification) error {
 // Returns all notifications for the stop and route requested
 func (m *MongoDB) GetNotificationsForStop(stopID string, routeID string) ([]model.Notification, error){
 	var notifications []model.Notification
-	err := m.notifications.Find(bson.M{"stop": stopID, "route": routeID}).All(&notifications) 
+	err := m.notifications.Find(bson.M{"stop": stopID, "route": routeID}).All(&notifications)
 	return notifications, err
 }
 

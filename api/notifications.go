@@ -1,42 +1,62 @@
 package api
 
 import (
-	// "encoding/json"
-	// "fmt"
-	// "math"
+	"encoding/json"
+	"github.com/wtg/shuttletracker/model"
 	"net/http"
-	// "strconv"
-	// "time"
-
-	// // MySQL driver
-	// "gopkg.in/cas.v1"
-
-	// log "github.com/Sirupsen/logrus"
-	// "github.com/gorilla/mux"
-
-	//"github.com/wtg/shuttletracker/model"
-	// "gopkg.in/mgo.v2/bson"
+	"html/template"
 )
 
-// TODO: Create notification based on user input, and add to the database
-func (api *API) NotificationsCreateHandler(w http.ResponseWriter, r *http.Request) {
-	// Get user input
-	// ? -- based on frontend implementation?
+// AdminMessageHandler handles the retrieval of the current administrator message
+func (api *API) AdminMessageHandler(w http.ResponseWriter, r *http.Request) {
+	message, err := api.db.GetCurrentMessage()
 
-	// // Create new notification
-	// notification := model.Notifiction {
-	// 	RouteID:		,
-	// 	StopID:			,
-	// 	PhoneNumber:	,
-	// 	Carrier:		,
-	// 	Sent:			false
-	// }
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	WriteJSON(w, message)
+}
 
-	// // Add new notification to database
-	// err = api.db.CreateNotification(&notification)
+// SetAdminMessage allows the user to set an alert message that will display to all users who visit the page
+func (api *API) SetAdminMessage(w http.ResponseWriter, r *http.Request) {
+	message := model.AdminMessage{}
+	err := json.NewDecoder(r.Body).Decode(&message)
 
-	// // Error handling
-	// if err != nil{
-	// 	http.Error(w. err.Error(), http.StatusIntervalServerError)
-	// }
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if len(message.Message) > 250 {
+		http.Error(w, "Message Too long, must be less than 251 characters", 400)
+		return
+	}
+	err = api.db.ClearMessage()
+	message.Message = template.HTMLEscapeString(message.Message)
+	err = api.db.AddMessage(&message)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	WriteJSON(w, "Success")
+	// TODO: Create notification based on user input, and add to the database
+	func (api *API) NotificationsCreateHandler(w http.ResponseWriter, r *http.Request) {
+		// Get user input
+		// ? -- based on frontend implementation?
+
+		// // Create new notification
+		// notification := model.Notifiction {
+		// 	RouteID:		,
+		// 	StopID:			,
+		// 	PhoneNumber:	,
+		// 	Carrier:		,
+		// 	Sent:			false
+		// }
+
+		// // Add new notification to database
+		// err = api.db.CreateNotification(&notification)
+
+		// // Error handling
+		// if err != nil{
+		// 	http.Error(w. err.Error(), http.StatusIntervalServerError)
+		// }
 }
