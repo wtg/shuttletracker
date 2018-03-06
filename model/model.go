@@ -8,8 +8,8 @@ import (
 // VehicleUpdate represents a single position observed for a Vehicle.
 type VehicleUpdate struct {
 	VehicleID string    	`json:"vehicleID"   bson:"vehicleID,omitempty"`
-	Lat       string    	`json:"lat"         bson:"lat"`			
-	Lng       string    	`json:"lng"         bson:"lng"`			
+	Lat       string    	`json:"lat"         bson:"lat"`
+	Lng       string    	`json:"lng"         bson:"lng"`
 	Heading   string    	`json:"heading"     bson:"heading"`
 	Speed     string    	`json:"speed"       bson:"speed"`
 	Lock      string    	`json:"lock"        bson:"lock"`
@@ -53,22 +53,49 @@ type Coord struct {
 	Lng float64 `json:"lng" bson:"lng"`
 }
 
+//WeekTime represents a time of the week that routes will be turned on or off, include a time and day
+//The state variable is intentionally vague so that it can be used for several different applications
+type WeekTime struct {
+	Day   time.Weekday `json:"day"     bson:"day"`
+	Time  time.Time    `json:"time"    bson:"time"`
+	State int          `json:"on"   bson:"on"`
+}
+
+//ByTime is an interface used to compare two weektime objects to sort them
+type ByTime []WeekTime
+
+func (a ByTime) Len() int      { return len(a) }
+func (a ByTime) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a ByTime) Less(i, j int) bool {
+	if a[i].Day < a[j].Day {
+		return true
+	} else if a[i].Day > a[j].Day {
+		return false
+	} else {
+		if a[j].Time.After(a[i].Time) {
+			return true
+		}
+		return false
+
+	}
+}
+
 // Route represents a set of coordinates to draw a path on our tracking map
 type Route struct {
-	ID             string    `json:"id"             bson:"id"`
-	Name           string    `json:"name"           bson:"name"`
-	Description    string    `json:"description"    bson:"description"`
-	StartTime      string    `json:"startTime"      bson:"startTime"`
-	EndTime        string    `json:"endTime"        bson:"endTime"`
-	Enabled        bool      `json:"enabled,bool"	bson:"enabled"`
-	Color          string    `json:"color"          bson:"color"`
-	Width          int       `json:"width,string"   bson:"width"`
-	Coords         []Coord   `json:"coords"         bson:"coords"`
-	Duration       []Segment `json:"duration"       bson:"duration"`
-	StopsID        []string  `json:"stopsid"        bson:"stopsid"`
-	AvailableRoute int       `json:"availableroute" bson:"availableroute"`
-	Created        time.Time `json:"created"        bson:"created"`
-	Updated        time.Time `json:"updated"        bson:"updated"`
+	ID             string     `json:"id"             bson:"id"`
+	Name           string     `json:"name"           bson:"name"`
+	Description    string     `json:"description"    bson:"description"`
+	TimeInterval   []WeekTime `json:"intervals"			 bson:"intervals"`
+	Enabled        bool       `json:"enabled,bool"	 bson:"enabled"`
+	Active         bool       `json:"active,bool"	 bson:"enabled"`
+	Color          string     `json:"color"          bson:"color"`
+	Width          int        `json:"width,string"   bson:"width"`
+	Coords         []Coord    `json:"coords"         bson:"coords"`
+	Duration       []Segment  `json:"duration"       bson:"duration"`
+	StopsID        []string   `json:"stopsid"        bson:"stopsid"`
+	AvailableRoute int        `json:"availableroute" bson:"availableroute"`
+	Created        time.Time  `json:"created"        bson:"created"`
+	Updated        time.Time  `json:"updated"        bson:"updated"`
 }
 
 // Stop indicates where a tracked object is scheduled to arrive

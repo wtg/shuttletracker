@@ -20,13 +20,13 @@ html, body {
   height: auto;
 }
 
+
 .nav-list{
   padding: 0;
 }
 
 
 .sidebar{
-  width: 150px;
 }
 .nav-item{
   text-align: left;
@@ -74,25 +74,4 @@ html, body {
   font-size: 22px;
   float:left;
   text-align: center;
-}
-
-.button{
-  user-select: none;
-  margin: 2px;
-  background-color: white;
-  padding: 5px;
-  font-size: 12px;
-  text-decoration: none;
-  background-color: none;
-  border-style: solid;
-  border-color: #e74c3c;
-  border-width: 1px;
-  transition: background-color 0.5s ease;
-  color: #e74c3c;
-}
-.button:hover{
-  background-color: #e74c3c;
-  color: #eee;
-  cursor: pointer;
-
 }
