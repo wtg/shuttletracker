@@ -17,10 +17,12 @@ function checkTime(i) {
 }
 
 Vue.component('live-indicator',{
-  template: `<div v-bind:style="liveStyle">{{lv}} <div v-if="live" class="pulsate" style="position:absolute;float:right; width:10px;height:10px;background-color:blue;border-radius:50%;top:9px;right:3px;"></div>{{text}}</div>`,
+  template: `<div id="live" v-bind:style="liveStyle">
+    <p>{{lv + " " + text}}</p>
+    <div v-if="live" class="pulsate" style=""></div></div>`,
   data (){
     return{
-      liveStyle: {color:"black",width: "40px", height:"18px",padding:"5px",borderRadius:"5px",fontSize:"15px", backgroundColor:"rgba(255, 255, 255, 0.88)", boxShadow: "0 1px 1px rgba(0, 0, 0, 0.8)", display:"none", position: "absolute", right:"10px",top:"42px"},
+      liveStyle: {},
       text: "",
       lv:"Live",
       live: false
