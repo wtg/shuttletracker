@@ -185,52 +185,10 @@ func (u *Updater) update() {
 				log.WithError(err).Errorf("Could not insert vehicle update.")
 			}
 
-			// Notifications 
-			// Convert lat and lng to floats
-			lat, err := strconv.ParseFloat(update.Lat, 64)
-			if err != nil {
-				log.WithError(err).Error("Unable to convert lat to float.")
-			}
+			// Call notifications 
+			// made more smaller functions for notifications
+			u.Notify(update.Lat, update.Lng, &update)
 
-			lng, err := strconv.ParseFloat(update.Lng, 64)
-			if err != nil {
-				log.WithError(err).Error("Unable to convert lng to float.")
-			}
-
-			// Check if vehicle is at a stop
-			current_stop, next_stop, at_stop := u.AtStop(lat, lng, update.Route)
-
-			if !at_stop{
-				log.Debugf("Vechile is not at a stop")
-				return
-			} 
-			
-			log.Debugf("Current stop: %s   Next stop: %s", current_stop.Name, next_stop.Name)
-			
-			// Request notifications for next stop
-			var notifications []model.Notification
-			notifications, err = u.db.GetNotificationsForStop(next_stop.ID, update.Route);
-			
-			if err != nil{
-				log.WithError(err).Error("Unable to get notifications.")
-				return
-			} 
-
-			// Send notifications
-			sent := Send(notifications, current_stop.Name, next_stop.Name)
-			log.Debugf("Sent %d notification(s).", sent)
-
-
-			// Delete notifications for correct stop on correct route
-			deleted, err := u.db.DeleteNotificationsForStop(next_stop.ID, update.Route)
-			if err != nil {
-				log.WithError(err).Error("Unable to remove notifications.")
-				return
-			}
-
-			if deleted > 0 {
-				log.Debugf("Removed %d notifications.", deleted)
-			}
 
 		}(vehicleData)
 	}
@@ -331,6 +289,59 @@ func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Rout
 	}
 	log.Debugf("%v on %s route.", vehicle.VehicleName, route.Name)
 	return route, err
+}
+
+func (u *Updater) Notify (lt string, lg string, update *model.VehicleUpdate){
+	route := update.Route
+
+	// Convert lat and lng to floats
+	lat := u.GetFloat(lt)
+	lng := u.GetFloat(lg)
+
+	// Check if vehicle is at a stop
+	current_stop, next_stop, at_stop := u.AtStop(lat, lng, route)
+
+	if !at_stop{
+		log.Debugf("Vechile is not at a stop")
+		return
+	} 
+	
+	log.Debugf("Current stop: %s   Next stop: %s", current_stop.Name, next_stop.Name)
+		
+	// Request notifications for next stop
+	var notifications []model.Notification
+	notifications, err := u.db.GetNotificationsForStop(next_stop.ID, route);
+	
+	if err != nil{
+		log.WithError(err).Error("Unable to get notifications.")
+		return
+	} 
+
+	// Send notifications
+	sent := Send(notifications, current_stop.Name, next_stop.Name)
+	log.Debugf("Sent %d notification(s).", sent)
+
+
+	// Delete notifications for correct stop on correct route
+	deleted, err := u.db.DeleteNotificationsForStop(next_stop.ID, route)
+	if err != nil {
+		log.WithError(err).Error("Unable to remove notifications.")
+		return
+	}
+
+	if deleted > 0 {
+		log.Debugf("Removed %d notifications.", deleted)
+	}
+
+}
+
+func (u *Updater) GetFloat (numString string) (num float64){
+	num, err := strconv.ParseFloat(numString, 64)
+		if err != nil {
+			log.WithError(err).Error("Unable to convert to float.")
+		}
+	return num
+
 }
 
 func (u *Updater) AtStop (lat float64, lng float64, routeID string) (model.Stop, model.Stop, bool) {
