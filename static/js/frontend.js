@@ -447,7 +447,9 @@ Vue.component('about-modal',{
   template:`
   <div class="modal">
   <div class="modalContent">
-    Basic modal content
+    <span class="close">&times;</span>
+    <h4>Basic modal content</h4>
+    <p>Some modal info</p>
     </div>
   </div>
   `
@@ -463,6 +465,12 @@ Vue.component('dropdown-menu',{
         <img v-on:click="toggleDropdownMenuVisibility()" class="dropdown-icon" src="static/images/menu.svg">
       </a>
       <ul class="dropdown-menu">
+        <li class="dropdown-submenu-item" id="dropdown-submenu-item_styling">
+        <p class="dropdown-menu-item_p">Information</p>
+          <div class="dropdown-submenu-item_div" id="darkmode-icon">
+            <p v-on:click="toggleModal" class="dropdown-submenu-subitem">About</p>
+          </div>
+        </li>
         <li class="dropdown-menu-item" id="dropdown-menu-item_shuttle-schedule">
           <p class="dropdown-menu-item_p">Shuttle Schedules</p>
           <!-- http://www.rpi.edu/dept/parking/shuttle/ -->
@@ -517,7 +525,8 @@ Vue.component('dropdown-menu',{
     };
   },
     methods: {
-
+        toggleModal: function(){
+        },
         // following functions involve changing the dark mode state
         toggleDarkmode: function () {
             // toggles dark mode for the map portion of the site by applying the 'filter: invert' property
