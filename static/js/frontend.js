@@ -443,6 +443,17 @@ Vue.component('shuttle-map',{
   }
 });
 
+Vue.component('about-modal',{
+  template:`
+  <div class="modal">
+  <div class="modalContent">
+    Basic modal content
+    </div>
+  </div>
+  `
+
+})
+
 Vue.component('dropdown-menu',{
   template: `
 <div class="dropdown" >
@@ -681,6 +692,7 @@ Vue.component('title-bar', {
         <live-indicator></live-indicator>
       </li>
     </ul>
+    <about-modal/>
   </div>`,
     mounted() {},
     data (){
