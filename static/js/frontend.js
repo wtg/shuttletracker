@@ -448,8 +448,13 @@ Vue.component('about-modal',{
   <div class="modal">
   <div class="modalContent">
     <span class="close" @click=toggleModal>&times;</span>
-    <h4>Basic modal content</h4>
-    <p>Some modal info</p>
+    <h2>About the Shuttle tracker</h2>
+    <p>The Shuttle Tracker is <a href="https://github.com/wtg/shuttletracker">open source</a> and maintained by the <a href="https://webtech.union.rpi.edu">Web Technologies Group</a> it is maintained for the benefit of the student body.</p>
+    <h3>FAQ</h3>
+    <ul>
+      <li>Why is there no app?</li>
+      <li>How can I contribuite?</li>
+    </ul>
     </div>
   </div>
   `,
