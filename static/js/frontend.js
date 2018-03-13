@@ -447,14 +447,18 @@ Vue.component('about-modal',{
   template:`
   <div class="modal">
   <div class="modalContent">
-    <span class="close">&times;</span>
+    <span class="close" @click=toggleModal>&times;</span>
     <h4>Basic modal content</h4>
     <p>Some modal info</p>
     </div>
   </div>
-  `
-
-})
+  `,
+  methods: {
+      toggleModal: function(){
+        $(".modal").toggle();
+      }
+    }
+});
 
 Vue.component('dropdown-menu',{
   template: `
@@ -526,6 +530,7 @@ Vue.component('dropdown-menu',{
   },
     methods: {
         toggleModal: function(){
+          $(".modal").toggle();
         },
         // following functions involve changing the dark mode state
         toggleDarkmode: function () {
