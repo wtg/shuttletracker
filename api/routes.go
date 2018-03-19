@@ -10,13 +10,26 @@ import (
 	"time"
 
 	// MySQL driver
-	"gopkg.in/cas.v1"
-
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
-
 	"github.com/wtg/shuttletracker/model"
+	"gopkg.in/cas.v1"
 )
+
+func TimeAfter(t1 time.Time, t2 time.Time) bool {
+	if t1.Hour() > t2.Hour() {
+		return true
+	} else if t1.Hour() == t2.Hour() {
+		if t1.Minute() > t2.Minute() {
+			return true
+		} else if t1.Minute() == t2.Minute() {
+			if t1.Second() > t2.Second() {
+				return true
+			}
+		}
+	}
+	return false
+}
 
 //RouteIsActive determines if the current time means a route should be active or not
 //TODO: Move this to updater
@@ -27,11 +40,6 @@ func (api *API) RouteIsActive(r *model.Route) bool {
 	day := currentTime.Weekday()
 	state := -1
 
-	for idx := range r.TimeInterval {
-		//Bring the date to the current day to compare only the time object
-		add := -(int(r.TimeInterval[idx].Time.Sub(time.Now().Truncate(24*time.Hour)).Hours()/24) - 1)
-		r.TimeInterval[idx].Time = r.TimeInterval[idx].Time.AddDate(0, 0, add)
-	}
 	for idx, val := range r.TimeInterval {
 		if idx >= len(r.TimeInterval)-1 {
 			state = val.State
@@ -39,12 +47,12 @@ func (api *API) RouteIsActive(r *model.Route) bool {
 		} else {
 			if day < val.Day {
 				continue
-			} else if day == val.Day && !currentTime.After(val.Time) {
+			} else if day == val.Day && !TimeAfter(currentTime, val.Time) {
 				continue
-			} else if day == val.Day && currentTime.After(r.TimeInterval[idx+1].Time) {
+			} else if day == val.Day && TimeAfter(currentTime, r.TimeInterval[idx+1].Time) {
 				continue
 			} else if day > val.Day && day <= r.TimeInterval[idx+1].Day {
-				if currentTime.After(r.TimeInterval[idx+1].Time) {
+				if TimeAfter(currentTime, r.TimeInterval[idx+1].Time) {
 					continue
 				}
 			}
@@ -55,7 +63,7 @@ func (api *API) RouteIsActive(r *model.Route) bool {
 	}
 
 	route := model.Route{}
-	if(api.db != nil){
+	if api.db != nil {
 		r, err := api.db.GetRoute(r.ID)
 		route = r
 		if err != nil {
@@ -64,7 +72,7 @@ func (api *API) RouteIsActive(r *model.Route) bool {
 	}
 	//If we cannot determine a state for some reason default to active
 	route.Active = (state == 1 || state == -1)
-	if(api.db != nil){
+	if api.db != nil {
 		err := api.db.ModifyRoute(&route)
 		if err != nil {
 			return false

@@ -46,7 +46,6 @@ type Database interface {
 	GetCurrentMessage() (model.AdminMessage, error)
 	GetMessages() ([]model.AdminMessage, error)
 	ClearMessage() error
-
 }
 
 var (

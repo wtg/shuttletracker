@@ -54,7 +54,7 @@ type Coord struct {
 }
 
 //WeekTime represents a time of the week that routes will be turned on or off, include a time and day
-//The state variable is intentionally vague so that it can be used for several different applications
+//The state type is intentionally vague so that it can be used for several different applications
 type WeekTime struct {
 	Day   time.Weekday `json:"day"     bson:"day"`
 	Time  time.Time    `json:"time"    bson:"time"`
