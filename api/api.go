@@ -34,6 +34,14 @@ type API struct {
 	handler http.Handler
 }
 
+func (api *API) IsAuth(w http.ResponseWriter, r *http.Request) bool {
+	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
+		http.Error(w, "Not authenticated", 401)
+		return false
+	}
+	return true
+}
+
 // InitApp initializes the application given a config and connects to backends.
 // It also seeds any needed information to the database.
 func New(cfg Config, db database.Database) (*API, error) {
@@ -128,7 +136,9 @@ func (api *API) AdminHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		valid := false
 		users, _ := api.db.GetUsers()
+		fmt.Printf("len %d", len(users))
 		for _, u := range users {
+			fmt.Printf(u.Name)
 			if u.Name == strings.ToLower(cas.Username(r)) {
 				valid = true
 			}

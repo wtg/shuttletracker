@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"math"
 	"net/http"
 	"sort"
 	"strconv"
@@ -12,11 +11,9 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
 	"github.com/wtg/shuttletracker/model"
-	"gopkg.in/cas.v1"
 )
 
 //RouteIsActive determines if the current time means a route should be active or not
-//TODO: Move this to updater
 func (api *API) RouteIsActive(r *model.Route) bool {
 
 	//This is a time offset, to ensure routes are activated on the minute they are assigned activate
@@ -85,21 +82,10 @@ func (api *API) StopsHandler(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, stops)
 }
 
-// compute distance between two coordinates and return a value
-func ComputeDistance(c1 model.Coord, c2 model.Coord) float64 {
-	return float64(math.Sqrt(math.Pow(c1.Lat-c2.Lat, 2) + math.Pow(c1.Lng-c2.Lng, 2)))
-}
-
-func ComputeDistanceMapPoint(c1 model.MapPoint, c2 model.MapPoint) float64 {
-	return float64(math.Sqrt(math.Pow(c1.Latitude-c2.Latitude, 2) + math.Pow(c1.Longitude-c2.Longitude, 2)))
-}
-
 // RoutesCreateHandler adds a new route to the database
 func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Create a new route object using request fields
-	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
-		return
-	}
+
 	var routeData map[string]string
 	var coordsData []map[string]float64
 	// Decode route details
@@ -152,7 +138,7 @@ func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 // RoutesDeleteHandler deletes a route from database
 func (api *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
+	if !api.IsAuth(w, r) {
 		return
 	}
 	vars := mux.Vars(r)
@@ -172,7 +158,7 @@ type sched struct {
 
 // RoutesScheduler Allows for route active times to be set
 func (api *API) RoutesScheduler(w http.ResponseWriter, r *http.Request) {
-	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
+	if !api.IsAuth(w, r) {
 		return
 	}
 	times := sched{}
@@ -195,7 +181,7 @@ func (api *API) RoutesScheduler(w http.ResponseWriter, r *http.Request) {
 
 // RoutesEditHandler Only handles editing enabled flag for now
 func (api *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
-	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
+	if !api.IsAuth(w, r) {
 		return
 	}
 	route := model.Route{}
@@ -225,7 +211,7 @@ func (api *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
 
 // StopsCreateHandler adds a new route stop to the database
 func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
-	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
+	if !api.IsAuth(w, r) {
 		return
 	}
 
@@ -264,7 +250,7 @@ func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 // StopsDeleteHandler deletes a Stop.
 func (api *API) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
+	if !api.IsAuth(w, r) {
 		return
 	}
 
