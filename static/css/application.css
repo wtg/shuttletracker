@@ -29,7 +29,7 @@ html, body {
   max-height: 150px;
   overflow-y: auto;
   position: fixed;
-  z-index: 101;
+  z-index: 0;
   bottom: -510px;
   left: 0;
   right: 0;
@@ -124,7 +124,7 @@ li {
 
 div.modal{
   position: fixed;
-  z-index: 1;
+  z-index: 10;
   padding-top: 100px;
   left: 0;
   top: 0;
@@ -138,6 +138,7 @@ div.modal{
 div.modalContent{
   background-color: #fefefe;
   margin: auto;
+  z-index: 10;
   padding: 20px;
   border: 1px solid #888;
   width: 80%;
