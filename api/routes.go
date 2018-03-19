@@ -16,20 +16,6 @@ import (
 	"gopkg.in/cas.v1"
 )
 
-func TimeAfter(t1 time.Time, t2 time.Time) bool {
-	if t1.Hour() > t2.Hour() {
-		return true
-	} else if t1.Hour() == t2.Hour() {
-		if t1.Minute() > t2.Minute() {
-			return true
-		} else if t1.Minute() == t2.Minute() {
-			if t1.Second() > t2.Second() {
-				return true
-			}
-		}
-	}
-	return false
-}
 
 //RouteIsActive determines if the current time means a route should be active or not
 //TODO: Move this to updater
@@ -41,6 +27,7 @@ func (api *API) RouteIsActive(r *model.Route) bool {
 	state := -1
 
 	for idx, val := range r.TimeInterval {
+		//If it is the last in the time list (latest time for the week) use this index
 		if idx >= len(r.TimeInterval)-1 {
 			state = val.State
 			break
@@ -63,6 +50,7 @@ func (api *API) RouteIsActive(r *model.Route) bool {
 	}
 
 	route := model.Route{}
+	//Check if db is nil for testing
 	if api.db != nil {
 		r, err := api.db.GetRoute(r.ID)
 		route = r
@@ -85,8 +73,9 @@ func (api *API) RouteIsActive(r *model.Route) bool {
 func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all routes in database
 	routes, err := api.db.GetRoutes()
+	fmt.Printf("-------------------")
 	for idx := range routes {
-		api.RouteIsActive(&routes[idx])
+		fmt.Printf("Active: %v\n", api.RouteIsActive(&routes[idx]))
 	}
 	// Handle query errors
 	if err != nil {

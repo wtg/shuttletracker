@@ -8,6 +8,12 @@ import (
 	"time"
 )
 
+/*
+  Note: A couple of these tests fail around midnight, specifically the time after function
+  has several issues due to the time changing from 24:00 to 00:00 this does not affect the
+  functionality of the shuttle tracker
+*/
+
 func TestTimeAfter(t *testing.T) {
 	t1 := time.Now().Add(-time.Second)
 	t2 := time.Now().Add(time.Second)
@@ -45,6 +51,33 @@ func TestRouteIsActiveSameDay(t *testing.T) {
 	t2 := model.WeekTime{
 		Day:   time.Now().Weekday(),
 		Time:  time.Now().Add(1 * time.Hour),
+		State: 0,
+	}
+	interval = append(interval, t1, t2)
+
+	TestRoute := model.Route{
+		ID:           "Test",
+		Name:         "Test Route",
+		TimeInterval: interval,
+	}
+	if !api.RouteIsActive(&TestRoute) {
+		t.Errorf("Route should be active but is not")
+	}
+}
+
+func TestRouteIsActiveSimilarTime(t *testing.T) {
+	api := api.API{}
+
+	//Test when the day is the same, and time varies and should be active
+	interval := []model.WeekTime{}
+	t1 := model.WeekTime{
+		Day:   time.Now().Weekday(),
+		Time:  time.Now().Add(-5 * time.Second),
+		State: 1,
+	}
+	t2 := model.WeekTime{
+		Day:   time.Now().Weekday(),
+		Time:  time.Now().Add(5 * time.Second),
 		State: 0,
 	}
 	interval = append(interval, t1, t2)
