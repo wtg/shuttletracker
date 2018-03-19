@@ -21,8 +21,6 @@ func (t1 *Time) FromTime(t time.Time) {
 // GetTimeString returns the string version of the time represented by the struct
 func (t1 *Time) GetTimeString() string {
 	s := ""
-
-	fmt.Printf("|%06d|%6d|\n", 12, 345)
 	s += fmt.Sprintf("%02d", t1.Time.Hour())
 	s += ":"
 	s += fmt.Sprintf("%02d", t1.Time.Minute())
