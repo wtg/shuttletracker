@@ -6,9 +6,11 @@ import (
 	"time"
 )
 
+// Time struct is used to store route enable/disable times, so we can compare times without a date
 type Time struct {
-	time time.Time
-	Day  int
+	Time  time.Time    `json:time`
+	Day   time.Weekday `json:day`
+	State int          `json:on`
 }
 
 func leftPad(s string, padStr string, overallLen int) string {
@@ -18,16 +20,18 @@ func leftPad(s string, padStr string, overallLen int) string {
 	return retStr[(len(retStr) - overallLen):]
 }
 
+// FromTime is used to create a new model.Time object from a normal gotime object
 func (t1 *Time) FromTime(t time.Time) {
-	t1.time = t
+	t1.Time = t
 
 }
 
+// GetTimeString returns the string version of the time represented by the struct
 func (t1 *Time) GetTimeString() string {
 	s := ""
-	hrs := strconv.Itoa(t1.time.Hour())
-	mins := strconv.Itoa(t1.time.Minute())
-	seconds := strconv.Itoa(t1.time.Second())
+	hrs := strconv.Itoa(t1.Time.Hour())
+	mins := strconv.Itoa(t1.Time.Minute())
+	seconds := strconv.Itoa(t1.Time.Second())
 	s += leftPad(hrs, "0", 2)
 	s += ":"
 	s += leftPad(mins, "0", 2)
@@ -36,17 +40,18 @@ func (t1 *Time) GetTimeString() string {
 	return s
 }
 
+// After returns true if the time is after the parameter time, false otherwise
 func (t1 Time) After(t2 Time) bool {
 	if t1.Day > t2.Day {
 		return true
 	} else if t1.Day == t2.Day {
-		if t1.time.Hour() > t2.time.Hour() {
+		if t1.Time.Hour() > t2.Time.Hour() {
 			return true
-		} else if t1.time.Hour() == t2.time.Hour() {
-			if t1.time.Minute() > t2.time.Minute() {
+		} else if t1.Time.Hour() == t2.Time.Hour() {
+			if t1.Time.Minute() > t2.Time.Minute() {
 				return true
-			} else if t1.time.Minute() == t2.time.Minute() {
-				if t1.time.Second() > t2.time.Second() {
+			} else if t1.Time.Minute() == t2.Time.Minute() {
+				if t1.Time.Second() > t2.Time.Second() {
 					return true
 				}
 			}
