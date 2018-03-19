@@ -15,8 +15,6 @@ import (
 
 //RouteIsActive determines if the current time means a route should be active or not
 func (api *API) RouteIsActive(r *model.Route) bool {
-
-	//This is a time offset, to ensure routes are activated on the minute they are assigned activate
 	var currentTime model.Time
 	currentTime.FromTime(time.Now())
 	currentTime.Day = time.Now().Weekday()
@@ -61,7 +59,6 @@ func (api *API) RouteIsActive(r *model.Route) bool {
 func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all routes in database
 	routes, err := api.db.GetRoutes()
-
 	// Handle query errors
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -80,6 +77,15 @@ func (api *API) StopsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Send each stop to client as JSON
 	WriteJSON(w, stops)
+}
+
+func combineCoords(coordsData *[]map[string]float64) []model.Coord {
+	coords := []model.Coord{}
+	for _, c := range *coordsData {
+		coord := model.Coord{c["lat"], c["lng"]}
+		coords = append(coords, coord)
+	}
+	return coords
 }
 
 // RoutesCreateHandler adds a new route to the database
@@ -101,16 +107,8 @@ func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	// Create a Coord from each set of input coordinates
-	coords := []model.Coord{}
-	for _, c := range coordsData {
-		coord := model.Coord{c["lat"], c["lng"]}
-		coords = append(coords, coord)
-	}
+	coords := combineCoords(&coordsData)
 
-	// Here do the interpolation
-	// now we get the Segment for each segment ( this should be stored in database, just store it inside route for god sake)
-	// fmt.Printf("Size of coordinates = %d", len(coords))
-	// Type conversions
 	enabled, _ := strconv.ParseBool(routeData["enabled"])
 	width, _ := strconv.Atoi(routeData["width"])
 	currentTime := time.Now()
