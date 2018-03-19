@@ -447,7 +447,7 @@ Vue.component('about-modal',{
   template:`
   <div class="modal">
   <div class="modalContent">
-    <span class="close" @click=toggleModal>&times;</span>
+    <span class="close" @click="$emit('hidemodal')">&times;</span>
     <h2>About the Shuttle tracker</h2>
     <p>The Shuttle Tracker is <a href="https://github.com/wtg/shuttletracker">open source</a> and maintained by the <a href="https://webtech.union.rpi.edu">Web Technologies Group</a> it is maintained for the benefit of the student body.</p>
     <h3>FAQ</h3>
@@ -477,7 +477,7 @@ Vue.component('dropdown-menu',{
         <li class="dropdown-submenu-item" id="dropdown-submenu-item_styling">
         <p class="dropdown-menu-item_p">Information</p>
           <div class="dropdown-submenu-item_div" id="darkmode-icon">
-            <p v-on:click="toggleModal" class="dropdown-submenu-subitem">About</p>
+            <p @click="$emit('displaymodal')" class="dropdown-submenu-subitem">About</p>
           </div>
         </li>
         <li class="dropdown-menu-item" id="dropdown-menu-item_shuttle-schedule">
@@ -534,9 +534,6 @@ Vue.component('dropdown-menu',{
     };
   },
     methods: {
-        toggleModal: function(){
-          $(".modal").toggle();
-        },
         // following functions involve changing the dark mode state
         toggleDarkmode: function () {
             // toggles dark mode for the map portion of the site by applying the 'filter: invert' property
@@ -690,11 +687,11 @@ Vue.component('dropdown-menu',{
 Vue.component('title-bar', {
 
   template: `
-  <div class="titleBar" style="filter: invert(0)">
+  <div class="titleBar" style="filter: invert(0)" >
     <!-- left side of tile bar -->
     <ul class="titleContent" id="titleContent-left">
       <li>
-        <dropdown-menu></dropdown-menu>
+        <dropdown-menu @displaymodal="showModal=true"></dropdown-menu>
       </li>
       <li>
         <p class="title">{{title}}</p>
@@ -711,15 +708,17 @@ Vue.component('title-bar', {
         <live-indicator></live-indicator>
       </li>
     </ul>
-    <about-modal/>
+    <about-modal v-if="showModal" @hidemodal="showModal=false"/>
   </div>`,
     mounted() {},
     data (){
       return {
           title: "RPI Shuttle Tracker",
+          showModal: false,
       };
     },
-    methods: {},
+    methods: {
+    },
 
 });
 
