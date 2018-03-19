@@ -7,7 +7,6 @@ import (
 	"sort"
 	"strconv"
 	"time"
-
 	// MySQL driver
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
@@ -25,6 +24,9 @@ func (api *API) RouteIsActive(r *model.Route) bool {
 	currentTime.Day = time.Now().Weekday()
 	state := -1
 
+	if r.TimeInterval == nil || len(r.TimeInterval) == 1 {
+		state = 1
+	}
 	for idx, val := range r.TimeInterval {
 		//If it is the last in the time list (latest time for the week) use this index
 		if idx >= len(r.TimeInterval)-1 {
@@ -64,10 +66,12 @@ func (api *API) RouteIsActive(r *model.Route) bool {
 func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all routes in database
 	routes, err := api.db.GetRoutes()
-
 	// Handle query errors
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	for idx := range routes {
+		api.RouteIsActive(&routes[idx])
 	}
 	// Send each route to client as JSON
 	WriteJSON(w, routes)
