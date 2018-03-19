@@ -1,8 +1,7 @@
 package model
 
 import (
-	"strconv"
-	"strings"
+	"fmt"
 	"time"
 )
 
@@ -11,13 +10,6 @@ type Time struct {
 	Time  time.Time    `json:time`
 	Day   time.Weekday `json:day`
 	State int          `json:on`
-}
-
-func leftPad(s string, padStr string, overallLen int) string {
-	var padCountInt int
-	padCountInt = 1 + ((overallLen - len(padStr)) / len(padStr))
-	var retStr = strings.Repeat(padStr, padCountInt) + s
-	return retStr[(len(retStr) - overallLen):]
 }
 
 // FromTime is used to create a new model.Time object from a normal gotime object
@@ -29,14 +21,13 @@ func (t1 *Time) FromTime(t time.Time) {
 // GetTimeString returns the string version of the time represented by the struct
 func (t1 *Time) GetTimeString() string {
 	s := ""
-	hrs := strconv.Itoa(t1.Time.Hour())
-	mins := strconv.Itoa(t1.Time.Minute())
-	seconds := strconv.Itoa(t1.Time.Second())
-	s += leftPad(hrs, "0", 2)
+
+	fmt.Printf("|%06d|%6d|\n", 12, 345)
+	s += fmt.Sprintf("%02d", t1.Time.Hour())
 	s += ":"
-	s += leftPad(mins, "0", 2)
+	s += fmt.Sprintf("%02d", t1.Time.Minute())
 	s += ":"
-	s += leftPad(seconds, "0", 2)
+	s += fmt.Sprintf("%02d", t1.Time.Second())
 	return s
 }
 

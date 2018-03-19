@@ -36,7 +36,6 @@ func (api *API) RouteIsActive(r *model.Route) bool {
 			}
 			state = val.State
 			break
-
 		}
 	}
 
