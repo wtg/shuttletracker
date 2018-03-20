@@ -10,12 +10,11 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 2. Ensure your `$GOPATH` is set correctly, and is apart of your `$PATH`
    * From the bash terminal:`vi ~/.bashrc` to edit the file
    * Press 'G' to go to the end of file.Press 'A' to append to the end of the line. Press enter twice. Then add the following line(change the 'username'): 
-   
       ```
       GOPATH=/home/username/.go
       export GOPATH
       PATH=$PATH:$GOPATH/bin # Add GOPATH/bin to PATH for scripting
-      ```
+     ```
    * Then press escape, then press ':wq' and enter.
    * Type command in the terminal `source ~/.bashrc`
 3. Run `go get github.com/wtg/shuttletracker`
