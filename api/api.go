@@ -34,12 +34,25 @@ type API struct {
 	handler http.Handler
 }
 
-func (api *API) IsAuth(w http.ResponseWriter, r *http.Request) bool {
-	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
+type AuthHandler struct {
+	Handle func(http.ResponseWriter, *http.Request)
+	Api    *API
+}
+
+func (ah AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if ah.Api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		http.Error(w, "Not authenticated", 401)
-		return false
+		return
 	}
-	return true
+	ah.Handle(w, r)
+}
+
+func (api *API) HandleFuncCas(fn func(http.ResponseWriter, *http.Request)) AuthHandler {
+	handler := AuthHandler{
+		Handle: fn,
+		Api:    api,
+	}
+	return handler
 }
 
 // InitApp initializes the application given a config and connects to backends.
@@ -86,12 +99,12 @@ func New(cfg Config, db database.Database) (*API, error) {
 	r.Handle("/vehicles/create", api.CasAUTH.HandleFunc(api.VehiclesCreateHandler)).Methods("POST")
 	r.Handle("/vehicles/edit", api.CasAUTH.HandleFunc(api.VehiclesEditHandler)).Methods("POST")
 	r.Handle("/vehicles/{id:[0-9]+}", api.CasAUTH.HandleFunc(api.VehiclesDeleteHandler)).Methods("DELETE")
-	r.Handle("/routes/create", api.CasAUTH.HandleFunc(api.RoutesCreateHandler)).Methods("POST")
-	r.Handle("/routes/schedule", api.CasAUTH.HandleFunc(api.RoutesScheduler)).Methods("POST")
-	r.Handle("/routes/edit", api.CasAUTH.HandleFunc(api.RoutesEditHandler)).Methods("POST")
-	r.Handle("/routes/{id:.+}", api.CasAUTH.HandleFunc(api.RoutesDeleteHandler)).Methods("DELETE")
-	r.Handle("/stops/create", api.CasAUTH.HandleFunc(api.StopsCreateHandler)).Methods("POST")
-	r.Handle("/stops/{id:.+}", api.CasAUTH.HandleFunc(api.StopsDeleteHandler)).Methods("DELETE")
+	r.Handle("/routes/create", api.CasAUTH.Handle(api.HandleFuncCas(api.RoutesCreateHandler))).Methods("POST")
+	r.Handle("/routes/schedule", api.CasAUTH.Handle(api.HandleFuncCas(api.RoutesScheduler))).Methods("POST")
+	r.Handle("/routes/edit", api.CasAUTH.Handle(api.HandleFuncCas(api.RoutesEditHandler))).Methods("POST")
+	r.Handle("/routes/{id:.+}", api.CasAUTH.Handle(api.HandleFuncCas(api.RoutesDeleteHandler))).Methods("DELETE")
+	r.Handle("/stops/create", api.CasAUTH.Handle(api.HandleFuncCas(api.StopsCreateHandler))).Methods("POST")
+	r.Handle("/stops/{id:.+}", api.CasAUTH.Handle(api.HandleFuncCas(api.StopsDeleteHandler))).Methods("DELETE")
 	//r.HandleFunc("/import", api.ImportHandler).Methods("GET")
 	r.HandleFunc("/adminMessage", api.SetAdminMessage).Methods("POST")
 
