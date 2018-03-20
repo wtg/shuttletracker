@@ -179,6 +179,7 @@ li.dropdown-main-item {
 
 li.dropdown-main-item:hover {
   background-color: rgba(226, 226, 226, 0.85);
+  cursor: pointer;
 }
 
 a.dropdown-icon {

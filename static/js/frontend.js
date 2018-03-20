@@ -470,8 +470,8 @@ Vue.component('dropdown-menu',{
 <div class="dropdown" >
   <ul class="dropdown-main">
     <li class="dropdown-main-item">
-      <a href="#" class="dropdown-icon">
-        <img v-on:click="toggleDropdownMenuVisibility()" class="dropdown-icon" src="static/images/menu.svg">
+      <a v-on:click="toggleDropdownMenuVisibility()" class="dropdown-icon">
+        <img class="dropdown-icon" src="static/images/menu.svg">
       </a>
       <ul class="dropdown-menu">
         <li class="dropdown-submenu-item" id="dropdown-submenu-item_styling">
