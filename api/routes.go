@@ -55,7 +55,7 @@ func (api *API) RouteIsActive(r *model.Route) bool {
 	}
 
 	route := model.Route{}
-	if(api.db != nil){
+	if api.db != nil {
 		r, err := api.db.GetRoute(r.ID)
 		route = r
 		if err != nil {
@@ -64,7 +64,7 @@ func (api *API) RouteIsActive(r *model.Route) bool {
 	}
 	//If we cannot determine a state for some reason default to active
 	route.Active = (state == 1 || state == -1)
-	if(api.db != nil){
+	if api.db != nil {
 		err := api.db.ModifyRoute(&route)
 		if err != nil {
 			return false
