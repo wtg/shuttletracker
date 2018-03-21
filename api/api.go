@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi"
 	"github.com/spf13/viper"
 	"gopkg.in/cas.v1"
 
@@ -57,43 +57,62 @@ func New(cfg Config, db database.Database) (*API, error) {
 		db:      db,
 	}
 
-	r := mux.NewRouter()
+	r := chi.NewRouter()
 
-	// Public
-	r.HandleFunc("/vehicles", api.VehiclesHandler).Methods("GET")
-	r.HandleFunc("/updates", api.UpdatesHandler).Methods("GET")
-	r.HandleFunc("/adminMessage", api.AdminMessageHandler).Methods("GET")
-	r.HandleFunc("/updates/message", api.UpdateMessageHandler).Methods("GET")
-	r.HandleFunc("/routes", api.RoutesHandler).Methods("GET")
-	r.HandleFunc("/stops", api.StopsHandler).Methods("GET")
+	// Vehicles
+	r.Route("/vehicles", func(r chi.Router) {
+		r.Get("/", api.VehiclesHandler)
+		r.Method("POST", "/create", api.CasAUTH.HandleFunc(api.VehiclesCreateHandler))
+		r.Method("POST", "/edit", api.CasAUTH.HandleFunc(api.VehiclesEditHandler))
+		r.Method("DELETE", "/{id:[0-9]+}", api.CasAUTH.HandleFunc(api.VehiclesDeleteHandler))
+	})
+
+	// Updates
+	r.Route("/updates", func(r chi.Router) {
+		r.Get("/", api.UpdatesHandler)
+		r.Get("/message", api.UpdateMessageHandler)
+	})
+
+	// Admin message
+	r.Route("/adminMessage", func(r chi.Router) {
+		r.Get("/", api.AdminMessageHandler)
+		r.Post("/", api.SetAdminMessage)
+	})
+
+	// Routes
+	r.Route("/routes", func(r chi.Router) {
+		r.Get("/", api.RoutesHandler)
+		r.Method("POST", "/create", api.CasAUTH.HandleFunc(api.RoutesCreateHandler))
+		r.Method("POST", "/schedule", api.CasAUTH.HandleFunc(api.RoutesScheduler))
+		r.Method("POST", "/edit", api.CasAUTH.HandleFunc(api.RoutesEditHandler))
+		r.Method("DELETE", "/{id:.+}", api.CasAUTH.HandleFunc(api.RoutesDeleteHandler))
+	})
+
+	// Stops
+	r.Route("/stops", func(r chi.Router) {
+		r.Get("/", api.StopsHandler)
+		r.Method("POST", "/create", api.CasAUTH.HandleFunc(api.StopsCreateHandler))
+		r.Method("DELETE", "/{id:.+}", api.CasAUTH.HandleFunc(api.StopsDeleteHandler))
+	})
 
 	// Admin
-	r.Handle("/admin/", api.CasAUTH.HandleFunc(api.AdminHandler)).Methods("GET")
-	r.Handle("/admin", api.CasAUTH.HandleFunc(api.AdminHandler)).Methods("GET")
-	r.Handle("/getKey/", api.CasAUTH.HandleFunc(api.KeyHandler)).Methods("GET")
-	r.Handle("/admin/success/", api.CasAUTH.HandleFunc(api.AdminPageServer)).Methods("GET")
-	r.Handle("/admin/success", api.CasAUTH.HandleFunc(api.AdminPageServer)).Methods("GET")
-	r.Handle("/admin/logout/", api.CasAUTH.HandleFunc(api.AdminLogout)).Methods("GET")
-	r.Handle("/admin/logout", api.CasAUTH.HandleFunc(api.AdminLogout)).Methods("GET")
-	r.Handle("/vehicles/create", api.CasAUTH.HandleFunc(api.VehiclesCreateHandler)).Methods("POST")
-	r.Handle("/vehicles/edit", api.CasAUTH.HandleFunc(api.VehiclesEditHandler)).Methods("POST")
-	r.Handle("/vehicles/{id:[0-9]+}", api.CasAUTH.HandleFunc(api.VehiclesDeleteHandler)).Methods("DELETE")
-	r.Handle("/routes/create", api.CasAUTH.HandleFunc(api.RoutesCreateHandler)).Methods("POST")
-	r.Handle("/routes/schedule", api.CasAUTH.HandleFunc(api.RoutesScheduler)).Methods("POST")
-	r.Handle("/routes/edit", api.CasAUTH.HandleFunc(api.RoutesEditHandler)).Methods("POST")
-	r.Handle("/routes/{id:.+}", api.CasAUTH.HandleFunc(api.RoutesDeleteHandler)).Methods("DELETE")
-	r.Handle("/stops/create", api.CasAUTH.HandleFunc(api.StopsCreateHandler)).Methods("POST")
-	r.Handle("/stops/{id:.+}", api.CasAUTH.HandleFunc(api.StopsDeleteHandler)).Methods("DELETE")
-	//r.HandleFunc("/import", api.ImportHandler).Methods("GET")
-	r.HandleFunc("/adminMessage", api.SetAdminMessage).Methods("POST")
+	r.Route("/admin", func(r chi.Router) {
+		r.Method("GET", "/", api.CasAUTH.HandleFunc(api.AdminHandler))
+		r.Method("GET", "/success/", api.CasAUTH.HandleFunc(api.AdminPageServer))
+		r.Method("GET", "/logout", api.CasAUTH.HandleFunc(api.AdminLogout))
+
+	})
+
+	r.Method("GET", "/getKey/", api.CasAUTH.HandleFunc(api.KeyHandler))
 
 	// Static files
-	r.Handle("/", StaticHandler(http.HandlerFunc(IndexHandler))).Methods("GET")
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", StaticHandler(http.FileServer(http.Dir("static/")))))
+	r.Get("/", IndexHandler)
+	r.Method("GET", "/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
 
 	// Serve requests
-	hand := api.CasAUTH.Handle(r)
-	api.handler = hand
+	// hand := api.CasAUTH.Handle(r)
+	// api.handler = hand
+	api.handler = r
 
 	return &api, nil
 }
@@ -118,15 +137,6 @@ func (api *API) Run() {
 // IndexHandler serves the index page.
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "index.html")
-}
-
-// StaticHandler adds a Cache-Control header to all responses to require the
-// client to make sure its cached copy is up to date.
-func StaticHandler(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Cache-Control", "no-cache")
-		h.ServeHTTP(w, r)
-	})
 }
 
 // AdminHandler serves the admin page.

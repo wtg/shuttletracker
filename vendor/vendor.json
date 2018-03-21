@@ -19,6 +19,12 @@
 			"revisionTime": "2017-03-29T04:21:07Z"
 		},
 		{
+			"checksumSHA1": "YODbzvhUr0Tzp2/MkXflXph2hdY=",
+			"path": "github.com/go-chi/chi",
+			"revision": "e223a795a06a5598451cf022558c17c779f5a7ab",
+			"revisionTime": "2018-02-02T19:41:35Z"
+		},
+		{
 			"checksumSHA1": "42vkdsxNaLyPu+FktCzZ/8zsNSE=",
 			"path": "github.com/go-sql-driver/mysql",
 			"revision": "9dee4ca50b83acdf57a35fb9e6fb4be640afa2f3",
