@@ -449,7 +449,10 @@ Vue.component('about-modal',{
   <div class="modalContent">
     <span class="close" @click="$emit('hidemodal')">&times;</span>
     <h2>About the Shuttle Tracker</h2>
-    <p>The Shuttle Tracker is <a href="https://github.com/wtg/shuttletracker">open source</a> and maintained by the <a href="https://webtech.union.rpi.edu">Web Technologies Group</a> of the Rensselaer Union Student Senate for the benefit of the student body.</p>
+    <p>
+      The Shuttle Tracker is <a href="https://github.com/wtg/shuttletracker">open source</a> and maintained by the <a href="https://webtech.union.rpi.edu">Web Technologies Group</a> of the Rensselaer Union Student Senate for the benefit of the student body.
+      It is also an active <a href="https://rcos.io">RCOS</a> project, and dozens of students have contributed to it through RCOS in previous semesters.
+    </p>
 
     <h3>Why is there no app?</h3>
     <p>We're focused on making the Shuttle Tracker website as good as it can be. While most of our users are on mobile, we think the best way to deliver a great experience to the most people is to focus our efforts on this website.</p>
