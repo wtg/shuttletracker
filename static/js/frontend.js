@@ -455,11 +455,10 @@ Vue.component('about-modal',{
     <p>We're focused on making the Shuttle Tracker website as good as it can be. While most of our users are on mobile, we think the best way to deliver a great experience to the most people is to focus our efforts on this website.</p>
 
     <h3>How can I contribute?</h3>
+    <p>We have an active <a href="https://github.com/wtg/shuttletracker">repository</a> on GitHub where we track issues and accept pull requests. If you want to get involved in another way, email <a href="mailto:webtech@union.lists.rpi.edu">webtech@union.lists.rpi.edu</a> for more information.</p>
 
-    <h3>How are the shuttles tracked?</h3>
-    <p></p>
-
-    <h3>What is the Web Technologies Group?</h3>
+    <!-- <h3>How are the shuttles tracked?</h3>
+    <h3>What is the Web Technologies Group?</h3> -->
 
     </div>
   </div>
