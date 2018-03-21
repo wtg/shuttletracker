@@ -3,11 +3,10 @@ var state = 0;
 Vue.component('titlebar', {
   template:
   `<div>
-  <div v-bind:style="titlebarStyle" class ="title-bar">
-  <p class="title"><span class = "red" >Shuttle</span>Tracker</p>
+  <div v-bind:style="titlebarStyle" class ="hero-head">
   <a v-bind:style="logoutStyle" href="/admin/logout/">Logout</a>
-  </div>
-
+  <div class="container has-text-centered" style="height:50px;">
+  <p v-bind:style=""><span class = "red" >Shuttle</span>Tracker</p>
   </div>`,
 
   data (){
@@ -21,7 +20,8 @@ Vue.component('titlebar', {
         lineHeight:"50px",
         zIndex: "20",
         verticalAlign:"center",
-        boxShadow: '0 3px 7px rgba(0,0,0,0.25)'},
+        boxShadow: '0 3px 7px rgba(0,0,0,0.1)'},
+
       logoutStyle: {
         float: "right",
         textDecoration: "none",
@@ -39,21 +39,22 @@ Vue.component('sidebar',{
     <div v-bind:style="sidebarStyle" class="sidebar">
       <ul class ="nav-list">
         <li v-for="elem in elements" @click="setState(elem.id)" class="nav-item" v-bind:class="{ selected: (keepState == elem.id) }">{{elem.text}}</li>
-
       </ul>
     </div>
   `,
   data (){
     return{
-      elements: [{text: "Routes",id: 0},{text: "Stops",id: 1},{text: "Vehicles",id: 2}],
+      elements: [{text: "Routes",id: 0},{text: "Stops",id: 1},{text: "Vehicles",id: 2},{text: "Messages", id: 3}],
 
       sidebarStyle: {
         backgroundColor:"white",
-        height:"auto",
+        width: "150px",
+        minWidth:"45px",
+        height:"calc(100% - 50px)",
         bottom: "0",
         fontSize: "16px",
         zIndex: "10",
-        top:"40",
+        top:"50",
         float:"left",
         position: "absolute",
         lineHeight:"50px",
@@ -76,10 +77,11 @@ Vue.component('sidebar',{
 Vue.component("main-pane",{
   template:`
   <div v-bind:style="mainStyle">
-    <transition name="slide-fade">
     <route-panel v-if="state == 0"></route-panel>
     <stops-panel v-if="state == 1"></stops-panel>
     <vehicle-panel v-if="state == 2"></vehicle-panel>
+    <message-panel v-if="state == 3"></message-panel>
+
     </transition>
   </div>
   `,

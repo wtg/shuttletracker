@@ -62,6 +62,7 @@ func New(cfg Config, db database.Database) (*API, error) {
 	// Public
 	r.HandleFunc("/vehicles", api.VehiclesHandler).Methods("GET")
 	r.HandleFunc("/updates", api.UpdatesHandler).Methods("GET")
+	r.HandleFunc("/adminMessage", api.AdminMessageHandler).Methods("GET")
 	r.HandleFunc("/updates/message", api.UpdateMessageHandler).Methods("GET")
 	r.HandleFunc("/routes", api.RoutesHandler).Methods("GET")
 	r.HandleFunc("/stops", api.StopsHandler).Methods("GET")
@@ -78,11 +79,13 @@ func New(cfg Config, db database.Database) (*API, error) {
 	r.Handle("/vehicles/edit", api.CasAUTH.HandleFunc(api.VehiclesEditHandler)).Methods("POST")
 	r.Handle("/vehicles/{id:[0-9]+}", api.CasAUTH.HandleFunc(api.VehiclesDeleteHandler)).Methods("DELETE")
 	r.Handle("/routes/create", api.CasAUTH.HandleFunc(api.RoutesCreateHandler)).Methods("POST")
+	r.Handle("/routes/schedule", api.CasAUTH.HandleFunc(api.RoutesScheduler)).Methods("POST")
 	r.Handle("/routes/edit", api.CasAUTH.HandleFunc(api.RoutesEditHandler)).Methods("POST")
 	r.Handle("/routes/{id:.+}", api.CasAUTH.HandleFunc(api.RoutesDeleteHandler)).Methods("DELETE")
 	r.Handle("/stops/create", api.CasAUTH.HandleFunc(api.StopsCreateHandler)).Methods("POST")
 	r.Handle("/stops/{id:.+}", api.CasAUTH.HandleFunc(api.StopsDeleteHandler)).Methods("DELETE")
 	//r.HandleFunc("/import", api.ImportHandler).Methods("GET")
+	r.HandleFunc("/adminMessage", api.SetAdminMessage).Methods("POST")
 
 	// Static files
 	r.Handle("/", StaticHandler(http.HandlerFunc(IndexHandler))).Methods("GET")
