@@ -14,54 +14,6 @@ import (
 	"gopkg.in/cas.v1"
 )
 
-//RouteIsActive determines if the current time means a route should be active or not
-//TODO: Move this to updater
-func (api *API) RouteIsActive(r *model.Route) bool {
-
-	//This is a time offset, to ensure routes are activated on the minute they are assigned activate
-	var currentTime model.Time
-	currentTime.FromTime(time.Now())
-	currentTime.Day = time.Now().Weekday()
-	state := -1
-
-	if r.TimeInterval == nil || len(r.TimeInterval) == 1 {
-		state = 1
-	}
-	for idx, val := range r.TimeInterval {
-		//If it is the last in the time list (latest time for the week) use this index
-		if idx >= len(r.TimeInterval)-1 {
-			state = val.State
-			break
-		} else {
-			if currentTime.After(val) && currentTime.After(r.TimeInterval[idx+1]) {
-				continue
-			}
-			state = val.State
-			break
-		}
-	}
-
-	route := model.Route{}
-	//Check if db is nil for testing
-	if api.db != nil {
-		r, err := api.db.GetRoute(r.ID)
-		route = r
-		if err != nil {
-			return false
-		}
-	}
-	//If we cannot determine a state for some reason default to active
-	route.Active = (state == 1 || state == -1)
-	if api.db != nil {
-		err := api.db.ModifyRoute(&route)
-		if err != nil {
-			return false
-		}
-	}
-	return (state == 1 || state == -1)
-
-}
-
 // RoutesHandler finds all of the routes in the database
 func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	// Find all routes in database
@@ -70,9 +22,7 @@ func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	for idx := range routes {
-		api.RouteIsActive(&routes[idx])
-	}
+
 	// Send each route to client as JSON
 	WriteJSON(w, routes)
 }
