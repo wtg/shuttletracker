@@ -101,7 +101,7 @@ func New(cfg Config, db database.Database) (*API, error) {
 	r.Route("/admin", func(r chi.Router) {
 		r.Method("GET", "/", api.CasAUTH.HandleFunc(api.AdminHandler))
 		r.Method("GET", "/success/", api.CasAUTH.HandleFunc(api.AdminPageServer))
-		r.Method("GET", "/logout", api.CasAUTH.HandleFunc(api.AdminLogout))
+		r.Method("GET", "/logout/", api.CasAUTH.HandleFunc(api.AdminLogout))
 
 	})
 
