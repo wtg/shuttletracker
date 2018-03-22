@@ -77,7 +77,6 @@ func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Here do the interpolation
 	// now we get the Segment for each segment ( this should be stored in database, just store it inside route for god sake)
-	// fmt.Printf("Size of coordinates = %d", len(coords))
 	// Type conversions
 	enabled, _ := strconv.ParseBool(routeData["enabled"])
 	width, _ := strconv.Atoi(routeData["width"])
@@ -110,7 +109,6 @@ func (api *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	// fmt.Printf(vars["id"])
 	log.Debugf("deleting", vars["id"])
 	err := api.db.DeleteRoute(vars["id"])
 	// Error handling
@@ -224,7 +222,6 @@ func (api *API) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	log.Debugf("deleting", vars["id"])
-	// fmt.Printf(vars["id"])
 	err := api.db.DeleteStop(vars["id"])
 	// Error handling
 	if err != nil {
