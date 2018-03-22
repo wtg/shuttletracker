@@ -59,6 +59,8 @@ func New(cfg Config, db database.Database) (*API, error) {
 
 	r := chi.NewRouter()
 
+	r.Use(etag)
+
 	// Vehicles
 	r.Route("/vehicles", func(r chi.Router) {
 		r.Get("/", api.VehiclesHandler)
@@ -109,9 +111,6 @@ func New(cfg Config, db database.Database) (*API, error) {
 	r.Get("/", IndexHandler)
 	r.Method("GET", "/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
 
-	// Serve requests
-	// hand := api.CasAUTH.Handle(r)
-	// api.handler = hand
 	api.handler = r
 
 	return &api, nil
