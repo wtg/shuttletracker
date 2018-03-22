@@ -22,7 +22,9 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 5. Switch to the Shuttle Tracker directory (`$GOPATH/src/github.com/wtg/shuttletracker`)
 6. Run `govendor sync`
 7. Ensure you have MongoDB installed.
+   *`sudo apt-get install mongodb`
 8. Rename `conf.json.sample` to `conf.json`
+   
 9. Edit conf.json with the following:
    * `DataFeed`: API with tracking information from iTrak... For RPI, this is a unique API URL that we can get data from. It's currently private, and we will only share it with authorized members for now.
    * `UpdateInterval`: Number of seconds between each request to the data feed
