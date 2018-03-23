@@ -7,12 +7,11 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/go-chi/chi"
 	"gopkg.in/cas.v1"
 
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/model"
-
-	"github.com/gorilla/mux"
 )
 
 var (
@@ -94,9 +93,9 @@ func (api *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Delete vehicle from Vehicles collection
-	vars := mux.Vars(r)
-	log.Debugf("deleting", vars["id"])
-	err := api.db.DeleteVehicle(vars["id"])
+	id := chi.URLParam(r, "id")
+	log.Debugf("deleting", id)
+	err := api.db.DeleteVehicle(id)
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

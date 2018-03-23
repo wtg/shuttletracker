@@ -7,9 +7,12 @@ import (
 	"sort"
 	"strconv"
 	"time"
-	// MySQL driver
-	log "github.com/Sirupsen/logrus"
-	"github.com/gorilla/mux"
+
+	"github.com/go-chi/chi"
+	"gopkg.in/cas.v1"
+
+	"github.com/wtg/shuttletracker/log"
+
 	"github.com/wtg/shuttletracker/model"
 	"gopkg.in/cas.v1"
 )
@@ -108,9 +111,11 @@ func (api *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
 	}
-	vars := mux.Vars(r)
-	log.Debugf("deleting", vars["id"])
-	err := api.db.DeleteRoute(vars["id"])
+
+	id := chi.URLParam(r, "id")
+	log.Debugf("deleting", id)
+	err := api.db.DeleteRoute(id)
+
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -220,9 +225,10 @@ func (api *API) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	vars := mux.Vars(r)
-	log.Debugf("deleting", vars["id"])
-	err := api.db.DeleteStop(vars["id"])
+	id := chi.URLParam(r, "id")
+	log.Debugf("deleting", id)
+	err := api.db.DeleteStop(id)
+
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
