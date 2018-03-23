@@ -19,6 +19,12 @@
 			"revisionTime": "2017-03-29T04:21:07Z"
 		},
 		{
+			"checksumSHA1": "YODbzvhUr0Tzp2/MkXflXph2hdY=",
+			"path": "github.com/go-chi/chi",
+			"revision": "e223a795a06a5598451cf022558c17c779f5a7ab",
+			"revisionTime": "2018-02-02T19:41:35Z"
+		},
+		{
 			"checksumSHA1": "42vkdsxNaLyPu+FktCzZ/8zsNSE=",
 			"path": "github.com/go-sql-driver/mysql",
 			"revision": "9dee4ca50b83acdf57a35fb9e6fb4be640afa2f3",
@@ -35,12 +41,6 @@
 			"path": "github.com/gorilla/context",
 			"revision": "08b5f424b9271eedf6f9f0ce86cb9396ed337a42",
 			"revisionTime": "2016-08-17T18:46:32Z"
-		},
-		{
-			"checksumSHA1": "F5dR3/i70EhSIMZfeIV+H8/PtvM=",
-			"path": "github.com/gorilla/mux",
-			"revision": "94e7d24fd285520f3d12ae998f7fdd6b5393d453",
-			"revisionTime": "2017-02-17T19:26:16Z"
 		},
 		{
 			"checksumSHA1": "7JBkp3EZoc0MSbiyWfzVhO4RYoY=",
