@@ -7,6 +7,8 @@ import (
 	"hash"
 	"io"
 	"net/http"
+
+	"github.com/wtg/sgapi/log"
 )
 
 type etagResponseWriter struct {
@@ -37,7 +39,10 @@ func etag(next http.Handler) http.Handler {
 		if r.Header.Get("If-None-Match") == sum {
 			w.WriteHeader(304)
 		} else {
-			ew.buf.WriteTo(w)
+			_, err := ew.buf.WriteTo(w)
+			if err != nil {
+				log.WithError(err).Error("unable to write HTTP response")
+			}
 		}
 	})
 }
