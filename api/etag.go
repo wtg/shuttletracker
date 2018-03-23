@@ -8,7 +8,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/wtg/sgapi/log"
+	"github.com/wtg/shuttletracker/log"
 )
 
 type etagResponseWriter struct {
