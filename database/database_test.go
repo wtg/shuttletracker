@@ -35,7 +35,7 @@ func TestRouteIsActiveSameDay(t *testing.T) {
 	}
   RouteIsActive(&TestRoute)
 	if !TestRoute.Active {
-		t.Errorf("Route should be active but is not %v", TestRoute)
+		t.Errorf("Route should be active but is not %+v", TestRoute)
 	}
 }
 
@@ -89,7 +89,7 @@ func TestRouteIsActiveDiffDay(t *testing.T) {
 
 	RouteIsActive(&TestRoute)
 	if !TestRoute.Active {
-		t.Errorf("Route should be active but is not")
+		t.Errorf("Route should be active but is not %+v", TestRoute)
 	}
 
 	//Test when the day is explicitly different and should not be active
@@ -108,6 +108,6 @@ func TestRouteIsActiveDiffDay(t *testing.T) {
 	TestRoute.TimeInterval = interval
 	RouteIsActive(&TestRoute)
 	if TestRoute.Active {
-		t.Errorf("Route should not be active but is")
+		t.Errorf("Route should not be active but is %+v", TestRoute)
 	}
 }
