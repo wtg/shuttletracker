@@ -18,15 +18,26 @@ func TestCreateTime(t *testing.T) {
 func TestTimeAfter(t *testing.T) {
 	timeTest, _ := time.Parse("15:04:05", "12:05:06")
 	timeTestTwo := timeTest.Add(1 * time.Minute)
+
 	var t1 Time
 	t1.FromTime(timeTest)
 	var t2 Time
 	t2.FromTime(timeTestTwo)
+	var t3 Time
+	t3.FromTime(timeTestTwo.Add(time.Hour))
+	var t4 Time
+	t4.FromTime(timeTest.Add(time.Second))
 	if t1.After(t2) {
 		t.Errorf("t2 should be after t1")
 	}
 	if !t2.After(t1) {
 		t.Errorf("t1 should not be after t2")
+	}
+	if !t3.After(t1) {
+		t.Errorf("t1 should not be after t3")
+	}
+	if !t4.After(t1) {
+		t.Errorf("t1 should not be after t4")
 	}
 	if t1.After(t1) {
 		t.Errorf("a time cannot be after itself")
@@ -70,13 +81,9 @@ func TestSorting(t *testing.T) {
 	t3.Day = 1
 	var times []Time
 	times = append(times, t1, t2, t3)
+	times = append(times, t3, t2, t1)
+	times = append(times, t3, t1, t2)
 
 	sort.Sort(ByTime(times))
-	for idx, it := range times {
-		if idx < len(times)-1 {
-			if !times[idx+1].After(it) {
-				t.Errorf("Times %d and %d not in sorted order", idx, idx+1)
-			}
-		}
-	}
+
 }

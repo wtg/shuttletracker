@@ -6,54 +6,14 @@ import (
 	"sort"
 	"strconv"
 	"time"
-	// MySQL driver
-	log "github.com/Sirupsen/logrus"
-	"github.com/gorilla/mux"
+
+	"github.com/go-chi/chi"
+	"gopkg.in/cas.v1"
+
+	"github.com/wtg/shuttletracker/log"
+
 	"github.com/wtg/shuttletracker/model"
 )
-
-//RouteIsActive determines if the current time means a route should be active or not
-func (api *API) RouteIsActive(r *model.Route) bool {
-	var currentTime model.Time
-	currentTime.FromTime(time.Now())
-	currentTime.Day = time.Now().Weekday()
-	state := -1
-
-	if r.TimeInterval == nil || len(r.TimeInterval) == 1 {
-		state = 1
-	}
-	for idx, val := range r.TimeInterval {
-		//If it is the last in the time list (latest time for the week) use this index
-		if idx >= len(r.TimeInterval)-1 {
-			state = val.State
-			break
-		} else {
-			if currentTime.After(val) && currentTime.After(r.TimeInterval[idx+1]) {
-				continue
-			}
-			state = val.State
-			break
-		}
-	}
-	route := model.Route{}
-	if api.db != nil {
-		r, err := api.db.GetRoute(r.ID)
-		route = r
-		if err != nil {
-			return false
-		}
-	}
-	//If we cannot determine a state for some reason default to active
-	route.Active = (state == 1 || state == -1)
-	if api.db != nil {
-		err := api.db.ModifyRoute(&route)
-		if err != nil {
-			return false
-		}
-	}
-	return (state == 1 || state == -1)
-
-}
 
 // RoutesHandler finds all of the routes in the database
 func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
@@ -61,9 +21,14 @@ func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+<<<<<<< HEAD
 	for idx := range routes {
 		api.RouteIsActive(&routes[idx])
 	}
+=======
+
+	// Send each route to client as JSON
+>>>>>>> route-rewrite
 	WriteJSON(w, routes)
 }
 
@@ -99,6 +64,9 @@ func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	coords := combineCoords(&coordsData)
 
+	// Here do the interpolation
+	// now we get the Segment for each segment ( this should be stored in database, just store it inside route for god sake)
+	// Type conversions
 	enabled, _ := strconv.ParseBool(routeData["enabled"])
 	width, _ := strconv.Atoi(routeData["width"])
 	timeIntervals := []model.Time{}
@@ -121,9 +89,15 @@ func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 // RoutesDeleteHandler deletes a route from database
 func (api *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	log.Debugf("[ROUTE DELETE:]", vars["id"])
-	err := api.db.DeleteRoute(vars["id"])
+	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
+		return
+	}
+
+	id := chi.URLParam(r, "id")
+	log.Debugf("deleting", id)
+	err := api.db.DeleteRoute(id)
+
+	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -211,9 +185,15 @@ func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	log.Debugf("deleting", vars["id"])
-	err := api.db.DeleteStop(vars["id"])
+	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
+		return
+	}
+
+	id := chi.URLParam(r, "id")
+	log.Debugf("deleting", id)
+	err := api.db.DeleteStop(id)
+
+	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
