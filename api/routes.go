@@ -14,7 +14,6 @@ import (
 	"github.com/wtg/shuttletracker/log"
 
 	"github.com/wtg/shuttletracker/model"
-	"gopkg.in/cas.v1"
 )
 
 // RoutesHandler finds all of the routes in the database
