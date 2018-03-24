@@ -21,14 +21,7 @@ func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-<<<<<<< HEAD
-	for idx := range routes {
-		api.RouteIsActive(&routes[idx])
-	}
-=======
 
-	// Send each route to client as JSON
->>>>>>> route-rewrite
 	WriteJSON(w, routes)
 }
 
