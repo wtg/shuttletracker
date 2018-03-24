@@ -36,7 +36,6 @@ func (api *API) RouteIsActive(r *model.Route) bool {
 		}
 	}
 	route := model.Route{}
-	//Check if db is nil for testing
 	if api.db != nil {
 		r, err := api.db.GetRoute(r.ID)
 		route = r
