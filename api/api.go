@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/spf13/viper"
 	"gopkg.in/cas.v1"
 
@@ -59,6 +60,7 @@ func New(cfg Config, db database.Database) (*API, error) {
 
 	r := chi.NewRouter()
 
+	r.Use(middleware.DefaultCompress)
 	r.Use(etag)
 
 	// Vehicles
