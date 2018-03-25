@@ -34,7 +34,7 @@ func TestWriteJSON(t *testing.T) {
 			expectedError: false,
 		},
 		{
-			data:          make(chan (int)),
+			data:          make(chan int),
 			expectedWrite: "",
 			expectedError: true,
 		},
