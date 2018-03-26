@@ -44,7 +44,7 @@ func TestStatic(t *testing.T) {
 
 	server := httptest.NewServer(api.handler)
 	defer server.Close()
-	client := server.Client()
+	client := http.Client{}
 
 	for _, c := range cases {
 		url := server.URL + c.path
