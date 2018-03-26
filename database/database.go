@@ -7,12 +7,12 @@ import (
 	"github.com/wtg/shuttletracker/model"
 )
 
-//SetRouteActiveStatus determines if a given route is active based on its schedule intervals and updates the feild in the struct that is passed in
-func SetRouteActiveStatus(r *model.Route) {
+//SetRouteActiveStatus determines if a given route is active based on its schedule intervals and the time given, then updates the object in the parameter
+func SetRouteActiveStatus(r *model.Route, t time.Time) {
 
 	//This is a time offset, to ensure routes are activated on the minute they are assigned activate
 	var currentTime model.Time
-	currentTime.FromTime(time.Now())
+	currentTime.FromTime(t)
 	currentTime.Day = time.Now().Weekday()
 	state := -1
 
