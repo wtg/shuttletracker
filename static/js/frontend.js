@@ -346,7 +346,7 @@ Vue.component('shuttle-map',{
             data[j].color = "#FFF";
           }
 
-          if(this.ShuttlesArray[data[j].vehicleID] === undefined){
+          if (this.ShuttlesArray[data[j].vehicleID] === undefined){
             shuttleIcon.options.iconUrl = this.getShuttleIcon(data[j].color);
             this.ShuttlesArray[data[j].vehicleID] = {
               data: data[j],
@@ -358,17 +358,22 @@ Vue.component('shuttle-map',{
               message: ""
             };
             this.ShuttlesArray[data[j].vehicleID].marker.addTo(this.ShuttleMap);
-          }else{
+          } else {
             shuttleIcon.options.iconUrl = this.getShuttleIcon(data[j].color);
             this.ShuttlesArray[data[j].vehicleID].marker.setIcon(shuttleIcon);
             this.ShuttlesArray[data[j].vehicleID].marker.setLatLng([data[j].lat,data[j].lng]);
             this.ShuttlesArray[data[j].vehicleID].marker.setRotationAngle(parseInt(data[j].heading)-45);
           }
+
+          const message = data[j].vehicleName;
+          this.ShuttlesArray[data[j].vehicleID].marker.binbPopup(message);
+          console.log(this.ShuttlesArray[data[j].vehicleID]);
+          // 			message = fmt.Sprintf("<b>%s</b><br/>Traveling %s at<br/> %s mph as of %s", vehicle.VehicleName, CardinalDirection(&update.Heading), speed, lastUpdate)
+
         }
       }
-      this.ShuttleUpdateCounter ++;
-      this.grabVehicleInfo();
 
+      this.ShuttleUpdateCounter++;
     },
 
     showUserLocation: function(map){
@@ -403,43 +408,6 @@ Vue.component('shuttle-map',{
 
     stopClicked: function(e){
     },
-
-    grabVehicleInfo: function(){
-      $.get( "/vehicles", this.grabMessages).fail(function(){vehicleUpdateSuccess = false;});
-
-    },
-    updateMessages: function(){
-      for(var key in this.ShuttlesArray){
-        for(var messageKey in this.ShuttleMessages){
-          if(key == messageKey && this.ShuttlesArray[key] !== null){
-            this.ShuttlesArray[key].marker.bindPopup(this.ShuttleMessages[messageKey]);
-          }
-        }
-      }
-
-    },
-
-    grabMessages: function(data){
-      vehicleUpdateSuccess = true;
-      var nameToId = {};
-      for(var i = 0; i < data.length; i ++){
-        nameToId[data[i].vehicleName] = data[i].vehicleID;
-      }
-      var el = this;
-      $.get( "/updates/message", function(data){
-        vehicleMessageSuccess = true;
-        for(var i = 0 ; i < data.length; i ++){
-
-          var start_pos = data[i].indexOf('>') + 1;
-          var end_pos = data[i].indexOf('<',start_pos);
-          el.ShuttleMessages[nameToId[data[i].substring(start_pos,end_pos)]] = data[i];
-
-        }
-        el.updateMessages();
-      }).fail(function(){vehicleMessageSuccess = false;});
-
-    },
-
   }
 });
 
