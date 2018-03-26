@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"math"
 	"net/http"
 	"sort"
 	"strconv"
