@@ -18,7 +18,7 @@ func TestSetRouteActiveStatusSameDay(t *testing.T) {
 	interval := []model.Time{}
 	t1 := model.Time{
 		Day:   time.Now().Weekday(),
-		Time:  time.Now().Add(-5 * time.Hour),
+		Time:  time.Now().Add(-5 * time.Second),
 		State: 1,
 	}
 	t2 := model.Time{
