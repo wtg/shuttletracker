@@ -92,6 +92,7 @@ func (m *MongoDB) DeleteRoute(routeID string) error {
 func (m *MongoDB) GetRoute(routeID string) (model.Route, error) {
 	var route model.Route
 	err := m.routes.Find(bson.M{"id": routeID}).One(&route)
+	SetRouteActiveStatus(&route,time.Now())
 	return route, err
 }
 
@@ -99,6 +100,9 @@ func (m *MongoDB) GetRoute(routeID string) (model.Route, error) {
 func (m *MongoDB) GetRoutes() ([]model.Route, error) {
 	var routes []model.Route
 	err := m.routes.Find(bson.M{}).All(&routes)
+	for i := range routes {
+		SetRouteActiveStatus(&routes[i],time.Now())
+	}
 	return routes, err
 }
 
