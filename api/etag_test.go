@@ -23,13 +23,13 @@ func TestETag(t *testing.T) {
 		body       string
 	}
 	cases := []testCase{
-		testCase{
+		{
 			clientETag: "",
 			serverETag: "6e71b3cac15d32fe2d36c270887df9479c25c640",
 			statusCode: 200,
 			body:       "hello there",
 		},
-		testCase{
+		{
 			clientETag: "6e71b3cac15d32fe2d36c270887df9479c25c640",
 			serverETag: "6e71b3cac15d32fe2d36c270887df9479c25c640",
 			statusCode: 304,
