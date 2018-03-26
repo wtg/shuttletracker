@@ -24,10 +24,14 @@ script:
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
-# cache:
-#   directories:
-#     - $GOPATH/src
-#     - $GOPATH/pkg
+cache:
+  directories:
+    - $GOPATH/src
+    - $GOPATH/pkg
+
+before_cache:
+  - rm -rf $GOPATH/src/github.com/wtg/shuttletracker/*
+  - rm -rf $GOPATH/pkg/**/github.com/wtg/shuttletracker/*
 
 notifications:
   email: false
