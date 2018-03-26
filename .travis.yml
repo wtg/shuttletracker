@@ -11,12 +11,13 @@ matrix:
   allow_failures:
     - go: tip
 
-before_install:
+install:
   - go get -u github.com/kardianos/govendor && govendor sync
   - go get -u github.com/alecthomas/gometalinter && gometalinter --install
+  - go get -u github.com/bradleyfalzon/revgrep/...
 
 script:
-  - gometalinter --vendor ./... || true
+  - gometalinter --vendor ./... 2>&1 | revgrep origin/master
   - ./test.sh
 
 after_success:
