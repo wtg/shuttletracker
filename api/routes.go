@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
-	"gopkg.in/cas.v1"
 
 	"github.com/wtg/shuttletracker/log"
 
@@ -83,9 +82,6 @@ func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 // RoutesDeleteHandler deletes a route from database
 func (api *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
-		return
-	}
 
 	id := chi.URLParam(r, "id")
 	log.Debugf("deleting", id)
@@ -180,9 +176,6 @@ func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
-		return
-	}
 
 	id := chi.URLParam(r, "id")
 	log.Debugf("deleting", id)
