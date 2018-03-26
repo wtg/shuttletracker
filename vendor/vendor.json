@@ -13,6 +13,12 @@
 			"revisionTime": "2015-12-04T14:14:43Z"
 		},
 		{
+			"checksumSHA1": "CSPbwbyzqA6sfORicn4HFtIhF/c=",
+			"path": "github.com/davecgh/go-spew/spew",
+			"revision": "8991bc29aa16c548c550c7ff78260e27b9ab7c73",
+			"revisionTime": "2018-02-21T22:46:20Z"
+		},
+		{
 			"checksumSHA1": "x2Km0Qy3WgJJnV19Zv25VwTJcBM=",
 			"path": "github.com/fsnotify/fsnotify",
 			"revision": "4da3e2cfbabc9f751898f250b49f2439785783a1",
@@ -21,6 +27,12 @@
 		{
 			"checksumSHA1": "YODbzvhUr0Tzp2/MkXflXph2hdY=",
 			"path": "github.com/go-chi/chi",
+			"revision": "e223a795a06a5598451cf022558c17c779f5a7ab",
+			"revisionTime": "2018-02-02T19:41:35Z"
+		},
+		{
+			"checksumSHA1": "1Xlo4sCR+zeOzjslXc/NAOmkgXg=",
+			"path": "github.com/go-chi/chi/middleware",
 			"revision": "e223a795a06a5598451cf022558c17c779f5a7ab",
 			"revisionTime": "2018-02-02T19:41:35Z"
 		},
@@ -121,6 +133,12 @@
 			"revisionTime": "2017-06-28T01:26:37Z"
 		},
 		{
+			"checksumSHA1": "LuFv4/jlrmFNnDb/5SCSEPAM9vU=",
+			"path": "github.com/pmezard/go-difflib/difflib",
+			"revision": "792786c7400a136282c1664665ae0a8db921c6c2",
+			"revisionTime": "2016-01-10T10:55:54Z"
+		},
+		{
 			"checksumSHA1": "lBehULzb2/kIK3wZ0gz2yNmHq9s=",
 			"path": "github.com/spf13/afero",
 			"revision": "9be650865eab0c12963d8753212f4f9c66cdcf12",
@@ -155,6 +173,24 @@
 			"path": "github.com/spf13/viper",
 			"revision": "25b30aa063fc18e48662b86996252eabdcf2f0c7",
 			"revisionTime": "2017-07-23T05:52:07Z"
+		},
+		{
+			"checksumSHA1": "6thzskcj6XrMO5kW6GlRiuTDYjU=",
+			"path": "github.com/stretchr/objx",
+			"revision": "8a3f7159479fbc75b30357fbc48f380b7320f08e",
+			"revisionTime": "2018-01-29T17:20:03Z"
+		},
+		{
+			"checksumSHA1": "6LwXZI7kXm1C0h4Ui0Y52p9uQhk=",
+			"path": "github.com/stretchr/testify/assert",
+			"revision": "c679ae2cc0cb27ec3293fea7e254e47386f05d69",
+			"revisionTime": "2018-03-14T08:05:35Z"
+		},
+		{
+			"checksumSHA1": "Qloi2PTvZv+D9FDHXM/banCoaFY=",
+			"path": "github.com/stretchr/testify/mock",
+			"revision": "c679ae2cc0cb27ec3293fea7e254e47386f05d69",
+			"revisionTime": "2018-03-14T08:05:35Z"
 		},
 		{
 			"checksumSHA1": "Sypcm+UJjiKcT7P7kSp87nVuDtI=",
