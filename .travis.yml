@@ -17,7 +17,8 @@ install:
   - go get -u github.com/bradleyfalzon/revgrep/...
 
 script:
-  - gometalinter --vendor ./... 2>&1 | revgrep origin/master
+  - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then gometalinter --vendor ./... 2>&1 | revgrep origin/master; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then gometalinter --vendor ./... || true; fi
   - ./test.sh
 
 after_success:
