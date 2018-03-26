@@ -34,7 +34,7 @@ func TestSetRouteActiveStatusSameDay(t *testing.T) {
 		TimeInterval: interval,
 	}
   SetRouteActiveStatus(&TestRoute)
-	if TestRoute.Active {
+	if !TestRoute.Active {
 		t.Errorf("Route should be active but is not %+v", TestRoute)
 	}
 }
