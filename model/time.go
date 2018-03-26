@@ -7,9 +7,15 @@ import (
 
 // Time struct is used to store route enable/disable times, so we can compare times without a date
 type Time struct {
+<<<<<<< HEAD
 	Time  time.Time    `json:time`
 	Day   time.Weekday `json:day`
 	State int          `json:on`
+=======
+	Time  time.Time    `json:"time"`
+	Day   time.Weekday `json:"day"`
+	State int          `json:"on"`
+>>>>>>> master
 }
 
 // FromTime is used to create a new model.Time object from a normal gotime object

@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"math"
 	"net/http"
 	"sort"
 	"strconv"
@@ -18,6 +19,7 @@ import (
 // RoutesHandler finds all of the routes in the database
 func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	routes, err := api.db.GetRoutes()
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -98,8 +100,8 @@ func (api *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 //Use this for importing a schedule
 type sched struct {
-	Times []model.Time `json:times`
-	ID    string       `json:id`
+	Times []model.Time `json:"times"`
+	ID    string       `json:"id"`
 }
 
 // RoutesScheduler Allows for route active times to be set
@@ -115,6 +117,7 @@ func (api *API) RoutesScheduler(w http.ResponseWriter, r *http.Request) {
 	route := model.Route{}
 	route, err = api.db.GetRoute(times.ID)
 	route.TimeInterval = times.Times
+
 	err = api.db.ModifyRoute(&route)
 	if err != nil {
 		log.WithError(err).Error("Unable to store route into db")
