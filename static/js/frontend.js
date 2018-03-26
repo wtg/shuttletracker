@@ -293,11 +293,11 @@ Vue.component('shuttle-map',{
 
     },
 
-    grabVehicles: function(){
+    grabVehicles: function () {
       $.get( "/updates", this.updateVehicles).fail(function(){vehicleUpdateSuccess = false;});
     },
 
-    updateVehicles: function(data){
+    updateVehicles: function (data) {
       window.d = new Date();
       var hours = window.d.getHours();
       hours = checkTime(hours);
@@ -360,20 +360,62 @@ Vue.component('shuttle-map',{
             this.ShuttlesArray[data[j].vehicleID].marker.addTo(this.ShuttleMap);
           } else {
             shuttleIcon.options.iconUrl = this.getShuttleIcon(data[j].color);
+            this.ShuttlesArray[data[j].vehicleID].data = data[j];
             this.ShuttlesArray[data[j].vehicleID].marker.setIcon(shuttleIcon);
             this.ShuttlesArray[data[j].vehicleID].marker.setLatLng([data[j].lat,data[j].lng]);
             this.ShuttlesArray[data[j].vehicleID].marker.setRotationAngle(parseInt(data[j].heading)-45);
           }
-
-          const message = data[j].vehicleName;
-          this.ShuttlesArray[data[j].vehicleID].marker.binbPopup(message);
-          console.log(this.ShuttlesArray[data[j].vehicleID]);
-          // 			message = fmt.Sprintf("<b>%s</b><br/>Traveling %s at<br/> %s mph as of %s", vehicle.VehicleName, CardinalDirection(&update.Heading), speed, lastUpdate)
-
         }
       }
 
+      this.setVehicleMessages();
+
       this.ShuttleUpdateCounter++;
+    },
+
+    cardinalDirection: function(heading) {
+      if (heading >= 22.5 && heading < 67.5) {
+        return "northeast";
+      } else if (heading >= 67.5 && heading < 112.5) {
+        return "east";
+      } else if (heading >= 112.5 && heading < 157.5) {
+        return "southeast";
+      } else if (heading >= 157.5 && heading < 202.5) {
+        return "south";
+      } else if (heading >= 202.5 && heading < 247.5) {
+        return "southwest";
+      } else if (heading >= 247.5 && heading < 292.5) {
+        return "west";
+      } else if (heading >= 292.5 && heading < 337.5) {
+        return "northwest";
+      }
+      return "north";
+    },
+
+    setVehicleMessages: function () {
+      const v = this;
+      $.get("/vehicles", function (data) {
+        vehicleUpdateSuccess = true;
+        let idToName = {};
+        for (let i = 0; i < data.length; i++) {
+          idToName[data[i].vehicleID] = data[i].vehicleName;
+        }
+
+        for (const key in v.ShuttlesArray) {
+
+          const update = v.ShuttlesArray[key].data;
+          const speed = Math.round(update.speed * 100) / 100;
+          const date = new Date(update.created);
+          const direction = v.cardinalDirection(parseFloat(update.heading));
+
+          const message = `<b>${idToName[key]}</b><br>` +
+          `Traveling ${direction} at ${speed} mph<br>` +
+          `as of ${date.toLocaleTimeString()}`;
+          v.ShuttlesArray[key].marker.bindPopup(message);
+        }
+      }).fail(function() {
+        vehicleUpdateSuccess = false;
+      });
     },
 
     showUserLocation: function(map){
