@@ -122,8 +122,8 @@ func (api *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type sched struct {
-	Times []model.Time `json:times`
-	ID    string       `json:id`
+	Times []model.Time `json:"times"`
+	ID    string       `json:"id"`
 }
 
 // RoutesScheduler Allows for route active times to be set

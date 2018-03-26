@@ -13,7 +13,7 @@ import (
   functionality of the shuttle tracker
 */
 
-func TestRouteIsActiveSameDay(t *testing.T) {
+func TestSetRouteActiveStatusSameDay(t *testing.T) {
 	//Test when the day is the same, and time varies and should be active
 	interval := []model.Time{}
 	t1 := model.Time{
@@ -33,13 +33,13 @@ func TestRouteIsActiveSameDay(t *testing.T) {
 		Name:         "Test Route",
 		TimeInterval: interval,
 	}
-  RouteIsActive(&TestRoute)
-	if !TestRoute.Active {
+  SetRouteActiveStatus(&TestRoute)
+	if TestRoute.Active {
 		t.Errorf("Route should be active but is not %+v", TestRoute)
 	}
 }
 
-func TestRouteIsActiveSimilarTime(t *testing.T) {
+func TestSetRouteActiveStatusSimilarTime(t *testing.T) {
 	//Test when the day is the same, and time varies and should be active
 	interval := []model.Time{}
 	t1 := model.Time{
@@ -59,14 +59,14 @@ func TestRouteIsActiveSimilarTime(t *testing.T) {
 		Name:         "Test Route",
 		TimeInterval: interval,
 	}
-	RouteIsActive(&TestRoute)
+	SetRouteActiveStatus(&TestRoute)
 	if !TestRoute.Active {
 		t.Errorf("Route should be active but is not")
 	}
 }
 
 //Creates some test routes and tests if they should be active
-func TestRouteIsActiveDiffDay(t *testing.T) {
+func TestSetRouteActiveStatusDiffDay(t *testing.T) {
 	//Test when the day is explicitly different and should be active
 	interval := []model.Time{}
 	t1 := model.Time{
@@ -87,7 +87,7 @@ func TestRouteIsActiveDiffDay(t *testing.T) {
 		TimeInterval: interval,
 	}
 
-	RouteIsActive(&TestRoute)
+	SetRouteActiveStatus(&TestRoute)
 	if !TestRoute.Active {
 		t.Errorf("Route should be active but is not %+v", TestRoute)
 	}
@@ -106,7 +106,7 @@ func TestRouteIsActiveDiffDay(t *testing.T) {
 	}
 	interval = append(interval, t1, t2)
 	TestRoute.TimeInterval = interval
-	RouteIsActive(&TestRoute)
+	SetRouteActiveStatus(&TestRoute)
 	if TestRoute.Active {
 		t.Errorf("Route should not be active but is %+v", TestRoute)
 	}
