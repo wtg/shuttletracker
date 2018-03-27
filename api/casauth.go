@@ -34,18 +34,11 @@ func (cli *CasClient) casauth(next http.Handler) http.Handler {
 		if !cas.IsAuthenticated(r) {
 			cas.RedirectToLogin(w, r)
 		} else {
-			users, _ := cli.db.GetUsers()
-			valid := false
-			for _, u := range users {
-				if u.Name == strings.ToLower(cas.Username(r)) {
-					valid = true
-				}
-			}
-			if !valid {
-				cas.RedirectToLogout(w, r)
+			if cli.db.UserExists(strings.ToLower(cas.Username(r))) {
+				next.ServeHTTP(w, r)
 				return
 			}
-			next.ServeHTTP(w, r)
+			cas.RedirectToLogout(w, r)
 		}
 
 	})

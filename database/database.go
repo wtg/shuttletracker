@@ -70,6 +70,7 @@ type Database interface {
 
 	// Users
 	GetUsers() ([]model.User, error)
+	UserExists(uname string) bool
 
 	//Messages
 	AddMessage(message *model.AdminMessage) error
