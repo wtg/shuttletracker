@@ -1,23 +1,25 @@
 package api
 
 import (
+	"github.com/wtg/shuttletracker/database"
 	"gopkg.in/cas.v2"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 type CasClient struct {
-	cas    *cas.Client
-	tstore *cas.MemoryStore
+	cas *cas.Client
+	db  database.Database
 }
 
-func (cli *CasClient) Create(url *url.URL, tickets *cas.MemoryStore) {
+func (cli *CasClient) Create(url *url.URL, db database.Database) {
 	client := cas.NewClient(&cas.Options{
 		URL:   url,
 		Store: nil,
 	})
 	cli.cas = client
-	cli.tstore = tickets
+	cli.db = db
 }
 
 func (cli *CasClient) logout(w http.ResponseWriter, r *http.Request) {
@@ -26,15 +28,26 @@ func (cli *CasClient) logout(w http.ResponseWriter, r *http.Request) {
 
 func (cli *CasClient) casauth(next http.Handler) http.Handler {
 	return cli.cas.HandleFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Cache-Control", "no-cache")
 
 		if !cas.IsAuthenticated(r) {
 			cas.RedirectToLogin(w, r)
+
 			// return
 
 		} else {
+			users, _ := cli.db.GetUsers()
+			valid := false
+			for _, u := range users {
+				if u.Name == strings.ToLower(cas.Username(r)) {
+					valid = true
+				}
+			}
+			if !valid {
+				cas.RedirectToLogout(w, r)
+				return
+			}
+			next.ServeHTTP(w, r)
 		}
-		next.ServeHTTP(w, r)
 
 	})
 }

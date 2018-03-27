@@ -48,7 +48,7 @@ func New(cfg Config, db database.Database) (*API, error) {
 
 	r.Use(etag)
 	cli := CasClient{}
-	cli.Create(url, nil)
+	cli.Create(url, api.db)
 	// Vehicles
 	r.Route("/vehicles", func(r chi.Router) {
 		r.Get("/", api.VehiclesHandler)
