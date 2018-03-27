@@ -74,7 +74,6 @@ func New(cfg Config, db database.Database) (*API, error) {
 	// Updates
 	r.Route("/updates", func(r chi.Router) {
 		r.Get("/", api.UpdatesHandler)
-		r.Get("/message", api.UpdateMessageHandler)
 	})
 
 	// Admin message
