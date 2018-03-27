@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/spf13/viper"
 
 	"github.com/wtg/shuttletracker/database"
@@ -46,6 +47,7 @@ func New(cfg Config, db database.Database) (*API, error) {
 
 	r := chi.NewRouter()
 
+	r.Use(middleware.DefaultCompress)
 	r.Use(etag)
 	cli := CasClient{}
 	cli.Create(url, api.db)
