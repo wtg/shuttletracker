@@ -287,10 +287,16 @@ Vue.component('shuttle-map',{
           latlng: [data[i].lat, data[i].lng],
           marker: L.marker([data[i].lat,data[i].lng], {icon: stopIcon})
         };
-        stop.marker.bindPopup(stop.name);
+        stop.marker.bindPopup(this.sendNotification(stop));
         stop.marker.addTo(this.ShuttleMap).on('click', this.stopClicked);
       }
 
+    },
+
+    sendNotification: function(stop){
+      return  stop.name + `<br><form>
+      <input type = "submit" value = "Send Notification" v-on:click = "alert('Hello!')">
+    </form>`;
     },
 
     grabVehicles: function(){
@@ -509,6 +515,14 @@ Vue.component('dropdown-menu',{
             </li>
           </ul>
         </li>
+        <li class = "dropdown-menu-item" id = "dropdown-menu-item_notification">
+          <p class = "dropdown-menu-item_p">Notification</p>
+          <form>
+            Phone Number: <input type = "text" name = "phoneNumeber" id = "pn"/><br>
+            Resubmit Phone#: <input type = "text" name = "phoneNumber2" id = "rpn"><br>
+            <input type = "button" value = "Submit" @click = "validPhone">
+          </form>
+        </li>
       </ul>
     </li>
   </ul>
@@ -538,10 +552,41 @@ Vue.component('dropdown-menu',{
         menuVisibility: 0,
         dropdownMenuList: document.getElementsByClassName('dropdown-menu'),
         dropdownSubmenuList: document.getElementsByClassName('dropdown-submenu'),
-
+        
     };
   },
     methods: {
+        validPhone: function(){
+          var pn1 = document.getElementById("pn");
+          var pn2 = document.getElementById("rpn");
+          if(!this.checkNumber(pn1.value) || !this.checkNumber(pn2.value)){
+            alert("Phone Number must be digits");
+          }
+          else{
+            if(pn1.value != pn2.value){
+              alert('Different phone numbers');
+            }
+            else{
+              if(pn1.value.length != 10){
+                alert("Phone number not valid");
+              }
+              else{
+                alert("Submit Successfully");
+              }
+            }
+          }
+
+          pn1.value = "";
+          pn2.value = "";
+        },
+
+        checkNumber: function(s){
+          if (s!=null && s!=""){
+            return !isNaN(s);
+          }
+          return false;
+        },
+
         // following functions involve changing the dark mode state
         toggleDarkmode: function () {
             // toggles dark mode for the map portion of the site by applying the 'filter: invert' property
@@ -689,6 +734,8 @@ Vue.component('dropdown-menu',{
             }
         },
         // ====================================================================
+
+        
     }
 });
 
