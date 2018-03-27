@@ -3,8 +3,8 @@ package api
 import (
 	"encoding/json"
 	"github.com/wtg/shuttletracker/model"
-	"net/http"
 	"html/template"
+	"net/http"
 )
 
 // AdminMessageHandler handles the retrieval of the current administrator message

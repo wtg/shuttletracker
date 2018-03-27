@@ -2,8 +2,8 @@ html, body {
   background-color: #f7f7f7;
   height: 100%;
   width: 100%;
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
   font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -29,7 +29,7 @@ html, body {
   max-height: 150px;
   overflow-y: auto;
   position: fixed;
-  z-index: 101;
+  z-index: 0;
   bottom: -510px;
   left: 0;
   right: 0;
@@ -120,6 +120,42 @@ li {
 }
 
 
+/* CSS for about modal*/
+
+div.modal{
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  right: 0;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+  height: 100vh;
+}
+
+div.modalContent{
+  background-color: #fefefe;
+  margin: 50px auto 30px;
+  z-index: 10;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+span.close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+span.close:hover,
+span.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
 /* CSS for dropdown menus */
 div.dropdown ul {
   list-style: none none;
@@ -143,6 +179,7 @@ li.dropdown-main-item {
 
 li.dropdown-main-item:hover {
   background-color: rgba(226, 226, 226, 0.85);
+  cursor: pointer;
 }
 
 a.dropdown-icon {
