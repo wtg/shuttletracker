@@ -8,11 +8,13 @@ import (
 	"strings"
 )
 
+// CasClient stores the local cas client and an instance of the database
 type CasClient struct {
 	cas *cas.Client
 	db  database.Database
 }
 
+// Create creates a new CasClient from a casurl and a database
 func (cli *CasClient) Create(url *url.URL, db database.Database) {
 	client := cas.NewClient(&cas.Options{
 		URL:   url,
