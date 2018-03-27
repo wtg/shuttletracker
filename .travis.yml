@@ -1,10 +1,10 @@
 language: go
 
 go:
-  - "1.7.x"
-  - "1.8.x"
-  - "1.9.x"
-  - "1.10.x"
+  - 1.7.x
+  - 1.8.x
+  - 1.9.x
+  - 1.10.x
   - tip
 
 matrix:
@@ -14,13 +14,27 @@ matrix:
 before_install:
   - go get -u github.com/kardianos/govendor && govendor sync
   - go get -u github.com/alecthomas/gometalinter && gometalinter --install
+  - go get -u github.com/bradleyfalzon/revgrep/...
+
+install:
+  - go install
 
 script:
-  - gometalinter --vendor ./... || true
+  - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then gometalinter --vendor ./... 2>&1 | revgrep origin/master; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then gometalinter --vendor ./... || true; fi
   - ./test.sh
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
+cache:
+  directories:
+    - $GOPATH/src
+    - $GOPATH/pkg
+
+before_cache:
+  - rm -rf $GOPATH/src/github.com/wtg/shuttletracker/*
+  - rm -rf $GOPATH/pkg/**/github.com/wtg/shuttletracker/*
 
 notifications:
   email: false
