@@ -243,7 +243,7 @@ func (m *MongoDB) GetMessages() ([]model.AdminMessage, error) {
 
 func (m *MongoDB) UserExists(uname string) bool {
 	user := model.User{}
-	err := m.users.Find(bson.M{"name": uname}).One(user)
+	err := m.users.Find(bson.M{"name": uname}).One(&user)
 	_ = user
 	if err == nil {
 		return true
