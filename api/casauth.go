@@ -32,8 +32,6 @@ func (cli *CasClient) casauth(next http.Handler) http.Handler {
 		if !cas.IsAuthenticated(r) {
 			cas.RedirectToLogin(w, r)
 
-			// return
-
 		} else {
 			users, _ := cli.db.GetUsers()
 			valid := false
