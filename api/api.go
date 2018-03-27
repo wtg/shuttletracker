@@ -53,7 +53,6 @@ func New(cfg Config, db database.Database) (*API, error) {
 	r.Route("/vehicles", func(r chi.Router) {
 		r.Get("/", api.VehiclesHandler)
 		r.Group(func(r chi.Router) {
-
 			r.Use(cli.casauth)
 			r.Post("/create", api.VehiclesCreateHandler)
 			r.Post("/edit", api.VehiclesEditHandler)
@@ -107,6 +106,8 @@ func New(cfg Config, db database.Database) (*API, error) {
 
 		r.Use(cli.casauth)
 		r.Get("/", api.AdminHandler)
+		r.Get("/login", api.AdminHandler)
+		r.Get("/logout", cli.logout)
 
 	})
 	r.Group(func(r chi.Router) {
@@ -148,7 +149,11 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 
 // AdminHandler serves the admin page.
 func (api *API) AdminHandler(w http.ResponseWriter, r *http.Request) {
-
+	id := r.URL.Query()
+	//authenticated with a ticket, redirect the request
+	if len(id["ticket"]) != 0 {
+		http.Redirect(w, r, "/admin", 301)
+	}
 	http.ServeFile(w, r, "admin.html")
 
 }
