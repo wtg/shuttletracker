@@ -4,7 +4,6 @@ var partial = false;
 var routeSuccess = true;
 var stopsSuccess = true;
 var vehicleUpdateSuccess = true;
-var vehicleMessageSuccess = true;
 var lastUpdateTime = "";
 
 var d = new Date();
@@ -30,7 +29,7 @@ Vue.component('live-indicator',{
   },
   methods: {
     update: function(){
-      live = routeSuccess && vehicleUpdateSuccess && vehicleMessageSuccess;
+      live = routeSuccess && vehicleUpdateSuccess;
       partial = routeSuccess || vehicleUpdateSuccess;
       if(live === false){
         this.text = window.lastUpdateTime;
