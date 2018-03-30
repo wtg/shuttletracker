@@ -10,11 +10,13 @@ Vue.component('stop-card', {
     <b>Description</b>: {{info.description}}<br>
     <b>enabled</b>: <input type="checkbox" v-model="info.enabled"></input>{{info.enabled}}<br>
     <b>Route</b>: <select v-model="myRouteId" v-bind:id="'sel' + info.routeId"><option v-for="routeId in routeids" v-bind:value="routeId.id" v-bind:selected="info.routeId == routeId.id">{{routeId.name}}</option></select><br>
-    <br>
+    <b>Order</b>: {{info.order}} <br>
     <button class=" button" @click="shouldDelete(info.id)">{{deleteText}}</button>
     <button class=" button" @click="update(info.id)">{{updateText}}</button>
 
   </div>`,
+  //     <b>Order</b>: {{info.order}} <br>
+
   data (){
     return{
       myData: {},
@@ -58,6 +60,7 @@ Vue.component('stop-card', {
         "toDelete":true,
         "lat":this.info.lat,
         "lng":this.info.lng,
+        "order": this.info.order,
       };
       $.ajax({
         url: "/stops/create",
@@ -66,7 +69,6 @@ Vue.component('stop-card', {
         contentType: "application/json",
         complete: function(data){
           refresh=true;
-
         }
       });
     },
@@ -118,13 +120,16 @@ Vue.component('stop-create',{
   template:`
   <div><div class="route-description-box" style="height: 800px; padding-bottom: 10px;">
               <div id="stopsmap" style="height: 650px;float: left; width: 100%; background-color:black;z-index:0;"></div>
-              <b>name</b>: <input v-model="name" placeholder="Stop Name"></input><br>
+              <b>Name</b>: <input v-model="name" placeholder="Stop Name"></input><br>
               <b>Description</b>: <input v-model="description" placeholder="Stop Description"></input><br>
               <b>Enabled</b>:  <input type="checkbox" v-model="enabled"></input>{{enabled}}<br>
               <b>Route</b>: <select v-model="myRouteId"><option v-for="routeId in routeIDS" v-bind:value="routeId.id">{{routeId.name}}</option></select><br>
+              <b>Order</b>: <input v-model="order" placeholder="Stop Order"></input><br>
             <button class="button" @click="send(JSON.stringify(getJSON()))">Submit</button>
             <button class="button" @click="showJSON(JSON.stringify(getJSON()))">GetJSON</button>
     </div></div>`,
+    //              <b>Order</b>: <input v-model="order" placeholder="Stop Order"></input><br>
+
     data (){
       return{
         ID: "",
@@ -142,7 +147,7 @@ Vue.component('stop-create',{
         addStopMarker: null,
         myRouteId: "",
         routeIDS: [],
-
+        order: "",
       };
     },
     methods: {
@@ -169,6 +174,7 @@ Vue.component('stop-create',{
           "routeId":this.myRouteId.toString(),
           "lat": this.addStopMarker.getLatLng().lat.toString(),
           "lng": this.addStopMarker.getLatLng().lng.toString()};
+          //"order": this.order;
           return toSend;
       },
       showJSON: function(data){

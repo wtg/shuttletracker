@@ -93,6 +93,7 @@ type Stop struct {
 	Enabled      bool    `json:"enabled,string" bson:"enabled"`
 	RouteID      string  `json:"routeId"        bson:"routeId"`
 	SegmentIndex int     `json:"segmentindex"   bson:"segmentindex"`
+	Order				 string	 `json:"order"					bson:"order"`
 }
 
 type MapPoint struct {

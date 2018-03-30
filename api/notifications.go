@@ -38,6 +38,7 @@ func (api *API) SetAdminMessage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	WriteJSON(w, "Success")
+}
 	// TODO: Create notification based on user input, and add to the database
 	func (api *API) NotificationsCreateHandler(w http.ResponseWriter, r *http.Request) {
 		// Get user input

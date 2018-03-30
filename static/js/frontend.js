@@ -269,6 +269,14 @@ Vue.component('shuttle-map',{
 
     },
 
+    createButton: function(label) {
+      var btn = document.createElement('button');
+      btn.setAttribute('type', 'button');
+      //btn.innerHTML = label;
+      btn.setAttribute('value', 'Request Notifiction');
+      return btn;
+    },
+
     updateStops: function(data){
       stopsSuccess = true;
       var stopIcon = L.icon({
@@ -287,14 +295,27 @@ Vue.component('shuttle-map',{
           latlng: [data[i].lat, data[i].lng],
           marker: L.marker([data[i].lat,data[i].lng], {icon: stopIcon})
         };
-        stop.marker.bindPopup(stop.name);
+
+        // Create popup
+        //var notifyBtn = document.createElement("p");
+        //notifyBtn.setAttribute('type', 'button');
+        //notifyBtn.innerHTML = 'Request Notifiction';
+
+        stop.marker.bindPopup(stop.name + "<br><button>Request Notification</button>");
         stop.marker.addTo(this.ShuttleMap).on('click', this.stopClicked);
       }
 
     },
 
+<<<<<<< Updated upstream
     grabVehicles: function () {
       $.get( "/updates", this.updateVehicles).fail(function(){vehicleSuccess = false;});
+=======
+
+
+    grabVehicles: function(){
+      $.get( "/updates", this.updateVehicles).fail(function(){vehicleUpdateSuccess = false;});
+>>>>>>> Stashed changes
     },
 
     updateVehicles: function (data) {

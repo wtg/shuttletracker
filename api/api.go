@@ -98,7 +98,10 @@ func New(cfg Config, db database.Database) (*API, error) {
 		r.Method("DELETE", "/{id:.+}", api.CasAUTH.HandleFunc(api.StopsDeleteHandler))
 	})
 
-	r.HandleFunc("/notifications", api.NotificationsCreateHandler).Methods("GET")
+	// Notifications
+	r.Route("/notifications", func(r chi.Router){
+		r.Get("/", api.NotificationsCreateHandler)
+	})
 
 
 	// Admin
