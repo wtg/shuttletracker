@@ -193,6 +193,7 @@ Vue.component('shuttle-map',{
     updateRoutes: function(data){
       routeSuccess = true;
       var updatedRoute = [];
+			console.log(data)
       for(var i = 0; i < data.length; i ++){
         if(data[i].enabled === false || data[i].active === false){
           continue;
@@ -203,8 +204,8 @@ Vue.component('shuttle-map',{
         }
         var polylineOptions = {
           color: data[i].color,
-          weight: 3,
-          opacity: 1,
+          weight: 5,
+          opacity: .5,
         };
         if(data[i].width === 0){
           polylineOptions.dashArray = '10,10';
