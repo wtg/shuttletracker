@@ -3,7 +3,7 @@ var live = true;
 var partial = false;
 var routeSuccess = true;
 var stopsSuccess = true;
-var a = true;
+var vehicleSuccess = true;
 var lastUpdateTime = "";
 
 var d = new Date();
