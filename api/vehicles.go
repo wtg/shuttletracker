@@ -2,9 +2,7 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -131,70 +129,4 @@ func (api *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Convert updates to JSON
 	WriteJSON(w, updates) // it's good to take some REST in our server :)
-}
-
-// UpdateMessageHandler generates a message about an update for a vehicle
-func (api *API) UpdateMessageHandler(w http.ResponseWriter, r *http.Request) {
-	// For each vehicle/update, store message as a string
-	var messages []string
-	var message string
-
-	// Query all Vehicles
-	vehicles, err := api.db.GetVehicles()
-	// Handle errors
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-	// Find recent updates and generate message
-	for _, vehicle := range vehicles {
-		// find 10 most recent records
-		update, err := api.db.GetLastUpdateForVehicle(vehicle.VehicleID)
-		if err == nil {
-			// Use first 4 char substring of update.Speed
-			speed := update.Speed
-			if len(speed) > 4 {
-				speed = speed[0:4]
-			}
-
-			// Convert last updated time to local timezone
-			loc, err := time.LoadLocation("America/New_York")
-			if err != nil {
-				log.WithError(err).Error("Could not load time zone information.")
-				continue
-			}
-			lastUpdate := update.Created.In(loc).Format("3:04:05pm")
-
-			message = fmt.Sprintf("<b>%s</b><br/>Traveling %s at<br/> %s mph as of %s", vehicle.VehicleName, CardinalDirection(&update.Heading), speed, lastUpdate)
-			messages = append(messages, message)
-		}
-	}
-	// Convert to JSON
-	WriteJSON(w, messages)
-}
-
-// CardinalDirection returns the cardinal direction of a vehicle's heading.
-func CardinalDirection(h *string) string {
-	heading, err := strconv.ParseFloat(*h, 64)
-	if err != nil {
-		log.WithError(err).Error("Unable to parse float")
-		return "North"
-	}
-	switch {
-	case (heading >= 22.5 && heading < 67.5):
-		return "North-East"
-	case (heading >= 67.5 && heading < 112.5):
-		return "East"
-	case (heading >= 112.5 && heading < 157.5):
-		return "South-East"
-	case (heading >= 157.5 && heading < 202.5):
-		return "South"
-	case (heading >= 202.5 && heading < 247.5):
-		return "South-West"
-	case (heading >= 247.5 && heading < 292.5):
-		return "West"
-	case (heading >= 292.5 && heading < 337.5):
-		return "North-West"
-	default:
-		return "North"
-	}
 }
