@@ -4,7 +4,7 @@ Vue.component('titlebar', {
   template:
   `<div>
   <a v-bind:style="logoutStyle" href="/admin/logout/">Logout</a>
-  <div v-bind:style="titlebarStyle" class ="hero-head">
+  <div v-bind:style="titlebarStyle" class="hero-head">
   <div class="container has-text-centered" style="height:50px;">
   <p v-bind:style=""><span class = "red" >Shuttle</span>Tracker</p>
   </div>`,

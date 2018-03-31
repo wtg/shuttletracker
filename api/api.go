@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"gopkg.in/cas.v2"
 	"net/http"
 	"net/url"
 
@@ -46,11 +47,19 @@ func New(cfg Config, db database.Database) (*API, error) {
 	}
 
 	r := chi.NewRouter()
+	client := cas.NewClient(&cas.Options{
+		URL:   url,
+		Store: nil,
+	})
 
 	r.Use(middleware.DefaultCompress)
 	r.Use(etag)
-	cli := CasClient{}
-	cli.Create(url, api.db)
+
+	cli := casClient{
+		cas: client,
+		db:  api.db,
+	}
+
 	// Vehicles
 	r.Route("/vehicles", func(r chi.Router) {
 		r.Get("/", api.VehiclesHandler)

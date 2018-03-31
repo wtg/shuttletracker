@@ -242,12 +242,12 @@ func (m *MongoDB) GetMessages() ([]model.AdminMessage, error) {
 }
 
 // UserExists tests if a given user exists in the admin database
-func (m *MongoDB) UserExists(uname string) bool {
-	user := model.User{}
-	err := m.users.Find(bson.M{"name": uname}).One(&user)
-	_ = user
-	if err == nil {
-		return true
+func (m *MongoDB) UserExists(uname string) (bool, error) {
+	query := m.users.Find(bson.M{"name": uname})
+	n, err := query.Count()
+	if n == 1 {
+		return true, err
 	}
-	return false
+
+	return false, err
 }
