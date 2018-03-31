@@ -3,8 +3,7 @@ var live = true;
 var partial = false;
 var routeSuccess = true;
 var stopsSuccess = true;
-var vehicleUpdateSuccess = true;
-var vehicleMessageSuccess = true;
+var vehicleSuccess = true;
 var lastUpdateTime = "";
 
 var d = new Date();
@@ -30,8 +29,8 @@ Vue.component('live-indicator',{
   },
   methods: {
     update: function(){
-      live = routeSuccess && vehicleUpdateSuccess && vehicleMessageSuccess;
-      partial = routeSuccess || vehicleUpdateSuccess;
+      live = routeSuccess && vehicleSuccess;
+      partial = routeSuccess || vehicleSuccess;
       if(live === false){
         this.text = window.lastUpdateTime;
         this.liveStyle.width="auto";
@@ -90,6 +89,7 @@ Vue.component('shuttle-map',{
   mounted(){
     this.initMap();
     this.grabStops();
+    this.grabVehicles();
     var a = setInterval(this.grabVehicles, 3000);
     var b = setInterval(this.grabRoutes, 15000);
 
@@ -293,11 +293,11 @@ Vue.component('shuttle-map',{
 
     },
 
-    grabVehicles: function(){
-      $.get( "/updates", this.updateVehicles).fail(function(){vehicleUpdateSuccess = false;});
+    grabVehicles: function () {
+      $.get( "/updates", this.updateVehicles).fail(function(){vehicleSuccess = false;});
     },
 
-    updateVehicles: function(data){
+    updateVehicles: function (data) {
       window.d = new Date();
       var hours = window.d.getHours();
       hours = checkTime(hours);
@@ -307,7 +307,7 @@ Vue.component('shuttle-map',{
       secs = checkTime(secs);
 
       window.lastUpdateTime = (hours) + ":" + (mins) + ":" + (secs);
-      vehicleUpdateSuccess = true;
+      vehicleSuccess = true;
       var shuttleIcon = L.icon({
         iconUrl: this.getShuttleIcon("#FFF"),
 
@@ -346,7 +346,7 @@ Vue.component('shuttle-map',{
             data[j].color = "#FFF";
           }
 
-          if(this.ShuttlesArray[data[j].vehicleID] === undefined){
+          if (this.ShuttlesArray[data[j].vehicleID] === undefined){
             shuttleIcon.options.iconUrl = this.getShuttleIcon(data[j].color);
             this.ShuttlesArray[data[j].vehicleID] = {
               data: data[j],
@@ -358,17 +358,64 @@ Vue.component('shuttle-map',{
               message: ""
             };
             this.ShuttlesArray[data[j].vehicleID].marker.addTo(this.ShuttleMap);
-          }else{
+          } else {
             shuttleIcon.options.iconUrl = this.getShuttleIcon(data[j].color);
+            this.ShuttlesArray[data[j].vehicleID].data = data[j];
             this.ShuttlesArray[data[j].vehicleID].marker.setIcon(shuttleIcon);
             this.ShuttlesArray[data[j].vehicleID].marker.setLatLng([data[j].lat,data[j].lng]);
             this.ShuttlesArray[data[j].vehicleID].marker.setRotationAngle(parseInt(data[j].heading)-45);
           }
         }
       }
-      this.ShuttleUpdateCounter ++;
-      this.grabVehicleInfo();
 
+      this.setVehicleMessages();
+
+      this.ShuttleUpdateCounter++;
+    },
+
+    cardinalDirection: function(heading) {
+      if (heading >= 22.5 && heading < 67.5) {
+        return "northeast";
+      } else if (heading >= 67.5 && heading < 112.5) {
+        return "east";
+      } else if (heading >= 112.5 && heading < 157.5) {
+        return "southeast";
+      } else if (heading >= 157.5 && heading < 202.5) {
+        return "south";
+      } else if (heading >= 202.5 && heading < 247.5) {
+        return "southwest";
+      } else if (heading >= 247.5 && heading < 292.5) {
+        return "west";
+      } else if (heading >= 292.5 && heading < 337.5) {
+        return "northwest";
+      }
+      return "north";
+    },
+
+    setVehicleMessages: function () {
+      const v = this;
+      $.get("/vehicles", function (data) {
+        vehicleSuccess = true;
+        let idToName = {};
+        for (let i = 0; i < data.length; i++) {
+          idToName[data[i].vehicleID] = data[i].vehicleName;
+        }
+
+        for (const key in v.ShuttlesArray) {
+
+          const update = v.ShuttlesArray[key].data;
+          const speed = Math.round(update.speed * 100) / 100;
+          const date = new Date(update.created);
+          const direction = v.cardinalDirection(parseFloat(update.heading));
+
+          const message = `<b>${idToName[key]}</b><br>` +
+          `Traveling ${direction} at ${speed} mph<br>` +
+          `as of ${date.toLocaleTimeString()}`;
+          v.ShuttlesArray[key].marker.bindPopup(message);
+        }
+      }).fail(function() {
+        vehicleSuccess = false;
+      });
     },
 
     showUserLocation: function(map){
@@ -403,43 +450,6 @@ Vue.component('shuttle-map',{
 
     stopClicked: function(e){
     },
-
-    grabVehicleInfo: function(){
-      $.get( "/vehicles", this.grabMessages).fail(function(){vehicleUpdateSuccess = false;});
-
-    },
-    updateMessages: function(){
-      for(var key in this.ShuttlesArray){
-        for(var messageKey in this.ShuttleMessages){
-          if(key == messageKey && this.ShuttlesArray[key] !== null){
-            this.ShuttlesArray[key].marker.bindPopup(this.ShuttleMessages[messageKey]);
-          }
-        }
-      }
-
-    },
-
-    grabMessages: function(data){
-      vehicleUpdateSuccess = true;
-      var nameToId = {};
-      for(var i = 0; i < data.length; i ++){
-        nameToId[data[i].vehicleName] = data[i].vehicleID;
-      }
-      var el = this;
-      $.get( "/updates/message", function(data){
-        vehicleMessageSuccess = true;
-        for(var i = 0 ; i < data.length; i ++){
-
-          var start_pos = data[i].indexOf('>') + 1;
-          var end_pos = data[i].indexOf('<',start_pos);
-          el.ShuttleMessages[nameToId[data[i].substring(start_pos,end_pos)]] = data[i];
-
-        }
-        el.updateMessages();
-      }).fail(function(){vehicleMessageSuccess = false;});
-
-    },
-
   }
 });
 
