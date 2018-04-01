@@ -50,7 +50,7 @@ type Database interface {
 	CreateStop(stop *model.Stop) error
 	DeleteStop(stopID string) error
 	GetStops() ([]model.Stop, error)
-	// GetStopsForRoute(routeID string) ([]model.Stop, error)
+	GetStopsForRoute(routeID string) ([]model.Stop, error)
 	// ModifyStop(stop *model.Stop) error
 
 	// Vehicles
@@ -76,6 +76,15 @@ type Database interface {
 	GetCurrentMessage() (model.AdminMessage, error)
 	GetMessages() ([]model.AdminMessage, error)
 	ClearMessage() error
+<<<<<<< HEAD
+=======
+
+	// Notifications
+	CreateNotification(notification *model.Notification) error
+	GetNotificationsForStop(stopID string, routeID string) ([]model.Notification, error)
+	DeleteNotificationsForStop(stopID string, routeID string) (int, error)
+
+>>>>>>> origin/notifications
 }
 
 var (

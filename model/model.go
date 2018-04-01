@@ -7,17 +7,17 @@ import (
 
 // VehicleUpdate represents a single position observed for a Vehicle.
 type VehicleUpdate struct {
-	VehicleID string    `json:"vehicleID"   bson:"vehicleID,omitempty"`
-	Lat       string    `json:"lat"         bson:"lat"`
-	Lng       string    `json:"lng"         bson:"lng"`
-	Heading   string    `json:"heading"     bson:"heading"`
-	Speed     string    `json:"speed"       bson:"speed"`
-	Lock      string    `json:"lock"        bson:"lock"`
-	Time      string    `json:"time"        bson:"time"`
-	Date      string    `json:"date"        bson:"date"`
-	Status    string    `json:"status"      bson:"status"`
-	Created   time.Time `json:"created"     bson:"created"`
-	Route     string    `json:"RouteID"     bson:"routeID"`
+	VehicleID string    	`json:"vehicleID"   bson:"vehicleID,omitempty"`
+	Lat       string    	`json:"lat"         bson:"lat"`
+	Lng       string    	`json:"lng"         bson:"lng"`
+	Heading   string    	`json:"heading"     bson:"heading"`
+	Speed     string    	`json:"speed"       bson:"speed"`
+	Lock      string    	`json:"lock"        bson:"lock"`
+	Time      string    	`json:"time"        bson:"time"`
+	Date      string    	`json:"date"        bson:"date"`
+	Status    string    	`json:"status"      bson:"status"`
+	Created   time.Time 	`json:"created"     bson:"created"`
+	Route     string    	`json:"RouteID"     bson:"routeID"`
 }
 
 // Vehicle represents an object being tracked.
@@ -140,4 +140,12 @@ type Segment struct {
 	End      MapPoint `json:"destination"`
 	Distance float64  `json:"distance"`
 	Duration float64  `json:"duration"`
+}
+
+type Notification struct {
+	RouteID			string	`json:"route"			bson:"route,omitempty"`			// some stops are on more than one route
+	StopID			string 	`json:"stop"			bson:"stop,omitempty"`
+	PhoneNumber 	string	`json:"phone_number"	bson:"phone_number"`
+	Carrier 		string	`json:"carrier"			bson:"carrier"`
+	Sent 			bool	`json:"sent"			bson:"sent"`
 }
