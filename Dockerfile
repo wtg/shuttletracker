@@ -21,6 +21,6 @@ RUN mkdir /app
 COPY CHECKS /app
 
 RUN govendor sync
-RUN go build -o shuttletracker
+RUN go build ./cmd/shuttletracker
 
 CMD ["./shuttletracker"]
