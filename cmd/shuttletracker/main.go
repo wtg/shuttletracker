@@ -1,6 +1,6 @@
-// Package cmd bundles together all of shuttletracker's subpackages
+// Package main bundles together all of shuttletracker's subpackages
 // to create, configure, and run the shuttle tracker.
-package cmd
+package main
 
 import (
 	"github.com/kochman/runner"
@@ -11,6 +11,10 @@ import (
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/updater"
 )
+
+func main() {
+	Run()
+}
 
 // Run starts the shuttle tracker and blocks forever.
 func Run() {
