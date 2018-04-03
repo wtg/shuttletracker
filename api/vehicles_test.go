@@ -30,6 +30,9 @@ func TestVehiclesHandlerNoVehicles(t *testing.T) {
 	if resp.StatusCode != 200 {
 		t.Errorf("got status code %d, expected 200", resp.StatusCode)
 	}
+	if resp.Header.Get("Content-Type") != "application/json" {
+		t.Errorf("got Content-Type \"%s\", expected \"application/json\"", resp.Header.Get("Content-Type"))
+	}
 
 	vs.AssertExpectations(t)
 	vs.AssertNumberOfCalls(t, "Vehicles", 1)
