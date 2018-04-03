@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -16,22 +17,17 @@ var (
 	lastUpdate time.Time
 )
 
-// VehiclesHandler finds all the vehicles in the database.
+// VehiclesHandler returns all the vehicles.
 func (api *API) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
-	// Find all vehicles in database
-	vehicles, err := api.db.GetVehicles()
-
-	// Handle query errors
+	vehicles, err := api.vs.Vehicles()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	// Send each vehicle to client as JSON
 	WriteJSON(w, vehicles)
 }
 
-// VehiclesCreateHandler adds a new vehicle to the database.
+// VehiclesCreateHandler adds a new vehicle.
 func (api *API) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
@@ -49,7 +45,7 @@ func (api *API) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Store new vehicle under vehicles collection
-	err = api.db.CreateVehicle(&vehicle)
+	err = api.vs.CreateVehicle(&vehicle)
 	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -61,25 +57,25 @@ func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	vehicle := model.Vehicle{}
-	err := json.NewDecoder(r.Body).Decode(&vehicle)
+	vehicle := &model.Vehicle{}
+	err := json.NewDecoder(r.Body).Decode(vehicle)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	name := vehicle.VehicleName
+	name := vehicle.Name
 	enabled := vehicle.Enabled
 
-	vehicle, err = api.db.GetVehicle(vehicle.VehicleID)
+	vehicle, err = api.vs.Vehicle(vehicle.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	vehicle.VehicleName = name
+	vehicle.Name = name
 	vehicle.Enabled = enabled
 	vehicle.Updated = time.Now()
 
-	err = api.db.ModifyVehicle(&vehicle)
+	err = api.vs.ModifyVehicle(vehicle)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -90,20 +86,20 @@ func (api *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
 	}
-	// Delete vehicle from Vehicles collection
-	id := chi.URLParam(r, "id")
-	log.Debugf("deleting", id)
-	err := api.db.DeleteVehicle(id)
-	// Error handling
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = api.vs.DeleteVehicle(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
-// Here's my view, keep every name the same meaning, otherwise, choose another.
-// UpdatesHandler get the most recent update for each vehicle in the vehicles collection.
+// UpdatesHandler gets the most recent update for each enabled vehicle.
 func (api *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
-	vehicles, err := api.db.GetEnabledVehicles()
+	vehicles, err := api.vs.EnabledVehicles()
 	if err != nil {
 		log.WithError(err).Error("Unable to get enabled vehicles.")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -114,7 +110,7 @@ func (api *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 	updates := make([]model.VehicleUpdate, 0, len(vehicles))
 	for _, vehicle := range vehicles {
 		since := time.Now().Add(time.Minute * -5)
-		vehicleUpdates, err := api.db.GetUpdatesForVehicleSince(vehicle.VehicleID, since)
+		vehicleUpdates, err := api.db.GetUpdatesForVehicleSince(vehicle.ID, since)
 		if err != nil {
 			log.WithError(err).Error("Unable to get last vehicle update.")
 			http.Error(w, err.Error(), http.StatusInternalServerError)

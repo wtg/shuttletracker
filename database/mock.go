@@ -110,13 +110,13 @@ func (db *Mock) DeleteUpdatesBefore(before time.Time) (int, error) {
 }
 
 // GetUpdatesForVehicleSince gets all updates for a vehicle since a time.
-func (db *Mock) GetUpdatesForVehicleSince(vehicleID string, since time.Time) ([]model.VehicleUpdate, error) {
+func (db *Mock) GetUpdatesForVehicleSince(vehicleID int, since time.Time) ([]model.VehicleUpdate, error) {
 	args := db.Called(vehicleID, since)
 	return args.Get(0).([]model.VehicleUpdate), args.Error(1)
 }
 
 // GetLastUpdateForVehicle gets the most recent update for a vehicle.
-func (db *Mock) GetLastUpdateForVehicle(vehicleID string) (model.VehicleUpdate, error) {
+func (db *Mock) GetLastUpdateForVehicle(vehicleID int) (model.VehicleUpdate, error) {
 	args := db.Called(vehicleID)
 	return args.Get(0).(model.VehicleUpdate), args.Error(1)
 }

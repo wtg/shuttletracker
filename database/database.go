@@ -53,20 +53,12 @@ type Database interface {
 	// GetStopsForRoute(routeID string) ([]model.Stop, error)
 	// ModifyStop(stop *model.Stop) error
 
-	// Vehicles
-	CreateVehicle(vehicle *model.Vehicle) error
-	DeleteVehicle(vehicleID string) error
-	GetVehicle(vehicleID string) (model.Vehicle, error)
-	GetVehicles() ([]model.Vehicle, error)
-	GetEnabledVehicles() ([]model.Vehicle, error)
-	ModifyVehicle(vehicle *model.Vehicle) error
-
 	// Updates
 	CreateUpdate(update *model.VehicleUpdate) error
 	DeleteUpdatesBefore(before time.Time) (int, error)
 	// GetUpdatesSince(since time.Time) ([]model.VehicleUpdate, error)
-	GetUpdatesForVehicleSince(vehicleID string, since time.Time) ([]model.VehicleUpdate, error)
-	GetLastUpdateForVehicle(vehicleID string) (model.VehicleUpdate, error)
+	GetUpdatesForVehicleSince(vehicleID int, since time.Time) ([]model.VehicleUpdate, error)
+	GetLastUpdateForVehicle(vehicleID int) (model.VehicleUpdate, error)
 
 	// Users
 	GetUsers() ([]model.User, error)
@@ -79,8 +71,6 @@ type Database interface {
 }
 
 var (
-	// ErrVehicleNotFound indicates that a Vehicle is not in the database.
-	ErrVehicleNotFound = errors.New("Vehicle not found")
 	// ErrUpdateNotFound indicates that an Update is not in the database.
 	ErrUpdateNotFound = errors.New("Update not found")
 )

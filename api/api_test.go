@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/wtg/shuttletracker/database"
+	"github.com/wtg/shuttletracker/mock"
 )
 
 func TestStatic(t *testing.T) {
@@ -35,8 +36,9 @@ func TestStatic(t *testing.T) {
 
 	cfg := Config{}
 	db := &database.Mock{}
+	vs := &mock.VehicleService{}
 
-	api, err := New(cfg, db)
+	api, err := New(cfg, db, vs)
 	if err != nil {
 		t.Errorf("got error '%s', expected nil", err)
 		return

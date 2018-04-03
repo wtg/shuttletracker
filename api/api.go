@@ -12,11 +12,12 @@ import (
 	"github.com/spf13/viper"
 	"gopkg.in/cas.v1"
 
+	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/log"
 )
 
-// Configuration holds the settings for connecting to outside resources.
+// Config holds API settings.
 type Config struct {
 	GoogleMapAPIKey      string
 	GoogleMapMinDistance int
@@ -26,18 +27,19 @@ type Config struct {
 	MapboxAPIKey         string
 }
 
-// App holds references to Mongo resources.
+// API is responsible for configuring handlers for HTTP endpoints.
 type API struct {
 	cfg     Config
 	CasAUTH *cas.Client
 	CasMEM  *cas.MemoryStore
 	db      database.Database
 	handler http.Handler
+	vs      shuttletracker.VehicleService
 }
 
-// InitApp initializes the application given a config and connects to backends.
+// New initializes the application given a config and connects to backends.
 // It also seeds any needed information to the database.
-func New(cfg Config, db database.Database) (*API, error) {
+func New(cfg Config, db database.Database, vs shuttletracker.VehicleService) (*API, error) {
 	// Set up CAS authentication
 	url, err := url.Parse(cfg.CasURL)
 	if err != nil {
@@ -56,6 +58,7 @@ func New(cfg Config, db database.Database) (*API, error) {
 		CasAUTH: client,
 		CasMEM:  tickets,
 		db:      db,
+		vs:      vs,
 	}
 
 	r := chi.NewRouter()

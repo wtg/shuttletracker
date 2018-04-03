@@ -12,7 +12,6 @@ import (
 	"gopkg.in/cas.v1"
 
 	"github.com/wtg/shuttletracker/log"
-
 	"github.com/wtg/shuttletracker/model"
 )
 

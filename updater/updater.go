@@ -12,6 +12,7 @@ import (
 
 	"github.com/spf13/viper"
 
+	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/model"
@@ -23,6 +24,7 @@ type Updater struct {
 	updateInterval time.Duration
 	db             database.Database
 	dataRegexp     *regexp.Regexp
+	vs             shuttletracker.VehicleService
 }
 
 type Config struct {
@@ -31,8 +33,12 @@ type Config struct {
 }
 
 // New creates an Updater.
-func New(cfg Config, db database.Database) (*Updater, error) {
-	updater := &Updater{cfg: cfg, db: db}
+func New(cfg Config, db database.Database, vs shuttletracker.VehicleService) (*Updater, error) {
+	updater := &Updater{
+		cfg: cfg,
+		db:  db,
+		vs:  vs,
+	}
 
 	interval, err := time.ParseDuration(cfg.UpdateInterval)
 	if err != nil {
@@ -126,10 +132,14 @@ func (u *Updater) update() {
 
 			route := model.Route{}
 
-			vehicleID := strings.Replace(result["id"], "Vehicle ID:", "", -1)
-			vehicle, err := u.db.GetVehicle(vehicleID)
-			if err == database.ErrVehicleNotFound {
-				log.Warnf("Unknown vehicle ID \"%s\" returned by iTrak. Make sure all vehicles have been added.", vehicleID)
+			itrakID, err := strconv.Atoi(strings.Replace(result["id"], "Vehicle ID:", "", -1))
+			if err != nil {
+				log.WithError(err).Error("unable to determine tracker ID")
+				return
+			}
+			vehicle, err := u.vs.VehicleWithTrackerID(itrakID)
+			if err == shuttletracker.ErrVehicleNotFound {
+				log.Warnf("Unknown vehicle ID \"%s\" returned by iTrak. Make sure all vehicles have been added.", itrakID)
 				return
 			} else if err != nil {
 				log.WithError(err).Error("Unable to fetch vehicle.")
@@ -137,7 +147,7 @@ func (u *Updater) update() {
 			}
 
 			// determine if this is a new update from itrak by comparing timestamps
-			lastUpdate, err := u.db.GetLastUpdateForVehicle(vehicle.VehicleID)
+			lastUpdate, err := u.db.GetLastUpdateForVehicle(vehicle.ID)
 			if err != nil && err != database.ErrUpdateNotFound {
 				log.WithError(err).Error("Unable to retrieve last update.")
 				return
@@ -150,10 +160,10 @@ func (u *Updater) update() {
 					return
 				}
 			}
-			log.Debugf("Updating %s.", vehicle.VehicleName)
+			log.Debugf("Updating %s.", vehicle.Name)
 
 			// vehicle found and no error
-			route, err = u.GuessRouteForVehicle(&vehicle)
+			route, err = u.GuessRouteForVehicle(vehicle)
 			if err != nil {
 				log.WithError(err).Error("Unable to guess route for vehicle.")
 				return
@@ -199,7 +209,7 @@ func kphToMPH(kmh float64) float64 {
 
 // GuessRouteForVehicle returns a guess at what route the vehicle is on.
 // It may return an empty route if it does not believe a vehicle is on any route.
-func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Route, err error) {
+func (u *Updater) GuessRouteForVehicle(vehicle *shuttletracker.Vehicle) (route model.Route, err error) {
 	routes, err := u.db.GetRoutes()
 	if err != nil {
 		log.Error(err)
@@ -210,10 +220,10 @@ func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Rout
 		routeDistances[route.ID] = 0
 	}
 
-	updates, err := u.db.GetUpdatesForVehicleSince(vehicle.VehicleID, time.Now().Add(time.Minute*-15))
+	updates, err := u.db.GetUpdatesForVehicleSince(vehicle.ID, time.Now().Add(time.Minute*-15))
 	if len(updates) < 5 {
 		// Can't make a guess with fewer than 5 updates.
-		log.Debugf("%v has too few recent updates (%d) to guess route.", vehicle.VehicleName, len(updates))
+		log.Debugf("%v has too few recent updates (%d) to guess route.", vehicle.Name, len(updates))
 		return
 	}
 
@@ -264,7 +274,7 @@ func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Rout
 
 	// not on a route
 	if minRouteID == "" {
-		log.Debugf("%v not on route; distance from nearest: %v", vehicle.VehicleName, minDistance)
+		log.Debugf("%v not on route; distance from nearest: %v", vehicle.Name, minDistance)
 		return model.Route{}, nil
 	}
 
@@ -272,6 +282,6 @@ func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Rout
 	if err != nil {
 		return route, err
 	}
-	log.Debugf("%v on %s route.", vehicle.VehicleName, route.Name)
+	log.Debugf("%v on %s route.", vehicle.Name, route.Name)
 	return route, err
 }

@@ -5,10 +5,12 @@ package main
 import (
 	"github.com/kochman/runner"
 
+	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/api"
 	"github.com/wtg/shuttletracker/config"
 	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/log"
+	"github.com/wtg/shuttletracker/postgres"
 	"github.com/wtg/shuttletracker/updater"
 )
 
@@ -16,7 +18,7 @@ func main() {
 	Run()
 }
 
-// Run starts the shuttle tracker and blocks forever.
+// Run starts the Shuttle Tracker and blocks forever.
 func Run() {
 	log.Info("Shuttle Tracker starting...")
 
@@ -39,8 +41,16 @@ func Run() {
 		return
 	}
 
+	// Vehicle service
+	var vs shuttletracker.VehicleService
+	vs, err = postgres.NewVehicleService("postgres://localhost/shuttletracker?sslmode=disable")
+	if err != nil {
+		log.WithError(err).Error("unable to create VehicleService")
+		return
+	}
+
 	// Make shuttle position updater
-	updater, err := updater.New(*cfg.Updater, db)
+	updater, err := updater.New(*cfg.Updater, db, vs)
 	if err != nil {
 		log.WithError(err).Error("Could not create updater.")
 		return
@@ -48,7 +58,7 @@ func Run() {
 	runner.Add(updater)
 
 	// Make API server
-	api, err := api.New(*cfg.API, db)
+	api, err := api.New(*cfg.API, db, vs)
 	if err != nil {
 		log.WithError(err).Error("Could not create API server.")
 		return

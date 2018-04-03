@@ -4,9 +4,10 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	"github.com/wtg/shuttletracker/model"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+
+	"github.com/wtg/shuttletracker/model"
 )
 
 // MongoDB implements Database with—you guessed it—MongoDB.
@@ -92,7 +93,7 @@ func (m *MongoDB) DeleteRoute(routeID string) error {
 func (m *MongoDB) GetRoute(routeID string) (model.Route, error) {
 	var route model.Route
 	err := m.routes.Find(bson.M{"id": routeID}).One(&route)
-	SetRouteActiveStatus(&route,time.Now())
+	SetRouteActiveStatus(&route, time.Now())
 	return route, err
 }
 
@@ -101,7 +102,7 @@ func (m *MongoDB) GetRoutes() ([]model.Route, error) {
 	var routes []model.Route
 	err := m.routes.Find(bson.M{}).All(&routes)
 	for i := range routes {
-		SetRouteActiveStatus(&routes[i],time.Now())
+		SetRouteActiveStatus(&routes[i], time.Now())
 	}
 	return routes, err
 }
@@ -151,7 +152,7 @@ func (m *MongoDB) DeleteUpdatesBefore(before time.Time) (int, error) {
 }
 
 // GetLastUpdateForVehicle returns the latest Update for a vehicle by its ID.
-func (m *MongoDB) GetLastUpdateForVehicle(vehicleID string) (model.VehicleUpdate, error) {
+func (m *MongoDB) GetLastUpdateForVehicle(vehicleID int) (model.VehicleUpdate, error) {
 	var update model.VehicleUpdate
 	err := m.updates.Find(bson.M{"vehicleID": vehicleID}).Sort("-created").One(&update)
 	if err == mgo.ErrNotFound {
@@ -161,7 +162,7 @@ func (m *MongoDB) GetLastUpdateForVehicle(vehicleID string) (model.VehicleUpdate
 }
 
 // GetUpdatesForVehicleSince returns all updates since a time for a vehicle by its ID.
-func (m *MongoDB) GetUpdatesForVehicleSince(vehicleID string, since time.Time) ([]model.VehicleUpdate, error) {
+func (m *MongoDB) GetUpdatesForVehicleSince(vehicleID int, since time.Time) ([]model.VehicleUpdate, error) {
 	var updates []model.VehicleUpdate
 	err := m.updates.Find(bson.M{"vehicleID": vehicleID, "created": bson.M{"$gt": since}}).Sort("-created").All(&updates)
 	return updates, err
@@ -172,45 +173,6 @@ func (m *MongoDB) GetUsers() ([]model.User, error) {
 	var users []model.User
 	err := m.users.Find(bson.M{}).All(&users)
 	return users, err
-}
-
-// CreateVehicle creates a Vehicle.
-func (m *MongoDB) CreateVehicle(vehicle *model.Vehicle) error {
-	return m.vehicles.Insert(&vehicle)
-}
-
-// DeleteVehicle deletes a Vehicle by its ID.
-func (m *MongoDB) DeleteVehicle(vehicleID string) error {
-	return m.vehicles.Remove(bson.M{"vehicleID": vehicleID})
-}
-
-// GetVehicle returns a Vehicle by its ID.
-func (m *MongoDB) GetVehicle(vehicleID string) (model.Vehicle, error) {
-	var vehicle model.Vehicle
-	err := m.vehicles.Find(bson.M{"vehicleID": vehicleID}).One(&vehicle)
-	if err == mgo.ErrNotFound {
-		return vehicle, ErrVehicleNotFound
-	}
-	return vehicle, err
-}
-
-// GetVehicles returns all Vehicles.
-func (m *MongoDB) GetVehicles() ([]model.Vehicle, error) {
-	var vehicles []model.Vehicle
-	err := m.vehicles.Find(bson.M{}).All(&vehicles)
-	return vehicles, err
-}
-
-// GetEnabledVehicles returns all Vehicles that are enabled.
-func (m *MongoDB) GetEnabledVehicles() ([]model.Vehicle, error) {
-	var vehicles []model.Vehicle
-	err := m.vehicles.Find(bson.M{"enabled": true}).All(&vehicles)
-	return vehicles, err
-}
-
-// ModifyVehicle updates a Vehicle by its ID.
-func (m *MongoDB) ModifyVehicle(vehicle *model.Vehicle) error {
-	return m.vehicles.Update(bson.M{"vehicleID": vehicle.VehicleID}, vehicle)
 }
 
 // AddMessage sets the current admin message

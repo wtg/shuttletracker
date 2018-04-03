@@ -3,7 +3,12 @@ package model
 
 import (
 	"time"
+
+	"github.com/wtg/shuttletracker"
 )
+
+// Vehicle is a temporary type alias during refactoring
+type Vehicle = shuttletracker.Vehicle
 
 // VehicleUpdate represents a single position observed for a Vehicle.
 type VehicleUpdate struct {
@@ -18,15 +23,6 @@ type VehicleUpdate struct {
 	Status    string    `json:"status"      bson:"status"`
 	Created   time.Time `json:"created"     bson:"created"`
 	Route     string    `json:"RouteID"     bson:"routeID"`
-}
-
-// Vehicle represents an object being tracked.
-type Vehicle struct {
-	VehicleID   string    `json:"vehicleID"   bson:"vehicleID,omitempty"`
-	VehicleName string    `json:"vehicleName" bson:"vehicleName"`
-	Created     time.Time `bson:"created"`
-	Updated     time.Time `bson:"updated"`
-	Enabled     bool      `json:"enabled"     bson:"enabled"`
 }
 
 // Status contains a detailed message on the tracked object's status.
