@@ -5,7 +5,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/database"
+	"github.com/wtg/shuttletracker/mock"
 	"github.com/wtg/shuttletracker/model"
 )
 
@@ -26,7 +28,10 @@ func TestVehiclesHandler(t *testing.T) {
 		db := &database.Mock{}
 		db.On("GetVehicles").Return([]model.Vehicle{}, nil)
 
-		api, err := New(cfg, db)
+		vs := &mock.VehicleService{}
+		vs.On("Vehicles").Return([]*shuttletracker.Vehicle{}, nil)
+
+		api, err := New(cfg, db, vs)
 		if err != nil {
 			t.Errorf("got error '%s', expected nil", err)
 			return
@@ -53,5 +58,8 @@ func TestVehiclesHandler(t *testing.T) {
 			t.Logf("%+v", resp)
 			t.Errorf("%s %s returned status code %d, expected 200", c.method, url, resp.StatusCode)
 		}
+
+		vs.AssertExpectations(t)
+		vs.AssertNumberOfCalls(t, "Vehicles", 1)
 	}
 }
