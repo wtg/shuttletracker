@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	_ "github.com/lib/pq"
+
 	"github.com/wtg/shuttletracker"
 )
 
