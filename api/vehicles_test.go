@@ -6,60 +6,31 @@ import (
 	"testing"
 
 	"github.com/wtg/shuttletracker"
-	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/mock"
-	"github.com/wtg/shuttletracker/model"
 )
 
-func TestVehiclesHandler(t *testing.T) {
-	type testCase struct {
-		method string
-		path   string
-	}
-	cases := []testCase{
-		{
-			method: "GET",
-			path:   "/vehicles",
-		},
+func TestVehiclesHandlerNoVehicles(t *testing.T) {
+	vs := &mock.VehicleService{}
+	vs.On("Vehicles").Return([]*shuttletracker.Vehicle{}, nil)
+
+	api := API{
+		vs: vs,
 	}
 
-	for _, c := range cases {
-		cfg := Config{}
-		db := &database.Mock{}
-		db.On("GetVehicles").Return([]model.Vehicle{}, nil)
-
-		vs := &mock.VehicleService{}
-		vs.On("Vehicles").Return([]*shuttletracker.Vehicle{}, nil)
-
-		api, err := New(cfg, db, vs)
-		if err != nil {
-			t.Errorf("got error '%s', expected nil", err)
-			return
-		}
-
-		server := httptest.NewServer(api.handler)
-		defer server.Close()
-		client := http.Client{}
-
-		url := server.URL + c.path
-		req, err := http.NewRequest(c.method, url, nil)
-		if err != nil {
-			t.Errorf("unable to create HTTP request: %s", err)
-			continue
-		}
-		resp, err := client.Do(req)
-		if err != nil {
-			t.Errorf("unable to do request: %s", err)
-			continue
-		}
-
-		if resp.StatusCode != 200 {
-			t.Logf("%+v", req)
-			t.Logf("%+v", resp)
-			t.Errorf("%s %s returned status code %d, expected 200", c.method, url, resp.StatusCode)
-		}
-
-		vs.AssertExpectations(t)
-		vs.AssertNumberOfCalls(t, "Vehicles", 1)
+	w := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "", nil)
+	if err != nil {
+		t.Errorf("unable to create HTTP request: %s", err)
+		return
 	}
+
+	api.VehiclesHandler(w, req)
+	resp := w.Result()
+
+	if resp.StatusCode != 200 {
+		t.Errorf("got status code %d, expected 200", resp.StatusCode)
+	}
+
+	vs.AssertExpectations(t)
+	vs.AssertNumberOfCalls(t, "Vehicles", 1)
 }
