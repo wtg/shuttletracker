@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/mock"
@@ -156,4 +157,65 @@ func TestVehiclesCreateHandler(t *testing.T) {
 
 	vs.AssertExpectations(t)
 	vs.AssertNumberOfCalls(t, "CreateVehicle", 1)
+}
+
+func TestVehiclesEditHandler(t *testing.T) {
+	vs := &mock.VehicleService{}
+	vehicleTime := time.Now()
+	existingVehicle := &shuttletracker.Vehicle{
+		ID:        4,
+		Name:      "Vehicle 2",
+		Enabled:   true,
+		TrackerID: 2,
+		Created:   vehicleTime,
+	}
+	changedVehicle := &shuttletracker.Vehicle{
+		ID:        4,
+		Name:      "Vehicle 2 changed",
+		Enabled:   false,
+		TrackerID: 3,
+		Created:   vehicleTime,
+	}
+	vs.On("Vehicle", 4).Return(existingVehicle, nil)
+	// TODO: this is REALLY DUMB and doesn't actually check that the changes were persisted
+	vs.On("ModifyVehicle", "mock.Anything").Return(nil)
+
+	api := API{
+		vs: vs,
+	}
+
+	body := &bytes.Buffer{}
+	enc := json.NewEncoder(body)
+	err := enc.Encode(changedVehicle)
+	if err != nil {
+		t.Errorf("unexpected error: %s", err)
+		return
+	}
+
+	req, err := http.NewRequest("POST", "", body)
+	if err != nil {
+		t.Errorf("unable to create HTTP request: %s", err)
+		return
+	}
+
+	w := httptest.NewRecorder()
+	api.VehiclesEditHandler(w, req)
+	resp := w.Result()
+
+	if resp.StatusCode != 200 {
+		t.Errorf("got status code %d, expected 200", resp.StatusCode)
+	}
+
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Errorf("unexpected error: %s", err)
+		return
+	}
+	if len(respBody) != 0 {
+		t.Errorf("got body length %d, expected 0", len(respBody))
+	}
+
+	vs.AssertExpectations(t)
+	vs.AssertNumberOfCalls(t, "Vehicle", 1)
+	vs.AssertNumberOfCalls(t, "ModifyVehicle", 1)
 }

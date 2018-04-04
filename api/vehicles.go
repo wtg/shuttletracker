@@ -65,6 +65,7 @@ func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
 
 	name := vehicle.Name
 	enabled := vehicle.Enabled
+	trackerID := vehicle.TrackerID
 
 	vehicle, err = api.vs.Vehicle(vehicle.ID)
 	if err != nil {
@@ -73,6 +74,7 @@ func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	vehicle.Name = name
 	vehicle.Enabled = enabled
+	vehicle.TrackerID = trackerID
 	vehicle.Updated = time.Now()
 
 	err = api.vs.ModifyVehicle(vehicle)
