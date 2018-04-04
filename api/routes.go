@@ -37,7 +37,10 @@ func (api *API) StopsHandler(w http.ResponseWriter, r *http.Request) {
 func combineCoords(coordsData *[]map[string]float64) []model.Coord {
 	coords := []model.Coord{}
 	for _, c := range *coordsData {
-		coord := model.Coord{c["lat"], c["lng"]}
+		coord := model.Coord{
+			Lat: c["lat"],
+			Lng: c["lng"],
+		}
 		coords = append(coords, coord)
 	}
 	return coords
