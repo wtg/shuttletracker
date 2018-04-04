@@ -128,8 +128,8 @@ func (db *Mock) GetUsers() ([]model.User, error) {
 }
 
 // UserExists gets all users.
-func (db *Mock) UserExists() (bool, error) {
-	args := db.Called()
+func (db *Mock) UserExists(uname string) (bool, error) {
+	args := db.Called(uname)
 	return args.Get(0).(bool), args.Error(1)
 }
 
