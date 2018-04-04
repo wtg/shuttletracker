@@ -171,8 +171,10 @@ func (api *API) AdminHandler(w http.ResponseWriter, r *http.Request) {
 
 //KeyHandler sends Mapbox api key to authenticated user
 func (api *API) KeyHandler(w http.ResponseWriter, r *http.Request) {
-	WriteJSON(w, api.cfg.MapboxAPIKey)
-
+	err := WriteJSON(w, api.cfg.MapboxAPIKey)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func (api *API) AdminLogout(w http.ResponseWriter, r *http.Request) {
