@@ -21,6 +21,7 @@ func (cli *casClient) casauth(next http.Handler) http.Handler {
 	return cli.cas.HandleFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		if !cas.IsAuthenticated(r) {
+			w.Write([]byte("redirecting to cas;"))
 			cas.RedirectToLogin(w, r)
 		} else {
 			auth, err := cli.db.UserExists(strings.ToLower(cas.Username(r)))
