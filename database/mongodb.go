@@ -243,7 +243,7 @@ func (m *MongoDB) GetMessages() ([]model.AdminMessage, error) {
 
 // UserExists tests if a given user exists in the admin database
 func (m *MongoDB) UserExists(uname string) (bool, error) {
-	query := m.users.Find(bson.M{"name": uname})
+	query := m.users.Find(bson.M{"username": uname})
 	n, err := query.Count()
 	if n == 1 {
 		return true, err
