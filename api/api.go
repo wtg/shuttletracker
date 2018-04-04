@@ -119,6 +119,7 @@ func New(cfg Config, db database.Database) (*API, error) {
 		r.Get("/logout", cli.logout)
 
 	})
+
 	r.Group(func(r chi.Router) {
 		r.Use(cli.casauth)
 
@@ -163,6 +164,7 @@ func (api *API) AdminHandler(w http.ResponseWriter, r *http.Request) {
 	if len(id["ticket"]) != 0 {
 		http.Redirect(w, r, "/admin", 301)
 	}
+	w.Header().Set("Cache-Control", "no-cache")
 	http.ServeFile(w, r, "admin.html")
 
 }
