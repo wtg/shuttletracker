@@ -177,7 +177,9 @@ func TestVehiclesEditHandler(t *testing.T) {
 		Created:   vehicleTime,
 	}
 	vs.On("Vehicle", 4).Return(existingVehicle, nil)
-	// TODO: this is REALLY DUMB and doesn't actually check that the changes were persisted
+
+	// Because the handler sets the Updated field to time.Now(), we have to accept everything
+	// here and then check later that the method actually got the struct with fields we expected.
 	vs.On("ModifyVehicle", "mock.Anything").Return(nil)
 
 	api := API{
@@ -218,4 +220,34 @@ func TestVehiclesEditHandler(t *testing.T) {
 	vs.AssertExpectations(t)
 	vs.AssertNumberOfCalls(t, "Vehicle", 1)
 	vs.AssertNumberOfCalls(t, "ModifyVehicle", 1)
+
+	for _, call := range vs.Calls {
+		if call.Method == "ModifyVehicle" {
+			if len(call.Arguments) != 1 {
+				t.Errorf("got %d arguments, expected 1", len(call.Arguments))
+				continue
+			}
+			argVehicle, ok := call.Arguments[0].(*shuttletracker.Vehicle)
+			if !ok {
+				t.Error("expected ModifyVehicle to be called with *Vehicle argument")
+			}
+
+			if argVehicle.Created != changedVehicle.Created {
+				t.Error("got unexpected vehicle.Created value")
+			}
+			if argVehicle.Name != changedVehicle.Name {
+				t.Error("got unexpected vehicle.Name value")
+			}
+			if argVehicle.TrackerID != changedVehicle.TrackerID {
+				t.Error("got unexpected vehicle.TrackerID value")
+			}
+			if argVehicle.ID != changedVehicle.ID {
+				t.Error("got unexpected vehicle.ID value")
+			}
+			if argVehicle.Enabled != changedVehicle.Enabled {
+				t.Error("got unexpected vehicle.Enabled value")
+			}
+			break
+		}
+	}
 }
