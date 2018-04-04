@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -32,6 +33,18 @@ func TestVehiclesHandlerNoVehicles(t *testing.T) {
 	}
 	if resp.Header.Get("Content-Type") != "application/json" {
 		t.Errorf("got Content-Type \"%s\", expected \"application/json\"", resp.Header.Get("Content-Type"))
+	}
+
+	var returnedVehicles []*shuttletracker.Vehicle
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&returnedVehicles)
+	if err != nil {
+		t.Errorf("unexpected error: %s", err)
+		return
+	}
+
+	if len(returnedVehicles) != 0 {
+		t.Errorf("got %d vehicles, expected 0", len(returnedVehicles))
 	}
 
 	vs.AssertExpectations(t)
