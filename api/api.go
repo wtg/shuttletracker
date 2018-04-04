@@ -71,7 +71,7 @@ func New(cfg Config, db database.Database, vs shuttletracker.VehicleService) (*A
 		r.Get("/", api.VehiclesHandler)
 		r.Method("POST", "/create", api.CasAUTH.HandleFunc(api.VehiclesCreateHandler))
 		r.Method("POST", "/edit", api.CasAUTH.HandleFunc(api.VehiclesEditHandler))
-		r.Method("DELETE", "/{id:[0-9]+}", api.CasAUTH.HandleFunc(api.VehiclesDeleteHandler))
+		r.Method("DELETE", "/", api.CasAUTH.HandleFunc(api.VehiclesDeleteHandler))
 	})
 
 	// Updates

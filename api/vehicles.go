@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/go-chi/chi"
 	"gopkg.in/cas.v1"
 
 	"github.com/wtg/shuttletracker/log"
@@ -88,7 +87,8 @@ func (api *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
 		return
 	}
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

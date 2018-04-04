@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 	"time"
 
@@ -250,4 +251,40 @@ func TestVehiclesEditHandler(t *testing.T) {
 			break
 		}
 	}
+}
+
+func TestVehiclesDeleteHandler(t *testing.T) {
+	vs := &mock.VehicleService{}
+	vehicleID := 7
+	vs.On("DeleteVehicle", vehicleID).Return(nil)
+
+	api := API{
+		vs: vs,
+	}
+
+	req, err := http.NewRequest("DELETE", "/?id="+strconv.Itoa(vehicleID), nil)
+	if err != nil {
+		t.Errorf("unable to create HTTP request: %s", err)
+		return
+	}
+
+	w := httptest.NewRecorder()
+	api.VehiclesDeleteHandler(w, req)
+	resp := w.Result()
+
+	if resp.StatusCode != 200 {
+		t.Errorf("got status code %d, expected 200", resp.StatusCode)
+	}
+
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Errorf("unexpected error: %s", err)
+		return
+	}
+	if len(respBody) != 0 {
+		t.Errorf("got body length %d, expected 0", len(respBody))
+	}
+
+	vs.AssertExpectations(t)
+	vs.AssertNumberOfCalls(t, "DeleteVehicle", 1)
 }
