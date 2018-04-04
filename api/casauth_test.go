@@ -52,3 +52,48 @@ func TestCasUnauthenticated(t *testing.T) {
 	}
 
 }
+
+func TestInvalidTicket(t *testing.T) {
+
+	r := chi.NewRouter()
+
+	ts := httptest.NewServer(r)
+	defer ts.Close()
+
+	url, _ := url.Parse(ts.URL)
+  store := cas.MemoryStore{}
+  store.Write("ticket",&cas.AuthenticationResponse{
+    User: "lyonj4",
+  })
+	client := cas.NewClient(&cas.Options{
+		URL: url,
+    Store: &store,
+	})
+	db := &database.Mock{}
+	httpcli := http.Client{}
+	cli := casClient{
+		cas: client,
+		db:  db,
+	}
+	r.Use(cli.casauth)
+
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("test"))
+	})
+
+	req, err := http.NewRequest("GET", ts.URL + "/ticket=ticket", nil)
+
+	if err != nil {
+		t.Error(err)
+	}
+	resp, err := httpcli.Do(req)
+	if err != nil {
+		t.Error(err)
+	}
+  body, _ := ioutil.ReadAll(resp.Body)
+  bodyString := string(body)
+
+  if strings.Split(bodyString, ";")[0] != "redirecting to cas" {
+    t.Errorf("Received an unexpected response from casauth")
+  }
+}
