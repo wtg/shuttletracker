@@ -2,9 +2,11 @@ package api
 
 import (
 	"github.com/go-chi/chi"
+  gc "gopkg.in/cas.v2"
+
+	"github.com/wtg/shuttletracker/cas"
 	"github.com/wtg/shuttletracker/database"
 
-	"gopkg.in/cas.v2"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -15,13 +17,16 @@ import (
 
 func TestCasUnauthenticated(t *testing.T) {
 	url, _ := url.Parse("https://cas.example.com/")
-	client := cas.NewClient(&cas.Options{
+	c := gc.NewClient(&gc.Options{
 		URL: url,
 	})
+	client := cas.Gocas{
+		Cas: c,
+	}
 	db := &database.Mock{}
 	httpcli := http.Client{}
 	cli := casClient{
-		cas: client,
+		cas: &client,
 		db:  db,
 	}
 
@@ -51,49 +56,4 @@ func TestCasUnauthenticated(t *testing.T) {
 		t.Errorf("Received an unexpected response from casauth")
 	}
 
-}
-
-func TestInvalidTicket(t *testing.T) {
-
-	r := chi.NewRouter()
-
-	ts := httptest.NewServer(r)
-	defer ts.Close()
-
-	url, _ := url.Parse(ts.URL)
-  store := cas.MemoryStore{}
-  store.Write("ticket",&cas.AuthenticationResponse{
-    User: "lyonj4",
-  })
-	client := cas.NewClient(&cas.Options{
-		URL: url,
-    Store: &store,
-	})
-	db := &database.Mock{}
-	httpcli := http.Client{}
-	cli := casClient{
-		cas: client,
-		db:  db,
-	}
-	r.Use(cli.casauth)
-
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("test"))
-	})
-
-	req, err := http.NewRequest("GET", ts.URL + "/ticket=ticket", nil)
-
-	if err != nil {
-		t.Error(err)
-	}
-	resp, err := httpcli.Do(req)
-	if err != nil {
-		t.Error(err)
-	}
-  body, _ := ioutil.ReadAll(resp.Body)
-  bodyString := string(body)
-
-  if strings.Split(bodyString, ";")[0] != "redirecting to cas" {
-    t.Errorf("Received an unexpected response from casauth")
-  }
 }

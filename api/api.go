@@ -2,7 +2,8 @@ package api
 
 import (
 	"encoding/json"
-	"gopkg.in/cas.v2"
+	gc "gopkg.in/cas.v2"
+
 	"net/http"
 	"net/url"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/spf13/viper"
 
+	"github.com/wtg/shuttletracker/cas"
 	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/log"
 )
@@ -47,7 +49,7 @@ func New(cfg Config, db database.Database) (*API, error) {
 	}
 
 	r := chi.NewRouter()
-	client := cas.NewClient(&cas.Options{
+	client := gc.NewClient(&gc.Options{
 		URL:   url,
 		Store: nil,
 	})
@@ -56,8 +58,10 @@ func New(cfg Config, db database.Database) (*API, error) {
 	r.Use(etag)
 
 	cli := casClient{
-		cas: client,
-		db:  api.db,
+		cas: &cas.Gocas{
+			Cas: client,
+		},
+		db: api.db,
 	}
 
 	// Vehicles
