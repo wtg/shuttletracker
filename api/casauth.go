@@ -25,13 +25,15 @@ func (cli *casClient) casauth(next http.Handler) http.Handler {
 		} else {
 			auth, err := cli.db.UserExists(strings.ToLower(cas.Username(r)))
 			if err != nil {
-				cas.RedirectToLogout(w, r)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				auth = false
 			}
 			if auth {
 				next.ServeHTTP(w, r)
 				return
 			}
-			cas.RedirectToLogout(w, r)
+			http.Error(w, "unauthenticated", 401)
+
 		}
 
 	})

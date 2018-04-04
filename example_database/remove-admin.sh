@@ -1,5 +1,5 @@
 #! /bin/bash
 mongo << EOF
-db.users.remove( {'name': "$1"} );
+db.users.remove( {'username': "$1"} );
 quit()
 EOF
