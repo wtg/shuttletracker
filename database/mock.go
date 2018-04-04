@@ -127,6 +127,12 @@ func (db *Mock) GetUsers() ([]model.User, error) {
 	return args.Get(0).([]model.User), args.Error(1)
 }
 
+// UserExists gets all users.
+func (db *Mock) UserExists() (bool, error) {
+	args := db.Called()
+	return args.Get(0).(bool), args.Error(1)
+}
+
 // AddMessage adds a message.
 func (db *Mock) AddMessage(message *model.AdminMessage) error {
 	args := db.Called(message)
