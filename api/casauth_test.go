@@ -8,7 +8,6 @@ import (
 	"github.com/wtg/shuttletracker/database"
 
 	"io/ioutil"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
