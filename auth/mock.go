@@ -23,7 +23,7 @@ func (auth *Mock) Logout(w http.ResponseWriter, r *http.Request) {
 
 // Login writes login to the ResponseWriter
 func (auth *Mock) Login(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("logout"))
+	w.Write([]byte("login"))
 
 }
 
