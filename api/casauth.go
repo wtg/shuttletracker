@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/wtg/shuttletracker/cas"
+	"github.com/wtg/shuttletracker/auth"
 	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/log"
 
@@ -11,7 +11,7 @@ import (
 
 // casClient stores the local cas client and an instance of the database
 type casClient struct {
-	cas cas.Cas
+	cas auth.AuthenticationService
 	db  database.Database
 }
 

@@ -11,7 +11,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/spf13/viper"
 
-	"github.com/wtg/shuttletracker/cas"
+	"github.com/wtg/shuttletracker/auth"
 	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/log"
 )
@@ -58,8 +58,8 @@ func New(cfg Config, db database.Database) (*API, error) {
 	r.Use(etag)
 
 	cli := casClient{
-		cas: &cas.Gocas{
-			Cas: client,
+		cas: &auth.CAS{
+			CAS: client,
 		},
 		db: api.db,
 	}
