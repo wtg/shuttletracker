@@ -32,6 +32,7 @@ func (auth *Mock) Username(request *http.Request) string {
 	return "lyonj4"
 }
 
+// HandleFunc returns an http handler for the request
 func (auth *Mock) HandleFunc(f func(http.ResponseWriter, *http.Request)) http.Handler {
 	return http.HandlerFunc(f)
 }
