@@ -70,23 +70,25 @@ func (exp *Exporter) Export(dest string) {
     log.WithError(err)
   }
 }
-// 
-// func Main() {
-// 	log.Info("Shuttle Tracker starting...")
-//
-// 	// Config
-// 	cfg, err := config.New()
-// 	if err != nil {
-// 		log.WithError(err).Error("Could not create config.")
-// 		return
-// 	}
-// 	// Database
-// 	db, err := database.NewMongoDB(*cfg.Database)
-// 	if err != nil {
-// 		log.WithError(err).Errorf("MongoDB connection to \"%v\" failed.", cfg.Database.MongoURL)
-// 		return
-// 	}
-// 	e := Exporter{db}
-// 	e.Export("dump.json")
-//
-// }
+
+func Main() {
+	log.Info("Exporter starting...")
+
+	// Config
+	cfg, err := config.New()
+	if err != nil {
+		log.WithError(err).Error("Could not create config.")
+		return
+	}
+	// Database
+	db, err := database.NewMongoDB(*cfg.Database)
+	if err != nil {
+		log.WithError(err).Errorf("MongoDB connection to \"%v\" failed.", cfg.Database.MongoURL)
+		return
+	}
+	e := Exporter{db}
+	e.Export("dump.json")
+  log.Info("Done")
+
+
+}
