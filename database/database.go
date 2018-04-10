@@ -70,6 +70,7 @@ type Database interface {
 
 	// Users
 	GetUsers() ([]model.User, error)
+	CreateUser(user *model.User) error
 
 	//Messages
 	AddMessage(message *model.AdminMessage) error
