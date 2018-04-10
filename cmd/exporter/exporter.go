@@ -12,16 +12,18 @@ import (
 	"os"
 )
 
+// Exporter contains the database (implements the database interface) to import/export from
 type Exporter struct {
 	db database.Database
 }
 
+// Dump represents all of the types in the database excluding updates
 type Dump struct {
 	Routes   []model.Route        `json:"routes"`
 	Stops    []model.Stop         `json:"stops"`
 	Vehicles []model.Vehicle      `json:"vehicles"`
-	Users    []model.User         `json:users`
-	Messages []model.AdminMessage `json:messages`
+	Users    []model.User         `json:"users"`
+	Messages []model.AdminMessage `json:"messages"`
 }
 
 func (exp *Exporter) write(d Dump) {
