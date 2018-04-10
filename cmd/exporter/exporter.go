@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 
 	"fmt"
-	"github.com/wtg/shuttletracker/config"
 	"github.com/wtg/shuttletracker/log"
 	"os"
 )
