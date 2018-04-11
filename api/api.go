@@ -51,8 +51,8 @@ func New(cfg Config, db database.Database) (*API, error) {
 	r.Use(middleware.DefaultCompress)
 	r.Use(etag)
 
-	cli := casClient{}
-	CreateCasClient(url, db)
+
+	cli := CreateCasClient(url, db)
 
 	// Vehicles
 	r.Route("/vehicles", func(r chi.Router) {
