@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/go-chi/chi"
-	gc "gopkg.in/cas.v2"
 
 	"github.com/wtg/shuttletracker/auth"
 	"github.com/wtg/shuttletracker/database"
@@ -17,18 +16,11 @@ import (
 
 func TestCasUnauthenticated(t *testing.T) {
 	url, _ := url.Parse("https://cas.example.com/")
-	c := gc.NewClient(&gc.Options{
-		URL: url,
-	})
-	client := auth.CAS{
-		CAS: c,
-	}
+
 	db := &database.Mock{}
+
+	cli := CreateCasClient(url,db)
 	httpcli := http.Client{}
-	cli := casClient{
-		cas: &client,
-		db:  db,
-	}
 
 	r := chi.NewRouter()
 	r.Use(cli.casauth)
@@ -63,10 +55,8 @@ func TestCasAuthenticated(t *testing.T) {
 	client := &auth.Mock{}
 	db := &database.Mock{}
 	httpcli := http.Client{}
-	cli := casClient{
-		cas: client,
-		db:  db,
-	}
+
+	cli := Clone(client,db)
 	r := chi.NewRouter()
 	r.Use(cli.casauth)
 
@@ -75,6 +65,7 @@ func TestCasAuthenticated(t *testing.T) {
 	})
 	db.On("UserExists", "lyonj4").Return(true, nil)
 
+
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
@@ -82,6 +73,7 @@ func TestCasAuthenticated(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error creating http request")
 	}
+	// db.AssertExpectations(t)
 	resp, err := httpcli.Do(req)
 	if err != nil {
 		t.Errorf("Error performing http request")
@@ -103,10 +95,8 @@ func TestCasAuthenticatedBadUser(t *testing.T) {
 	client := &auth.Mock{}
 	db := &database.Mock{}
 	httpcli := http.Client{}
-	cli := casClient{
-		cas: client,
-		db:  db,
-	}
+	cli := Clone(client,db)
+
 	r := chi.NewRouter()
 	r.Use(cli.casauth)
 

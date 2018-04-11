@@ -18,18 +18,28 @@ type casClient struct {
 	db  database.Database
 }
 
-func (cli *casClient) create(url *url.URL, db *database.Database) {
+func CreateCasClient(url *url.URL, db database.Database) (*casClient){
 	client := gc.NewClient(&gc.Options{
 		URL:   url,
 		Store: nil,
 	})
 
-	cli = &casClient{
+	cli := &casClient{
 		cas: &auth.CAS{
 			CAS: client,
 		},
-		db: *db,
+		db: db,
 	}
+	return cli
+}
+
+func Clone(cli auth.AuthenticationService, db database.Database) (*casClient){
+
+	c:= &casClient{
+		cas: cli,
+		db: db,
+	}
+	return c
 }
 
 func (cli *casClient) logout(w http.ResponseWriter, r *http.Request) {
