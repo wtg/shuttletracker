@@ -2,9 +2,8 @@ package auth
 
 import (
 	"github.com/stretchr/testify/mock"
+	"github.com/wtg/shuttletracker/log"
 	"net/http"
-  "github.com/wtg/shuttletracker/log"
-
 )
 
 // Mock implements the auth interface.
@@ -19,19 +18,19 @@ func (auth *Mock) Authenticated(request *http.Request) bool {
 
 // Logout writes logout to the ResponseWriter
 func (auth *Mock) Logout(w http.ResponseWriter, r *http.Request) {
-	_,err:= w.Write([]byte("logout"))
-  if(err != nil){
-    log.WithError(err)
-  }
+	_, err := w.Write([]byte("logout"))
+	if err != nil {
+		log.WithError(err)
+	}
 
 }
 
 // Login writes login to the ResponseWriter
 func (auth *Mock) Login(w http.ResponseWriter, r *http.Request) {
-	_,err := w.Write([]byte("login"))
-  if(err != nil){
-    log.WithError(err)
-  }
+	_, err := w.Write([]byte("login"))
+	if err != nil {
+		log.WithError(err)
+	}
 }
 
 // Username returns the mock response to the server

@@ -21,7 +21,7 @@ func TestCasUnauthenticated(t *testing.T) {
 		URL: url,
 	})
 	client := auth.CAS{
-		CAS : c,
+		CAS: c,
 	}
 	db := &database.Mock{}
 	httpcli := http.Client{}
@@ -73,7 +73,7 @@ func TestCasAuthenticated(t *testing.T) {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("test"))
 	})
-	db.On("UserExists","lyonj4").Return(true,nil)
+	db.On("UserExists", "lyonj4").Return(true, nil)
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()
@@ -89,7 +89,7 @@ func TestCasAuthenticated(t *testing.T) {
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
 	bodyString := string(bodyBytes)
 
-	if (bodyString != "test"){
+	if bodyString != "test" {
 		t.Errorf("Response did not come through, authenticaiton failure")
 	}
 	_ = req
@@ -113,7 +113,7 @@ func TestCasAuthenticatedBadUser(t *testing.T) {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("test"))
 	})
-	db.On("UserExists","lyonj4").Return(false,nil)
+	db.On("UserExists", "lyonj4").Return(false, nil)
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()
@@ -128,7 +128,7 @@ func TestCasAuthenticatedBadUser(t *testing.T) {
 	}
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
 	bodyString := string(bodyBytes)
-	if (bodyString != "unauthenticated\n"){
+	if bodyString != "unauthenticated\n" {
 		t.Errorf("Response should be unauthenticated")
 	}
 	_ = req

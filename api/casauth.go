@@ -4,6 +4,9 @@ import (
 	"github.com/wtg/shuttletracker/auth"
 	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/log"
+	"net/url"
+
+	gc "gopkg.in/cas.v2"
 
 	"net/http"
 	"strings"
@@ -13,6 +16,20 @@ import (
 type casClient struct {
 	cas auth.AuthenticationService
 	db  database.Database
+}
+
+func (cli *casClient) create(url *url.URL, db *database.Database) {
+	client := gc.NewClient(&gc.Options{
+		URL:   url,
+		Store: nil,
+	})
+
+	cli = &casClient{
+		cas: &auth.CAS{
+			CAS: client,
+		},
+		db: *db,
+	}
 }
 
 func (cli *casClient) logout(w http.ResponseWriter, r *http.Request) {
