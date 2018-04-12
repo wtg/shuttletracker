@@ -18,6 +18,7 @@ type CasClient struct {
 	db  database.Database
 }
 
+// CreateCasClient creates an authentication service CasClient using a cas url and database
 func CreateCasClient(url *url.URL, db database.Database) (*CasClient){
 	client := gc.NewClient(&gc.Options{
 		URL:   url,
@@ -33,7 +34,8 @@ func CreateCasClient(url *url.URL, db database.Database) (*CasClient){
 	return cli
 }
 
-func Clone(cli auth.AuthenticationService, db database.Database) (*CasClient){
+// InjectMocks allows mock interfaces to be used
+func InjectMocks(cli auth.AuthenticationService, db database.Database) (*CasClient){
 
 	c:= &CasClient{
 		cas: cli,

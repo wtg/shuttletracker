@@ -56,7 +56,7 @@ func TestCasAuthenticated(t *testing.T) {
 	db := &database.Mock{}
 	httpcli := http.Client{}
 
-	cli := Clone(client,db)
+	cli := InjectMocks(client,db)
 	r := chi.NewRouter()
 	r.Use(cli.casauth)
 
@@ -73,7 +73,6 @@ func TestCasAuthenticated(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error creating http request")
 	}
-	// db.AssertExpectations(t)
 	resp, err := httpcli.Do(req)
 	if err != nil {
 		t.Errorf("Error performing http request")
@@ -84,6 +83,7 @@ func TestCasAuthenticated(t *testing.T) {
 	if bodyString != "test" {
 		t.Errorf("Response did not come through, authenticaiton failure")
 	}
+	db.AssertExpectations(t)
 	_ = req
 	_ = httpcli
 	_ = resp
@@ -95,7 +95,7 @@ func TestCasAuthenticatedBadUser(t *testing.T) {
 	client := &auth.Mock{}
 	db := &database.Mock{}
 	httpcli := http.Client{}
-	cli := Clone(client,db)
+	cli := InjectMocks(client,db)
 
 	r := chi.NewRouter()
 	r.Use(cli.casauth)
@@ -121,6 +121,8 @@ func TestCasAuthenticatedBadUser(t *testing.T) {
 	if bodyString != "unauthenticated\n" {
 		t.Errorf("Response should be unauthenticated")
 	}
+	db.AssertExpectations(t)
+
 	_ = req
 	_ = httpcli
 	_ = resp
