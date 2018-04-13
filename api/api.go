@@ -52,7 +52,7 @@ func New(cfg Config, db database.Database) (*API, error) {
 	r.Use(etag)
 
 
-	cli := CreateCasClient(url, db)
+	cli := CreateCASClient(url, db)
 
 	// Vehicles
 	r.Route("/vehicles", func(r chi.Router) {

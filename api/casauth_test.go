@@ -19,7 +19,7 @@ func TestCasUnauthenticated(t *testing.T) {
 
 	db := &database.Mock{}
 
-	cli := CreateCasClient(url,db)
+	cli := CreateCASClient(url,db)
 	httpcli := http.Client{}
 
 	r := chi.NewRouter()
