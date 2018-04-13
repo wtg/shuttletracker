@@ -3,12 +3,12 @@
 package main
 
 import (
-	"github.com/wtg/shuttletracker/cmd/shuttletracker"
-	// "github.com/wtg/shuttletracker/cmd/exporter"
+	// "github.com/wtg/shuttletracker/cmd/shuttletracker"
+	"github.com/wtg/shuttletracker/cmd/exporter"
 
 )
 
 func main() {
-	shuttletracker.Run()
-	// exporter.Export()
+	// shuttletracker.Run()
+	exporter.Run("dump.json")
 }

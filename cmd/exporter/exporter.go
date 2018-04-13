@@ -2,8 +2,10 @@ package exporter
 
 import (
 	"encoding/json"
+	"github.com/wtg/shuttletracker/config"
 	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/model"
+
 	"io/ioutil"
 
 	"fmt"
@@ -63,6 +65,46 @@ func (exp *Exporter) write(d Dump) {
 	}
 }
 
+func (exp *Exporter) read() (*Dump, error) {
+	dump := &Dump{}
+
+	routes, err := exp.db.GetRoutes()
+	if err != nil {
+		log.WithError(err)
+		return nil, err
+	}
+	dump.Routes = routes
+
+	stops, err := exp.db.GetStops()
+	if err != nil {
+		log.WithError(err)
+		return nil, err
+	}
+	dump.Stops = stops
+
+	vehicles, err := exp.db.GetVehicles()
+	if err != nil {
+		log.WithError(err)
+		return nil, err
+	}
+	dump.Vehicles = vehicles
+
+	users, err := exp.db.GetUsers()
+	if err != nil {
+		log.WithError(err)
+		return nil, err
+	}
+	dump.Users = users
+
+	messages, err := exp.db.GetMessages()
+	if err != nil {
+		log.WithError(err)
+		return nil, err
+	}
+	dump.Messages = messages
+	return dump, nil
+}
+
 // Import imports the database from a given file, it assumes the database is empty
 func (exp *Exporter) Import(file string) {
 	d := Dump{}
@@ -76,45 +118,34 @@ func (exp *Exporter) Import(file string) {
 	exp.write(d)
 }
 
+// Run writes a mongo database dump to a given file
+func Run(dest string) {
+	log.Info("Exporter starting...")
+
+	// Config
+	cfg, err := config.New()
+	if err != nil {
+		log.WithError(err).Error("Could not create config.")
+		return
+	}
+
+	// Database
+	db, err := database.NewMongoDB(*cfg.Database)
+	if err != nil {
+		log.WithError(err).Errorf("MongoDB connection to \"%v\" failed.", cfg.Database.MongoURL)
+		return
+	}
+
+	e := &Exporter{
+		db: db,
+	}
+	e.Export(dest)
+	log.Info("Done")
+}
+
 // Export exports the database to the given file as a json
 func (exp *Exporter) Export(dest string) {
-	dump := Dump{}
-
-	routes, err := exp.db.GetRoutes()
-	if err != nil {
-		log.WithError(err)
-		return
-	}
-	dump.Routes = routes
-
-	stops, err := exp.db.GetStops()
-	if err != nil {
-		log.WithError(err)
-		return
-	}
-	dump.Stops = stops
-
-	vehicles, err := exp.db.GetVehicles()
-	if err != nil {
-		log.WithError(err)
-		return
-	}
-	dump.Vehicles = vehicles
-
-	users, err := exp.db.GetUsers()
-	if err != nil {
-		log.WithError(err)
-		return
-	}
-	dump.Users = users
-
-	messages, err := exp.db.GetMessages()
-	if err != nil {
-		log.WithError(err)
-		return
-	}
-	dump.Messages = messages
-
+	dump, err := exp.read()
 	out, err := json.Marshal(dump)
 	if err != nil {
 		log.WithError(err)
