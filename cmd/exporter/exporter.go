@@ -8,9 +8,7 @@ import (
 
 	"io/ioutil"
 
-	"fmt"
 	"github.com/wtg/shuttletracker/log"
-	"os"
 )
 
 // Exporter contains the database (implements the database interface) to import/export from
@@ -110,12 +108,15 @@ func (exp *Exporter) Import(file string) {
 	d := Dump{}
 	raw, err := ioutil.ReadFile(file)
 	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+		log.WithError(err)
+		return
 	}
 
-	json.Unmarshal(raw, &d)
-	exp.write(d)
+	err = json.Unmarshal(raw, &d)
+	if err != nil {
+		log.WithError(err)
+		return
+	}
 }
 
 // Run writes a mongo database dump to a given file
@@ -146,6 +147,10 @@ func Run(dest string) {
 // Export exports the database to the given file as a json
 func (exp *Exporter) Export(dest string) {
 	dump, err := exp.read()
+	if err != nil {
+		log.WithError(err)
+		return
+	}
 	out, err := json.Marshal(dump)
 	if err != nil {
 		log.WithError(err)
