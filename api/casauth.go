@@ -12,20 +12,20 @@ import (
 	"strings"
 )
 
-// casClient stores the local cas client and an instance of the database
-type casClient struct {
+// CASClient stores the local cas client and an instance of the database
+type CASClient struct {
 	cas auth.AuthenticationService
 	db  database.Database
 }
 
-// CreatecasClient creates an authentication service casClient using a cas url and database
-func CreateCASClient(url *url.URL, db database.Database) (*casClient){
+// CreateCASClient creates an authentication service CASClient using a cas url and database
+func CreateCASClient(url *url.URL, db database.Database) (*CASClient){
 	client := gc.NewClient(&gc.Options{
 		URL:   url,
 		Store: nil,
 	})
 
-	cli := &casClient{
+	cli := &CASClient{
 		cas: &auth.CAS{
 			CAS: client,
 		},
@@ -35,20 +35,20 @@ func CreateCASClient(url *url.URL, db database.Database) (*casClient){
 }
 
 // InjectMocks allows mock interfaces to be used
-func InjectMocks(cli auth.AuthenticationService, db database.Database) (*casClient){
+func InjectMocks(cli auth.AuthenticationService, db database.Database) (*CASClient){
 
-	c:= &casClient{
+	c:= &CASClient{
 		cas: cli,
 		db: db,
 	}
 	return c
 }
 
-func (cli *casClient) logout(w http.ResponseWriter, r *http.Request) {
+func (cli *CASClient) logout(w http.ResponseWriter, r *http.Request) {
 	cli.cas.Logout(w, r)
 }
 
-func (cli *casClient) casauth(next http.Handler) http.Handler {
+func (cli *CASClient) casauth(next http.Handler) http.Handler {
 	return cli.cas.HandleFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		if !cli.cas.Authenticated(r) {
