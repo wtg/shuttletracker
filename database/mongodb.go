@@ -92,7 +92,7 @@ func (m *MongoDB) DeleteRoute(routeID string) error {
 func (m *MongoDB) GetRoute(routeID string) (model.Route, error) {
 	var route model.Route
 	err := m.routes.Find(bson.M{"id": routeID}).One(&route)
-	SetRouteActiveStatus(&route,time.Now())
+	SetRouteActiveStatus(&route, time.Now())
 	return route, err
 }
 
@@ -101,7 +101,7 @@ func (m *MongoDB) GetRoutes() ([]model.Route, error) {
 	var routes []model.Route
 	err := m.routes.Find(bson.M{}).All(&routes)
 	for i := range routes {
-		SetRouteActiveStatus(&routes[i],time.Now())
+		SetRouteActiveStatus(&routes[i], time.Now())
 	}
 	return routes, err
 }
@@ -239,4 +239,15 @@ func (m *MongoDB) GetMessages() ([]model.AdminMessage, error) {
 	messages := []model.AdminMessage{}
 	err := m.messages.Find(bson.M{}).All(&messages)
 	return messages, err
+}
+
+// UserExists tests if a given user exists in the admin database
+func (m *MongoDB) UserExists(uname string) (bool, error) {
+	query := m.users.Find(bson.M{"username": uname})
+	n, err := query.Count()
+	if n == 1 {
+		return true, err
+	}
+
+	return false, err
 }

@@ -3,8 +3,8 @@ var state = 0;
 Vue.component('titlebar', {
   template:
   `<div>
-  <div v-bind:style="titlebarStyle" class ="hero-head">
-  <a v-bind:style="logoutStyle" href="/admin/logout/">Logout</a>
+  <a style="right:10px;top:7px;" class="button" v-bind:style="logoutStyle" href="/admin/logout">Logout</a>
+  <div v-bind:style="titlebarStyle" class="hero-head">
   <div class="container has-text-centered" style="height:50px;">
   <p v-bind:style=""><span class = "red" >Shuttle</span>Tracker</p>
   </div>`,
@@ -23,14 +23,15 @@ Vue.component('titlebar', {
         boxShadow: '0 3px 7px rgba(0,0,0,0.1)'},
 
       logoutStyle: {
-        float: "right",
+        position: "fixed",
+        zIndex:"30",
         textDecoration: "none",
         paddingRight: "10px"
       }
     };
   },
   mounted (){
-  }
+  },
 
 });
 
