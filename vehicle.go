@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// ErrVehicleNotFound indicates that a Vehicle is not in the database.
+// ErrVehicleNotFound indicates that a Vehicle is not in the service.
 var ErrVehicleNotFound = errors.New("Vehicle not found")
 
 // Vehicle represents an object being tracked.
