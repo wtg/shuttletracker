@@ -35,7 +35,7 @@ func TestSetRouteActiveStatusSameDay(t *testing.T) {
 		Name:         "Test Route",
 		TimeInterval: interval,
 	}
-  SetRouteActiveStatus(&TestRoute,timeTest)
+	SetRouteActiveStatus(&TestRoute, timeTest)
 	if !TestRoute.Active {
 		t.Errorf("Route should be active but is not %+v", TestRoute)
 	}
@@ -62,7 +62,7 @@ func TestSetRouteActiveStatusSimilarTime(t *testing.T) {
 		Name:         "Test Route",
 		TimeInterval: interval,
 	}
-	SetRouteActiveStatus(&TestRoute,timeTest)
+	SetRouteActiveStatus(&TestRoute, timeTest)
 	if !TestRoute.Active {
 		t.Errorf("Route should be active but is not")
 	}
@@ -91,7 +91,7 @@ func TestSetRouteActiveStatusDiffDay(t *testing.T) {
 		TimeInterval: interval,
 	}
 
-	SetRouteActiveStatus(&TestRoute,timeTest)
+	SetRouteActiveStatus(&TestRoute, timeTest)
 	if !TestRoute.Active {
 		t.Errorf("Route should be active but is not %+v", TestRoute)
 	}
@@ -110,7 +110,7 @@ func TestSetRouteActiveStatusDiffDay(t *testing.T) {
 	}
 	interval = append(interval, t1, t2)
 	TestRoute.TimeInterval = interval
-	SetRouteActiveStatus(&TestRoute,timeTest)
+	SetRouteActiveStatus(&TestRoute, timeTest)
 	if TestRoute.Active {
 		t.Errorf("Route should not be active but is %+v", TestRoute)
 	}

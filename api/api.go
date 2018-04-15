@@ -2,15 +2,13 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
+
 	"net/http"
 	"net/url"
-	"strings"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/spf13/viper"
-	"gopkg.in/cas.v1"
 
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/database"
@@ -30,8 +28,6 @@ type Config struct {
 // API is responsible for configuring handlers for HTTP endpoints.
 type API struct {
 	cfg     Config
-	CasAUTH *cas.Client
-	CasMEM  *cas.MemoryStore
 	db      database.Database
 	handler http.Handler
 	vs      shuttletracker.VehicleService
@@ -45,20 +41,12 @@ func New(cfg Config, db database.Database, vs shuttletracker.VehicleService) (*A
 	if err != nil {
 		return nil, err
 	}
-	var tickets *cas.MemoryStore
-
-	client := cas.NewClient(&cas.Options{
-		URL:   url,
-		Store: nil,
-	})
 
 	// Create API instance to store database session and collections
 	api := API{
-		cfg:     cfg,
-		CasAUTH: client,
-		CasMEM:  tickets,
-		db:      db,
-		vs:      vs,
+		cfg: cfg,
+		db:  db,
+		vs:  vs,
 	}
 
 	r := chi.NewRouter()
@@ -66,12 +54,17 @@ func New(cfg Config, db database.Database, vs shuttletracker.VehicleService) (*A
 	r.Use(middleware.DefaultCompress)
 	r.Use(etag)
 
+	cli := CreateCASClient(url, db)
+
 	// Vehicles
 	r.Route("/vehicles", func(r chi.Router) {
 		r.Get("/", api.VehiclesHandler)
-		r.Method("POST", "/create", api.CasAUTH.HandleFunc(api.VehiclesCreateHandler))
-		r.Method("POST", "/edit", api.CasAUTH.HandleFunc(api.VehiclesEditHandler))
-		r.Method("DELETE", "/", api.CasAUTH.HandleFunc(api.VehiclesDeleteHandler))
+		r.Group(func(r chi.Router) {
+			r.Use(cli.casauth)
+			r.Post("/create", api.VehiclesCreateHandler)
+			r.Post("/edit", api.VehiclesEditHandler)
+			r.Delete("/", api.VehiclesDeleteHandler)
+		})
 	})
 
 	// Updates
@@ -82,34 +75,52 @@ func New(cfg Config, db database.Database, vs shuttletracker.VehicleService) (*A
 	// Admin message
 	r.Route("/adminMessage", func(r chi.Router) {
 		r.Get("/", api.AdminMessageHandler)
-		r.Post("/", api.SetAdminMessage)
+		r.Group(func(r chi.Router) {
+
+			r.Use(cli.casauth)
+			r.Post("/", api.SetAdminMessage)
+		})
 	})
 
 	// Routes
 	r.Route("/routes", func(r chi.Router) {
 		r.Get("/", api.RoutesHandler)
-		r.Method("POST", "/create", api.CasAUTH.HandleFunc(api.RoutesCreateHandler))
-		r.Method("POST", "/schedule", api.CasAUTH.HandleFunc(api.RoutesScheduler))
-		r.Method("POST", "/edit", api.CasAUTH.HandleFunc(api.RoutesEditHandler))
-		r.Method("DELETE", "/{id:.+}", api.CasAUTH.HandleFunc(api.RoutesDeleteHandler))
+		r.Group(func(r chi.Router) {
+			r.Use(cli.casauth)
+			r.Post("/create", api.RoutesCreateHandler)
+			r.Post("/schedule", api.RoutesScheduler)
+			r.Post("/edit", api.RoutesEditHandler)
+			r.Delete("/{id:.+}", api.RoutesDeleteHandler)
+		})
 	})
 
 	// Stops
 	r.Route("/stops", func(r chi.Router) {
 		r.Get("/", api.StopsHandler)
-		r.Method("POST", "/create", api.CasAUTH.HandleFunc(api.StopsCreateHandler))
-		r.Method("DELETE", "/{id:.+}", api.CasAUTH.HandleFunc(api.StopsDeleteHandler))
+
+		r.Group(func(r chi.Router) {
+			r.Use(cli.casauth)
+			r.Post("/create", api.StopsCreateHandler)
+			r.Delete("/{id:.+}", api.StopsDeleteHandler)
+
+		})
 	})
 
+	r.Get("/logout/", cli.logout)
 	// Admin
 	r.Route("/admin", func(r chi.Router) {
-		r.Method("GET", "/", api.CasAUTH.HandleFunc(api.AdminHandler))
-		r.Method("GET", "/success/", api.CasAUTH.HandleFunc(api.AdminPageServer))
-		r.Method("GET", "/logout/", api.CasAUTH.HandleFunc(api.AdminLogout))
+		r.Use(cli.casauth)
+		r.Get("/", api.AdminHandler)
+		r.Get("/login", api.AdminHandler)
+		r.Get("/logout", cli.logout)
 
 	})
 
-	r.Method("GET", "/getKey/", api.CasAUTH.HandleFunc(api.KeyHandler))
+	r.Group(func(r chi.Router) {
+		r.Use(cli.casauth)
+
+		r.Get("/getKey/", api.KeyHandler)
+	})
 
 	// Static files
 	r.Get("/", IndexHandler)
@@ -144,55 +155,25 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 
 // AdminHandler serves the admin page.
 func (api *API) AdminHandler(w http.ResponseWriter, r *http.Request) {
-	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
-		cas.RedirectToLogin(w, r)
-		return
-	} else {
-		valid := false
-		users, _ := api.db.GetUsers()
-		for _, u := range users {
-			if u.Name == strings.ToLower(cas.Username(r)) {
-				valid = true
-			}
-		}
-		if api.cfg.Authenticate == false {
-			valid = true
-			fmt.Printf("not authenticating")
-		}
-		if valid {
-			http.Redirect(w, r, "/admin/success/", 301)
-		} else {
-			http.Redirect(w, r, "/admin/logout/", 301)
-		}
+	id := r.URL.Query()
+	//authenticated with a ticket, redirect the request
+	if len(id["ticket"]) != 0 {
+		http.Redirect(w, r, "/admin", 301)
 	}
+	w.Header().Set("Cache-Control", "no-cache")
+	http.ServeFile(w, r, "admin.html")
 
 }
 
 //KeyHandler sends Mapbox api key to authenticated user
 func (api *API) KeyHandler(w http.ResponseWriter, r *http.Request) {
-	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
-		http.Redirect(w, r, "/admin/", 301)
-	} else {
-		WriteJSON(w, api.cfg.MapboxAPIKey)
+	err := WriteJSON(w, api.cfg.MapboxAPIKey)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-}
-
-func (api *API) AdminPageServer(w http.ResponseWriter, r *http.Request) {
-
-	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
-		http.Redirect(w, r, "/admin/", 301)
-		return
-	} else {
-		http.ServeFile(w, r, "admin.html")
-	}
-
 }
 
 func (api *API) AdminLogout(w http.ResponseWriter, r *http.Request) {
-
-	if cas.IsAuthenticated(r) {
-		cas.RedirectToLogout(w, r)
-	}
 
 }
 

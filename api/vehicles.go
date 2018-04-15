@@ -6,8 +6,6 @@ import (
 	"strconv"
 	"time"
 
-	"gopkg.in/cas.v1"
-
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/model"
 )
@@ -28,9 +26,6 @@ func (api *API) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
 
 // VehiclesCreateHandler adds a new vehicle.
 func (api *API) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
-	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
-		return
-	}
 
 	// Create new vehicle object using request fields
 	vehicle := model.Vehicle{}
@@ -52,9 +47,6 @@ func (api *API) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
-	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
-		return
-	}
 
 	vehicle := &model.Vehicle{}
 	err := json.NewDecoder(r.Body).Decode(vehicle)
@@ -84,10 +76,6 @@ func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if api.cfg.Authenticate && !cas.IsAuthenticated(r) {
-		return
-	}
-
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
