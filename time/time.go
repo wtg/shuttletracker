@@ -1,7 +1,8 @@
-package model
+package time
 
 import (
 	"fmt"
+	"sort"
 	"time"
 )
 
@@ -50,20 +51,18 @@ func (t1 Time) After(t2 Time) bool {
 	return false
 }
 
-//ByTime is an interface used to sort times
-type ByTime []Time
-
-func (a ByTime) Len() int      { return len(a) }
-func (a ByTime) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
-func (a ByTime) Less(i, j int) bool {
-	if a[i].Day < a[j].Day {
-		return true
-	} else if a[i].Day > a[j].Day {
-		return false
-	} else {
-		if a[j].After(a[i]) {
+// Sort sorts a slice of Times.
+func Sort(times []Time) {
+	sort.Slice(times, func(i, j int) bool {
+		if times[i].Day < times[j].Day {
 			return true
+		} else if times[i].Day > times[j].Day {
+			return false
+		} else {
+			if times[j].After(times[i]) {
+				return true
+			}
+			return false
 		}
-		return false
-	}
+	})
 }

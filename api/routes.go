@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	"sort"
 	"strconv"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/model"
+	sttime "github.com/wtg/shuttletracker/time"
 )
 
 // RoutesHandler finds all of the routes in the database
@@ -110,7 +110,7 @@ func (api *API) RoutesScheduler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	sort.Sort(model.ByTime(times.Times))
+	sttime.Sort(times.Times)
 	route := model.Route{}
 	route, err = api.db.GetRoute(times.ID)
 	route.TimeInterval = times.Times
