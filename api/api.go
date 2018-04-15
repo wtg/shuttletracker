@@ -173,10 +173,6 @@ func (api *API) KeyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (api *API) AdminLogout(w http.ResponseWriter, r *http.Request) {
-
-}
-
 // WriteJSON writes the data as JSON.
 func WriteJSON(w http.ResponseWriter, data interface{}) error {
 	w.Header().Set("Content-Type", "application/json")
