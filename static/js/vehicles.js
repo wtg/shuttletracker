@@ -1,14 +1,14 @@
 
 Vue.component('vehicle-create',{
   template:`<div class="vehicle-card route-description-box">
-    <b>id</b>: <input type="textbox" v-model="ID" placeholder="1123454125"></input> (must be same as itrak vehicle ID) <br>
+    <b>Tracker ID</b>: <input type="textbox" v-model="trackerID" placeholder="1123454125"></input> (must be same as iTrak vehicle ID) <br>
     <b>name</b>:<input type="textbox" v-model="name" placeholder="Vehicle Name"></input> <br>
     <b>enabled</b>:<input type="checkbox" v-model="enabled"></input><br>
     <div class = "button" @click="send" style="width: 50px;">add</div>
     </div>`,
     data (){
       return{
-        ID: "",
+        trackerID: "",
         name: "",
         enabled: true,
       };
@@ -16,7 +16,11 @@ Vue.component('vehicle-create',{
     methods: {
       send: function(){
 
-        var pkg = {"vehicleID":this.ID, "vehicleName":this.name, "enabled":this.enabled};
+        var pkg = {
+          "tracker_id": this.trackerID,
+          "name":this.name,
+          "enabled":this.enabled
+        };
 
         pkg = JSON.stringify(pkg);
         $.ajax({
@@ -28,7 +32,7 @@ Vue.component('vehicle-create',{
             refresh = true;
           }
         });
-        this.ID = "";
+        this.trackerID = "";
         this.name = "";
       }
     }
@@ -38,10 +42,10 @@ Vue.component('vehicle-card', {
   props: ['info'],
   template:
   `<div class="vehicle-card route-description-box">
-    <b>id</b>: {{info.vehicleID}}<br>
-    <b>name</b>: <input type="textbox" v-model="info.vehicleName"></input> <br>
-    <b>enabled</b>: <input type="checkbox" @click="editVehicle" v-model="info.enabled"></input>{{info.enabled}}<br>
-    <b>Created</b>: {{info.Created}} <br>
+    <b>Tracker ID</b>: {{info.tracker_id}}<br>
+    <b>name</b>: <input type="textbox" v-model="info.name"></input> <br>
+    <b>enabled</b>: <input type="checkbox" v-model="info.enabled"></input>{{info.enabled}}<br>
+    <b>Created</b>: {{info.created}} <br>
     <div @click="editVehicle" class = "button" style="width: auto; float:left;">Change</div>
     <div @click="deleteVehicle" class = "button" style="width: auto; float:left;">Delete</div>
     <br>
@@ -55,7 +59,7 @@ Vue.component('vehicle-card', {
     deleteVehicle: function(){
       var el = this;
       $.ajax({
-        url: '/vehicles/' + el.info.vehicleID,
+        url: '/vehicles?id=' + el.info.id,
         type: 'DELETE',
         success: function(result) {
           refresh = true;
@@ -65,7 +69,12 @@ Vue.component('vehicle-card', {
     },
     editVehicle: function(){
       var el = this;
-      var pkg = {"vehicleID":this.info.vehicleID, "vehicleName":this.info.vehicleName, "enabled":!this.info.enabled};
+      var pkg = {
+        "id": this.info.id,
+        "name": this.info.name,
+        "enabled": this.info.enabled,
+        "tracker_id": this.info.tracker_id
+      };
       $.ajax({
         url: "/vehicles/edit",
         type: "POST",
@@ -91,7 +100,7 @@ Vue.component('vehicle-panel', {
   </div>`,
   data (){
     return{
-      shuttleData: [{shuttleID:22}]
+      shuttleData: []
     };
   },
   mounted(){

@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/model"
 )
@@ -26,50 +27,45 @@ func (api *API) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
 
 // VehiclesCreateHandler adds a new vehicle.
 func (api *API) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
-
-	// Create new vehicle object using request fields
-	vehicle := model.Vehicle{}
-	vehicle.Created = time.Now()
-	vehicle.Updated = vehicle.Created
+	vehicle := shuttletracker.Vehicle{}
 	vehicleData := json.NewDecoder(r.Body)
 	err := vehicleData.Decode(&vehicle)
-	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	// Store new vehicle under vehicles collection
 	err = api.vs.CreateVehicle(&vehicle)
-	// Error handling
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
-
-	vehicle := &model.Vehicle{}
+	vehicle := &shuttletracker.Vehicle{}
 	err := json.NewDecoder(r.Body).Decode(vehicle)
 	if err != nil {
+		log.WithError(err).Error("unable to decode vehicle")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	name := vehicle.Name
 	enabled := vehicle.Enabled
 	trackerID := vehicle.TrackerID
-
 	vehicle, err = api.vs.Vehicle(vehicle.ID)
 	if err != nil {
+		log.WithError(err).Error("unable to retrieve vehicle")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	vehicle.Name = name
 	vehicle.Enabled = enabled
 	vehicle.TrackerID = trackerID
-	vehicle.Updated = time.Now()
 
 	err = api.vs.ModifyVehicle(vehicle)
 	if err != nil {
+		log.WithError(err).Error("unable to modify vehicle")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
