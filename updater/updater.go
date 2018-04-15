@@ -132,11 +132,7 @@ func (u *Updater) update() {
 
 			route := model.Route{}
 
-			itrakID, err := strconv.Atoi(strings.Replace(result["id"], "Vehicle ID:", "", -1))
-			if err != nil {
-				log.WithError(err).Error("unable to determine tracker ID")
-				return
-			}
+			itrakID := strings.Replace(result["id"], "Vehicle ID:", "", -1)
 			vehicle, err := u.vs.VehicleWithTrackerID(itrakID)
 			if err == shuttletracker.ErrVehicleNotFound {
 				log.Warnf("Unknown vehicle ID \"%s\" returned by iTrak. Make sure all vehicles have been added.", itrakID)

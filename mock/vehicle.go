@@ -28,7 +28,7 @@ func (vs *VehicleService) Vehicle(vehicleID int) (*shuttletracker.Vehicle, error
 	return args.Get(0).(*shuttletracker.Vehicle), args.Error(1)
 }
 
-func (vs *VehicleService) VehicleWithTrackerID(trackerID int) (*shuttletracker.Vehicle, error) {
+func (vs *VehicleService) VehicleWithTrackerID(trackerID string) (*shuttletracker.Vehicle, error) {
 	args := vs.Called(trackerID)
 	return args.Get(0).(*shuttletracker.Vehicle), args.Error(1)
 }

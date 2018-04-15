@@ -117,7 +117,7 @@ func TestVehiclesCreateHandler(t *testing.T) {
 	vehicle := &shuttletracker.Vehicle{
 		Name:      "Vehicle 2",
 		Enabled:   true,
-		TrackerID: 2,
+		TrackerID: "2",
 	}
 	vs.On("CreateVehicle", vehicle).Return(nil)
 
@@ -167,14 +167,14 @@ func TestVehiclesEditHandler(t *testing.T) {
 		ID:        4,
 		Name:      "Vehicle 2",
 		Enabled:   true,
-		TrackerID: 2,
+		TrackerID: "2",
 		Created:   vehicleTime,
 	}
 	changedVehicle := &shuttletracker.Vehicle{
 		ID:        4,
 		Name:      "Vehicle 2 changed",
 		Enabled:   false,
-		TrackerID: 3,
+		TrackerID: "3",
 		Created:   vehicleTime,
 	}
 	vs.On("Vehicle", 4).Return(existingVehicle, nil)

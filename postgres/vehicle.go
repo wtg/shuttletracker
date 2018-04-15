@@ -33,9 +33,14 @@ func NewVehicleService(url string) (*VehicleService, error) {
 
 func (v *VehicleService) initializeSchema() error {
 	schema := `
+DROP TABLE vehicles;
 CREATE TABLE vehicles (
-    id serial primary key,
-    name text
+    id serial PRIMARY KEY,
+	name text,
+	created timestamp with time zone NOT NULL DEFAULT now(),
+	updated timestamp with time zone NOT NULL DEFAULT now(),
+	enabled boolean NOT NULL,
+	tracker_id varchar(10)
 );
     `
 	_, err := v.db.Exec(schema)
@@ -44,35 +49,78 @@ CREATE TABLE vehicles (
 
 // CreateVehicle creates a Vehicle.
 func (v *VehicleService) CreateVehicle(vehicle *shuttletracker.Vehicle) error {
-	return nil
+	statement := "INSERT INTO vehicles (name, enabled, tracker_id) " +
+		"VALUES ($1, $2, $3) RETURNING id;"
+	row := v.db.QueryRow(statement, vehicle.Name, vehicle.Enabled, vehicle.TrackerID)
+	err := row.Scan(&vehicle.ID)
+	return err
 }
 
 // DeleteVehicle deletes a Vehicle by its ID.
 func (v *VehicleService) DeleteVehicle(id int) error {
-	return nil
+	statement := "DELETE FROM vehicles WHERE id = $1;"
+	_, err := v.db.Exec(statement, id)
+	return err
 }
 
 // GetVehicle returns a Vehicle by its ID.
 func (v *VehicleService) Vehicle(id int) (*shuttletracker.Vehicle, error) {
-	var vehicle *shuttletracker.Vehicle
-	return vehicle, nil
+	vehicle := &shuttletracker.Vehicle{
+		ID: id,
+	}
+
+	statement := "SELECT name, created, updated, enabled, tracker_id" +
+		"FROM vehicles WHERE id = $1;"
+	row := v.db.QueryRow(statement, id)
+	err := row.Scan(&vehicle.Name, &vehicle.Created, &vehicle.Updated, &vehicle.Enabled, &vehicle.TrackerID)
+
+	return vehicle, err
 }
 
 // GetVehicles returns all Vehicles.
 func (v *VehicleService) Vehicles() ([]*shuttletracker.Vehicle, error) {
 	var vehicles []*shuttletracker.Vehicle
+
+	statement := "SELECT id, name, created, updated, enabled, tracker_id FROM vehicles;"
+	rows, err := v.db.Query(statement)
+	if err != nil {
+		return vehicles, err
+	}
+
+	for rows.Next() {
+		vehicle := &shuttletracker.Vehicle{}
+		err := rows.Scan(&vehicle.ID, &vehicle.Name, &vehicle.Created, &vehicle.Updated, &vehicle.Enabled, &vehicle.TrackerID)
+		if err != nil {
+			return vehicles, err
+		}
+		vehicles = append(vehicles, vehicle)
+	}
+
 	return vehicles, nil
 }
 
-// GetVehicle returns a Vehicle by its ID.
+// EnabledVehicles returns all Vehicles that are enabled.
 func (v *VehicleService) EnabledVehicles() ([]*shuttletracker.Vehicle, error) {
 	var vehicles []*shuttletracker.Vehicle
-	return vehicles, nil
-}
 
-// GetEnabledVehicles returns all Vehicles that are enabled.
-func (v *VehicleService) GetEnabledVehicles() ([]*shuttletracker.Vehicle, error) {
-	var vehicles []*shuttletracker.Vehicle
+	statement := "SELECT id, name, created, updated, tracker_id" +
+		"FROM vehicles WHERE enabled = true;"
+	rows, err := v.db.Query(statement)
+	if err != nil {
+		return vehicles, err
+	}
+
+	for rows.Next() {
+		vehicle := &shuttletracker.Vehicle{
+			Enabled: true,
+		}
+		err := rows.Scan(&vehicle.ID, &vehicle.Name, &vehicle.Created, &vehicle.Updated, &vehicle.TrackerID)
+		if err != nil {
+			return vehicles, err
+		}
+		vehicles = append(vehicles, vehicle)
+	}
+
 	return vehicles, nil
 }
 
@@ -81,7 +129,14 @@ func (v *VehicleService) ModifyVehicle(vehicle *shuttletracker.Vehicle) error {
 	return nil
 }
 
-func (v *VehicleService) VehicleWithTrackerID(id int) (*shuttletracker.Vehicle, error) {
-	var vehicle *shuttletracker.Vehicle
-	return vehicle, nil
+func (v *VehicleService) VehicleWithTrackerID(id string) (*shuttletracker.Vehicle, error) {
+	vehicle := &shuttletracker.Vehicle{
+		TrackerID: id,
+	}
+	statement := "SELECT id, name, created, updated, enabled, tracker_id" +
+		"FROM vehicles WHERE tracker_id = $1;"
+	row := v.db.QueryRow(statement, id)
+	err := row.Scan(&vehicle.ID, &vehicle.Name, &vehicle.Created, &vehicle.Updated, &vehicle.Enabled)
+
+	return vehicle, err
 }

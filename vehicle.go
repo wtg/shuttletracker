@@ -15,13 +15,13 @@ type Vehicle struct {
 	Created   time.Time `bson:"created"`
 	Updated   time.Time `bson:"updated"`
 	Enabled   bool      `json:"enabled"     bson:"enabled"`
-	TrackerID int
+	TrackerID string    `json:"tracker_id"`
 }
 
 // VehicleService is an interface for interacting with Vehicles.
 type VehicleService interface {
 	Vehicle(id int) (*Vehicle, error)
-	VehicleWithTrackerID(id int) (*Vehicle, error)
+	VehicleWithTrackerID(id string) (*Vehicle, error)
 	Vehicles() ([]*Vehicle, error)
 	EnabledVehicles() ([]*Vehicle, error)
 	CreateVehicle(vehicle *Vehicle) error
