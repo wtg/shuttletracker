@@ -78,40 +78,6 @@ func NewMongoDBConfig(v *viper.Viper) *MongoDBConfig {
 	return cfg
 }
 
-// CreateRoute creates a Route.
-func (m *MongoDB) CreateRoute(route *model.Route) error {
-	route.ID = bson.NewObjectId().Hex()
-	return m.routes.Insert(&route)
-}
-
-// DeleteRoute deletes a Route by its ID.
-func (m *MongoDB) DeleteRoute(routeID string) error {
-	return m.routes.Remove(bson.M{"id": routeID})
-}
-
-// GetRoute returns a Route by its ID.
-func (m *MongoDB) GetRoute(routeID string) (model.Route, error) {
-	var route model.Route
-	err := m.routes.Find(bson.M{"id": routeID}).One(&route)
-	SetRouteActiveStatus(&route, time.Now())
-	return route, err
-}
-
-// GetRoutes returns all Routes.
-func (m *MongoDB) GetRoutes() ([]model.Route, error) {
-	var routes []model.Route
-	err := m.routes.Find(bson.M{}).All(&routes)
-	for i := range routes {
-		SetRouteActiveStatus(&routes[i], time.Now())
-	}
-	return routes, err
-}
-
-// ModifyRoute updates an existing Route by its ID.
-func (m *MongoDB) ModifyRoute(route *model.Route) error {
-	return m.routes.Update(bson.M{"id": route.ID}, route)
-}
-
 // CreateStop creates a Stop.
 func (m *MongoDB) CreateStop(stop *model.Stop) error {
 	stop.ID = bson.NewObjectId().Hex()

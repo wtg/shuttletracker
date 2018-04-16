@@ -16,7 +16,6 @@ type Time struct {
 // FromTime is used to create a new model.Time object from a normal gotime object
 func (t1 *Time) FromTime(t time.Time) {
 	t1.Time = t
-
 }
 
 // GetTimeString returns the string version of the time represented by the struct

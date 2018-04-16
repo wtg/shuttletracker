@@ -22,9 +22,8 @@ import (
 type Updater struct {
 	cfg            Config
 	updateInterval time.Duration
-	db             database.Database
 	dataRegexp     *regexp.Regexp
-	vs             shuttletracker.VehicleService
+	ms             shuttletracker.ModelService
 }
 
 type Config struct {
@@ -33,11 +32,10 @@ type Config struct {
 }
 
 // New creates an Updater.
-func New(cfg Config, db database.Database, vs shuttletracker.VehicleService) (*Updater, error) {
+func New(cfg Config, ms shuttletracker.ModelService) (*Updater, error) {
 	updater := &Updater{
 		cfg: cfg,
-		db:  db,
-		vs:  vs,
+		ms:  ms,
 	}
 
 	interval, err := time.ParseDuration(cfg.UpdateInterval)
@@ -121,19 +119,10 @@ func (u *Updater) update() {
 
 			// Create new vehicle update & insert update into database
 
-			// convert KPH to MPH
-			speedKMH, err := strconv.ParseFloat(strings.Replace(result["speed"], "spd:", "", -1), 64)
-			if err != nil {
-				log.Error(err)
-				return
-			}
-			speedMPH := kphToMPH(speedKMH)
-			speedMPHString := strconv.FormatFloat(speedMPH, 'f', 5, 64)
-
-			route := model.Route{}
+			route := &shuttletracker.Route{}
 
 			itrakID := strings.Replace(result["id"], "Vehicle ID:", "", -1)
-			vehicle, err := u.vs.VehicleWithTrackerID(itrakID)
+			vehicle, err := u.ms.VehicleWithTrackerID(itrakID)
 			if err == shuttletracker.ErrVehicleNotFound {
 				log.Warnf("Unknown vehicle ID \"%s\" returned by iTrak. Make sure all vehicles have been added.", itrakID)
 				return
@@ -143,18 +132,19 @@ func (u *Updater) update() {
 			}
 
 			// determine if this is a new update from itrak by comparing timestamps
-			lastUpdate, err := u.db.GetLastUpdateForVehicle(vehicle.ID)
-			if err != nil && err != database.ErrUpdateNotFound {
-				log.WithError(err).Error("Unable to retrieve last update.")
+			newTime, err := itrakTimeDate(result["time"], result["date"])
+			if err != nil {
+				log.WithError(err).Error("unable to parse iTRAK time and date")
 				return
 			}
-			itrakTime := strings.Replace(result["time"], "time:", "", -1)
-			itrakDate := strings.Replace(result["date"], "date:", "", -1)
-			if err == nil {
-				if lastUpdate.Time == itrakTime && lastUpdate.Date == itrakDate {
-					// Timestamp is not new; don't store update.
-					return
-				}
+			lastUpdate, err := u.ms.LatestLocation(vehicle.ID)
+			if err != nil && err != database.ErrUpdateNotFound {
+				log.WithError(err).Error("unable to retrieve last update")
+				return
+			}
+			if err != database.ErrUpdateNotFound && newTime.Equal(lastUpdate.Time) {
+				// Timestamp is not new; don't store update.
+				return
 			}
 			log.Debugf("Updating %s.", vehicle.Name)
 
@@ -165,22 +155,43 @@ func (u *Updater) update() {
 				return
 			}
 
-			update := model.VehicleUpdate{
-				VehicleID: strings.Replace(result["id"], "Vehicle ID:", "", -1),
-				Lat:       strings.Replace(result["lat"], "lat:", "", -1),
-				Lng:       strings.Replace(result["lng"], "lon:", "", -1),
-				Heading:   strings.Replace(result["heading"], "dir:", "", -1),
-				Speed:     speedMPHString,
-				Lock:      strings.Replace(result["lock"], "lck:", "", -1),
-				Time:      itrakTime,
-				Date:      itrakDate,
-				Status:    strings.Replace(result["status"], "trig:", "", -1),
-				Created:   time.Now(),
-				Route:     route.ID,
+			latitude, err := strconv.ParseFloat(strings.Replace(result["lat"], "lat:", "", -1), 64)
+			if err != nil {
+				log.WithError(err).Error("unable to parse latitude as float")
+				return
+			}
+			longitude, err := strconv.ParseFloat(strings.Replace(result["lng"], "lon:", "", -1), 64)
+			if err != nil {
+				log.WithError(err).Error("unable to parse longitude as float")
+				return
+			}
+			heading, err := strconv.ParseFloat(strings.Replace(result["heading"], "dir:", "", -1), 64)
+			if err != nil {
+				log.WithError(err).Error("unable to parse heading as float")
+				return
+			}
+			// convert KPH to MPH
+			speedKMH, err := strconv.ParseFloat(strings.Replace(result["speed"], "spd:", "", -1), 64)
+			if err != nil {
+				log.Error(err)
+				return
+			}
+			speedMPH := kphToMPH(speedKMH)
+
+			trackerID := strings.Replace(result["id"], "Vehicle ID:", "", -1)
+
+			update := &shuttletracker.Location{
+				TrackerID: trackerID,
+				Latitude:  latitude,
+				Longitude: longitude,
+				Heading:   heading,
+				Speed:     speedMPH,
+				Time:      newTime,
+				RouteID:   route.ID,
 			}
 
-			if err := u.db.CreateUpdate(&update); err != nil {
-				log.WithError(err).Errorf("Could not insert vehicle update.")
+			if err := u.ms.CreateLocation(update); err != nil {
+				log.WithError(err).Errorf("could not create location")
 			}
 		}(vehicleData)
 	}
@@ -188,9 +199,9 @@ func (u *Updater) update() {
 	log.Debugf("Updated vehicles.")
 
 	// Prune updates older than one month
-	deleted, err := u.db.DeleteUpdatesBefore(time.Now().AddDate(0, -1, 0))
+	deleted, err := u.ms.DeleteLocationsBefore(time.Now().AddDate(0, -1, 0))
 	if err != nil {
-		log.WithError(err).Error("Unable to remove old updates.")
+		log.WithError(err).Error("unable to remove old locations")
 		return
 	}
 	if deleted > 0 {
@@ -205,18 +216,18 @@ func kphToMPH(kmh float64) float64 {
 
 // GuessRouteForVehicle returns a guess at what route the vehicle is on.
 // It may return an empty route if it does not believe a vehicle is on any route.
-func (u *Updater) GuessRouteForVehicle(vehicle *shuttletracker.Vehicle) (route model.Route, err error) {
-	routes, err := u.db.GetRoutes()
+func (u *Updater) GuessRouteForVehicle(vehicle *shuttletracker.Vehicle) (route *shuttletracker.Route, err error) {
+	routes, err := u.ms.Routes()
 	if err != nil {
 		log.Error(err)
 	}
 
-	routeDistances := make(map[string]float64)
+	routeDistances := make(map[int]float64)
 	for _, route := range routes {
 		routeDistances[route.ID] = 0
 	}
 
-	updates, err := u.db.GetUpdatesForVehicleSince(vehicle.ID, time.Now().Add(time.Minute*-15))
+	updates, err := u.ms.LocationsSince(vehicle.ID, time.Now().Add(time.Minute*-15))
 	if len(updates) < 5 {
 		// Can't make a guess with fewer than 5 updates.
 		log.Debugf("%v has too few recent updates (%d) to guess route.", vehicle.Name, len(updates))
@@ -224,23 +235,14 @@ func (u *Updater) GuessRouteForVehicle(vehicle *shuttletracker.Vehicle) (route m
 	}
 
 	for _, update := range updates {
-		updateLatitude, err := strconv.ParseFloat(update.Lat, 64)
-		if err != nil {
-			log.Error(err)
-		}
-		updateLongitude, err := strconv.ParseFloat(update.Lng, 64)
-		if err != nil {
-			log.Error(err)
-		}
-
 		for _, route := range routes {
 			if !route.Enabled {
 				routeDistances[route.ID] += math.Inf(0)
 			}
 			nearestDistance := math.Inf(0)
 			for _, coord := range route.Coords {
-				distance := math.Sqrt(math.Pow(updateLatitude-coord.Lat, 2) +
-					math.Pow(updateLongitude-coord.Lng, 2))
+				distance := math.Sqrt(math.Pow(update.Latitude-coord.Lat, 2) +
+					math.Pow(update.Longitude-coord.Lng, 2))
 				if distance < nearestDistance {
 					nearestDistance = distance
 
@@ -254,7 +256,7 @@ func (u *Updater) GuessRouteForVehicle(vehicle *shuttletracker.Vehicle) (route m
 	}
 
 	minDistance := math.Inf(0)
-	var minRouteID string
+	var minRouteID int
 	for id := range routeDistances {
 		distance := routeDistances[id] / float64(len(updates))
 		if distance < minDistance {
@@ -263,21 +265,25 @@ func (u *Updater) GuessRouteForVehicle(vehicle *shuttletracker.Vehicle) (route m
 			// If more than ~5% of the last 100 samples were far away from a route, say the shuttle is not on a route
 			// This is extremely aggressive and requires a shuttle to be on a route for ~5 minutes before it registers as on the route
 			if minDistance > 5 {
-				minRouteID = ""
+				minRouteID = 0
 			}
 		}
 	}
 
 	// not on a route
-	if minRouteID == "" {
+	if minRouteID == 0 {
 		log.Debugf("%v not on route; distance from nearest: %v", vehicle.Name, minDistance)
-		return model.Route{}, nil
+		return &model.Route{}, nil
 	}
 
-	route, err = u.db.GetRoute(minRouteID)
+	route, err = u.ms.Route(minRouteID)
 	if err != nil {
 		return route, err
 	}
 	log.Debugf("%v on %s route.", vehicle.Name, route.Name)
 	return route, err
+}
+
+func itrakTimeDate(itrakTime, itrakDate string) (time.Time, error) {
+	return time.Parse("01022006", itrakDate)
 }

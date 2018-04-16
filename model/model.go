@@ -23,7 +23,7 @@ type VehicleUpdate struct {
 	Date      string    `json:"date"        bson:"date"`
 	Status    string    `json:"status"      bson:"status"`
 	Created   time.Time `json:"created"     bson:"created"`
-	Route     string    `json:"RouteID"     bson:"routeID"`
+	Route     int       `json:"RouteID"     bson:"routeID"`
 }
 
 // Status contains a detailed message on the tracked object's status.
@@ -73,7 +73,7 @@ type Stop struct {
 	StartTime    string  `json:"startTime"      bson:"startTime"`
 	EndTime      string  `json:"endTime"        bson:"endTime"`
 	Enabled      bool    `json:"enabled,string" bson:"enabled"`
-	RouteID      string  `json:"routeId"        bson:"routeId"`
+	RouteID      int     `json:"routeId"        bson:"routeId"`
 	SegmentIndex int     `json:"segmentindex"   bson:"segmentindex"`
 }
 

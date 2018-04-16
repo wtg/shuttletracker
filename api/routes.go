@@ -15,7 +15,7 @@ import (
 
 // RoutesHandler finds all of the routes in the database
 func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
-	routes, err := api.db.GetRoutes()
+	routes, err := api.ms.Routes()
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -76,7 +76,7 @@ func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 		Coords:       coords,
 		Created:      time.Now(),
 		Updated:      time.Now()}
-	err = api.db.CreateRoute(&route)
+	err = api.ms.CreateRoute(&route)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -84,12 +84,12 @@ func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 // RoutesDeleteHandler deletes a route from database
 func (api *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
-
-	id := chi.URLParam(r, "id")
-	log.Debugf("deleting", id)
-	err := api.db.DeleteRoute(id)
-
-	// Error handling
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = api.ms.DeleteRoute(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -98,7 +98,7 @@ func (api *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 //Use this for importing a schedule
 type sched struct {
 	Times []model.Time `json:"times"`
-	ID    string       `json:"id"`
+	ID    int          `json:"id"`
 }
 
 // RoutesScheduler Allows for route active times to be set
@@ -111,11 +111,11 @@ func (api *API) RoutesScheduler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sttime.Sort(times.Times)
-	route := model.Route{}
-	route, err = api.db.GetRoute(times.ID)
+	route := &model.Route{}
+	route, err = api.ms.Route(times.ID)
 	route.TimeInterval = times.Times
 
-	err = api.db.ModifyRoute(&route)
+	err = api.ms.ModifyRoute(route)
 	if err != nil {
 		log.WithError(err).Error("Unable to store route into db")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -125,21 +125,21 @@ func (api *API) RoutesScheduler(w http.ResponseWriter, r *http.Request) {
 
 // RoutesEditHandler Only handles editing enabled flag for now
 func (api *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
-	route := model.Route{}
-	err := json.NewDecoder(r.Body).Decode(&route)
+	route := &model.Route{}
+	err := json.NewDecoder(r.Body).Decode(route)
 	if err != nil {
 		log.WithError(err).Error("Unable to decode route")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	en := route.Enabled
-	route, err = api.db.GetRoute(route.ID)
+	route, err = api.ms.Route(route.ID)
 	route.Enabled = en
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = api.db.ModifyRoute(&route)
+	err = api.ms.ModifyRoute(route)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -155,7 +155,7 @@ func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	route, err := api.db.GetRoute(stop.RouteID)
+	route, err := api.ms.Route(stop.RouteID)
 	if err != nil {
 		log.WithError(err).Error("Unable to get route.")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -168,7 +168,7 @@ func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	route.StopsID = append(route.StopsID, stop.ID)
-	err = api.db.ModifyRoute(&route)
+	err = api.ms.ModifyRoute(route)
 	if err != nil {
 		log.WithError(err).Error("Unable to modify route.")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -178,7 +178,6 @@ func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
-
 	id := chi.URLParam(r, "id")
 	log.Debugf("deleting", id)
 	err := api.db.DeleteStop(id)

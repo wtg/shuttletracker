@@ -39,26 +39,12 @@ func SetRouteActiveStatus(r *model.Route, t time.Time) {
 
 // Database is an interface that can be implemented by a database backend.
 type Database interface {
-	// Routes
-	CreateRoute(route *model.Route) error
-	DeleteRoute(routeID string) error
-	GetRoute(routeID string) (model.Route, error)
-	GetRoutes() ([]model.Route, error)
-	ModifyRoute(route *model.Route) error
-
 	// Stops
 	CreateStop(stop *model.Stop) error
 	DeleteStop(stopID string) error
 	GetStops() ([]model.Stop, error)
 	// GetStopsForRoute(routeID string) ([]model.Stop, error)
 	// ModifyStop(stop *model.Stop) error
-
-	// Updates
-	CreateUpdate(update *model.VehicleUpdate) error
-	DeleteUpdatesBefore(before time.Time) (int, error)
-	// GetUpdatesSince(since time.Time) ([]model.VehicleUpdate, error)
-	GetUpdatesForVehicleSince(vehicleID int, since time.Time) ([]model.VehicleUpdate, error)
-	GetLastUpdateForVehicle(vehicleID int) (model.VehicleUpdate, error)
 
 	// Users
 	GetUsers() ([]model.User, error)

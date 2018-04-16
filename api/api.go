@@ -30,12 +30,12 @@ type API struct {
 	cfg     Config
 	db      database.Database
 	handler http.Handler
-	vs      shuttletracker.VehicleService
+	ms      shuttletracker.ModelService
 }
 
 // New initializes the application given a config and connects to backends.
 // It also seeds any needed information to the database.
-func New(cfg Config, db database.Database, vs shuttletracker.VehicleService) (*API, error) {
+func New(cfg Config, db database.Database, ms shuttletracker.ModelService) (*API, error) {
 	// Set up CAS authentication
 	url, err := url.Parse(cfg.CasURL)
 	if err != nil {
@@ -46,7 +46,7 @@ func New(cfg Config, db database.Database, vs shuttletracker.VehicleService) (*A
 	api := API{
 		cfg: cfg,
 		db:  db,
-		vs:  vs,
+		ms:  ms,
 	}
 
 	r := chi.NewRouter()
@@ -76,7 +76,6 @@ func New(cfg Config, db database.Database, vs shuttletracker.VehicleService) (*A
 	r.Route("/adminMessage", func(r chi.Router) {
 		r.Get("/", api.AdminMessageHandler)
 		r.Group(func(r chi.Router) {
-
 			r.Use(cli.casauth)
 			r.Post("/", api.SetAdminMessage)
 		})
@@ -90,19 +89,17 @@ func New(cfg Config, db database.Database, vs shuttletracker.VehicleService) (*A
 			r.Post("/create", api.RoutesCreateHandler)
 			r.Post("/schedule", api.RoutesScheduler)
 			r.Post("/edit", api.RoutesEditHandler)
-			r.Delete("/{id:.+}", api.RoutesDeleteHandler)
+			r.Delete("/", api.RoutesDeleteHandler)
 		})
 	})
 
 	// Stops
 	r.Route("/stops", func(r chi.Router) {
 		r.Get("/", api.StopsHandler)
-
 		r.Group(func(r chi.Router) {
 			r.Use(cli.casauth)
 			r.Post("/create", api.StopsCreateHandler)
 			r.Delete("/{id:.+}", api.StopsDeleteHandler)
-
 		})
 	})
 
@@ -113,12 +110,10 @@ func New(cfg Config, db database.Database, vs shuttletracker.VehicleService) (*A
 		r.Get("/", api.AdminHandler)
 		r.Get("/login", api.AdminHandler)
 		r.Get("/logout", cli.logout)
-
 	})
 
 	r.Group(func(r chi.Router) {
 		r.Use(cli.casauth)
-
 		r.Get("/getKey/", api.KeyHandler)
 	})
 

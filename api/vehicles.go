@@ -8,7 +8,6 @@ import (
 
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
-	"github.com/wtg/shuttletracker/model"
 )
 
 var (
@@ -17,7 +16,7 @@ var (
 
 // VehiclesHandler returns all the vehicles.
 func (api *API) VehiclesHandler(w http.ResponseWriter, r *http.Request) {
-	vehicles, err := api.vs.Vehicles()
+	vehicles, err := api.ms.Vehicles()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -34,7 +33,7 @@ func (api *API) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = api.vs.CreateVehicle(&vehicle)
+	err = api.ms.CreateVehicle(&vehicle)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -52,7 +51,7 @@ func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
 	name := vehicle.Name
 	enabled := vehicle.Enabled
 	trackerID := vehicle.TrackerID
-	vehicle, err = api.vs.Vehicle(vehicle.ID)
+	vehicle, err = api.ms.Vehicle(vehicle.ID)
 	if err != nil {
 		log.WithError(err).Error("unable to retrieve vehicle")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -63,7 +62,7 @@ func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
 	vehicle.Enabled = enabled
 	vehicle.TrackerID = trackerID
 
-	err = api.vs.ModifyVehicle(vehicle)
+	err = api.ms.ModifyVehicle(vehicle)
 	if err != nil {
 		log.WithError(err).Error("unable to modify vehicle")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -77,7 +76,7 @@ func (api *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = api.vs.DeleteVehicle(id)
+	err = api.ms.DeleteVehicle(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -85,7 +84,7 @@ func (api *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 // UpdatesHandler gets the most recent update for each enabled vehicle.
 func (api *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
-	vehicles, err := api.vs.EnabledVehicles()
+	vehicles, err := api.ms.EnabledVehicles()
 	if err != nil {
 		log.WithError(err).Error("Unable to get enabled vehicles.")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -93,10 +92,10 @@ func (api *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// slice of capacity len(vehicles) and size zero
-	updates := make([]model.VehicleUpdate, 0, len(vehicles))
+	updates := make([]*shuttletracker.Location, 0, len(vehicles))
 	for _, vehicle := range vehicles {
 		since := time.Now().Add(time.Minute * -5)
-		vehicleUpdates, err := api.db.GetUpdatesForVehicleSince(vehicle.ID, since)
+		vehicleUpdates, err := api.ms.LocationsSince(vehicle.ID, since)
 		if err != nil {
 			log.WithError(err).Error("Unable to get last vehicle update.")
 			http.Error(w, err.Error(), http.StatusInternalServerError)

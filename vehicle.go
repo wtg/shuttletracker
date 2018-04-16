@@ -10,11 +10,11 @@ var ErrVehicleNotFound = errors.New("Vehicle not found")
 
 // Vehicle represents an object being tracked.
 type Vehicle struct {
-	ID        int       `json:"id"   bson:"vehicleID,omitempty"`
-	Name      string    `json:"name" bson:"vehicleName"`
-	Created   time.Time `json:"created" bson:"created"`
-	Updated   time.Time `json:"updated" bson:"updated"`
-	Enabled   bool      `json:"enabled"     bson:"enabled"`
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	Created   time.Time `json:"created"`
+	Updated   time.Time `json:"updated"`
+	Enabled   bool      `json:"enabled"`
 	TrackerID string    `json:"tracker_id"`
 }
 
