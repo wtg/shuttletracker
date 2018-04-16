@@ -285,5 +285,12 @@ func (u *Updater) GuessRouteForVehicle(vehicle *shuttletracker.Vehicle) (route *
 }
 
 func itrakTimeDate(itrakTime, itrakDate string) (time.Time, error) {
-	return time.Parse("01022006", itrakDate)
+	// Add a leading zero to the time value if it's missing.
+	// time.Parse expects this.
+	if len(itrakTime) == 10 {
+		itrakTime = itrakTime[:5] + "0" + itrakTime[5:]
+	}
+
+	combined := itrakDate + " " + itrakTime
+	return time.Parse("date:01022006 time:150405", combined)
 }
