@@ -15,11 +15,11 @@ import (
 )
 
 func TestVehiclesHandlerNoVehicles(t *testing.T) {
-	vs := &mock.VehicleService{}
-	vs.On("Vehicles").Return([]*shuttletracker.Vehicle{}, nil)
+	ms := &mock.ModelService{}
+	ms.VehicleService.On("Vehicles").Return([]*shuttletracker.Vehicle{}, nil)
 
 	api := API{
-		vs: vs,
+		ms: ms,
 	}
 
 	w := httptest.NewRecorder()
@@ -51,12 +51,12 @@ func TestVehiclesHandlerNoVehicles(t *testing.T) {
 		t.Errorf("got %d vehicles, expected 0", len(returnedVehicles))
 	}
 
-	vs.AssertExpectations(t)
-	vs.AssertNumberOfCalls(t, "Vehicles", 1)
+	ms.VehicleService.AssertExpectations(t)
+	ms.VehicleService.AssertNumberOfCalls(t, "Vehicles", 1)
 }
 
 func TestVehiclesHandlerTwoVehicles(t *testing.T) {
-	vs := &mock.VehicleService{}
+	ms := &mock.ModelService{}
 	vehicles := []*shuttletracker.Vehicle{
 		{
 			Name:    "Vehicle 1",
@@ -67,10 +67,10 @@ func TestVehiclesHandlerTwoVehicles(t *testing.T) {
 			Enabled: true,
 		},
 	}
-	vs.On("Vehicles").Return(vehicles, nil)
+	ms.VehicleService.On("Vehicles").Return(vehicles, nil)
 
 	api := API{
-		vs: vs,
+		ms: ms,
 	}
 
 	w := httptest.NewRecorder()
@@ -108,21 +108,21 @@ func TestVehiclesHandlerTwoVehicles(t *testing.T) {
 		}
 	}
 
-	vs.AssertExpectations(t)
-	vs.AssertNumberOfCalls(t, "Vehicles", 1)
+	ms.VehicleService.AssertExpectations(t)
+	ms.VehicleService.AssertNumberOfCalls(t, "Vehicles", 1)
 }
 
 func TestVehiclesCreateHandler(t *testing.T) {
-	vs := &mock.VehicleService{}
+	ms := &mock.ModelService{}
 	vehicle := &shuttletracker.Vehicle{
 		Name:      "Vehicle 2",
 		Enabled:   true,
 		TrackerID: "2",
 	}
-	vs.On("CreateVehicle", vehicle).Return(nil)
+	ms.VehicleService.On("CreateVehicle", vehicle).Return(nil)
 
 	api := API{
-		vs: vs,
+		ms: ms,
 	}
 
 	body := &bytes.Buffer{}
@@ -156,12 +156,12 @@ func TestVehiclesCreateHandler(t *testing.T) {
 		t.Errorf("got body length %d, expected 0", len(respBody))
 	}
 
-	vs.AssertExpectations(t)
-	vs.AssertNumberOfCalls(t, "CreateVehicle", 1)
+	ms.VehicleService.AssertExpectations(t)
+	ms.VehicleService.AssertNumberOfCalls(t, "CreateVehicle", 1)
 }
 
 func TestVehiclesEditHandler(t *testing.T) {
-	vs := &mock.VehicleService{}
+	ms := &mock.ModelService{}
 	vehicleTime := time.Now()
 	existingVehicle := &shuttletracker.Vehicle{
 		ID:        4,
@@ -177,14 +177,14 @@ func TestVehiclesEditHandler(t *testing.T) {
 		TrackerID: "3",
 		Created:   vehicleTime,
 	}
-	vs.On("Vehicle", 4).Return(existingVehicle, nil)
+	ms.VehicleService.On("Vehicle", 4).Return(existingVehicle, nil)
 
 	// Because the handler sets the Updated field to time.Now(), we have to accept everything
 	// here and then check later that the method actually got the struct with fields we expected.
-	vs.On("ModifyVehicle", "mock.Anything").Return(nil)
+	ms.VehicleService.On("ModifyVehicle", "mock.Anything").Return(nil)
 
 	api := API{
-		vs: vs,
+		ms: ms,
 	}
 
 	body := &bytes.Buffer{}
@@ -218,11 +218,11 @@ func TestVehiclesEditHandler(t *testing.T) {
 		t.Errorf("got body length %d, expected 0", len(respBody))
 	}
 
-	vs.AssertExpectations(t)
-	vs.AssertNumberOfCalls(t, "Vehicle", 1)
-	vs.AssertNumberOfCalls(t, "ModifyVehicle", 1)
+	ms.VehicleService.AssertExpectations(t)
+	ms.VehicleService.AssertNumberOfCalls(t, "Vehicle", 1)
+	ms.VehicleService.AssertNumberOfCalls(t, "ModifyVehicle", 1)
 
-	for _, call := range vs.Calls {
+	for _, call := range ms.VehicleService.Calls {
 		if call.Method == "ModifyVehicle" {
 			if len(call.Arguments) != 1 {
 				t.Errorf("got %d arguments, expected 1", len(call.Arguments))
@@ -254,12 +254,12 @@ func TestVehiclesEditHandler(t *testing.T) {
 }
 
 func TestVehiclesDeleteHandler(t *testing.T) {
-	vs := &mock.VehicleService{}
+	ms := &mock.ModelService{}
 	vehicleID := 7
-	vs.On("DeleteVehicle", vehicleID).Return(nil)
+	ms.VehicleService.On("DeleteVehicle", vehicleID).Return(nil)
 
 	api := API{
-		vs: vs,
+		ms: ms,
 	}
 
 	req, err := http.NewRequest("DELETE", "/?id="+strconv.Itoa(vehicleID), nil)
@@ -285,6 +285,6 @@ func TestVehiclesDeleteHandler(t *testing.T) {
 		t.Errorf("got body length %d, expected 0", len(respBody))
 	}
 
-	vs.AssertExpectations(t)
-	vs.AssertNumberOfCalls(t, "DeleteVehicle", 1)
+	ms.VehicleService.AssertExpectations(t)
+	ms.VehicleService.AssertNumberOfCalls(t, "DeleteVehicle", 1)
 }

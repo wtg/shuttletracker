@@ -1,8 +1,9 @@
 package database
 
 import (
-	"github.com/wtg/shuttletracker/model"
 	"testing"
+
+	"github.com/wtg/shuttletracker/model"
 
 	"time"
 )
@@ -31,7 +32,7 @@ func TestSetRouteActiveStatusSameDay(t *testing.T) {
 	interval = append(interval, t1, t2)
 
 	TestRoute := model.Route{
-		ID:           "Test",
+		ID:           1,
 		Name:         "Test Route",
 		TimeInterval: interval,
 	}
@@ -58,7 +59,7 @@ func TestSetRouteActiveStatusSimilarTime(t *testing.T) {
 	interval = append(interval, t1, t2)
 
 	TestRoute := model.Route{
-		ID:           "Test",
+		ID:           1,
 		Name:         "Test Route",
 		TimeInterval: interval,
 	}
@@ -86,7 +87,7 @@ func TestSetRouteActiveStatusDiffDay(t *testing.T) {
 	interval = append(interval, t1, t2)
 
 	TestRoute := model.Route{
-		ID:           "Test",
+		ID:           1,
 		Name:         "Test Route",
 		TimeInterval: interval,
 	}

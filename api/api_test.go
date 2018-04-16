@@ -36,11 +36,11 @@ func TestStatic(t *testing.T) {
 
 	cfg := Config{}
 	db := &database.Mock{}
-	vs := &mock.VehicleService{}
+	ms := &mock.ModelService{}
 
-	api, err := New(cfg, db, vs)
+	api, err := New(cfg, db, ms)
 	if err != nil {
-		t.Errorf("got error '%s', expected nil", err)
+		t.Errorf("unexpected error: %s", err)
 		return
 	}
 
