@@ -32,10 +32,10 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
    * `MongoUrl`: URL where MongoDB is located
    * `MongoPort`: Port where MongoDB is bound (default is 27017)
 10. Start MongoDB, and ensure it is running, and listening on port 27017 (or whichever port you defined in `MongoPort` within `conf.json`)
-    * `./runMongo` at shuttletracker directory.
+    * `./runMongo` at shuttletracker directory.(Use a new terminal windows)
 11. Add data to your database. Example DBs are provided in `example_database`, as well as a simple import/export script to setup the database for you.
     - If using an example database, you might need to check the name of the imported database, and change `MongoUrl` accordingly.
-12. Start the app by running `go run main.go` in the project root directory.
+12. Start the app by running `go run main.go` in the project root directory. 
 13. You can optionally add yourself as an administrator by using the `make-admin` script in the example_database folder, passing it your RCS ID as the first argument.
 14. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel
 
