@@ -6,7 +6,9 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 
 ## Setting Up
 
-1. Install Go (https://golang.org/doc/install)
+### Windows Subsystem for Linux
+
+1. Install Go `sudo apt-get install golang-go`
 2. Ensure your `$GOPATH` is set correctly, and is apart of your `$PATH`
    * From the bash terminal:`vi ~/.bashrc` to edit the file
    * Press 'G' to go to the end of file.Press 'A' to append to the end of the line. Press enter twice. Then add the following line(change the 'username'): 
@@ -15,17 +17,16 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
       export GOPATH
       PATH=$PATH:$GOPATH/bin # Add GOPATH/bin to PATH for scripting
      ```
-   * Then press escape, then press ':wq' and enter.
+   * Then press escape, then press `:wq` and enter.
    * Type command in the terminal `source ~/.bashrc`
 3. Run `go get github.com/wtg/shuttletracker`
 4. Install `govendor`  by running `go get -u github.com/kardianos/govendor`
 5. Switch to the Shuttle Tracker directory (`$GOPATH/src/github.com/wtg/shuttletracker`)
 6. Run `govendor sync`
-7. Ensure you have MongoDB installed.
+7. Ensure you have MongoDB installed:
    * `sudo apt-get install mongodb`
-8. Rename `conf.json.sample` to `conf.json`
+8. Rename `conf.json.sample` to `conf.json`:
    * `mv conf.json.sample conf.json`
-   
 9. Edit conf.json with the following: `nano conf.json`
    * `DataFeed`: API with tracking information from iTrak... For RPI, this is a unique API URL that we can get data from. It's currently private, and we will only share it with authorized members for now.
    * `UpdateInterval`: Number of seconds between each request to the data feed
