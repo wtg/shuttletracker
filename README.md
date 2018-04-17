@@ -24,7 +24,7 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 7. Ensure you have MongoDB installed.
    * `sudo apt-get install mongodb`
 8. Rename `conf.json.sample` to `conf.json`
-  * `mv conf.json.sample conf.json`
+   * `mv conf.json.sample conf.json`
    
 9. Edit conf.json with the following: `nano conf.json`
    * `DataFeed`: API with tracking information from iTrak... For RPI, this is a unique API URL that we can get data from. It's currently private, and we will only share it with authorized members for now.
