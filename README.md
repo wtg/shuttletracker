@@ -11,7 +11,7 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 1. Install Go `sudo apt-get install golang-go`
 2. Ensure your `$GOPATH` is set correctly, and is apart of your `$PATH`
    * From the bash terminal:`vi ~/.bashrc` to edit the file
-   * Press 'G' to go to the end of file.Press 'A' to append to the end of the line. Press enter twice. Then add the following line(change the 'username'): 
+   * Press 'G' to go to the end of file. Press 'A' to append to the end of the line. Press enter twice. Then add the following line( change the 'username'): 
       ```
       GOPATH=/home/username/.go
       export GOPATH
@@ -22,9 +22,9 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 3. Run `go get github.com/wtg/shuttletracker`
 4. Install `govendor`  by running `go get -u github.com/kardianos/govendor`
 5. Switch to the Shuttle Tracker directory (`$GOPATH/src/github.com/wtg/shuttletracker`)
-6. Run `govendor sync`
+6. Run `govendor sync`.
 7. Ensure you have MongoDB installed:
-   * `sudo apt-get install mongodb`
+   * If not type command in the terminal: `sudo apt-get install mongodb`
 8. Rename `conf.json.sample` to `conf.json`:
    * `mv conf.json.sample conf.json`
 9. Edit conf.json with the following: `nano conf.json`
