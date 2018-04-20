@@ -78,31 +78,6 @@ func NewMongoDBConfig(v *viper.Viper) *MongoDBConfig {
 	return cfg
 }
 
-// CreateStop creates a Stop.
-func (m *MongoDB) CreateStop(stop *model.Stop) error {
-	stop.ID = bson.NewObjectId().Hex()
-	return m.stops.Insert(&stop)
-}
-
-// DeleteStop deletes a Stop by its ID.
-func (m *MongoDB) DeleteStop(stopID string) error {
-	return m.stops.Remove(bson.M{"id": stopID})
-}
-
-// GetStop returns a Stop by its ID.
-func (m *MongoDB) GetStop(stopID string) (model.Stop, error) {
-	var stop model.Stop
-	err := m.stops.Find(bson.M{"id": stopID}).One(&stop)
-	return stop, err
-}
-
-// GetStops returns all Stops.
-func (m *MongoDB) GetStops() ([]model.Stop, error) {
-	var stops []model.Stop
-	err := m.stops.Find(bson.M{}).All(&stops)
-	return stops, err
-}
-
 // CreateUpdate creates an Update.
 func (m *MongoDB) CreateUpdate(update *model.VehicleUpdate) error {
 	return m.updates.Insert(&update)
@@ -132,22 +107,4 @@ func (m *MongoDB) GetUpdatesForVehicleSince(vehicleID int, since time.Time) ([]m
 	var updates []model.VehicleUpdate
 	err := m.updates.Find(bson.M{"vehicleID": vehicleID, "created": bson.M{"$gt": since}}).Sort("-created").All(&updates)
 	return updates, err
-}
-
-// GetUsers returns all Users.
-func (m *MongoDB) GetUsers() ([]model.User, error) {
-	var users []model.User
-	err := m.users.Find(bson.M{}).All(&users)
-	return users, err
-}
-
-// UserExists tests if a given user exists in the admin database
-func (m *MongoDB) UserExists(uname string) (bool, error) {
-	query := m.users.Find(bson.M{"username": uname})
-	n, err := query.Count()
-	if n == 1 {
-		return true, err
-	}
-
-	return false, err
 }

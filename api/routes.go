@@ -6,8 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/go-chi/chi"
-
+	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/model"
 	sttime "github.com/wtg/shuttletracker/time"
@@ -26,7 +25,7 @@ func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 
 // StopsHandler finds all of the route stops in the database
 func (api *API) StopsHandler(w http.ResponseWriter, r *http.Request) {
-	stops, err := api.db.GetStops()
+	stops, err := api.ms.Stops()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -148,29 +147,16 @@ func (api *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
 
 // StopsCreateHandler adds a new route stop to the database
 func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
-	var stop model.Stop
-	err := json.NewDecoder(r.Body).Decode(&stop)
+	stop := &shuttletracker.Stop{}
+	err := json.NewDecoder(r.Body).Decode(stop)
 	if err != nil {
-		log.WithError(err).Error("Unable to decode stop")
+		log.WithError(err).Error("unable to decode stop")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	route, err := api.ms.Route(stop.RouteID)
+	err = api.ms.CreateStop(stop)
 	if err != nil {
-		log.WithError(err).Error("Unable to get route.")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	err = api.db.CreateStop(&stop)
-	if err != nil {
-		log.WithError(err).Error("Unable to create stop.")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	route.StopsID = append(route.StopsID, stop.ID)
-	err = api.ms.ModifyRoute(route)
-	if err != nil {
-		log.WithError(err).Error("Unable to modify route.")
+		log.WithError(err).Error("unable to create stop")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -178,11 +164,12 @@ func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-	log.Debugf("deleting", id)
-	err := api.db.DeleteStop(id)
-
-	// Error handling
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = api.ms.DeleteStop(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

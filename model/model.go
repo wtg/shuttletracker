@@ -53,21 +53,6 @@ type Time = sttime.Time
 // Coord is a temporary type alias during refactoring
 type Coord = shuttletracker.Coord
 
-// Stop indicates where a tracked object is scheduled to arrive
-type Stop struct {
-	ID           string  `json:"id"             bson:"id"`
-	Name         string  `json:"name"           bson:"name"`
-	Description  string  `json:"description"    bson:"description"`
-	Lat          float64 `json:"lat,string"     bson:"lat"`
-	Lng          float64 `json:"lng,string"     bson:"lng"`
-	Address      string  `json:"address"        bson:"address"`
-	StartTime    string  `json:"startTime"      bson:"startTime"`
-	EndTime      string  `json:"endTime"        bson:"endTime"`
-	Enabled      bool    `json:"enabled,string" bson:"enabled"`
-	RouteID      int     `json:"routeId"        bson:"routeId"`
-	SegmentIndex int     `json:"segmentindex"   bson:"segmentindex"`
-}
-
 type MapPoint struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`

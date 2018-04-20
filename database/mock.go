@@ -43,24 +43,6 @@ func (db *Mock) ModifyRoute(route *model.Route) error {
 	return args.Error(0)
 }
 
-// CreateStop creates a stop.
-func (db *Mock) CreateStop(stop *model.Stop) error {
-	args := db.Called(stop)
-	return args.Error(0)
-}
-
-// DeleteStop deletes a stop.
-func (db *Mock) DeleteStop(stopID string) error {
-	args := db.Called(stopID)
-	return args.Error(0)
-}
-
-// GetStops gets all stops.
-func (db *Mock) GetStops() ([]model.Stop, error) {
-	args := db.Called()
-	return args.Get(0).([]model.Stop), args.Error(1)
-}
-
 // CreateVehicle creates a vehicle.
 func (db *Mock) CreateVehicle(vehicle *model.Vehicle) error {
 	args := db.Called(vehicle)
@@ -119,16 +101,4 @@ func (db *Mock) GetUpdatesForVehicleSince(vehicleID int, since time.Time) ([]mod
 func (db *Mock) GetLastUpdateForVehicle(vehicleID int) (model.VehicleUpdate, error) {
 	args := db.Called(vehicleID)
 	return args.Get(0).(model.VehicleUpdate), args.Error(1)
-}
-
-// GetUsers gets all users.
-func (db *Mock) GetUsers() ([]model.User, error) {
-	args := db.Called()
-	return args.Get(0).([]model.User), args.Error(1)
-}
-
-// UserExists gets all users.
-func (db *Mock) UserExists(uname string) (bool, error) {
-	args := db.Called(uname)
-	return args.Get(0).(bool), args.Error(1)
 }

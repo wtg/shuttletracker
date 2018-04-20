@@ -10,6 +10,7 @@ type Postgres struct {
 	db *sql.DB
 	VehicleService
 	RouteService
+	StopService
 	LocationService
 	MessageService
 	UserService
@@ -31,6 +32,10 @@ func New(url string) (*Postgres, error) {
 		return nil, err
 	}
 	err = pg.RouteService.initializeSchema()
+	if err != nil {
+		return nil, err
+	}
+	err = pg.StopService.initializeSchema()
 	if err != nil {
 		return nil, err
 	}
