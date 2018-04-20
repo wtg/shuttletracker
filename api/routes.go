@@ -159,7 +159,7 @@ func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	//log.Debugf("Able to decode stop.")
 
 	// TODO: account for multiple routes
-	//route := model.Route{}
+	route := model.Route{}
 	routes := []model.Route{}
 	// if len(stop.RouteIDS) == 1{
 	// 	route, err := api.db.GetRoute(stop.RouteID)
