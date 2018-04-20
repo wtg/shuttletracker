@@ -12,6 +12,7 @@ type Postgres struct {
 	RouteService
 	LocationService
 	MessageService
+	UserService
 }
 
 // New returns a configured Postgres.
@@ -38,6 +39,10 @@ func New(url string) (*Postgres, error) {
 		return nil, err
 	}
 	err = pg.MessageService.initializeSchema()
+	if err != nil {
+		return nil, err
+	}
+	err = pg.UserService.initializeSchema()
 	if err != nil {
 		return nil, err
 	}

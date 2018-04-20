@@ -1,25 +1,25 @@
 package api
 
 import (
-	"github.com/wtg/shuttletracker/auth"
-	"github.com/wtg/shuttletracker/database"
-	"github.com/wtg/shuttletracker/log"
+	"net/http"
 	"net/url"
+	"strings"
 
 	gc "gopkg.in/cas.v2"
 
-	"net/http"
-	"strings"
+	"github.com/wtg/shuttletracker"
+	"github.com/wtg/shuttletracker/auth"
+	"github.com/wtg/shuttletracker/log"
 )
 
 // CASClient stores the local cas client and an instance of the database
 type CASClient struct {
 	cas auth.AuthenticationService
-	db  database.Database
+	us  shuttletracker.UserService
 }
 
 // CreateCASClient creates an authentication service CASClient using a cas url and database
-func CreateCASClient(url *url.URL, db database.Database) (*CASClient){
+func CreateCASClient(url *url.URL, us shuttletracker.UserService) *CASClient {
 	client := gc.NewClient(&gc.Options{
 		URL:   url,
 		Store: nil,
@@ -29,17 +29,17 @@ func CreateCASClient(url *url.URL, db database.Database) (*CASClient){
 		cas: &auth.CAS{
 			CAS: client,
 		},
-		db: db,
+		us: us,
 	}
 	return cli
 }
 
 // InjectMocks allows mock interfaces to be used
-func InjectMocks(cli auth.AuthenticationService, db database.Database) (*CASClient){
+func InjectMocks(cli auth.AuthenticationService, us shuttletracker.UserService) *CASClient {
 
-	c:= &CASClient{
+	c := &CASClient{
 		cas: cli,
-		db: db,
+		us:  us,
 	}
 	return c
 }
@@ -59,7 +59,7 @@ func (cli *CASClient) casauth(next http.Handler) http.Handler {
 			}
 			cli.cas.Login(w, r)
 		} else {
-			auth, err := cli.db.UserExists(strings.ToLower(cli.cas.Username(r)))
+			auth, err := cli.us.UserExists(strings.ToLower(cli.cas.Username(r)))
 			if err != nil {
 				log.WithError(err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -36,7 +36,7 @@ type API struct {
 
 // New initializes the application given a config and connects to backends.
 // It also seeds any needed information to the database.
-func New(cfg Config, db database.Database, ms shuttletracker.ModelService, msg shuttletracker.MessageService) (*API, error) {
+func New(cfg Config, db database.Database, ms shuttletracker.ModelService, msg shuttletracker.MessageService, us shuttletracker.UserService) (*API, error) {
 	// Set up CAS authentication
 	url, err := url.Parse(cfg.CasURL)
 	if err != nil {
@@ -56,7 +56,7 @@ func New(cfg Config, db database.Database, ms shuttletracker.ModelService, msg s
 	r.Use(middleware.DefaultCompress)
 	r.Use(etag)
 
-	cli := CreateCASClient(url, db)
+	cli := CreateCASClient(url, us)
 
 	// Vehicles
 	r.Route("/vehicles", func(r chi.Router) {

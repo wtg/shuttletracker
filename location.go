@@ -7,8 +7,8 @@ import (
 // Location represents information about a vehicle's location.
 type Location struct {
 	ID        int       `json:"id"`
-	TrackerID string    `json:"tracker_id"`
 	VehicleID int       `json:"vehicle_id"`
+	TrackerID string    `json:"tracker_id"`
 	Latitude  float64   `json:"latitude"`
 	Longitude float64   `json:"longitude"`
 	Heading   float64   `json:"heading"`

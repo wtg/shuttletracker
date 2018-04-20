@@ -48,12 +48,13 @@ func Run() {
 	}
 
 	// Model service
-	var ms shuttletracker.ModelService
-	ms = pg
+	var ms shuttletracker.ModelService = pg
 
 	// Message service
-	var msg shuttletracker.MessageService
-	msg = pg
+	var msg shuttletracker.MessageService = pg
+
+	// User service
+	var us shuttletracker.UserService = pg
 
 	// Make shuttle position updater
 	updater, err := updater.New(*cfg.Updater, ms)
@@ -64,7 +65,7 @@ func Run() {
 	runner.Add(updater)
 
 	// Make API server
-	api, err := api.New(*cfg.API, db, ms, msg)
+	api, err := api.New(*cfg.API, db, ms, msg, us)
 	if err != nil {
 		log.WithError(err).Error("Could not create API server.")
 		return

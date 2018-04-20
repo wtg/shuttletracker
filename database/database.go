@@ -46,9 +46,6 @@ type Database interface {
 	// GetStopsForRoute(routeID string) ([]model.Stop, error)
 	// ModifyStop(stop *model.Stop) error
 
-	// Users
-	GetUsers() ([]model.User, error)
-	UserExists(uname string) (bool, error)
 }
 
 var (
