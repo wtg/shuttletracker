@@ -156,7 +156,27 @@ func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	route, err := api.db.GetRoute(stop.RouteID)
+	//log.Debugf("Able to decode stop.")
+
+	// TODO: account for multiple routes
+	//route := model.Route{}
+	routes := []model.Route{}
+	// if len(stop.RouteIDS) == 1{
+	// 	route, err := api.db.GetRoute(stop.RouteID)
+	// } else {
+		for i := 0; i < len(stop.RouteIDS); i++ {
+			//routeString :=
+			//log.Debugf(string(stop.RouteIDS[i]))
+			route, err := api.db.GetRoute(string(stop.RouteIDS[i]))
+			//log.Debugf("Route: " + route.Name)
+			if err != nil {
+				log.WithError(err).Error("Unable to get route.")
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			routes = append(routes, route)
+		}
+
 	if err != nil {
 		log.WithError(err).Error("Unable to get route.")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -175,6 +195,17 @@ func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	// We have to know the order of the stop and store a velocity vector into duration for the prediction
+	// for i := range stop.RouteIDS {
+	// 	routes[i].StopsID = append(routes[i].StopsID, stop.ID) // THIS REQUIRES the front end to have correct order << to be improved
+	// 	err = api.db.ModifyRoute(&routes[i])
+	// 	if err != nil {
+	// 		log.WithError(err).Error("Unable to modify route.")
+	// 		http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 		return
+	// 	}
+	// }
+
 	WriteJSON(w, stop)
 }
 

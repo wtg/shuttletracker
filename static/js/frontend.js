@@ -307,18 +307,12 @@ Vue.component('shuttle-map',{
 
     },
 
-<<<<<<< Updated upstream
     grabVehicles: function () {
       $.get( "/updates", this.updateVehicles).fail(function(){vehicleSuccess = false;});
-=======
-
-
-    grabVehicles: function(){
-      $.get( "/updates", this.updateVehicles).fail(function(){vehicleUpdateSuccess = false;});
->>>>>>> Stashed changes
     },
 
     updateVehicles: function (data) {
+      //console.log("Hello");
       window.d = new Date();
       var hours = window.d.getHours();
       hours = checkTime(hours);
