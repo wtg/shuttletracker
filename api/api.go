@@ -31,11 +31,12 @@ type API struct {
 	db      database.Database
 	handler http.Handler
 	ms      shuttletracker.ModelService
+	msg     shuttletracker.MessageService
 }
 
 // New initializes the application given a config and connects to backends.
 // It also seeds any needed information to the database.
-func New(cfg Config, db database.Database, ms shuttletracker.ModelService) (*API, error) {
+func New(cfg Config, db database.Database, ms shuttletracker.ModelService, msg shuttletracker.MessageService) (*API, error) {
 	// Set up CAS authentication
 	url, err := url.Parse(cfg.CasURL)
 	if err != nil {
@@ -47,6 +48,7 @@ func New(cfg Config, db database.Database, ms shuttletracker.ModelService) (*API
 		cfg: cfg,
 		db:  db,
 		ms:  ms,
+		msg: msg,
 	}
 
 	r := chi.NewRouter()

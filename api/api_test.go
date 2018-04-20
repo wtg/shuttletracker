@@ -37,8 +37,9 @@ func TestStatic(t *testing.T) {
 	cfg := Config{}
 	db := &database.Mock{}
 	ms := &mock.ModelService{}
+	msg := &mock.MessageService{}
 
-	api, err := New(cfg, db, ms)
+	api, err := New(cfg, db, ms, msg)
 	if err != nil {
 		t.Errorf("unexpected error: %s", err)
 		return

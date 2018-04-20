@@ -1,12 +1,21 @@
 package postgres
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/wtg/shuttletracker"
 )
 
-type LocationService struct{}
+type LocationService struct {
+	db *sql.DB
+}
+
+func (ls *LocationService) initializeSchema() error {
+	schema := ``
+	_, err := ls.db.Exec(schema)
+	return err
+}
 
 func (ls *LocationService) CreateLocation(location *shuttletracker.Location) error {
 	return nil

@@ -141,34 +141,6 @@ func (m *MongoDB) GetUsers() ([]model.User, error) {
 	return users, err
 }
 
-// AddMessage sets the current admin message
-func (m *MongoDB) AddMessage(message *model.AdminMessage) error {
-	message.ID = 1
-	message.Created = time.Now()
-	return m.messages.Insert(message)
-}
-
-// ClearMessage Clears the current message.
-func (m *MongoDB) ClearMessage() error {
-	message := model.AdminMessage{}
-	message.ID = 1
-	return m.messages.Remove(bson.M{"id": 1})
-}
-
-// GetCurrentMessage gets the most recent admin message
-func (m *MongoDB) GetCurrentMessage() (model.AdminMessage, error) {
-	message := model.AdminMessage{}
-	err := m.messages.Find(bson.M{}).Sort("-created").One(&message)
-	return message, err
-}
-
-// GetMessages gets the most recent admin messages
-func (m *MongoDB) GetMessages() ([]model.AdminMessage, error) {
-	messages := []model.AdminMessage{}
-	err := m.messages.Find(bson.M{}).All(&messages)
-	return messages, err
-}
-
 // UserExists tests if a given user exists in the admin database
 func (m *MongoDB) UserExists(uname string) (bool, error) {
 	query := m.users.Find(bson.M{"username": uname})

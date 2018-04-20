@@ -41,13 +41,19 @@ func Run() {
 		return
 	}
 
-	// Model service
-	var ms shuttletracker.ModelService
-	ms, err = postgres.NewModelService("postgres://localhost/shuttletracker?sslmode=disable")
+	pg, err := postgres.New("postgres://localhost/shuttletracker?sslmode=disable")
 	if err != nil {
-		log.WithError(err).Error("unable to create ModelService")
+		log.WithError(err).Error("unable to create Postgres")
 		return
 	}
+
+	// Model service
+	var ms shuttletracker.ModelService
+	ms = pg
+
+	// Message service
+	var msg shuttletracker.MessageService
+	msg = pg
 
 	// Make shuttle position updater
 	updater, err := updater.New(*cfg.Updater, ms)
@@ -58,7 +64,7 @@ func Run() {
 	runner.Add(updater)
 
 	// Make API server
-	api, err := api.New(*cfg.API, db, ms)
+	api, err := api.New(*cfg.API, db, ms, msg)
 	if err != nil {
 		log.WithError(err).Error("Could not create API server.")
 		return

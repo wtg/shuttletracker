@@ -132,27 +132,3 @@ func (db *Mock) UserExists(uname string) (bool, error) {
 	args := db.Called(uname)
 	return args.Get(0).(bool), args.Error(1)
 }
-
-// AddMessage adds a message.
-func (db *Mock) AddMessage(message *model.AdminMessage) error {
-	args := db.Called(message)
-	return args.Error(0)
-}
-
-// GetCurrentMessage gets the current message.
-func (db *Mock) GetCurrentMessage() (model.AdminMessage, error) {
-	args := db.Called()
-	return args.Get(0).(model.AdminMessage), args.Error(1)
-}
-
-// GetMessages gets all messages.
-func (db *Mock) GetMessages() ([]model.AdminMessage, error) {
-	args := db.Called()
-	return args.Get(0).([]model.AdminMessage), args.Error(1)
-}
-
-// ClearMessage clears the message.
-func (db *Mock) ClearMessage() error {
-	args := db.Called()
-	return args.Error(0)
-}
