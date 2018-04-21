@@ -14,26 +14,8 @@ type VehicleService struct {
 	db *sql.DB
 }
 
-// NewVehicleService returns a configured VehicleService.
-func NewVehicleService(url string) (*VehicleService, error) {
-	db, err := sql.Open("postgres", url)
-	if err != nil {
-		return nil, err
-	}
-
-	vs := &VehicleService{
-		db: db,
-	}
-
-	err = vs.initializeSchema()
-	if err != nil {
-		return nil, err
-	}
-
-	return vs, nil
-}
-
-func (v *VehicleService) initializeSchema() error {
+func (v *VehicleService) initializeSchema(db *sql.DB) error {
+	v.db = db
 	schema := `
 -- DROP TABLE vehicles;
 CREATE TABLE IF NOT EXISTS vehicles (

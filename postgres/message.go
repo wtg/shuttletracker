@@ -11,7 +11,8 @@ type MessageService struct {
 	db *sql.DB
 }
 
-func (ms *MessageService) initializeSchema() error {
+func (ms *MessageService) initializeSchema(db *sql.DB) error {
+	ms.db = db
 	schema := ``
 	_, err := ms.db.Exec(schema)
 	return err

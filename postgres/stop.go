@@ -11,7 +11,8 @@ type StopService struct {
 	db *sql.DB
 }
 
-func (ss *StopService) initializeSchema() error {
+func (ss *StopService) initializeSchema(db *sql.DB) error {
+	ss.db = db
 	schema := ``
 	_, err := ss.db.Exec(schema)
 	return err

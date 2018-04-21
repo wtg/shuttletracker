@@ -11,7 +11,8 @@ type LocationService struct {
 	db *sql.DB
 }
 
-func (ls *LocationService) initializeSchema() error {
+func (ls *LocationService) initializeSchema(db *sql.DB) error {
+	ls.db = db
 	schema := ``
 	_, err := ls.db.Exec(schema)
 	return err

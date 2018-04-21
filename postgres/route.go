@@ -14,26 +14,8 @@ type RouteService struct {
 	db *sql.DB
 }
 
-// NewRouteService returns a configured RouteService.
-func NewRouteService(url string) (*RouteService, error) {
-	db, err := sql.Open("postgres", url)
-	if err != nil {
-		return nil, err
-	}
-
-	rs := &RouteService{
-		db: db,
-	}
-
-	err = rs.initializeSchema()
-	if err != nil {
-		return nil, err
-	}
-
-	return rs, nil
-}
-
-func (r *RouteService) initializeSchema() error {
+func (r *RouteService) initializeSchema(db *sql.DB) error {
+	r.db = db
 	schema := `
 --DROP TABLE routes;
 CREATE TABLE IF NOT EXISTS routes (
