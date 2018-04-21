@@ -13,9 +13,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/wtg/shuttletracker"
-	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/log"
-	"github.com/wtg/shuttletracker/model"
 )
 
 // Updater handles periodically grabbing the latest vehicle location data from iTrak.
@@ -138,11 +136,11 @@ func (u *Updater) update() {
 				return
 			}
 			lastUpdate, err := u.ms.LatestLocation(vehicle.ID)
-			if err != nil && err != database.ErrUpdateNotFound {
+			if err != nil && err != shuttletracker.ErrLocationNotFound {
 				log.WithError(err).Error("unable to retrieve last update")
 				return
 			}
-			if err != database.ErrUpdateNotFound && newTime.Equal(lastUpdate.Time) {
+			if err != shuttletracker.ErrLocationNotFound && newTime.Equal(lastUpdate.Time) {
 				// Timestamp is not new; don't store update.
 				return
 			}
@@ -273,7 +271,7 @@ func (u *Updater) GuessRouteForVehicle(vehicle *shuttletracker.Vehicle) (route *
 	// not on a route
 	if minRouteID == 0 {
 		log.Debugf("%v not on route; distance from nearest: %v", vehicle.Name, minDistance)
-		return &model.Route{}, nil
+		return &shuttletracker.Route{}, nil
 	}
 
 	route, err = u.ms.Route(minRouteID)

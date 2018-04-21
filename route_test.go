@@ -1,11 +1,10 @@
-package database
+package shuttletracker
 
 import (
 	"testing"
-
-	"github.com/wtg/shuttletracker/model"
-
 	"time"
+
+	sttime "github.com/wtg/shuttletracker/time"
 )
 
 /*
@@ -16,22 +15,22 @@ import (
 
 func TestSetRouteActiveStatusSameDay(t *testing.T) {
 	//Test when the day is the same, and time varies and should be active
-	interval := []model.Time{}
+	interval := []sttime.Time{}
 	timeTest, _ := time.Parse("15:04:05", "12:05:06")
 
-	t1 := model.Time{
+	t1 := sttime.Time{
 		Day:   timeTest.Weekday(),
 		Time:  timeTest.Add(-5 * time.Hour),
 		State: 1,
 	}
-	t2 := model.Time{
+	t2 := sttime.Time{
 		Day:   timeTest.Weekday(),
 		Time:  timeTest.Add(1 * time.Hour),
 		State: 0,
 	}
 	interval = append(interval, t1, t2)
 
-	TestRoute := model.Route{
+	TestRoute := Route{
 		ID:           1,
 		Name:         "Test Route",
 		TimeInterval: interval,
@@ -44,21 +43,21 @@ func TestSetRouteActiveStatusSameDay(t *testing.T) {
 
 func TestSetRouteActiveStatusSimilarTime(t *testing.T) {
 	//Test when the day is the same, and time varies and should be active
-	interval := []model.Time{}
+	interval := []sttime.Time{}
 	timeTest, _ := time.Parse("15:04:05", "12:05:06")
-	t1 := model.Time{
+	t1 := sttime.Time{
 		Day:   timeTest.Weekday(),
 		Time:  timeTest.Add(-5 * time.Second),
 		State: 1,
 	}
-	t2 := model.Time{
+	t2 := sttime.Time{
 		Day:   timeTest.Weekday(),
 		Time:  timeTest.Add(5 * time.Second),
 		State: 0,
 	}
 	interval = append(interval, t1, t2)
 
-	TestRoute := model.Route{
+	TestRoute := Route{
 		ID:           1,
 		Name:         "Test Route",
 		TimeInterval: interval,
@@ -72,21 +71,21 @@ func TestSetRouteActiveStatusSimilarTime(t *testing.T) {
 //Creates some test routes and tests if they should be active
 func TestSetRouteActiveStatusDiffDay(t *testing.T) {
 	//Test when the day is explicitly different and should be active
-	interval := []model.Time{}
+	interval := []sttime.Time{}
 	timeTest, _ := time.Parse("15:04:05", "12:05:06")
-	t1 := model.Time{
+	t1 := sttime.Time{
 		Day:   timeTest.Weekday() - 1,
 		Time:  timeTest.Add(-5 * time.Minute),
 		State: 1,
 	}
-	t2 := model.Time{
+	t2 := sttime.Time{
 		Day:   timeTest.Weekday(),
 		Time:  timeTest.Add(5 * time.Minute),
 		State: 0,
 	}
 	interval = append(interval, t1, t2)
 
-	TestRoute := model.Route{
+	TestRoute := Route{
 		ID:           1,
 		Name:         "Test Route",
 		TimeInterval: interval,
@@ -98,13 +97,13 @@ func TestSetRouteActiveStatusDiffDay(t *testing.T) {
 	}
 
 	//Test when the day is explicitly different and should not be active
-	interval = []model.Time{}
-	t1 = model.Time{
+	interval = []sttime.Time{}
+	t1 = sttime.Time{
 		Day:   timeTest.Weekday() - 1,
 		Time:  timeTest.Add(-5 * time.Minute),
 		State: 0,
 	}
-	t2 = model.Time{
+	t2 = sttime.Time{
 		Day:   timeTest.Weekday(),
 		Time:  timeTest.Add(5 * time.Minute),
 		State: 1,

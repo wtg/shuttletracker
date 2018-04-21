@@ -11,7 +11,6 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/wtg/shuttletracker"
-	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/log"
 )
 
@@ -28,7 +27,6 @@ type Config struct {
 // API is responsible for configuring handlers for HTTP endpoints.
 type API struct {
 	cfg     Config
-	db      database.Database
 	handler http.Handler
 	ms      shuttletracker.ModelService
 	msg     shuttletracker.MessageService
@@ -36,7 +34,7 @@ type API struct {
 
 // New initializes the application given a config and connects to backends.
 // It also seeds any needed information to the database.
-func New(cfg Config, db database.Database, ms shuttletracker.ModelService, msg shuttletracker.MessageService, us shuttletracker.UserService) (*API, error) {
+func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageService, us shuttletracker.UserService) (*API, error) {
 	// Set up CAS authentication
 	url, err := url.Parse(cfg.CasURL)
 	if err != nil {
@@ -46,7 +44,6 @@ func New(cfg Config, db database.Database, ms shuttletracker.ModelService, msg s
 	// Create API instance to store database session and collections
 	api := API{
 		cfg: cfg,
-		db:  db,
 		ms:  ms,
 		msg: msg,
 	}

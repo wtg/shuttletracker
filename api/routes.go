@@ -65,7 +65,7 @@ func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	width, _ := strconv.Atoi(routeData["width"])
 	timeIntervals := []model.Time{}
 
-	route := model.Route{
+	route := &shuttletracker.Route{
 		Name:         routeData["name"],
 		Description:  routeData["description"],
 		TimeInterval: timeIntervals,
@@ -75,7 +75,7 @@ func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 		Coords:       coords,
 		Created:      time.Now(),
 		Updated:      time.Now()}
-	err = api.ms.CreateRoute(&route)
+	err = api.ms.CreateRoute(route)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -110,7 +110,7 @@ func (api *API) RoutesScheduler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sttime.Sort(times.Times)
-	route := &model.Route{}
+	route := &shuttletracker.Route{}
 	route, err = api.ms.Route(times.ID)
 	route.TimeInterval = times.Times
 
@@ -124,7 +124,7 @@ func (api *API) RoutesScheduler(w http.ResponseWriter, r *http.Request) {
 
 // RoutesEditHandler Only handles editing enabled flag for now
 func (api *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
-	route := &model.Route{}
+	route := &shuttletracker.Route{}
 	err := json.NewDecoder(r.Body).Decode(route)
 	if err != nil {
 		log.WithError(err).Error("Unable to decode route")

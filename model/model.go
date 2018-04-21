@@ -44,9 +44,6 @@ type LatestPosition struct {
 	StatusMessage *string   `json:"public_status_message"` // this is a pointer so it defaults to null
 }
 
-// Route is a temporary type alias during refactoring
-type Route = shuttletracker.Route
-
 // Time is a temporary type alias during refactoring
 type Time = sttime.Time
 

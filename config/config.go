@@ -6,17 +6,16 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/wtg/shuttletracker/api"
-	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/updater"
 )
 
 // Config is the global configuration struct.
 type Config struct {
-	Database *database.MongoDBConfig
-	Updater  *updater.Config
-	API      *api.Config
-	Log      *log.Config
+	// Database *database.MongoDBConfig
+	Updater *updater.Config
+	API     *api.Config
+	Log     *log.Config
 }
 
 // New creates a new, global Config. Reads in configuration from config files.
@@ -30,7 +29,6 @@ func New() (*Config, error) {
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	cfg.API = api.NewConfig(v)
-	cfg.Database = database.NewMongoDBConfig(v)
 	cfg.Updater = updater.NewConfig(v)
 	cfg.Log = log.NewConfig()
 

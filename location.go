@@ -1,6 +1,7 @@
 package shuttletracker
 
 import (
+	"errors"
 	"time"
 )
 
@@ -24,3 +25,8 @@ type LocationService interface {
 	LocationsSince(vehicleID int, since time.Time) ([]*Location, error)
 	LatestLocation(vehicleID int) (*Location, error)
 }
+
+var (
+	// ErrUpdateNotFound indicates that an Update is not in the database.
+	ErrLocationNotFound = errors.New("location not found")
+)

@@ -8,7 +8,6 @@ import (
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/api"
 	"github.com/wtg/shuttletracker/config"
-	"github.com/wtg/shuttletracker/database"
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/postgres"
 	"github.com/wtg/shuttletracker/updater"
@@ -34,13 +33,7 @@ func Run() {
 	// Log
 	log.SetLevel(cfg.Log.Level)
 
-	// Database
-	db, err := database.NewMongoDB(*cfg.Database)
-	if err != nil {
-		log.WithError(err).Errorf("MongoDB connection to \"%v\" failed.", cfg.Database.MongoURL)
-		return
-	}
-
+	// db, err := database.NewMongoDB(*cfg.Database)
 	pg, err := postgres.New("postgres://localhost/shuttletracker?sslmode=disable")
 	if err != nil {
 		log.WithError(err).Error("unable to create Postgres")
@@ -65,7 +58,7 @@ func Run() {
 	runner.Add(updater)
 
 	// Make API server
-	api, err := api.New(*cfg.API, db, ms, msg, us)
+	api, err := api.New(*cfg.API, ms, msg, us)
 	if err != nil {
 		log.WithError(err).Error("Could not create API server.")
 		return
