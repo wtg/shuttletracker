@@ -8,7 +8,6 @@ import (
 
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
-	"github.com/wtg/shuttletracker/model"
 	sttime "github.com/wtg/shuttletracker/time"
 )
 
@@ -32,10 +31,10 @@ func (api *API) StopsHandler(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, stops)
 }
 
-func combineCoords(coordsData *[]map[string]float64) []model.Coord {
-	coords := []model.Coord{}
+func combineCoords(coordsData *[]map[string]float64) []shuttletracker.Coord {
+	coords := []shuttletracker.Coord{}
 	for _, c := range *coordsData {
-		coord := model.Coord{
+		coord := shuttletracker.Coord{
 			Lat: c["lat"],
 			Lng: c["lng"],
 		}
@@ -63,7 +62,7 @@ func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Type conversions
 	enabled, _ := strconv.ParseBool(routeData["enabled"])
 	width, _ := strconv.Atoi(routeData["width"])
-	timeIntervals := []model.Time{}
+	timeIntervals := []sttime.Time{}
 
 	route := &shuttletracker.Route{
 		Name:         routeData["name"],
@@ -96,8 +95,8 @@ func (api *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 //Use this for importing a schedule
 type sched struct {
-	Times []model.Time `json:"times"`
-	ID    int          `json:"id"`
+	Times []sttime.Time `json:"times"`
+	ID    int           `json:"id"`
 }
 
 // RoutesScheduler Allows for route active times to be set
