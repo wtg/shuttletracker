@@ -13,7 +13,7 @@ func (us *UserService) initializeSchema(db *sql.DB) error {
 CREATE TABLE IF NOT EXISTS users (
 	id serial PRIMARY KEY,
 	username varchar(10) UNIQUE NOT NULL
-)
+);
 	`
 	_, err := us.db.Exec(schema)
 	return err

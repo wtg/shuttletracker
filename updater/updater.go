@@ -185,7 +185,9 @@ func (u *Updater) update() {
 				Heading:   heading,
 				Speed:     speedMPH,
 				Time:      newTime,
-				RouteID:   route.ID,
+			}
+			if route != nil {
+				update.RouteID = &route.ID
 			}
 
 			if err := u.ms.CreateLocation(update); err != nil {

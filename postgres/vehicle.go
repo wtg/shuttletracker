@@ -34,9 +34,9 @@ CREATE TABLE IF NOT EXISTS vehicles (
 // CreateVehicle creates a Vehicle.
 func (v *VehicleService) CreateVehicle(vehicle *shuttletracker.Vehicle) error {
 	statement := "INSERT INTO vehicles (name, enabled, tracker_id) " +
-		"VALUES ($1, $2, $3) RETURNING id;"
+		"VALUES ($1, $2, $3) RETURNING id, created, updated;"
 	row := v.db.QueryRow(statement, vehicle.Name, vehicle.Enabled, vehicle.TrackerID)
-	err := row.Scan(&vehicle.ID)
+	err := row.Scan(&vehicle.ID, &vehicle.Created, &vehicle.Updated)
 	return err
 }
 
