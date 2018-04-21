@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-// AdminMessage represents a message popup for the user from the site administrator
+// Message represents a message displayed to users.
 type Message struct {
 	ID      int       `json:"id"`
 	Type    string    `json:"type"`
@@ -13,6 +13,7 @@ type Message struct {
 	Created time.Time `json:"created"`
 }
 
+// MessageService is an interface for interacting with Messages.
 type MessageService interface {
 	Message() (*Message, error)
 	SetMessage(message *Message) error

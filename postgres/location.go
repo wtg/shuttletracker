@@ -7,6 +7,7 @@ import (
 	"github.com/wtg/shuttletracker"
 )
 
+// LocationService implements shuttletracker.LocationService.
 type LocationService struct {
 	db *sql.DB
 }
@@ -31,6 +32,7 @@ CREATE TABLE IF NOT EXISTS locations (
 	return err
 }
 
+// CreateLocation creates a Location in the database.
 func (ls *LocationService) CreateLocation(l *shuttletracker.Location) error {
 	query := `
 WITH location AS (
@@ -55,6 +57,7 @@ LEFT JOIN vehicles ON vehicles.tracker_id = location.tracker_id;`
 	return err
 }
 
+// DeleteLocationsBefore deletes all Locations in the database with tracker times before the provided Time.
 func (ls *LocationService) DeleteLocationsBefore(before time.Time) (int, error) {
 	statement := "DELETE FROM locations WHERE time < $1;"
 	res, err := ls.db.Exec(statement, before)
@@ -68,6 +71,7 @@ func (ls *LocationService) DeleteLocationsBefore(before time.Time) (int, error) 
 	return int(n), nil
 }
 
+// LocationsSince returns all Locations since a tracker Time for a certain Vehicle.
 func (ls *LocationService) LocationsSince(vehicleID int, since time.Time) ([]*shuttletracker.Location, error) {
 	locations := []*shuttletracker.Location{}
 	query := "SELECT l.id, l.tracker_id, l.latitude, l.longitude, l.heading, l.speed, l.time, l.route_id, l.created " +
@@ -89,6 +93,7 @@ func (ls *LocationService) LocationsSince(vehicleID int, since time.Time) ([]*sh
 	return locations, nil
 }
 
+// LatestLocation returns the most recent Location created for a Vehicle.
 func (ls *LocationService) LatestLocation(vehicleID int) (*shuttletracker.Location, error) {
 	l := &shuttletracker.Location{
 		VehicleID: &vehicleID,

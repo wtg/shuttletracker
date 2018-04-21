@@ -32,6 +32,6 @@ type LocationService interface {
 }
 
 var (
-	// ErrUpdateNotFound indicates that an Update is not in the database.
+	// ErrLocationNotFound indicates that a Location is not in the database.
 	ErrLocationNotFound = errors.New("location not found")
 )
