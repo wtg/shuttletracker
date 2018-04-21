@@ -56,22 +56,48 @@ LEFT JOIN vehicles ON vehicles.tracker_id = location.tracker_id;`
 }
 
 func (ls *LocationService) DeleteLocationsBefore(before time.Time) (int, error) {
-	return 0, nil
+	statement := "DELETE FROM locations WHERE time < $1;"
+	res, err := ls.db.Exec(statement, before)
+	if err != nil {
+		return 0, err
+	}
+	n, err := res.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return int(n), nil
 }
 
 func (ls *LocationService) LocationsSince(vehicleID int, since time.Time) ([]*shuttletracker.Location, error) {
-	return nil, nil
+	locations := []*shuttletracker.Location{}
+	query := "SELECT l.id, l.tracker_id, l.latitude, l.longitude, l.heading, l.speed, l.time, l.route_id, l.created " +
+		"FROM locations l, vehicles v WHERE l.tracker_id = v.tracker_id AND v.id = $1 AND l.time > $2;"
+	rows, err := ls.db.Query(query, vehicleID, since)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		l := &shuttletracker.Location{
+			VehicleID: &vehicleID,
+		}
+		err := rows.Scan(&l.ID, &l.TrackerID, &l.Latitude, &l.Longitude, &l.Heading, &l.Speed, &l.Time, &l.RouteID, &l.Created)
+		if err != nil {
+			return nil, err
+		}
+		locations = append(locations, l)
+	}
+	return locations, nil
 }
 
 func (ls *LocationService) LatestLocation(vehicleID int) (*shuttletracker.Location, error) {
 	l := &shuttletracker.Location{
 		VehicleID: &vehicleID,
 	}
-	query := "SELECT l.id, l.tracker_id, l.latitude, l.longitude, l.heading, l.speed, l.time, l.route_id " +
+	query := "SELECT l.id, l.tracker_id, l.latitude, l.longitude, l.heading, l.speed, l.time, l.route_id, l.created " +
 		"FROM locations l, vehicles v WHERE l.tracker_id = v.tracker_id AND v.id = $1 " +
-		"ORDER BY l.created DESC;"
+		"ORDER BY l.created DESC LIMIT 1;"
 	row := ls.db.QueryRow(query, vehicleID)
-	err := row.Scan(&l.ID, &l.TrackerID, &l.Latitude, &l.Longitude, &l.Heading, &l.Speed, &l.Time, &l.RouteID)
+	err := row.Scan(&l.ID, &l.TrackerID, &l.Latitude, &l.Longitude, &l.Heading, &l.Speed, &l.Time, &l.RouteID, &l.Created)
 	if err == sql.ErrNoRows {
 		return nil, shuttletracker.ErrLocationNotFound
 	} else if err != nil {
