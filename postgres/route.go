@@ -12,6 +12,9 @@ import (
 	"github.com/wtg/shuttletracker"
 )
 
+// pointsRegex matches points in a Postgres path, e.g. [(42.72283,-73.67964),(42.72297,-73.67948)]
+var pointsRegex = regexp.MustCompile(`\((-?\d+\.?\d*),(-?\d+\.?\d*)\)`)
+
 // RouteService implements shuttletracker.RouteService.
 type RouteService struct {
 	db *sql.DB
@@ -50,11 +53,7 @@ func (p *scanPoints) Scan(src interface{}) error {
 		return errors.New("unable to scan points")
 	}
 
-	r, err := regexp.Compile(`\((\d+),(\d+)\)`)
-	if err != nil {
-		return err
-	}
-	for _, pointMatch := range r.FindAllSubmatch(b, -1) {
+	for _, pointMatch := range pointsRegex.FindAllSubmatch(b, -1) {
 		lat, err := strconv.ParseFloat(string(pointMatch[1]), 64)
 		if err != nil {
 			return err
