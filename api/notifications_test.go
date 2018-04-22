@@ -1,5 +1,7 @@
 package api
 
+// TODO: fix these tests
+
 /*
 import (
 	"net/http"

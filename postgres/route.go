@@ -1,12 +1,13 @@
 package postgres
 
 import (
+	"bytes"
 	"database/sql"
+	"database/sql/driver"
 	"errors"
+	"fmt"
+	"regexp"
 	"strconv"
-	"strings"
-
-	"github.com/lib/pq"
 
 	"github.com/wtg/shuttletracker"
 )
@@ -26,7 +27,8 @@ CREATE TABLE IF NOT EXISTS routes (
 	updated timestamp with time zone NOT NULL DEFAULT now(),
 	enabled boolean NOT NULL,
 	width smallint NOT NULL DEFAULT 4,
-	color varchar(9) NOT NULL DEFAULT '#ffffff'
+	color varchar(9) NOT NULL DEFAULT '#ffffff',
+	points path
 );
 CREATE TABLE IF NOT EXISTS routes_points (
 	id serial PRIMARY KEY,
@@ -38,55 +40,49 @@ CREATE TABLE IF NOT EXISTS routes_points (
 	return err
 }
 
-type scanPoint struct {
-	latitude, longitude float64
+// TODO: document this
+type scanPoints struct {
+	points []shuttletracker.Point
 }
 
-type scanPoints []scanPoint
-
-func (p scanPoints) points() []shuttletracker.Point {
-	points := []shuttletracker.Point{}
-	for _, point := range p {
-		newPoint := shuttletracker.Point{
-			Latitude:  point.latitude,
-			Longitude: point.longitude,
-		}
-		points = append(points, newPoint)
+// TODO: document this
+func (p *scanPoints) Scan(src interface{}) error {
+	if src == nil {
+		p.points = []shuttletracker.Point{}
+		return nil
 	}
-	return points
-}
-
-func (p *scanPoint) Scan(src interface{}) error {
 	b, ok := src.([]byte)
 	if !ok {
-		return errors.New("unable to scan point")
+		return errors.New("unable to scan points")
 	}
 
-	s := string(b)
-	s = s[1 : len(s)-1]
-	split := strings.Split(s, ",")
-
-	lat, err := strconv.ParseFloat(split[0], 64)
+	r, err := regexp.Compile(`\((\d+),(\d+)\)`)
 	if err != nil {
 		return err
 	}
-	p.latitude = lat
-
-	lon, err := strconv.ParseFloat(split[1], 64)
-	if err != nil {
-		return err
+	for _, pointMatch := range r.FindAllSubmatch(b, -1) {
+		lat, err := strconv.ParseFloat(string(pointMatch[1]), 64)
+		if err != nil {
+			return err
+		}
+		lon, err := strconv.ParseFloat(string(pointMatch[2]), 64)
+		if err != nil {
+			return err
+		}
+		point := shuttletracker.Point{
+			Latitude:  lat,
+			Longitude: lon,
+		}
+		p.points = append(p.points, point)
 	}
-	p.longitude = lon
-
 	return nil
 }
 
+// Routes returns all Routes in the database.
 func (rs *RouteService) Routes() ([]*shuttletracker.Route, error) {
 	routes := []*shuttletracker.Route{}
-	query := "SELECT r.id, r.name, r.created, r.updated, r.enabled, r.width, r.color, array_agg(point(rp.latitude, rp.longitude)) as points" +
-		" FROM routes r" +
-		" LEFT JOIN routes_points rp ON r.id = rp.route_id" +
-		" GROUP BY r.id;"
+	query := "SELECT r.id, r.name, r.created, r.updated, r.enabled, r.width, r.color, r.points" +
+		" FROM routes r;"
 	rows, err := rs.db.Query(query)
 	if err != nil {
 		return nil, err
@@ -94,28 +90,84 @@ func (rs *RouteService) Routes() ([]*shuttletracker.Route, error) {
 	for rows.Next() {
 		r := &shuttletracker.Route{}
 		p := scanPoints{}
-		err := rows.Scan(&r.ID, &r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, pq.Array(&p))
+		err := rows.Scan(&r.ID, &r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, &p)
 		if err != nil {
 			return nil, err
 		}
-		r.Points = p.points()
+		r.Points = p.points
 		routes = append(routes, r)
 	}
 	return routes, nil
 }
 
+// Route returns the Route with the provided ID.
 func (rs *RouteService) Route(id int) (*shuttletracker.Route, error) {
-	return nil, nil
+	query := "SELECT r.name, r.created, r.updated, r.enabled, r.width, r.color, r.points" +
+		" FROM routes r;"
+	row := rs.db.QueryRow(query, id)
+	r := &shuttletracker.Route{}
+	p := scanPoints{}
+	err := row.Scan(&r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, &p)
+	if err != nil {
+		return nil, err
+	}
+	r.Points = p.points
+	return r, nil
 }
 
+// TODO: document this
+type valuePoints []shuttletracker.Point
+
+// TODO: document this
+func (p valuePoints) Value() (driver.Value, error) {
+	if len(p) == 0 {
+		return nil, nil
+	}
+
+	buf := &bytes.Buffer{}
+	err := buf.WriteByte('[')
+	if err != nil {
+		return nil, err
+	}
+
+	for i, point := range p {
+		_, err = buf.WriteString(fmt.Sprintf("(%f,%f)", point.Latitude, point.Longitude))
+		if err != nil {
+			return nil, err
+		}
+		if i != len(p)-1 {
+			err = buf.WriteByte(',')
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	err = buf.WriteByte(']')
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+// CreateRoute creates a Route.
 func (rs *RouteService) CreateRoute(route *shuttletracker.Route) error {
-	return nil
+	statement := "INSERT INTO routes (name, enabled, width, color, points)" +
+		" VALUES ($1, $2, $3, $4, $5) RETURNING id, created, updated;"
+	row := rs.db.QueryRow(statement, route.Name, route.Enabled, route.Width, route.Color, valuePoints(route.Points))
+	return row.Scan(&route.ID, &route.Created, &route.Updated)
 }
 
+// DeleteRoute deletes a Route.
 func (rs *RouteService) DeleteRoute(id int) error {
-	return nil
+	statement := "DELETE FROM routes WHERE id = $1;"
+	_, err := rs.db.Exec(statement, id)
+	return err
 }
 
+// ModifyRoute modifies an existing Route.
 func (rs *RouteService) ModifyRoute(route *shuttletracker.Route) error {
-	return nil
+	statement := "UPDATE routes SET name = $1, enabled = $2, width = $3, color = $4, points = $5, updated = now()" +
+		" WHERE id = $6 RETURNING updated;"
+	row := rs.db.QueryRow(statement, route.Name, route.Enabled, route.Width, route.Color, valuePoints(route.Points), route.ID)
+	return row.Scan(&route.Updated)
 }
