@@ -29,12 +29,6 @@ CREATE TABLE IF NOT EXISTS routes (
 	width smallint NOT NULL DEFAULT 4,
 	color varchar(9) NOT NULL DEFAULT '#ffffff',
 	points path
-);
-CREATE TABLE IF NOT EXISTS routes_points (
-	id serial PRIMARY KEY,
-	latitude double precision NOT NULL,
-	longitude double precision NOT NULL,
-	route_id integer REFERENCES routes NOT NULL
 );`
 	_, err := rs.db.Exec(schema)
 	return err
