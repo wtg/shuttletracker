@@ -219,7 +219,7 @@ func kphToMPH(kmh float64) float64 {
 func (u *Updater) GuessRouteForVehicle(vehicle *shuttletracker.Vehicle) (route *shuttletracker.Route, err error) {
 	routes, err := u.ms.Routes()
 	if err != nil {
-		log.Error(err)
+		return nil, err
 	}
 
 	routeDistances := make(map[int]float64)
@@ -273,7 +273,7 @@ func (u *Updater) GuessRouteForVehicle(vehicle *shuttletracker.Vehicle) (route *
 	// not on a route
 	if minRouteID == 0 {
 		log.Debugf("%v not on route; distance from nearest: %v", vehicle.Name, minDistance)
-		return &shuttletracker.Route{}, nil
+		return nil, nil
 	}
 
 	route, err = u.ms.Route(minRouteID)
