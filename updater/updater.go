@@ -240,12 +240,11 @@ func (u *Updater) GuessRouteForVehicle(vehicle *shuttletracker.Vehicle) (route *
 				routeDistances[route.ID] += math.Inf(0)
 			}
 			nearestDistance := math.Inf(0)
-			for _, coord := range route.Coords {
-				distance := math.Sqrt(math.Pow(update.Latitude-coord.Lat, 2) +
-					math.Pow(update.Longitude-coord.Lng, 2))
+			for _, point := range route.Points {
+				distance := math.Sqrt(math.Pow(update.Latitude-point.Latitude, 2) +
+					math.Pow(update.Longitude-point.Longitude, 2))
 				if distance < nearestDistance {
 					nearestDistance = distance
-
 				}
 			}
 			if nearestDistance > .003 {
