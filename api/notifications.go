@@ -15,6 +15,7 @@ func (api *API) AdminMessageHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.WithError(err).Error("unable to get message")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	WriteJSON(w, message)
 }

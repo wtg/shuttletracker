@@ -18,8 +18,15 @@ type Route struct {
 	Width        int           `json:"width"`
 	Coords       []Coord       `json:"coords"`
 	StopsID      []string      `json:"stopsid"`
-	Created      time.Time     `json:"created"        bson:"created"`
-	Updated      time.Time     `json:"updated"        bson:"updated"`
+	Created      time.Time     `json:"created"`
+	Updated      time.Time     `json:"updated"`
+	Points       []Point       `json:"points"`
+}
+
+// Point represents a latitude/longitude pair.
+type Point struct {
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 }
 
 // Coord represents a single lat/lng point used to draw routes

@@ -15,7 +15,6 @@ type LocationService struct {
 func (ls *LocationService) initializeSchema(db *sql.DB) error {
 	ls.db = db
 	schema := `
---DROP TABLE locations;
 CREATE TABLE IF NOT EXISTS locations (
 	id serial PRIMARY KEY,
 	tracker_id varchar(10) NOT NULL,
@@ -26,8 +25,7 @@ CREATE TABLE IF NOT EXISTS locations (
 	time timestamp with time zone NOT NULL,
 	route_id integer,
 	created timestamp with time zone NOT NULL DEFAULT now()
-);
-	`
+);`
 	_, err := ls.db.Exec(schema)
 	return err
 }
