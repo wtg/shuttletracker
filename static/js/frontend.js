@@ -198,8 +198,8 @@ Vue.component('shuttle-map',{
           continue;
         }
         var points = [];
-        for(var j = 0; j < data[i].coords.length; j ++){
-          points.push(new L.LatLng(data[i].coords[j].lat,data[i].coords[j].lng));
+        for(var j = 0; j < data[i].points.length; j ++){
+          points.push(new L.LatLng(data[i].points[j].latitude,data[i].points[j].longitude));
         }
         var polylineOptions = {
           color: data[i].color,

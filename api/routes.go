@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
@@ -14,11 +13,11 @@ import (
 // RoutesHandler finds all of the routes in the database
 func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	routes, err := api.ms.Routes()
-
 	if err != nil {
+		log.WithError(err).Error("unable to get routes")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-
 	WriteJSON(w, routes)
 }
 
@@ -31,51 +30,23 @@ func (api *API) StopsHandler(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, stops)
 }
 
-func combineCoords(coordsData *[]map[string]float64) []shuttletracker.Coord {
-	coords := []shuttletracker.Coord{}
-	for _, c := range *coordsData {
-		coord := shuttletracker.Coord{
-			Lat: c["lat"],
-			Lng: c["lng"],
-		}
-		coords = append(coords, coord)
-	}
-	return coords
-}
-
 // RoutesCreateHandler adds a new route to the database
 func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
-	var routeData map[string]string
-	var coordsData []map[string]float64
-	err := json.NewDecoder(r.Body).Decode(&routeData)
+	route := &shuttletracker.Route{}
+	err := json.NewDecoder(r.Body).Decode(route)
 	if err != nil {
+		log.WithError(err).Error("unable to decode route")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	err = json.Unmarshal([]byte(routeData["coords"]), &coordsData)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-	coords := combineCoords(&coordsData)
 
-	// Here do the interpolation
-	// now we get the Segment for each segment ( this should be stored in database, just store it inside route for god sake)
-	// Type conversions
-	enabled, _ := strconv.ParseBool(routeData["enabled"])
-	width, _ := strconv.Atoi(routeData["width"])
-	timeIntervals := []sttime.Time{}
+	// timeIntervals := []sttime.Time{}
+	// route := &shuttletracker.Route{
+	// 	TimeInterval: timeIntervals,
 
-	route := &shuttletracker.Route{
-		Name:         routeData["name"],
-		Description:  routeData["description"],
-		TimeInterval: timeIntervals,
-		Enabled:      enabled,
-		Color:        routeData["color"],
-		Width:        width,
-		Coords:       coords,
-		Created:      time.Now(),
-		Updated:      time.Now()}
 	err = api.ms.CreateRoute(route)
 	if err != nil {
+		log.WithError(err).Error("unable to create route")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
