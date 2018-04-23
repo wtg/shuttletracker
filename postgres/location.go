@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS locations (
 	speed real NOT NULL,
 	time timestamp with time zone NOT NULL,
 	route_id integer,
-	created timestamp with time zone NOT NULL DEFAULT now()
+	created timestamp with time zone NOT NULL DEFAULT now(),
+	UNIQUE (tracker_id, time)
 );`
 	_, err := ls.db.Exec(schema)
 	return err
@@ -45,7 +46,7 @@ WITH location AS (
 	) VALUES ($1, $2, $3, $4, $5, $6, $7)
 	RETURNING id, tracker_id, created)
 SELECT
-	location.id as location_id,
+	location.id AS location_id,
 	vehicles.id AS vehicle_id,
 	location.created
 FROM location
