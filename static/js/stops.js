@@ -120,8 +120,6 @@ Vue.component('stop-create',{
               <div id="stopsmap" style="height: 650px;float: left; width: 100%; background-color:black;z-index:0;"></div>
               <b>name</b>: <input v-model="name" placeholder="Stop Name"></input><br>
               <b>Description</b>: <input v-model="description" placeholder="Stop Description"></input><br>
-              <b>Enabled</b>:  <input type="checkbox" v-model="enabled"></input>{{enabled}}<br>
-              <b>Route</b>: <select v-model="myRouteId"><option v-for="routeId in routeIDS" v-bind:value="routeId.id">{{routeId.name}}</option></select><br>
             <button class="button" @click="send(JSON.stringify(getJSON()))">Submit</button>
             <button class="button" @click="showJSON(JSON.stringify(getJSON()))">GetJSON</button>
     </div></div>`,
@@ -131,9 +129,6 @@ Vue.component('stop-create',{
         name: "",
         description: "",
         color: "",
-        width: 4,
-        active: true,
-        enabled: true,
         StopsMap: null,
         APIKey: null,
         RoutingControl: null,
@@ -163,13 +158,11 @@ Vue.component('stop-create',{
         var toSend = {
           "name":this.name,
           "description":this.description,
-          "startTime":"",
-          "endTime":"",
-          "enabled":this.enabled.toString(),
-          "routeId":this.myRouteId.toString(),
-          "lat": this.addStopMarker.getLatLng().lat.toString(),
-          "lng": this.addStopMarker.getLatLng().lng.toString()};
-          return toSend;
+          "enabled":this.enabled,
+          "latitude": this.addStopMarker.getLatLng().lat,
+          "longitude": this.addStopMarker.getLatLng().lng
+        };
+        return toSend;
       },
       showJSON: function(data){
         var wnd = window.open("about:blank", "", "_blank");

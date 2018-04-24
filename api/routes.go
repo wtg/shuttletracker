@@ -25,7 +25,9 @@ func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 func (api *API) StopsHandler(w http.ResponseWriter, r *http.Request) {
 	stops, err := api.ms.Stops()
 	if err != nil {
+		log.WithError(err).Error("unable to get stops")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	WriteJSON(w, stops)
 }
@@ -40,6 +42,7 @@ func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO
 	// timeIntervals := []sttime.Time{}
 	// route := &shuttletracker.Route{
 	// 	TimeInterval: timeIntervals,
