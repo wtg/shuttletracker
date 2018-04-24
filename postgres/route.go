@@ -156,10 +156,31 @@ func (p valuePoints) Value() (driver.Value, error) {
 
 // CreateRoute creates a Route.
 func (rs *RouteService) CreateRoute(route *shuttletracker.Route) error {
+	tx, err := rs.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	// insert route
 	statement := "INSERT INTO routes (name, enabled, width, color, points)" +
 		" VALUES ($1, $2, $3, $4, $5) RETURNING id, created, updated;"
-	row := rs.db.QueryRow(statement, route.Name, route.Enabled, route.Width, route.Color, valuePoints(route.Points))
-	return row.Scan(&route.ID, &route.Created, &route.Updated)
+	row := tx.QueryRow(statement, route.Name, route.Enabled, route.Width, route.Color, valuePoints(route.Points))
+	err = row.Scan(&route.ID, &route.Created, &route.Updated)
+	if err != nil {
+		return err
+	}
+
+	// insert stop ordering
+	statement = "INSERT INTO routes_stops (route_id, stop_id, \"order\")" +
+		" SELECT $1, stop_id, \"order\" - 1 AS \"order\" FROM" +
+		" unnest($2::integer[]) WITH ORDINALITY AS s(stop_id, \"order\");"
+	_, err = tx.Exec(statement, route.ID, pq.Array(route.StopIDs))
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }
 
 // DeleteRoute deletes a Route.
