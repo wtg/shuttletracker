@@ -83,8 +83,9 @@ func (p *scanPoints) Scan(src interface{}) error {
 func (rs *RouteService) Routes() ([]*shuttletracker.Route, error) {
 	routes := []*shuttletracker.Route{}
 	query := "SELECT r.id, r.name, r.created, r.updated, r.enabled, r.width, r.color, r.points," +
-		" array_remove(array_agg(rs.stop_id), NULL) as stop_ids" +
-		" FROM routes r LEFT JOIN routes_stops rs on r.id = rs.route_id GROUP BY r.id;"
+		" array_remove(array_agg(rs.stop_id ORDER BY rs.order ASC), NULL) as stop_ids" +
+		" FROM routes r LEFT JOIN routes_stops rs" +
+		" ON r.id = rs.route_id GROUP BY r.id;"
 	rows, err := rs.db.Query(query)
 	if err != nil {
 		return nil, err
@@ -105,8 +106,9 @@ func (rs *RouteService) Routes() ([]*shuttletracker.Route, error) {
 // Route returns the Route with the provided ID.
 func (rs *RouteService) Route(id int) (*shuttletracker.Route, error) {
 	query := "SELECT r.id, r.name, r.created, r.updated, r.enabled, r.width, r.color, r.points," +
-		" array_remove(array_agg(rs.stop_id), NULL) as stop_ids" +
-		" FROM routes r LEFT JOIN routes_stops rs on r.id = rs.route_id WHERE r.id = $1 GROUP BY r.id;"
+		" array_remove(array_agg(rs.stop_id ORDER BY rs.order ASC), NULL) as stop_ids" +
+		" FROM routes r LEFT JOIN routes_stops rs" +
+		" ON r.id = rs.route_id WHERE r.id = $1 GROUP BY r.id;"
 	row := rs.db.QueryRow(query, id)
 	r := &shuttletracker.Route{}
 	p := scanPoints{}
