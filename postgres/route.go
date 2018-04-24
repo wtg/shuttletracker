@@ -105,12 +105,14 @@ func (rs *RouteService) Routes() ([]*shuttletracker.Route, error) {
 
 // Route returns the Route with the provided ID.
 func (rs *RouteService) Route(id int) (*shuttletracker.Route, error) {
-	query := "SELECT r.id, r.name, r.created, r.updated, r.enabled, r.width, r.color, r.points," +
+	query := "SELECT r.name, r.created, r.updated, r.enabled, r.width, r.color, r.points," +
 		" array_remove(array_agg(rs.stop_id ORDER BY rs.order ASC), NULL) as stop_ids" +
 		" FROM routes r LEFT JOIN routes_stops rs" +
 		" ON r.id = rs.route_id WHERE r.id = $1 GROUP BY r.id;"
 	row := rs.db.QueryRow(query, id)
-	r := &shuttletracker.Route{}
+	r := &shuttletracker.Route{
+		ID: id,
+	}
 	p := scanPoints{}
 	err := row.Scan(&r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, &p, pq.Array(&r.StopIDs))
 	if err != nil {
@@ -192,8 +194,35 @@ func (rs *RouteService) DeleteRoute(id int) error {
 
 // ModifyRoute modifies an existing Route.
 func (rs *RouteService) ModifyRoute(route *shuttletracker.Route) error {
+	tx, err := rs.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	// update route
 	statement := "UPDATE routes SET name = $1, enabled = $2, width = $3, color = $4, points = $5, updated = now()" +
 		" WHERE id = $6 RETURNING updated;"
-	row := rs.db.QueryRow(statement, route.Name, route.Enabled, route.Width, route.Color, valuePoints(route.Points), route.ID)
-	return row.Scan(&route.Updated)
+	row := tx.QueryRow(statement, route.Name, route.Enabled, route.Width, route.Color, valuePoints(route.Points), route.ID)
+	err = row.Scan(&route.Updated)
+	if err != nil {
+		return err
+	}
+
+	// remove existing stop ordering
+	_, err = tx.Exec("DELETE FROM routes_stops WHERE route_id = $1;", route.ID)
+	if err != nil {
+		return err
+	}
+
+	// insert stop ordering
+	statement = "INSERT INTO routes_stops (route_id, stop_id, \"order\")" +
+		" SELECT $1, stop_id, \"order\" - 1 AS \"order\" FROM" +
+		" unnest($2::integer[]) WITH ORDINALITY AS s(stop_id, \"order\");"
+	_, err = tx.Exec(statement, route.ID, pq.Array(route.StopIDs))
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }
