@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/lib/pq"
 	"github.com/wtg/shuttletracker"
 )
 
@@ -32,6 +33,13 @@ CREATE TABLE IF NOT EXISTS routes (
 	width smallint NOT NULL DEFAULT 4,
 	color varchar(9) NOT NULL DEFAULT '#ffffff',
 	points path
+);
+CREATE TABLE IF NOT EXISTS routes_stops (
+	id serial PRIMARY KEY,
+	route_id integer REFERENCES routes NOT NULL,
+	stop_id integer REFERENCES stops NOT NULL,
+	"order" integer NOT NULL,
+	UNIQUE (route_id, "order")
 );`
 	_, err := rs.db.Exec(schema)
 	return err
@@ -74,8 +82,9 @@ func (p *scanPoints) Scan(src interface{}) error {
 // Routes returns all Routes in the database.
 func (rs *RouteService) Routes() ([]*shuttletracker.Route, error) {
 	routes := []*shuttletracker.Route{}
-	query := "SELECT r.id, r.name, r.created, r.updated, r.enabled, r.width, r.color, r.points" +
-		" FROM routes r;"
+	query := "SELECT r.id, r.name, r.created, r.updated, r.enabled, r.width, r.color, r.points," +
+		" array_remove(array_agg(rs.stop_id), NULL) as stop_ids" +
+		" FROM routes r LEFT JOIN routes_stops rs on r.id = rs.route_id GROUP BY r.id;"
 	rows, err := rs.db.Query(query)
 	if err != nil {
 		return nil, err
@@ -83,7 +92,7 @@ func (rs *RouteService) Routes() ([]*shuttletracker.Route, error) {
 	for rows.Next() {
 		r := &shuttletracker.Route{}
 		p := scanPoints{}
-		err := rows.Scan(&r.ID, &r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, &p)
+		err := rows.Scan(&r.ID, &r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, &p, pq.Array(&r.StopIDs))
 		if err != nil {
 			return nil, err
 		}
@@ -95,12 +104,13 @@ func (rs *RouteService) Routes() ([]*shuttletracker.Route, error) {
 
 // Route returns the Route with the provided ID.
 func (rs *RouteService) Route(id int) (*shuttletracker.Route, error) {
-	query := "SELECT r.name, r.created, r.updated, r.enabled, r.width, r.color, r.points" +
-		" FROM routes r;"
+	query := "SELECT r.id, r.name, r.created, r.updated, r.enabled, r.width, r.color, r.points," +
+		" array_remove(array_agg(rs.stop_id), NULL) as stop_ids" +
+		" FROM routes r LEFT JOIN routes_stops rs on r.id = rs.route_id WHERE r.id = $1 GROUP BY r.id;"
 	row := rs.db.QueryRow(query, id)
 	r := &shuttletracker.Route{}
 	p := scanPoints{}
-	err := row.Scan(&r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, &p)
+	err := row.Scan(&r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, &p, pq.Array(&r.StopIDs))
 	if err != nil {
 		return nil, err
 	}

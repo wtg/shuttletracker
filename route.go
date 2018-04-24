@@ -16,8 +16,7 @@ type Route struct {
 	Active       bool          `json:"active"`
 	Color        string        `json:"color"`
 	Width        int           `json:"width"`
-	Coords       []Coord       `json:"coords"`
-	StopsID      []string      `json:"stopsid"`
+	StopIDs      []int64       `json:"stop_ids"`
 	Created      time.Time     `json:"created"`
 	Updated      time.Time     `json:"updated"`
 	Points       []Point       `json:"points"`
