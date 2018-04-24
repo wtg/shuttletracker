@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS routes (
 );
 CREATE TABLE IF NOT EXISTS routes_stops (
 	id serial PRIMARY KEY,
-	route_id integer REFERENCES routes NOT NULL,
+	route_id integer REFERENCES routes ON DELETE CASCADE NOT NULL,
 	stop_id integer REFERENCES stops NOT NULL,
 	"order" integer NOT NULL,
 	UNIQUE (route_id, "order")
