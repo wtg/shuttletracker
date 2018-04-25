@@ -11,6 +11,9 @@ matrix:
   allow_failures:
     - go: tip
 
+services:
+  - docker
+
 before_install:
   - go get -u github.com/kardianos/govendor && govendor sync
   - go get -u github.com/alecthomas/gometalinter && gometalinter --install
@@ -23,6 +26,7 @@ script:
   - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then gometalinter --vendor ./... 2>&1 | revgrep origin/master; fi
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then gometalinter --vendor ./... || true; fi
   - ./test.sh
+  - docker build .
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

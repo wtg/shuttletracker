@@ -1,26 +1,15 @@
-FROM alpine:3.7
+FROM golang:1.10
 
-RUN apk add --no-cache \
-    ca-certificates \
-    git \
-    go \
-    musl-dev \
-    tzdata
-
-ENV GOPATH /go
-ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
-
-RUN mkdir -p "$GOPATH/src/github.com/wtg/shuttletracker" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
-WORKDIR $GOPATH/src/github.com/wtg/shuttletracker
 RUN go get -u github.com/kardianos/govendor
-
-COPY . .
+RUN mkdir -p /go/src/github.com/wtg/shuttletracker
+WORKDIR /go/src/github.com/wtg/shuttletracker
+COPY vendor/vendor.json ./vendor/
+RUN govendor sync
+COPY . /go/src/github.com/wtg/shuttletracker
+RUN go install github.com/wtg/shuttletracker
 
 # Dokku checks http://dokku.viewdocs.io/dokku/deployment/zero-downtime-deploys/
 RUN mkdir /app
 COPY CHECKS /app
 
-RUN govendor sync
-RUN go build -o shuttletracker
-
-CMD ["./shuttletracker"]
+CMD ["/go/bin/shuttletracker"]
