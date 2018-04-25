@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS stops (
 	return err
 }
 
+// CreateStop creates a Stop.
 func (ss *StopService) CreateStop(stop *shuttletracker.Stop) error {
 	statement := "INSERT INTO stops (name, description, latitude, longitude) VALUES" +
 		" ($1, $2, $3, $4) RETURNING id, created, updated;"
@@ -34,6 +35,7 @@ func (ss *StopService) CreateStop(stop *shuttletracker.Stop) error {
 	return row.Scan(&stop.ID, &stop.Created, &stop.Updated)
 }
 
+// Stops returns all Stops.
 func (ss *StopService) Stops() ([]*shuttletracker.Stop, error) {
 	stops := []*shuttletracker.Stop{}
 	query := "SELECT s.id, s.name, s.created, s.updated, s.description, s.latitude, s.longitude" +
@@ -53,6 +55,7 @@ func (ss *StopService) Stops() ([]*shuttletracker.Stop, error) {
 	return stops, nil
 }
 
+// DeleteStop deletes a Stop.
 func (ss *StopService) DeleteStop(id int) error {
 	statement := "DELETE FROM stops WHERE id = $1;"
 	_, err := ss.db.Exec(statement, id)

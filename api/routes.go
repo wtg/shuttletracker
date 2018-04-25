@@ -83,8 +83,12 @@ func (api *API) RoutesScheduler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sttime.Sort(times.Times)
-	route := &shuttletracker.Route{}
-	route, err = api.ms.Route(times.ID)
+	route, err := api.ms.Route(times.ID)
+	if err != nil {
+		log.WithError(err).Error("unable to get route")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	route.TimeInterval = times.Times
 
 	err = api.ms.ModifyRoute(route)

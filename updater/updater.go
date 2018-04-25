@@ -107,92 +107,8 @@ func (u *Updater) update() {
 	for _, vehicleData := range vehiclesData {
 		wg.Add(1)
 		go func(vehicleData string) {
-			defer wg.Done()
-			match := u.dataRegexp.FindAllStringSubmatch(vehicleData, -1)[0]
-			// Store named capturing group and matching expression as a key value pair
-			result := map[string]string{}
-			for i, item := range match {
-				result[u.dataRegexp.SubexpNames()[i]] = item
-			}
-
-			// Create new vehicle update & insert update into database
-
-			route := &shuttletracker.Route{}
-
-			itrakID := strings.Replace(result["id"], "Vehicle ID:", "", -1)
-			vehicle, err := u.ms.VehicleWithTrackerID(itrakID)
-			if err == shuttletracker.ErrVehicleNotFound {
-				log.Warnf("Unknown vehicle ID \"%s\" returned by iTrak. Make sure all vehicles have been added.", itrakID)
-				return
-			} else if err != nil {
-				log.WithError(err).Error("Unable to fetch vehicle.")
-				return
-			}
-
-			// determine if this is a new update from itrak by comparing timestamps
-			newTime, err := itrakTimeDate(result["time"], result["date"])
-			if err != nil {
-				log.WithError(err).Error("unable to parse iTRAK time and date")
-				return
-			}
-			lastUpdate, err := u.ms.LatestLocation(vehicle.ID)
-			if err != nil && err != shuttletracker.ErrLocationNotFound {
-				log.WithError(err).Error("unable to retrieve last update")
-				return
-			}
-			if err != shuttletracker.ErrLocationNotFound && newTime.Equal(lastUpdate.Time) {
-				// Timestamp is not new; don't store update.
-				return
-			}
-			log.Debugf("Updating %s.", vehicle.Name)
-
-			// vehicle found and no error
-			route, err = u.GuessRouteForVehicle(vehicle)
-			if err != nil {
-				log.WithError(err).Error("Unable to guess route for vehicle.")
-				return
-			}
-
-			latitude, err := strconv.ParseFloat(strings.Replace(result["lat"], "lat:", "", -1), 64)
-			if err != nil {
-				log.WithError(err).Error("unable to parse latitude as float")
-				return
-			}
-			longitude, err := strconv.ParseFloat(strings.Replace(result["lng"], "lon:", "", -1), 64)
-			if err != nil {
-				log.WithError(err).Error("unable to parse longitude as float")
-				return
-			}
-			heading, err := strconv.ParseFloat(strings.Replace(result["heading"], "dir:", "", -1), 64)
-			if err != nil {
-				log.WithError(err).Error("unable to parse heading as float")
-				return
-			}
-			// convert KPH to MPH
-			speedKMH, err := strconv.ParseFloat(strings.Replace(result["speed"], "spd:", "", -1), 64)
-			if err != nil {
-				log.Error(err)
-				return
-			}
-			speedMPH := kphToMPH(speedKMH)
-
-			trackerID := strings.Replace(result["id"], "Vehicle ID:", "", -1)
-
-			update := &shuttletracker.Location{
-				TrackerID: trackerID,
-				Latitude:  latitude,
-				Longitude: longitude,
-				Heading:   heading,
-				Speed:     speedMPH,
-				Time:      newTime,
-			}
-			if route != nil {
-				update.RouteID = &route.ID
-			}
-
-			if err := u.ms.CreateLocation(update); err != nil {
-				log.WithError(err).Errorf("could not create location")
-			}
+			u.handleVehicleData(vehicleData)
+			wg.Done()
 		}(vehicleData)
 	}
 	wg.Wait()
@@ -206,6 +122,92 @@ func (u *Updater) update() {
 	}
 	if deleted > 0 {
 		log.Debugf("Removed %d old updates.", deleted)
+	}
+}
+
+func (u *Updater) handleVehicleData(vehicleData string) {
+	match := u.dataRegexp.FindAllStringSubmatch(vehicleData, -1)[0]
+	// Store named capturing group and matching expression as a key value pair
+	result := map[string]string{}
+	for i, item := range match {
+		result[u.dataRegexp.SubexpNames()[i]] = item
+	}
+
+	// Create new vehicle update & insert update into database
+
+	itrakID := strings.Replace(result["id"], "Vehicle ID:", "", -1)
+	vehicle, err := u.ms.VehicleWithTrackerID(itrakID)
+	if err == shuttletracker.ErrVehicleNotFound {
+		log.Warnf("Unknown vehicle ID \"%s\" returned by iTrak. Make sure all vehicles have been added.", itrakID)
+		return
+	} else if err != nil {
+		log.WithError(err).Error("Unable to fetch vehicle.")
+		return
+	}
+
+	// determine if this is a new update from itrak by comparing timestamps
+	newTime, err := itrakTimeDate(result["time"], result["date"])
+	if err != nil {
+		log.WithError(err).Error("unable to parse iTRAK time and date")
+		return
+	}
+	lastUpdate, err := u.ms.LatestLocation(vehicle.ID)
+	if err != nil && err != shuttletracker.ErrLocationNotFound {
+		log.WithError(err).Error("unable to retrieve last update")
+		return
+	}
+	if err != shuttletracker.ErrLocationNotFound && newTime.Equal(lastUpdate.Time) {
+		// Timestamp is not new; don't store update.
+		return
+	}
+	log.Debugf("Updating %s.", vehicle.Name)
+
+	// vehicle found and no error
+	route, err := u.GuessRouteForVehicle(vehicle)
+	if err != nil {
+		log.WithError(err).Error("Unable to guess route for vehicle.")
+		return
+	}
+
+	latitude, err := strconv.ParseFloat(strings.Replace(result["lat"], "lat:", "", -1), 64)
+	if err != nil {
+		log.WithError(err).Error("unable to parse latitude as float")
+		return
+	}
+	longitude, err := strconv.ParseFloat(strings.Replace(result["lng"], "lon:", "", -1), 64)
+	if err != nil {
+		log.WithError(err).Error("unable to parse longitude as float")
+		return
+	}
+	heading, err := strconv.ParseFloat(strings.Replace(result["heading"], "dir:", "", -1), 64)
+	if err != nil {
+		log.WithError(err).Error("unable to parse heading as float")
+		return
+	}
+	// convert KPH to MPH
+	speedKMH, err := strconv.ParseFloat(strings.Replace(result["speed"], "spd:", "", -1), 64)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	speedMPH := kphToMPH(speedKMH)
+
+	trackerID := strings.Replace(result["id"], "Vehicle ID:", "", -1)
+
+	update := &shuttletracker.Location{
+		TrackerID: trackerID,
+		Latitude:  latitude,
+		Longitude: longitude,
+		Heading:   heading,
+		Speed:     speedMPH,
+		Time:      newTime,
+	}
+	if route != nil {
+		update.RouteID = &route.ID
+	}
+
+	if err := u.ms.CreateLocation(update); err != nil {
+		log.WithError(err).Errorf("could not create location")
 	}
 }
 
