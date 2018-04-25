@@ -54,5 +54,7 @@ func (ss *StopService) Stops() ([]*shuttletracker.Stop, error) {
 }
 
 func (ss *StopService) DeleteStop(id int) error {
-	return nil
+	statement := "DELETE FROM stops WHERE id = $1;"
+	_, err := ss.db.Exec(statement, id)
+	return err
 }

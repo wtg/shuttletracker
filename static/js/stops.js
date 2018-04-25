@@ -37,13 +37,14 @@ Vue.component('stop-card', {
       }
     },
     deleteStop: function(id){
+      var el = this;
       $.ajax({
-           url: '/stops/' + id,
-           type: 'DELETE',
-           success: function(result) {
-             refresh = true;
-           }
-         });
+        url: '/stops?id=' + el.info.id,
+        type: 'DELETE',
+        success: function(result) {
+          refresh = true;
+        }
+      });
     },
     update: function(id){
       var el = this;

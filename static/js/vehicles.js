@@ -63,7 +63,6 @@ Vue.component('vehicle-card', {
         type: 'DELETE',
         success: function(result) {
           refresh = true;
-
         }
       });
     },
