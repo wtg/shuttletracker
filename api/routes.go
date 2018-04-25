@@ -7,7 +7,6 @@ import (
 
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
-	sttime "github.com/wtg/shuttletracker/time"
 )
 
 // RoutesHandler finds all of the routes in the database
@@ -42,11 +41,6 @@ func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO
-	// timeIntervals := []sttime.Time{}
-	// route := &shuttletracker.Route{
-	// 	TimeInterval: timeIntervals,
-
 	err = api.ms.CreateRoute(route)
 	if err != nil {
 		log.WithError(err).Error("unable to create route")
@@ -61,41 +55,10 @@ func (api *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	err = api.ms.DeleteRoute(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
-
-//Use this for importing a schedule
-type sched struct {
-	Times []sttime.Time `json:"times"`
-	ID    int           `json:"id"`
-}
-
-// RoutesScheduler Allows for route active times to be set
-func (api *API) RoutesScheduler(w http.ResponseWriter, r *http.Request) {
-	var times sched
-	err := json.NewDecoder(r.Body).Decode(&times)
-	if err != nil {
-		log.WithError(err).Error("Unable to decode route")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	sttime.Sort(times.Times)
-	route, err := api.ms.Route(times.ID)
-	if err != nil {
-		log.WithError(err).Error("unable to get route")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	route.TimeInterval = times.Times
-
-	err = api.ms.ModifyRoute(route)
-	if err != nil {
-		log.WithError(err).Error("Unable to store route into db")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
 	}
 }
 

@@ -86,7 +86,6 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		r.Group(func(r chi.Router) {
 			r.Use(cli.casauth)
 			r.Post("/create", api.RoutesCreateHandler)
-			r.Post("/schedule", api.RoutesScheduler)
 			r.Post("/edit", api.RoutesEditHandler)
 			r.Delete("/", api.RoutesDeleteHandler)
 		})
