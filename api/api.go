@@ -53,7 +53,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	r.Use(middleware.DefaultCompress)
 	r.Use(etag)
 
-	cli := CreateCASClient(url, us)
+	cli := CreateCASClient(url, us, cfg.Authenticate)
 
 	// Vehicles
 	r.Route("/vehicles", func(r chi.Router) {

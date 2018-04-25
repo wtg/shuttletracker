@@ -19,7 +19,7 @@ func TestCasUnauthenticated(t *testing.T) {
 
 	us := &mock.UserService{}
 
-	cli := CreateCASClient(url, us)
+	cli := CreateCASClient(url, us, true)
 	httpcli := http.Client{}
 
 	r := chi.NewRouter()
@@ -56,7 +56,7 @@ func TestCasAuthenticated(t *testing.T) {
 	us := &mock.UserService{}
 	httpcli := http.Client{}
 
-	cli := InjectMocks(client, us)
+	cli := InjectMocks(client, us, true)
 	r := chi.NewRouter()
 	r.Use(cli.casauth)
 
@@ -94,7 +94,7 @@ func TestCasAuthenticatedBadUser(t *testing.T) {
 	client := &auth.Mock{}
 	us := &mock.UserService{}
 	httpcli := http.Client{}
-	cli := InjectMocks(client, us)
+	cli := InjectMocks(client, us, true)
 
 	r := chi.NewRouter()
 	r.Use(cli.casauth)
