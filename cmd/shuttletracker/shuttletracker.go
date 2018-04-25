@@ -1,6 +1,6 @@
 // Package cmd bundles together all of shuttletracker's subpackages
 // to create, configure, and run the shuttle tracker.
-package cmd
+package shuttletracker
 
 import (
 	"github.com/kochman/runner"

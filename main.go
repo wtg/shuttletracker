@@ -3,9 +3,10 @@
 package main
 
 import (
-	"github.com/wtg/shuttletracker/cmd"
+	"github.com/wtg/shuttletracker/cmd/shuttletracker"
 )
 
 func main() {
-	cmd.Run()
+	shuttletracker.Run()
+
 }

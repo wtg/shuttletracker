@@ -174,6 +174,11 @@ func (m *MongoDB) GetUsers() ([]model.User, error) {
 	return users, err
 }
 
+// CreateUser returns all Users.
+func (m *MongoDB) CreateUser(user *model.User) error {
+	return m.vehicles.Insert(&user)
+}
+
 // CreateVehicle creates a Vehicle.
 func (m *MongoDB) CreateVehicle(vehicle *model.Vehicle) error {
 	return m.vehicles.Insert(&vehicle)

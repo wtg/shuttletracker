@@ -127,10 +127,17 @@ func (db *Mock) GetUsers() ([]model.User, error) {
 	return args.Get(0).([]model.User), args.Error(1)
 }
 
+// CreateUser adds a user to the dabase.
+func (db *Mock) CreateUser(user *model.User) error {
+	args := db.Called(user)
+	return args.Error(0)
+}
+
 // UserExists gets all users.
 func (db *Mock) UserExists(uname string) (bool, error) {
 	args := db.Called(uname)
 	return args.Get(0).(bool), args.Error(1)
+
 }
 
 // AddMessage adds a message.
