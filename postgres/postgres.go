@@ -1,6 +1,10 @@
 package postgres
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"github.com/spf13/viper"
+)
 
 /*
 Postgres implements shuttletracker.VehicleService, shuttletracker.RouteService,
@@ -15,9 +19,14 @@ type Postgres struct {
 	UserService
 }
 
+// Config contains database connection information.
+type Config struct {
+	URL string
+}
+
 // New returns a configured Postgres.
-func New(url string) (*Postgres, error) {
-	db, err := sql.Open("postgres", url)
+func New(cfg Config) (*Postgres, error) {
+	db, err := sql.Open("postgres", cfg.URL)
 	if err != nil {
 		return nil, err
 	}
@@ -55,4 +64,13 @@ func New(url string) (*Postgres, error) {
 	}
 
 	return pg, nil
+}
+
+// NewConfig creates a new Config.
+func NewConfig(v *viper.Viper) *Config {
+	cfg := &Config{
+		URL: "postgres://localhost/shuttletracker?sslmode=disable",
+	}
+	v.SetDefault("postgres.url", cfg.URL)
+	return cfg
 }

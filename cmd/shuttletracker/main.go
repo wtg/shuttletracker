@@ -33,8 +33,7 @@ func Run() {
 	// Log
 	log.SetLevel(cfg.Log.Level)
 
-	// db, err := database.NewMongoDB(*cfg.Database)
-	pg, err := postgres.New("postgres://localhost/shuttletracker?sslmode=disable")
+	pg, err := postgres.New(*cfg.Postgres)
 	if err != nil {
 		log.WithError(err).Error("unable to create Postgres")
 		return
