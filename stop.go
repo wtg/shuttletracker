@@ -4,7 +4,7 @@ import "time"
 
 // Stop is a place where vehicles frequently stop.
 type Stop struct {
-	ID        int       `json:"id"`
+	ID        int64     `json:"id"`
 	Latitude  float64   `json:"latitude"`
 	Longitude float64   `json:"longitude"`
 	Created   time.Time `json:"created"`
@@ -19,5 +19,5 @@ type Stop struct {
 type StopService interface {
 	Stops() ([]*Stop, error)
 	CreateStop(stop *Stop) error
-	DeleteStop(id int) error
+	DeleteStop(id int64) error
 }

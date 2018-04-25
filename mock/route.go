@@ -18,13 +18,13 @@ func (rs *RouteService) CreateRoute(route *shuttletracker.Route) error {
 }
 
 // DeleteRoute deletes a Route.
-func (rs *RouteService) DeleteRoute(id int) error {
+func (rs *RouteService) DeleteRoute(id int64) error {
 	args := rs.Called(id)
 	return args.Error(0)
 }
 
 // Route gets a Route.
-func (rs *RouteService) Route(id int) (*shuttletracker.Route, error) {
+func (rs *RouteService) Route(id int64) (*shuttletracker.Route, error) {
 	args := rs.Called(id)
 	return args.Get(0).(*shuttletracker.Route), args.Error(1)
 }

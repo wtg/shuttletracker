@@ -41,14 +41,14 @@ func (v *VehicleService) CreateVehicle(vehicle *shuttletracker.Vehicle) error {
 }
 
 // DeleteVehicle deletes a Vehicle by its ID.
-func (v *VehicleService) DeleteVehicle(id int) error {
+func (v *VehicleService) DeleteVehicle(id int64) error {
 	statement := "DELETE FROM vehicles WHERE id = $1;"
 	_, err := v.db.Exec(statement, id)
 	return err
 }
 
 // Vehicle returns a Vehicle by its ID.
-func (v *VehicleService) Vehicle(id int) (*shuttletracker.Vehicle, error) {
+func (v *VehicleService) Vehicle(id int64) (*shuttletracker.Vehicle, error) {
 	vehicle := &shuttletracker.Vehicle{
 		ID: id,
 	}

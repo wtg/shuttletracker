@@ -26,13 +26,13 @@ func (ls *LocationService) DeleteLocationsBefore(before time.Time) (int, error) 
 }
 
 // LocationsSince gets Locations since a time for a certain Vehicle.
-func (ls *LocationService) LocationsSince(vehicleID int, since time.Time) ([]*shuttletracker.Location, error) {
+func (ls *LocationService) LocationsSince(vehicleID int64, since time.Time) ([]*shuttletracker.Location, error) {
 	args := ls.Called(vehicleID)
 	return args.Get(0).([]*shuttletracker.Location), args.Error(1)
 }
 
 // LatestLocation returns the most recent Location for a Vehicle.
-func (ls *LocationService) LatestLocation(vehicleID int) (*shuttletracker.Location, error) {
+func (ls *LocationService) LatestLocation(vehicleID int64) (*shuttletracker.Location, error) {
 	args := ls.Called(vehicleID)
 	return args.Get(0).(*shuttletracker.Location), args.Error(1)
 }

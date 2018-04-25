@@ -18,13 +18,13 @@ func (vs *VehicleService) CreateVehicle(vehicle *shuttletracker.Vehicle) error {
 }
 
 // DeleteVehicle deletes a Vehicle.
-func (vs *VehicleService) DeleteVehicle(vehicleID int) error {
+func (vs *VehicleService) DeleteVehicle(vehicleID int64) error {
 	args := vs.Called(vehicleID)
 	return args.Error(0)
 }
 
 // Vehicle gets a Vehicle.
-func (vs *VehicleService) Vehicle(vehicleID int) (*shuttletracker.Vehicle, error) {
+func (vs *VehicleService) Vehicle(vehicleID int64) (*shuttletracker.Vehicle, error) {
 	args := vs.Called(vehicleID)
 	return args.Get(0).(*shuttletracker.Vehicle), args.Error(1)
 }

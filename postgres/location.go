@@ -71,7 +71,7 @@ func (ls *LocationService) DeleteLocationsBefore(before time.Time) (int, error) 
 }
 
 // LocationsSince returns all Locations since a tracker Time for a certain Vehicle.
-func (ls *LocationService) LocationsSince(vehicleID int, since time.Time) ([]*shuttletracker.Location, error) {
+func (ls *LocationService) LocationsSince(vehicleID int64, since time.Time) ([]*shuttletracker.Location, error) {
 	locations := []*shuttletracker.Location{}
 	query := "SELECT l.id, l.tracker_id, l.latitude, l.longitude, l.heading, l.speed, l.time, l.route_id, l.created " +
 		"FROM locations l, vehicles v WHERE l.tracker_id = v.tracker_id AND v.id = $1 AND l.time > $2;"
@@ -93,7 +93,7 @@ func (ls *LocationService) LocationsSince(vehicleID int, since time.Time) ([]*sh
 }
 
 // LatestLocation returns the most recent Location created for a Vehicle.
-func (ls *LocationService) LatestLocation(vehicleID int) (*shuttletracker.Location, error) {
+func (ls *LocationService) LatestLocation(vehicleID int64) (*shuttletracker.Location, error) {
 	l := &shuttletracker.Location{
 		VehicleID: &vehicleID,
 	}

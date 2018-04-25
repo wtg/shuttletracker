@@ -104,7 +104,7 @@ func (rs *RouteService) Routes() ([]*shuttletracker.Route, error) {
 }
 
 // Route returns the Route with the provided ID.
-func (rs *RouteService) Route(id int) (*shuttletracker.Route, error) {
+func (rs *RouteService) Route(id int64) (*shuttletracker.Route, error) {
 	query := "SELECT r.name, r.created, r.updated, r.enabled, r.width, r.color, r.points," +
 		" array_remove(array_agg(rs.stop_id ORDER BY rs.order ASC), NULL) as stop_ids" +
 		" FROM routes r LEFT JOIN routes_stops rs" +
@@ -186,7 +186,7 @@ func (rs *RouteService) CreateRoute(route *shuttletracker.Route) error {
 }
 
 // DeleteRoute deletes a Route.
-func (rs *RouteService) DeleteRoute(id int) error {
+func (rs *RouteService) DeleteRoute(id int64) error {
 	statement := "DELETE FROM routes WHERE id = $1;"
 	_, err := rs.db.Exec(statement, id)
 	return err

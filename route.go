@@ -6,12 +6,12 @@ import (
 
 // Route represents a set of coordinates to draw a path on our tracking map
 type Route struct {
-	ID          int       `json:"id"`
+	ID          int64     `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	Enabled     bool      `json:"enabled"`
 	Color       string    `json:"color"`
-	Width       int       `json:"width"`
+	Width       int64     `json:"width"`
 	StopIDs     []int64   `json:"stop_ids"`
 	Created     time.Time `json:"created"`
 	Updated     time.Time `json:"updated"`
@@ -26,9 +26,9 @@ type Point struct {
 
 // RouteService is an interface for interacting with Routes.
 type RouteService interface {
-	Route(id int) (*Route, error)
+	Route(id int64) (*Route, error)
 	Routes() ([]*Route, error)
 	CreateRoute(route *Route) error
-	DeleteRoute(id int) error
+	DeleteRoute(id int64) error
 	ModifyRoute(route *Route) error
 }

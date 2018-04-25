@@ -17,7 +17,7 @@ func (ss *StopService) CreateStop(stop *shuttletracker.Stop) error {
 }
 
 // DeleteStop deletes a Stop.
-func (ss *StopService) DeleteStop(id int) error {
+func (ss *StopService) DeleteStop(id int64) error {
 	args := ss.Called(id)
 	return args.Error(0)
 }

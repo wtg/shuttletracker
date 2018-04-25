@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
 	"testing"
 	"time"
 
@@ -177,7 +176,7 @@ func TestVehiclesEditHandler(t *testing.T) {
 		TrackerID: "3",
 		Created:   vehicleTime,
 	}
-	ms.VehicleService.On("Vehicle", 4).Return(existingVehicle, nil)
+	ms.VehicleService.On("Vehicle", int64(4)).Return(existingVehicle, nil)
 
 	// Because the handler sets the Updated field to time.Now(), we have to accept everything
 	// here and then check later that the method actually got the struct with fields we expected.
@@ -255,14 +254,14 @@ func TestVehiclesEditHandler(t *testing.T) {
 
 func TestVehiclesDeleteHandler(t *testing.T) {
 	ms := &mock.ModelService{}
-	vehicleID := 7
+	vehicleID := int64(7)
 	ms.VehicleService.On("DeleteVehicle", vehicleID).Return(nil)
 
 	api := API{
 		ms: ms,
 	}
 
-	req, err := http.NewRequest("DELETE", "/?id="+strconv.Itoa(vehicleID), nil)
+	req, err := http.NewRequest("DELETE", "/?id=7", nil)
 	if err != nil {
 		t.Errorf("unable to create HTTP request: %s", err)
 		return

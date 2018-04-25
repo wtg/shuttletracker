@@ -10,7 +10,7 @@ var ErrVehicleNotFound = errors.New("Vehicle not found")
 
 // Vehicle represents an object being tracked.
 type Vehicle struct {
-	ID        int       `json:"id"`
+	ID        int64     `json:"id"`
 	Name      string    `json:"name"`
 	Created   time.Time `json:"created"`
 	Updated   time.Time `json:"updated"`
@@ -20,11 +20,11 @@ type Vehicle struct {
 
 // VehicleService is an interface for interacting with Vehicles.
 type VehicleService interface {
-	Vehicle(id int) (*Vehicle, error)
+	Vehicle(id int64) (*Vehicle, error)
 	VehicleWithTrackerID(id string) (*Vehicle, error)
 	Vehicles() ([]*Vehicle, error)
 	EnabledVehicles() ([]*Vehicle, error)
 	CreateVehicle(vehicle *Vehicle) error
-	DeleteVehicle(id int) error
+	DeleteVehicle(id int64) error
 	ModifyVehicle(vehicle *Vehicle) error
 }

@@ -224,7 +224,7 @@ func (u *Updater) GuessRouteForVehicle(vehicle *shuttletracker.Vehicle) (route *
 		return nil, err
 	}
 
-	routeDistances := make(map[int]float64)
+	routeDistances := make(map[int64]float64)
 	for _, route := range routes {
 		routeDistances[route.ID] = 0
 	}
@@ -257,7 +257,7 @@ func (u *Updater) GuessRouteForVehicle(vehicle *shuttletracker.Vehicle) (route *
 	}
 
 	minDistance := math.Inf(0)
-	var minRouteID int
+	var minRouteID int64
 	for id := range routeDistances {
 		distance := routeDistances[id] / float64(len(updates))
 		if distance < minDistance {

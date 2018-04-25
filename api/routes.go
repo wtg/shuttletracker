@@ -50,7 +50,7 @@ func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 // RoutesDeleteHandler deletes a route from database
 func (api *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	id, err := strconv.ParseInt(r.URL.Query().Get("id"), 10, 64)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -104,7 +104,7 @@ func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	id, err := strconv.ParseInt(r.URL.Query().Get("id"), 10, 64)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
