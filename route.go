@@ -34,5 +34,5 @@ type RouteService interface {
 	ModifyRoute(route *Route) error
 }
 
-// ErrRouteeNotFound indicates that a Route is not in the service.
+// ErrRouteNotFound indicates that a Route is not in the service.
 var ErrRouteNotFound = errors.New("Route not found")
