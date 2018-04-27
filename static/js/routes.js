@@ -147,26 +147,16 @@ Vue.component('route-card', {
     </div>
     <div v-if="state==2" class="column">
       <b>Stop ordering</b><br>
-      <draggable :list="info.stopsid" :options="{handle:'.drag-stop'}">
-        <div v-for="stop in info.stopsid">
-          <div class="drag-stop">{{stop}}</div>
-        </div>
+      <draggable v-model="info.stopsid">
+          <div v-for="stop in info.stopsid">
+            {{stop}}
+          </div>
       </draggable>
     </div>
     </div>
   </div></div>
-  
   `,
-  //        <div v-for="name in info.stops": key="text"></div>
-  //      <draggable v-model="info.stops" @start="drag=true" @end="drag=false">
-
-  // import { Draggable } from '../dist/node_modules/draggable-vue-directive';
-  // export default {
-  //   components: {
-  //     draggable
-  //   },
-  //<script src="../dist/node_modules/sortablejs/Sortable.js"></script>
-  //<script src="../dist/node_modules/vuedraggable/dist/vuedraggable.js"></script>
+  
   data (){
     return{
       myData: {},
@@ -205,7 +195,6 @@ Vue.component('route-card', {
            }
          });
     }
-  }
   }
 });
 
