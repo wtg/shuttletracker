@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 	"time"
 
@@ -54,6 +55,31 @@ func TestVehiclesHandlerNoVehicles(t *testing.T) {
 	ms.VehicleService.AssertNumberOfCalls(t, "Vehicles", 1)
 }
 
+// vehiclesEqual is a helper function for comparing two vehicles in the tests
+func vehiclesEqual(first, second *shuttletracker.Vehicle) bool {
+	// ensure that we are comparing all of the fields
+	val := reflect.ValueOf(*first)
+	if val.NumField() != 6 {
+		return false
+	}
+
+	// compare the fields
+	if first.ID != second.ID {
+		return false
+	} else if first.Name != second.Name {
+		return false
+	} else if !first.Created.Equal(second.Created) {
+		return false
+	} else if !first.Updated.Equal(second.Updated) {
+		return false
+	} else if first.Enabled != second.Enabled {
+		return false
+	} else if first.TrackerID != second.TrackerID {
+		return false
+	}
+
+	return true
+}
 func TestVehiclesHandlerTwoVehicles(t *testing.T) {
 	ms := &mock.ModelService{}
 	vehicles := []*shuttletracker.Vehicle{
@@ -102,7 +128,7 @@ func TestVehiclesHandlerTwoVehicles(t *testing.T) {
 	}
 
 	for i := range vehicles {
-		if *vehicles[i] != *returnedVehicles[i] {
+		if !vehiclesEqual(vehicles[i], returnedVehicles[i]) {
 			t.Errorf("got different vehicles at index %d: %+v expected %+v", i, returnedVehicles[i], vehicles[i])
 		}
 	}
@@ -117,6 +143,8 @@ func TestVehiclesCreateHandler(t *testing.T) {
 		Name:      "Vehicle 2",
 		Enabled:   true,
 		TrackerID: "2",
+		Created:   time.Now().UTC(),
+		Updated:   time.Now().UTC(),
 	}
 	ms.VehicleService.On("CreateVehicle", vehicle).Return(nil)
 
