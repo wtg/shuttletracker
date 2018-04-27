@@ -188,8 +188,20 @@ func (rs *RouteService) CreateRoute(route *shuttletracker.Route) error {
 // DeleteRoute deletes a Route.
 func (rs *RouteService) DeleteRoute(id int64) error {
 	statement := "DELETE FROM routes WHERE id = $1;"
-	_, err := rs.db.Exec(statement, id)
-	return err
+	result, err := rs.db.Exec(statement, id)
+	if err != nil {
+		return err
+	}
+
+	n, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if n == 0 {
+		return shuttletracker.ErrRouteNotFound
+	}
+
+	return nil
 }
 
 // ModifyRoute modifies an existing Route.

@@ -58,7 +58,11 @@ func (api *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = api.ms.DeleteRoute(id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		if err == shuttletracker.ErrRouteNotFound {
+			http.Error(w, "Route not found", http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
 
@@ -111,6 +115,10 @@ func (api *API) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err = api.ms.DeleteStop(id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		if err == shuttletracker.ErrStopNotFound {
+			http.Error(w, "Stop not found", http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }

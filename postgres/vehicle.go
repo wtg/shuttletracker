@@ -43,8 +43,20 @@ func (v *VehicleService) CreateVehicle(vehicle *shuttletracker.Vehicle) error {
 // DeleteVehicle deletes a Vehicle by its ID.
 func (v *VehicleService) DeleteVehicle(id int64) error {
 	statement := "DELETE FROM vehicles WHERE id = $1;"
-	_, err := v.db.Exec(statement, id)
-	return err
+	result, err := v.db.Exec(statement, id)
+	if err != nil {
+		return err
+	}
+
+	n, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if n == 0 {
+		return shuttletracker.ErrVehicleNotFound
+	}
+
+	return nil
 }
 
 // Vehicle returns a Vehicle by its ID.

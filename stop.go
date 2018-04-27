@@ -1,6 +1,9 @@
 package shuttletracker
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 // Stop is a place where vehicles frequently stop.
 type Stop struct {
@@ -21,3 +24,6 @@ type StopService interface {
 	CreateStop(stop *Stop) error
 	DeleteStop(id int64) error
 }
+
+// ErrStopNotFound indicates that a Stop is not in the service.
+var ErrStopNotFound = errors.New("Stop not found")

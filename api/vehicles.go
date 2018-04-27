@@ -78,7 +78,11 @@ func (api *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err = api.ms.DeleteVehicle(id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		if err == shuttletracker.ErrVehicleNotFound {
+			http.Error(w, "Vehicle not found", http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
 
