@@ -103,10 +103,10 @@
 			"revisionTime": "2017-08-14T05:04:56Z"
 		},
 		{
-			"checksumSHA1": "F7vsuKOVSMnFSi90odRxfhBEBeA=",
+			"checksumSHA1": "V1a5/Ra9HXKNuArt5WKUqu+Jxt8=",
 			"path": "github.com/lib/pq",
-			"revision": "d34b9ff171c21ad295489235aec8b6626023cd04",
-			"revisionTime": "2018-03-27T07:18:24Z"
+			"revision": "b2004221932bd6b13167ef654c81cffac36f7537",
+			"revisionTime": "2018-03-19T19:41:35Z"
 		},
 		{
 			"checksumSHA1": "AU3fA8Sm33Vj9PBoRPSeYfxLRuE=",
