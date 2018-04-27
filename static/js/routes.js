@@ -18,6 +18,13 @@ Vue.component('active-selector',{
   </div>
   <br>
   </div>`,
+
+  // import draggable from 'vuedraggable';
+
+  // export default {
+  //   components: {
+  //     draggable
+  //   },
   data (){
     return {
       selected: 1,
@@ -120,25 +127,46 @@ Vue.component('route-card', {
   <ul>
   <li v-bind:class="{'is-active':state==0}"><a @click="state = 0">Route</a></li>
   <li v-bind:class="{'is-active':state==1}"><a @click="state = 1">Schedule</a></li>
+  <li v-bind:class="{'is-active':state==2}"><a @click="state = 2">Stops</a></li>
   </ul>
   </div>
   <div >
     <div class="columns">
     <div v-if="state==0" class="column">
-    <b>id</b>: {{info.id}}<br>
-    <b>name</b>: {{info.name}}<br>
-    <b>Description</b>: {{info.description}}<br>
-    <b>enabled</b>: <input type="checkbox" v-model="info.enabled" @click="toggleRoute(info.id)"></input>{{info.enabled}}<br>
-    <b>Color</b>: {{info.color}}<br>
-    <b>Created</b>: {{info.created}} <br>
-    <br>
-    <button class="button" @click="shouldDelete(info.id)">{{buttonText}}</button>
+      <b>id</b>: {{info.id}}<br>
+      <b>name</b>: {{info.name}}<br>
+      <b>Description</b>: {{info.description}}<br>
+      <b>enabled</b>: <input type="checkbox" v-model="info.enabled" @click="toggleRoute(info.id)"></input>{{info.enabled}}<br>
+      <b>Color</b>: {{info.color}}<br>
+      <b>Created</b>: {{info.created}} <br>
+      <br>
+      <button class="button" @click="shouldDelete(info.id)">{{buttonText}}</button>
     </div>
     <div v-if="state==1" class="column">
-    <active-selector :routeId=info.id></active-selector>
+      <active-selector :routeId=info.id></active-selector>
+    </div>
+    <div v-if="state==2" class="column">
+      <b>Stop ordering</b><br>
+      <draggable :list="info.stopsid" :options="{handle:'.drag-stop'}">
+        <div v-for="stop in info.stopsid">
+          <div class="drag-stop">{{stop}}</div>
+        </div>
+      </draggable>
     </div>
     </div>
-  </div></div>`,
+  </div></div>
+  
+  `,
+  //        <div v-for="name in info.stops": key="text"></div>
+  //      <draggable v-model="info.stops" @start="drag=true" @end="drag=false">
+
+  // import { Draggable } from '../dist/node_modules/draggable-vue-directive';
+  // export default {
+  //   components: {
+  //     draggable
+  //   },
+  //<script src="../dist/node_modules/sortablejs/Sortable.js"></script>
+  //<script src="../dist/node_modules/vuedraggable/dist/vuedraggable.js"></script>
   data (){
     return{
       myData: {},
@@ -177,9 +205,8 @@ Vue.component('route-card', {
            }
          });
     }
-
   }
-
+  }
 });
 
 Vue.component('route-json',{
