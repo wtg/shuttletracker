@@ -162,6 +162,8 @@ func (rs *RouteService) CreateRoute(route *shuttletracker.Route) error {
 	if err != nil {
 		return err
 	}
+	// We can't really do anything if rolling back a transaction fails.
+	// nolint: errcheck
 	defer tx.Rollback()
 
 	// insert route
@@ -210,6 +212,8 @@ func (rs *RouteService) ModifyRoute(route *shuttletracker.Route) error {
 	if err != nil {
 		return err
 	}
+	// We can't really do anything if rolling back a transaction fails.
+	// nolint: errcheck
 	defer tx.Rollback()
 
 	// update route
