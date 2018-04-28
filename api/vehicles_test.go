@@ -187,6 +187,7 @@ func TestVehiclesCreateHandler(t *testing.T) {
 	ms.VehicleService.AssertNumberOfCalls(t, "CreateVehicle", 1)
 }
 
+// nolint: gocyclo
 func TestVehiclesEditHandler(t *testing.T) {
 	ms := &mock.ModelService{}
 	vehicleTime := time.Now()
