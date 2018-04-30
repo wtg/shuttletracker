@@ -1,6 +1,7 @@
 package updater
 
-import (		
+/*
+import (
 	"net/smtp"
 
 	"github.com/wtg/shuttletracker/log"
@@ -32,9 +33,9 @@ func GetEmail(phone_number string, input_carrier string) (string) {
 }
 
 func CreateMessage(current_stop string, next_stop string) ([]byte){
-	
+
 	var message_body string = "The shuttle is at " + current_stop + ".\nThe next stop is " + next_stop + "."
-	
+
 	msg := []byte("RPI Shuttle Tracker Notification\r\n" +
 		message_body + "\r\n")
 
@@ -44,7 +45,7 @@ func CreateMessage(current_stop string, next_stop string) ([]byte){
 func Send(notifications []model.Notification, current_stop string, next_stop string) (int){
 
 	// Get recipient(s) email address, and create message
-	var to_emails []string 
+	var to_emails []string
 	for i := range notifications {
 		to_emails = append(to_emails, GetEmail(notifications[i].PhoneNumber, notifications[i].Carrier))
 	}
@@ -53,13 +54,13 @@ func Send(notifications []model.Notification, current_stop string, next_stop str
 
 	// Authenticate sender email
 	auth := smtp.PlainAuth("", "shuttletrackertest@gmail.com", "shuttletracker2017", "smtp.gmail.com")
-	
+
 	// Connect to the server, authenticate, set the sender and recipient, and send
 	var sent int = 0
 	for i := range to_emails {
 		var to = []string{to_emails[i]}
 		err := smtp.SendMail("smtp.gmail.com:587", auth, "shuttletrackertest@gmail.com", to, message)
-		
+
 		if err != nil {
 			log.Debugf("Message send error: %v", err)
 		} else {
@@ -68,5 +69,5 @@ func Send(notifications []model.Notification, current_stop string, next_stop str
 		}
 	}
 	return sent
-	
-}
+
+}*/

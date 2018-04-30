@@ -97,14 +97,6 @@ func New(cfg Config, db database.Database) (*API, error) {
 		r.Method("POST", "/create", api.CasAUTH.HandleFunc(api.StopsCreateHandler))
 		r.Method("DELETE", "/{id:.+}", api.CasAUTH.HandleFunc(api.StopsDeleteHandler))
 	})
-	// Public
-	r.HandleFunc("/vehicles", api.VehiclesHandler).Methods("GET")
-	r.HandleFunc("/updates", api.UpdatesHandler).Methods("GET")
-	r.HandleFunc("/adminMessage", api.AdminMessageHandler).Methods("GET")
-	r.HandleFunc("/updates/message", api.UpdateMessageHandler).Methods("GET")
-	r.HandleFunc("/routes", api.RoutesHandler).Methods("GET")
-	r.HandleFunc("/stops", api.StopsHandler).Methods("GET")
-	r.HandleFunc("/notifications", api.NotificationsCreateHandler).Methods("GET")
 
 	// Admin
 	r.Route("/admin", func(r chi.Router) {
@@ -113,6 +105,11 @@ func New(cfg Config, db database.Database) (*API, error) {
 		r.Method("GET", "/logout/", api.CasAUTH.HandleFunc(api.AdminLogout))
 
 	})
+
+	// User
+	/*r.Route("/user", func(r chi.Router)){
+		//r.Method("GET", "/", )
+	}*/
 
 	r.Method("GET", "/getKey/", api.CasAUTH.HandleFunc(api.KeyHandler))
 

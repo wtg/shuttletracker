@@ -7,17 +7,17 @@ import (
 
 // VehicleUpdate represents a single position observed for a Vehicle.
 type VehicleUpdate struct {
-	VehicleID string    	`json:"vehicleID"   bson:"vehicleID,omitempty"`
-	Lat       string    	`json:"lat"         bson:"lat"`
-	Lng       string    	`json:"lng"         bson:"lng"`
-	Heading   string    	`json:"heading"     bson:"heading"`
-	Speed     string    	`json:"speed"       bson:"speed"`
-	Lock      string    	`json:"lock"        bson:"lock"`
-	Time      string    	`json:"time"        bson:"time"`
-	Date      string    	`json:"date"        bson:"date"`
-	Status    string    	`json:"status"      bson:"status"`
-	Created   time.Time 	`json:"created"     bson:"created"`
-	Route     string    	`json:"RouteID"     bson:"routeID"`
+	VehicleID string    `json:"vehicleID"   bson:"vehicleID,omitempty"`
+	Lat       string    `json:"lat"         bson:"lat"`
+	Lng       string    `json:"lng"         bson:"lng"`
+	Heading   string    `json:"heading"     bson:"heading"`
+	Speed     string    `json:"speed"       bson:"speed"`
+	Lock      string    `json:"lock"        bson:"lock"`
+	Time      string    `json:"time"        bson:"time"`
+	Date      string    `json:"date"        bson:"date"`
+	Status    string    `json:"status"      bson:"status"`
+	Created   time.Time `json:"created"     bson:"created"`
+	Route     string    `json:"RouteID"     bson:"routeID"`
 }
 
 // Vehicle represents an object being tracked.
@@ -58,9 +58,9 @@ type Route struct {
 	ID             string    `json:"id"             bson:"id"`
 	Name           string    `json:"name"           bson:"name"`
 	Description    string    `json:"description"    bson:"description"`
-	TimeInterval   []Time    `json:"intervals"			 bson:"intervals"`
-	Enabled        bool      `json:"enabled,bool"	 bson:"enabled"`
-	Active         bool      `json:"active,bool"	 bson:"enabled"`
+	TimeInterval   []Time    `json:"intervals"		bson:"intervals"`
+	Enabled        bool      `json:"enabled,bool"	bson:"enabled"`
+	Active         bool      `json:"active,bool"	bson:"enabled"`
 	Color          string    `json:"color"          bson:"color"`
 	Width          int       `json:"width,string"   bson:"width"`
 	Coords         []Coord   `json:"coords"         bson:"coords"`
@@ -73,11 +73,11 @@ type Route struct {
 
 // AdminMessage represents a message popup for the user from the site administrator
 type AdminMessage struct {
-	ID      int       `json:"id" 									bson:"id"`
-	Type    string    `json:type								bson:"type"`
-	Message string    `json:message						bson:"message"`
-	Display bool      `json:display						bson:"display"`
-	Created time.Time `json:created						bson:"created"`
+	ID      int       `json:"id" 				bson:"id"`
+	Type    string    `json:type				bson:"type"`
+	Message string    `json:message				bson:"message"`
+	Display bool      `json:display				bson:"display"`
+	Created time.Time `json:created				bson:"created"`
 }
 
 // Stop indicates where a tracked object is scheduled to arrive
@@ -143,9 +143,15 @@ type Segment struct {
 }
 
 type Notification struct {
-	RouteID			string	`json:"route"			bson:"route,omitempty"`			// some stops are on more than one route
-	StopID			string 	`json:"stop"			bson:"stop,omitempty"`
-	PhoneNumber 	string	`json:"phone_number"	bson:"phone_number"`
-	Carrier 		string	`json:"carrier"			bson:"carrier"`
-	Sent 			bool	`json:"sent"			bson:"sent"`
+	RouteID string `json:"route"			bson:"route,omitempty"` // some stops are on more than one route
+	StopID  string `json:"stop"				bson:"stop,omitempty"`
+	//PhoneNumber 	string	`json:"phone_number"	bson:"phone_number"`
+	Carrier string `json:"carrier"			bson:"carrier"`
+	Sent    bool   `json:"sent"				bson:"sent"`
+}
+
+type UserPhone struct {
+	PhoneNumber string `json:"phone_number"	bson:"phone_number"`
+	ClientId    int    `json:"client_id"`
+	Verified    bool   `json:"verified"`
 }

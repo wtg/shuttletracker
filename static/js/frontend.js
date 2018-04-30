@@ -294,9 +294,8 @@ Vue.component('shuttle-map',{
     },
 
     sendNotification: function(stop){
-      return  stop.name + `<br><form>
-      <input type = "submit" value = "Send Notification" v-on:click = "alert('Hello!')">
-    </form>`;
+      return  stop.name + `<br>
+      <button onclick = "alert('submit successfully')"> Send Notification</button>`;
     },
 
     grabVehicles: function(){
@@ -408,6 +407,7 @@ Vue.component('shuttle-map',{
     },
 
     stopClicked: function(e){
+      
     },
 
     grabVehicleInfo: function(){
@@ -449,6 +449,7 @@ Vue.component('shuttle-map',{
   }
 });
 
+
 Vue.component('about-modal',{
   template:`
   <div class="modal">
@@ -477,6 +478,64 @@ Vue.component('about-modal',{
         $(".modal").toggle();
       }
     }
+});
+
+Vue.component('notification-modal', {
+  template:`
+    <div class = "notification-modal">
+      <div class = "notification-content">
+        <span class="close" @click="$emit('hidemodal')">&times;</span>
+        <h2>Request Notification</h2>
+          <b>Enter Phone Number</b> <br>
+          <input type="textbox" name = "phoneNumber" id = "pn" placeholder = "Phone Number"></input><br>
+          <b>Enter Phone Number Again</b> <br>
+          <input type = "textbox" name = "phoneNumber2" id = "rpn" placeholder = "Retype Phone Number"></input><br>
+          <button class = "notification-button" @click = "validPhone">Submit</button>
+        </ul>
+      </div>
+    </div>
+  `,
+  methods: {
+    toggleModal: function(){
+      $(".modal").toggle();
+    }, 
+    
+    send: function(){
+
+    },
+
+    validPhone: function(){
+      var pn1 = document.getElementById("pn");
+      var pn2 = document.getElementById("rpn");
+      if(!this.checkNumber(pn1.value) || !this.checkNumber(pn2.value)){
+        alert("Phone Number must be digits");
+      }
+      else{
+        if(pn1.value != pn2.value){
+          alert('Different phone numbers');
+        }
+        else{
+          if(pn1.value.length != 10){
+            alert("Phone number not valid");
+          }
+          else{
+            this.send();
+            alert("Submit Successfully");
+          }
+        }
+      }
+
+      pn1.value = "";
+      pn2.value = "";
+    },
+
+    checkNumber: function(s){
+      if (s!=null && s!=""){
+        return !isNaN(s);
+      }
+      return false;
+    },
+  }
 });
 
 Vue.component('dropdown-menu',{
@@ -517,11 +576,14 @@ Vue.component('dropdown-menu',{
         </li>
         <li class = "dropdown-menu-item" id = "dropdown-menu-item_notification">
           <p class = "dropdown-menu-item_p">Notification</p>
-          <form>
-            Phone Number: <input type = "text" name = "phoneNumeber" id = "pn"/><br>
-            Resubmit Phone#: <input type = "text" name = "phoneNumber2" id = "rpn"><br>
-            <input type = "button" value = "Submit" @click = "validPhone">
-          </form>
+            <div class="dropdown-submenu-item_div" id="darkmode-icon">
+              <p @click="$emit('trigger')" class="dropdown-submenu-subitem">Request Notification</p>
+            </div>
+            <!--<form>
+              Phone Number: <input type = "text" name = "phoneNumber" id = "pn"/><br>
+              Resubmit Phone#: <input type = "text" name = "phoneNumber2" id = "rpn"><br>
+              <input type = "button" value = "Submit" @click = "validPhone">
+            </form> -->
         </li>
       </ul>
     </li>
@@ -552,39 +614,23 @@ Vue.component('dropdown-menu',{
         menuVisibility: 0,
         dropdownMenuList: document.getElementsByClassName('dropdown-menu'),
         dropdownSubmenuList: document.getElementsByClassName('dropdown-submenu'),
-        
     };
   },
     methods: {
-        validPhone: function(){
-          var pn1 = document.getElementById("pn");
-          var pn2 = document.getElementById("rpn");
-          if(!this.checkNumber(pn1.value) || !this.checkNumber(pn2.value)){
-            alert("Phone Number must be digits");
-          }
-          else{
-            if(pn1.value != pn2.value){
-              alert('Different phone numbers');
+        send: function(){
+          var pkg = {"Phone Number": this.phone};
+          pkg = JSON.stringify(pkg);
+          $.ajax({
+            url: "/notifications/create",
+            type: "POST",
+            data: pkg,
+            contentType: "application/json",
+            complete: function(data){
+              refresh=true;
             }
-            else{
-              if(pn1.value.length != 10){
-                alert("Phone number not valid");
-              }
-              else{
-                alert("Submit Successfully");
-              }
-            }
-          }
+          });
 
-          pn1.value = "";
-          pn2.value = "";
-        },
-
-        checkNumber: function(s){
-          if (s!=null && s!=""){
-            return !isNaN(s);
-          }
-          return false;
+          this.phone = "";
         },
 
         // following functions involve changing the dark mode state
@@ -746,7 +792,7 @@ Vue.component('title-bar', {
     <!-- left side of tile bar -->
     <ul class="titleContent" id="titleContent-left">
       <li>
-        <dropdown-menu @displaymodal="showModal=true"></dropdown-menu>
+        <dropdown-menu @displaymodal="showModalAbout=true" @trigger="showModalNoti=true"></dropdown-menu>
       </li>
       <li>
         <p class="title">{{title}}</p>
@@ -763,13 +809,15 @@ Vue.component('title-bar', {
         <live-indicator></live-indicator>
       </li>
     </ul>
-    <about-modal v-if="showModal" @hidemodal="showModal=false"/>
+    <about-modal v-if="showModalAbout" @hidemodal="showModalAbout=false"/>
+    <notification-modal v-if = "showModalNoti" @hidemodal="showModalNoti=false"/>
   </div>`,
     mounted() {},
     data (){
       return {
           title: "RPI Shuttle Tracker",
-          showModal: false,
+          showModalAbout: false,
+          showModalNoti: false,
       };
     },
     methods: {

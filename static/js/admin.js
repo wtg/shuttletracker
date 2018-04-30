@@ -81,7 +81,6 @@ Vue.component("main-pane",{
     <stops-panel v-if="state == 1"></stops-panel>
     <vehicle-panel v-if="state == 2"></vehicle-panel>
     <message-panel v-if="state == 3"></message-panel>
-
     </transition>
   </div>
   `,
