@@ -2,5 +2,5 @@ package model
 
 // User represents a user.
 type User struct {
-	Name string
+	Username string `bson:"username"`
 }

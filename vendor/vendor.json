@@ -217,6 +217,12 @@
 			"revisionTime": "2016-07-14T08:02:20Z"
 		},
 		{
+			"checksumSHA1": "p+R5MqPdKK/1xlqaECuh+vbEmC4=",
+			"path": "gopkg.in/cas.v2",
+			"revision": "1b87d011d1fc0430cdbdfe3115c9843ec33d9da6",
+			"revisionTime": "2017-07-27T10:16:41Z"
+		},
+		{
 			"checksumSHA1": "1D8GzeoFGUs5FZOoyC2DpQg8c5Y=",
 			"path": "gopkg.in/mgo.v2",
 			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
