@@ -21,7 +21,7 @@ before_install:
   - go get -u github.com/bradleyfalzon/revgrep/...
 
 install:
-  - go install
+  - go install github.com/wtg/shuttletracker/cmd/shuttletracker
 
 script:
   - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then gometalinter --vendor ./... 2>&1 | revgrep origin/master; fi
