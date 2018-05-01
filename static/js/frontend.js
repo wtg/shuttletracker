@@ -284,8 +284,8 @@ Vue.component('shuttle-map',{
           name: data[i].name,
           description: data[i].description,
           id: data[i].id,
-          latlng: [data[i].lat, data[i].lng],
-          marker: L.marker([data[i].lat,data[i].lng], {icon: stopIcon})
+          latlng: [data[i].latitude, data[i].longitude],
+          marker: L.marker([data[i].latitude,data[i].longitude], {icon: stopIcon})
         };
         stop.marker.bindPopup(stop.name);
         stop.marker.addTo(this.ShuttleMap).on('click', this.stopClicked);
@@ -320,7 +320,7 @@ Vue.component('shuttle-map',{
         for (var key in this.ShuttlesArray){
           var good = false;
           for(var i = 0; i < data.length; i ++){
-            if(key == data[i].vehicleID){
+            if(key == data[i].vehicle_id){
               good = true;
             }
           }
@@ -346,24 +346,24 @@ Vue.component('shuttle-map',{
             data[j].color = "#FFF";
           }
 
-          if (this.ShuttlesArray[data[j].vehicleID] === undefined){
+          if (this.ShuttlesArray[data[j].vehicle_id] === undefined){
             shuttleIcon.options.iconUrl = this.getShuttleIcon(data[j].color);
-            this.ShuttlesArray[data[j].vehicleID] = {
+            this.ShuttlesArray[data[j].vehicle_id] = {
               data: data[j],
-              marker: L.marker([data[j].lat,data[j].lng], {
+              marker: L.marker([data[j].latitude,data[j].longitude], {
                 icon: shuttleIcon,
                 rotationAngle: parseInt(data[j].heading)-45,rotationOrigin: 'center',
                 zIndexOffset: 1000
               }),
               message: ""
             };
-            this.ShuttlesArray[data[j].vehicleID].marker.addTo(this.ShuttleMap);
+            this.ShuttlesArray[data[j].vehicle_id].marker.addTo(this.ShuttleMap);
           } else {
             shuttleIcon.options.iconUrl = this.getShuttleIcon(data[j].color);
-            this.ShuttlesArray[data[j].vehicleID].data = data[j];
-            this.ShuttlesArray[data[j].vehicleID].marker.setIcon(shuttleIcon);
-            this.ShuttlesArray[data[j].vehicleID].marker.setLatLng([data[j].lat,data[j].lng]);
-            this.ShuttlesArray[data[j].vehicleID].marker.setRotationAngle(parseInt(data[j].heading)-45);
+            this.ShuttlesArray[data[j].vehicle_id].data = data[j];
+            this.ShuttlesArray[data[j].vehicle_id].marker.setIcon(shuttleIcon);
+            this.ShuttlesArray[data[j].vehicle_id].marker.setLatLng([data[j].latitude,data[j].longitude]);
+            this.ShuttlesArray[data[j].vehicle_id].marker.setRotationAngle(parseInt(data[j].heading)-45);
           }
         }
       }
