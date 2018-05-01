@@ -352,7 +352,7 @@ Vue.component('shuttle-map',{
               data: data[j],
               marker: L.marker([data[j].latitude,data[j].longitude], {
                 icon: shuttleIcon,
-                rotationAngle: parseInt(data[j].heading)-45,rotationOrigin: 'center',
+                rotationAngle: data[j].heading-45,rotationOrigin: 'center',
                 zIndexOffset: 1000
               }),
               message: ""
@@ -363,7 +363,7 @@ Vue.component('shuttle-map',{
             this.ShuttlesArray[data[j].vehicle_id].data = data[j];
             this.ShuttlesArray[data[j].vehicle_id].marker.setIcon(shuttleIcon);
             this.ShuttlesArray[data[j].vehicle_id].marker.setLatLng([data[j].latitude,data[j].longitude]);
-            this.ShuttlesArray[data[j].vehicle_id].marker.setRotationAngle(parseInt(data[j].heading)-45);
+            this.ShuttlesArray[data[j].vehicle_id].marker.setRotationAngle(data[j].heading-45);
           }
         }
       }
@@ -398,7 +398,7 @@ Vue.component('shuttle-map',{
         vehicleSuccess = true;
         let idToName = {};
         for (let i = 0; i < data.length; i++) {
-          idToName[data[i].vehicleID] = data[i].vehicleName;
+          idToName[data[i].id] = data[i].name;
         }
 
         for (const key in v.ShuttlesArray) {
@@ -406,7 +406,7 @@ Vue.component('shuttle-map',{
           const update = v.ShuttlesArray[key].data;
           const speed = Math.round(update.speed * 100) / 100;
           const date = new Date(update.created);
-          const direction = v.cardinalDirection(parseFloat(update.heading));
+          const direction = v.cardinalDirection(update.heading);
 
           const message = `<b>${idToName[key]}</b><br>` +
           `Traveling ${direction} at ${speed} mph<br>` +
