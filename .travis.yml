@@ -15,6 +15,9 @@ matrix:
 services:
   - docker
 
+addons:
+  postgresql: "10.0"
+
 before_install:
   - go get -u github.com/kardianos/govendor && govendor sync -v
   - go get -u github.com/alecthomas/gometalinter && gometalinter --install
@@ -22,6 +25,9 @@ before_install:
 
 install:
   - go install github.com/wtg/shuttletracker/cmd/shuttletracker
+
+before_script:
+  - psql -c 'create database shuttletracker_test;' -U postgres
 
 script:
   - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then gometalinter --vendor ./... 2>&1 | revgrep origin/master; fi
