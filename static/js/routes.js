@@ -170,7 +170,7 @@ Vue.component('route-card', {
 
     deleteRoute: function(id){
       $.ajax({
-           url: '/routes/' + id,
+           url: '/routes?id=' + id,
            type: 'DELETE',
            success: function(result) {
              refresh = true;
