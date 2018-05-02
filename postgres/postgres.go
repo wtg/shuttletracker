@@ -42,11 +42,11 @@ func New(cfg Config) (*Postgres, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = pg.RouteService.initializeSchema(db)
+	err = pg.StopService.initializeSchema(db)
 	if err != nil {
 		return nil, err
 	}
-	err = pg.StopService.initializeSchema(db)
+	err = pg.RouteService.initializeSchema(db)
 	if err != nil {
 		return nil, err
 	}
