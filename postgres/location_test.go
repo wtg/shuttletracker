@@ -39,7 +39,7 @@ func tearDownPostgres(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to open database: %s", err)
 	}
-	_, err = db.Exec("drop owned by postgres;")
+	_, err = db.Exec("drop schema public cascade; create schema public authorization postgres;")
 	if err != nil {
 		t.Fatalf("unable to clear database: %s", err)
 	}
