@@ -16,7 +16,7 @@ services:
   - docker
 
 addons:
-  postgresql: "10.0"
+  postgresql: "10"
 
 before_install:
   - go get -u github.com/kardianos/govendor && govendor sync -v
