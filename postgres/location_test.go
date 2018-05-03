@@ -45,6 +45,7 @@ func tearDownPostgres(t *testing.T) {
 	}
 }
 
+// nolint: gocyclo
 func TestCreateLocation(t *testing.T) {
 	if testing.Short() {
 		t.SkipNow()
@@ -113,6 +114,7 @@ func TestCreateLocation(t *testing.T) {
 	}
 }
 
+// nolint: gocyclo
 func TestDeleteLocationsBefore(t *testing.T) {
 	if testing.Short() {
 		t.SkipNow()
