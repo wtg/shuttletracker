@@ -77,11 +77,11 @@ type Database interface {
 	GetCurrentMessage() (model.AdminMessage, error)
 	GetMessages() ([]model.AdminMessage, error)
 	ClearMessage() error
-	
+
 	//Notification
-	CreateNotification(notification *model.Notification) error
-	GetNotificationsForStop(stopID string, routeID string)([]model.Notification, error)
-	DeleteNotificationsForStop(stopID string, routeID string) (int, error)
+	//CreateNotification(notification *model.Notification) error
+	//GetNotificationsForStop(stopID string, routeID string)([]model.Notification, error)
+	//DeleteNotificationsForStop(stopID string, routeID string) (int, error)
 }
 
 var (

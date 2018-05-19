@@ -2,13 +2,11 @@ package database
 
 import (
 	"time"
+
 	"github.com/spf13/viper"
 	"github.com/wtg/shuttletracker/model"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-
-	//"github.com/wtg/shuttletracker/log"
-
 )
 
 // MongoDB implements Database with—you guessed it—MongoDB.
@@ -20,8 +18,6 @@ type MongoDB struct {
 	stops    *mgo.Collection
 	users    *mgo.Collection
 	messages *mgo.Collection
-	notifications 	*mgo.Collection
-
 }
 
 // MongoDBConfig contains information on how to connect to a MongoDB server.
@@ -45,8 +41,6 @@ func NewMongoDB(cfg MongoDBConfig) (*MongoDB, error) {
 	db.stops = db.session.DB("").C("stops")
 	db.users = db.session.DB("").C("users")
 	db.messages = db.session.DB("").C("messages")
-	db.notifications = db.session.DB("").C("notifications")
-
 
 	// Ensure unique vehicle identification
 	vehicleIndex := mgo.Index{
@@ -141,37 +135,6 @@ func (m *MongoDB) GetStops() ([]model.Stop, error) {
 	err := m.stops.Find(bson.M{}).All(&stops)
 	return stops, err
 }
-
-// GetStopsForRoute returns all stops on a specified route.
-func (m *MongoDB) GetStopsForRoute(routeID string) ([]model.Stop, error){
-	var stops []model.Stop
-
-	err := m.stops.Find(bson.M{"routeId": routeID}).All(&stops)
-
-	// Make sure stops on both routes are included.
-	// Union has RouteID for East Route, but it's on both routes.
-	// Not a very good solution to the problem -- FIXME
-
-	// TODO: change RouteID for stops on multiple routes to be unique, empty,
-	// or have all ID's for the routes they are on
-
-	var stops_in_both bool = false
-	for _, stop := range stops{
-		if stop.Name == "Student Union"{
-			stops_in_both = true
-			break;
-		}
-	}
-
-	if !stops_in_both{
-		var union model.Stop
-		err = m.stops.Find(bson.M{"name": "Student Union"}).One(&union)
-		stops = append(stops, union)
-	}
-
-	return stops, err
-}
-
 
 // CreateUpdate creates an Update.
 func (m *MongoDB) CreateUpdate(update *model.VehicleUpdate) error {
@@ -278,27 +241,6 @@ func (m *MongoDB) GetMessages() ([]model.AdminMessage, error) {
 	return messages, err
 }
 
-<<<<<<< HEAD
-// Creates a notification.
-func (m *MongoDB) CreateNotification(notification *model.Notification) error {
-	return m.notifications.Insert(&notification)
-}
-
-// Returns all notifications for the stop and route requested
-func (m *MongoDB) GetNotificationsForStop(stopID string, routeID string) ([]model.Notification, error){
-	var notifications []model.Notification
-	err := m.notifications.Find(bson.M{"stop": stopID, "route": routeID}).All(&notifications)
-	return notifications, err
-}
-
-// Deletes notifications based on stop and route
-func (m *MongoDB) DeleteNotificationsForStop(stopID string, routeID string) (int, error){
-	info, err := m.notifications.RemoveAll((bson.M{"stop": stopID, "route": routeID}))
-	if err != nil {
-		return 0, err
-	}
-	return info.Removed, nil
-=======
 // UserExists tests if a given user exists in the admin database
 func (m *MongoDB) UserExists(uname string) (bool, error) {
 	query := m.users.Find(bson.M{"username": uname})
@@ -308,5 +250,4 @@ func (m *MongoDB) UserExists(uname string) (bool, error) {
 	}
 
 	return false, err
->>>>>>> origin
 }

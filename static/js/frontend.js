@@ -490,6 +490,21 @@ Vue.component('notification-modal', {
           <input type="textbox" name = "phoneNumber" id = "pn" placeholder = "Phone Number"></input><br>
           <b>Enter Phone Number Again</b> <br>
           <input type = "textbox" name = "phoneNumber2" id = "rpn" placeholder = "Retype Phone Number"></input><br>
+          
+          <b>Which route?</b>
+          <select id = "route" name = "routeName">
+            <option value = "selectRoute">-----Please select route------</option>
+            <option value = "west">West</option>
+            <option value = "east">East</option>
+          </select><br>
+
+          <b>Which stop?</b><br>
+          <select id = "westStop" name = "westStopName">
+            <option value = "selectWestStop">------Please select stop------</option>
+          </select><br>
+          <select id = "eastStop" name = "eastStopName">
+            <option value = "selectEastStop">------Please select stop------</option>
+          </select><br>
           <button class = "notification-button" @click = "validPhone">Submit</button>
         </ul>
       </div>
@@ -499,6 +514,14 @@ Vue.component('notification-modal', {
     toggleModal: function(){
       $(".modal").toggle();
     }, 
+
+    checkRoute: function(){
+      var route = document.getElementById("route");
+      if(route.options[route.selectedIndex].value == 'selectRoute'){
+        alert("Please select a route!");
+        return false;
+      }
+    },
     
     send: function(){
 
@@ -519,8 +542,10 @@ Vue.component('notification-modal', {
             alert("Phone number not valid");
           }
           else{
-            this.send();
-            alert("Submit Successfully");
+            if(this.checkRoute()){
+              //this.send();
+              alert("Submit Successfully");
+            }
           }
         }
       }
@@ -579,11 +604,6 @@ Vue.component('dropdown-menu',{
             <div class="dropdown-submenu-item_div" id="darkmode-icon">
               <p @click="$emit('trigger')" class="dropdown-submenu-subitem">Request Notification</p>
             </div>
-            <!--<form>
-              Phone Number: <input type = "text" name = "phoneNumber" id = "pn"/><br>
-              Resubmit Phone#: <input type = "text" name = "phoneNumber2" id = "rpn"><br>
-              <input type = "button" value = "Submit" @click = "validPhone">
-            </form> -->
         </li>
       </ul>
     </li>

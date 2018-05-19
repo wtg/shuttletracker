@@ -51,7 +51,6 @@ func New(cfg Config, db database.Database) (*API, error) {
 	r.Use(middleware.DefaultCompress)
 	r.Use(etag)
 
-
 	cli := CreateCASClient(url, db)
 
 	// Vehicles
@@ -114,20 +113,11 @@ func New(cfg Config, db database.Database) (*API, error) {
 
 	})
 
-<<<<<<< HEAD
-	// User
-	/*r.Route("/user", func(r chi.Router)){
-		//r.Method("GET", "/", )
-	}*/
-
-	r.Method("GET", "/getKey/", api.CasAUTH.HandleFunc(api.KeyHandler))
-=======
 	r.Group(func(r chi.Router) {
 		r.Use(cli.casauth)
 
 		r.Get("/getKey/", api.KeyHandler)
 	})
->>>>>>> origin
 
 	// Static files
 	r.Get("/", IndexHandler)
