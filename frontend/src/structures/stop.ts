@@ -1,7 +1,7 @@
 /**
  * Stop represents a single stop on a route
  */
-export default class Stop{
+export default class Stop {
     public id: string;
     public name: string;
     public description: string;
