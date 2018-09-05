@@ -6,7 +6,7 @@ import Stop from '../stop';
  */
 export default class InfoServiceProvider {
     public GrabVehicles(): Promise<Vehicle[]> {
-        return fetch('http://shuttles.rpi.edu/vehicles').then((data) => data.json()).then((data) => {
+        return fetch('https://shuttles.rpi.edu/vehicles').then((data) => data.json()).then((data) => {
             const ret = new Array<Vehicle>();
             data.forEach((element: {
                 vehicleID: number,
@@ -24,7 +24,7 @@ export default class InfoServiceProvider {
     }
 
     public GrabRoutes(): Promise<Route[]> {
-        return fetch('http://shuttles.rpi.edu/routes').then((data) => data.json()).then((data) => {
+        return fetch('https://shuttles.rpi.edu/routes').then((data) => data.json()).then((data) => {
             const ret = new Array<Route>();
             data.forEach((element: {
                 id: string,
@@ -45,7 +45,7 @@ export default class InfoServiceProvider {
     }
 
     public GrabStops(): Promise<Stop[]> {
-        return fetch('http://shuttles.rpi.edu/stops').then((data) => data.json()).then((data) => {
+        return fetch('https://shuttles.rpi.edu/stops').then((data) => data.json()).then((data) => {
             const ret = new Array<Stop>();
             data.forEach((element: {
                 id: string,

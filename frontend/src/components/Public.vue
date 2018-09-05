@@ -1,5 +1,5 @@
 <template>
-<div style="padding: 0px; margin: 0px;">
+<div style="padding: 0px; margin: 0px;width: 100%; height: 100%;">
     <div class="titleBar">
         <ul class="titleContent">
             <dropdown />
@@ -9,7 +9,10 @@
           <img src="~../assets/wtg.svg" />
         </div>
     </div>
-    <div id="mymap"></div>
+    <span style="width: 100%; height: 100%; position: fixed;">
+      <div id="mymap"></div>
+
+    </span>
 </div>
 </template>
 
@@ -21,6 +24,17 @@ import Route from '../structures/route';
 import Stop from '../structures/stop';
 import dropdown from './dropdown.vue';
 import * as L from 'leaflet';
+import { setTimeout, setInterval } from 'timers';
+
+const StopSVG = require('../assets/circle.svg') as string;
+
+const StopIcon = L.icon({
+  iconUrl: StopSVG,
+  iconSize:     [12, 12], // size of the icon
+  iconAnchor:   [6, 6], // point of the icon which will correspond to marker's location
+  shadowAnchor: [6, 6],  // the same for the shadow
+  popupAnchor:  [0, 0], // point from which the popup should open relative to the iconAnchor
+});
 
 export default Vue.extend({
   name: 'Public',
@@ -29,32 +43,94 @@ export default Vue.extend({
       vehicles: [],
       routes: [],
       stops: [],
+      ready: false,
+      Map: undefined,
+      existingRouteLayers: [],
+      initialized: false,
     } as {
       vehicles: Vehicle[],
       routes: Route[],
       stops: Stop[],
+      ready: boolean,
+      Map: L.Map | undefined, // Leaflets types are not always useful
+      existingRouteLayers: L.Polyline[],
+      initialized: boolean;
     });
   },
   mounted() {
     const a  = new InfoService();
-    a.GrabVehicles().then((data: Vehicle[]) => this.vehicles = data);
-    a.GrabRoutes().then((data: Route[]) => this.routes = data);
-    a.GrabStops().then((data: Stop[]) => this.stops = data);
-    const ShuttleMap = L.map('mymap', {
-      zoomControl: false,
-      attributionControl: false, // hide Leaflet
+    this.$store.dispatch('grabRotues');
+    this.$store.dispatch('grabStops');
+    this.$store.dispatch('grabVehicles');
+
+    this.$nextTick(() => {
+      this.ready = true;
+      this.Map = L.map('mymap', {
+        zoomControl: false,
+        attributionControl: false,
+      });
+
+      this.Map.setView([42.728172, -73.678803], 15.3);
+
+      this.Map.addControl(L.control.attribution({
+          position: 'bottomright',
+          prefix: '',
+      }));
+      L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png', {
+        attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
+                      'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. ' +
+                      'Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under ' +
+                      '<a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
+        maxZoom: 17,
+        minZoom: 14,
+      }).addTo(this.Map);
+
+      this.Map.invalidateSize();
+
     });
-    ShuttleMap.setView([42.728172, -73.678803], 15.3);
-    // show attribution without Leaflet
-    ShuttleMap.addControl(L.control.attribution({
-        position: 'bottomright',
-        prefix: '',
-    }));
-    L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png', {
-      attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
-      maxZoom: 17,
-      minZoom: 14,
-    }).addTo(ShuttleMap);
+    this.renderRoutes();
+    this.$store.subscribe((mutation: any, state: any) => {
+      if (mutation.type === 'setRoutes') {
+        this.renderRoutes();
+      }
+      if (mutation.type === 'setStops') {
+        this.renderStops();
+      }
+    });
+  },
+  methods: {
+    routePolyLines(): L.Polyline[] {
+      return this.$store.getters.getRoutePolyLines;
+    },
+    renderRoutes() {
+      if (this.routePolyLines().length > 0 && !this.initialized) {
+        if (this.Map !== undefined) {
+          this.initialized = true;
+          this.Map.fitBounds(this.$store.getters.getBoundsPolyLine.getBounds());
+        }
+      }
+      this.existingRouteLayers.forEach((line) => {
+        if (this.Map !== undefined) {
+          this.Map.removeLayer(line);
+        }
+      });
+      this.existingRouteLayers = new Array<L.Polyline>();
+      this.routePolyLines().forEach((line: L.Polyline) => {
+        if (this.Map !== undefined) {
+          this.Map.addLayer(line);
+          this.existingRouteLayers.push(line);
+        }
+      });
+    },
+    renderStops() {
+      this.$store.state.Stops.forEach((stop: Stop) => {
+        const marker = L.marker([stop.lat, stop.lng], {icon: StopIcon});
+        if (this.Map !== undefined) {
+          marker.bindPopup(stop.name);
+          marker.addTo(this.Map);
+        }
+      });
+    },
   },
   components: {
     dropdown,
@@ -65,8 +141,11 @@ export default Vue.extend({
 <style lang="scss">
 
 #mymap{
-  height: 100%;
-  position: relative;
+    height: 100%;
+    width: 100%;
+    position: relative;
+    filter: invert(0);
+    
 }
 
 .titleBar {

@@ -201,6 +201,5 @@ export default Vue.extend({
     padding: 0 8px;
     }
 
-    /* ===================== */
 </style>
 
