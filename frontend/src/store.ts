@@ -6,6 +6,7 @@ import InfoServiceProvider from './structures/serviceproviders/info.service';
 import Stop from './structures/stop';
 import Vehicle from './structures/vehicle';
 import * as L from 'leaflet';
+import Update from './structures/update';
 
 Vue.use(Vuex);
 const InfoService = new InfoServiceProvider();
@@ -25,6 +26,36 @@ const store: StoreOptions<StoreState> = {
     },
     setVehicles(state, vehicles: Vehicle[]) {
       state.Vehicles = vehicles;
+    },
+    addUpdates(state, updates: Update[]) {
+      const toHide = new Array<Vehicle> ();
+      state.Vehicles.forEach((vehicle: Vehicle) => {
+        let found = false;
+        for (let i = 0; i < updates.length; i++) {
+          if (Number(vehicle.id) === Number(updates[i].vehicleID)) {
+
+            found = true;
+            vehicle.missedUpdates = 0;
+            vehicle.setRoute(undefined);
+            for (let j = 0; j < state.Routes.length; j ++) {
+              if (state.Routes[j].id === updates[i].RouteID) {
+                vehicle.setRoute(state.Routes[j]);
+                break;
+              }
+            }
+            vehicle.setLatLng(Number(updates[i].lat), Number(updates[i].lng));
+            vehicle.showOnMap(true);
+
+            break;
+          }
+        }
+        if (!found) {
+          vehicle.missedUpdates ++;
+          if (vehicle.missedUpdates > 5) {
+            vehicle.showOnMap(false);
+          }
+        }
+      });
     },
   },
   getters: {
@@ -74,7 +105,10 @@ const store: StoreOptions<StoreState> = {
       InfoService.GrabStops().then((ret: Stop[]) => commit('setStops', ret));
     },
     grabVehicles( {commit} ) {
-      InfoService.GrabVehicles().then((ret: Vehicle[]) => commit('setRoutes', ret));
+      InfoService.GrabVehicles().then((ret: Vehicle[]) => commit('setVehicles', ret));
+    },
+    grabUpdates( {commit} ) {
+      InfoService.GrabUpdates().then((ret: Update[]) => commit('addUpdates', ret));
     },
   },
 };

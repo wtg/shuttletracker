@@ -15,6 +15,8 @@
     "ordered-imports": false,
     "object-literal-sort-keys": false,
     "no-consecutive-blank-lines": false,
-    "no-var-requires": false
+    "no-var-requires": false,
+    "max-line-length": false,
+    "prefer-for-of": false
   }
 }

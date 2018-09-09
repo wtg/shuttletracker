@@ -62,6 +62,11 @@ export default Vue.extend({
     this.$store.dispatch('grabRotues');
     this.$store.dispatch('grabStops');
     this.$store.dispatch('grabVehicles');
+    this.$store.dispatch('grabUpdates');
+
+    setInterval(() => {
+      this.$store.dispatch('grabUpdates');
+    }, 5000);
 
     this.$nextTick(() => {
       this.ready = true;
@@ -81,8 +86,8 @@ export default Vue.extend({
                       'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. ' +
                       'Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under ' +
                       '<a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
-        maxZoom: 17,
-        minZoom: 14,
+        // maxZoom: 17,
+        // minZoom: 14,
       }).addTo(this.Map);
 
       this.Map.invalidateSize();
@@ -96,6 +101,9 @@ export default Vue.extend({
       if (mutation.type === 'setStops') {
         this.renderStops();
       }
+      if (mutation.type === 'setVehicles') {
+        this.addVehicles();
+      }
     });
   },
   methods: {
@@ -104,7 +112,7 @@ export default Vue.extend({
     },
     renderRoutes() {
       if (this.routePolyLines().length > 0 && !this.initialized) {
-        if (this.Map !== undefined) {
+        if (this.Map !== undefined && !this.$store.getters.getBoundsPolyLine.isEmpty()) {
           this.initialized = true;
           this.Map.fitBounds(this.$store.getters.getBoundsPolyLine.getBounds());
         }
@@ -128,6 +136,13 @@ export default Vue.extend({
         if (this.Map !== undefined) {
           marker.bindPopup(stop.name);
           marker.addTo(this.Map);
+        }
+      });
+    },
+    addVehicles() {
+      this.$store.state.Vehicles.forEach((veh: Vehicle) => {
+        if (this.Map !== undefined) {
+          veh.addToMap(this.Map);
         }
       });
     },
