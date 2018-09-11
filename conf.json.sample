@@ -4,14 +4,13 @@
     "UpdateInterval": "3s"
   },
   "API": {
-    "GoogleMapAPIKey": "",
-    "GoogleMapMinDistance": 1,
     "CasURL": "https://cas-auth.rpi.edu/cas/",
     "Authenticate": true,
-    "ListenURL": "127.0.0.1:8080"
+    "ListenURL": "127.0.0.1:8080",
+    "MapboxAPIKey": ""
   },
-  "Database": {
-    "MongoURL": "127.0.0.1:27017"
+  "Postgres": {
+    "URL": "postgres://localhost/shuttletracker?sslmode=disable"
   },
   "Log": {
     "Level": "debug"
