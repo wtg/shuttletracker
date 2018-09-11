@@ -14,10 +14,12 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 6. Run `govendor sync`
 7. Ensure you have [Postgres downloaded](https://www.postgresql.org/download/), installed, and running. On macOS, prefer installing it with Homebrew.
 8. Run `createdb shuttletracker` to create a Postgres database.
-8. Rename `conf.json.sample` to `conf.json`
-9. Edit `conf.json` with the following, if necessary:
+9. Rename `conf.json.sample` to `conf.json`
+10. Edit `conf.json` with the following, if necessary:
    * `Updater.DataFeed`: API with tracking information from iTrak. For RPI, this is a unique API URL that we can get data from. It's private, and a Shuttle Tracker developer can provide it to you.
+   * `API.MapboxAPIKey`: Necessary for creating routes through the admin interface. [Create your own token](https://www.mapbox.com/help/how-access-tokens-work/) or ask a Shuttle Tracker developer to provide you with one.
    * `Postgres.URL`: URL where Postgres is located. The provided default typically won't need to be modified.
+
 11. Add data to your database. Example DBs are provided in `example_database`, as well as a simple import/export script to setup the database for you.
     - If using an example database, you might need to check the name of the imported database and change the Postgres URL accordingly.
 12. Start the app by running `go run cmd/shuttletracker/main.go` in the project root directory.

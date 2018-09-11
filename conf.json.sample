@@ -6,7 +6,8 @@
   "API": {
     "CasURL": "https://cas-auth.rpi.edu/cas/",
     "Authenticate": true,
-    "ListenURL": "127.0.0.1:8080"
+    "ListenURL": "127.0.0.1:8080",
+    "MapBoxAPIKey": ""
   },
   "Postgres": {
     "URL": "postgres://localhost/shuttletracker?sslmode=disable"
