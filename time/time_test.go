@@ -1,7 +1,6 @@
-package model
+package time
 
 import (
-	"sort"
 	"testing"
 	"time"
 )
@@ -80,10 +79,40 @@ func TestSorting(t *testing.T) {
 	t1.Day = 2
 	t3.Day = 1
 	var times []Time
+
 	times = append(times, t1, t2, t3)
+	Sort(times)
+	if times[0] != t3 {
+		t.Error()
+	}
+	if times[1] != t2 {
+		t.Error()
+	}
+	if times[2] != t1 {
+		t.Error()
+	}
+
 	times = append(times, t3, t2, t1)
+	Sort(times)
+	if times[0] != t3 || times[1] != t3 {
+		t.Error()
+	}
+	if times[2] != t2 || times[3] != t2 {
+		t.Error()
+	}
+	if times[4] != t1 || times[5] != t1 {
+		t.Error()
+	}
+
 	times = append(times, t3, t1, t2)
-
-	sort.Sort(ByTime(times))
-
+	Sort(times)
+	if times[0] != t3 || times[1] != t3 || times[2] != t3 {
+		t.Error()
+	}
+	if times[3] != t2 || times[4] != t2 || times[5] != t2 {
+		t.Error()
+	}
+	if times[6] != t1 || times[7] != t1 || times[8] != t1 {
+		t.Error()
+	}
 }
