@@ -4,7 +4,7 @@ import (
 	"github.com/go-chi/chi"
 
 	"github.com/wtg/shuttletracker/auth"
-	"github.com/wtg/shuttletracker/database"
+	"github.com/wtg/shuttletracker/mock"
 
 	"io/ioutil"
 	"net/http"
@@ -17,9 +17,9 @@ import (
 func TestCasUnauthenticated(t *testing.T) {
 	url, _ := url.Parse("https://cas.example.com/")
 
-	db := &database.Mock{}
+	us := &mock.UserService{}
 
-	cli := CreateCASClient(url,db)
+	cli := CreateCASClient(url, us, true)
 	httpcli := http.Client{}
 
 	r := chi.NewRouter()
@@ -53,18 +53,17 @@ func TestCasUnauthenticated(t *testing.T) {
 func TestCasAuthenticated(t *testing.T) {
 
 	client := &auth.Mock{}
-	db := &database.Mock{}
+	us := &mock.UserService{}
 	httpcli := http.Client{}
 
-	cli := InjectMocks(client,db)
+	cli := InjectMocks(client, us, true)
 	r := chi.NewRouter()
 	r.Use(cli.casauth)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("test"))
 	})
-	db.On("UserExists", "lyonj4").Return(true, nil)
-
+	us.On("UserExists", "lyonj4").Return(true, nil)
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()
@@ -83,7 +82,7 @@ func TestCasAuthenticated(t *testing.T) {
 	if bodyString != "test" {
 		t.Errorf("Response did not come through, authenticaiton failure")
 	}
-	db.AssertExpectations(t)
+	us.AssertExpectations(t)
 	_ = req
 	_ = httpcli
 	_ = resp
@@ -93,9 +92,9 @@ func TestCasAuthenticated(t *testing.T) {
 func TestCasAuthenticatedBadUser(t *testing.T) {
 
 	client := &auth.Mock{}
-	db := &database.Mock{}
+	us := &mock.UserService{}
 	httpcli := http.Client{}
-	cli := InjectMocks(client,db)
+	cli := InjectMocks(client, us, true)
 
 	r := chi.NewRouter()
 	r.Use(cli.casauth)
@@ -103,7 +102,7 @@ func TestCasAuthenticatedBadUser(t *testing.T) {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("test"))
 	})
-	db.On("UserExists", "lyonj4").Return(false, nil)
+	us.On("UserExists", "lyonj4").Return(false, nil)
 
 	ts := httptest.NewServer(r)
 	defer ts.Close()
@@ -121,7 +120,7 @@ func TestCasAuthenticatedBadUser(t *testing.T) {
 	if bodyString != "unauthenticated\n" {
 		t.Errorf("Response should be unauthenticated")
 	}
-	db.AssertExpectations(t)
+	us.AssertExpectations(t)
 
 	_ = req
 	_ = httpcli

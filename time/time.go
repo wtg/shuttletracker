@@ -1,7 +1,8 @@
-package model
+package time
 
 import (
 	"fmt"
+	"sort"
 	"time"
 )
 
@@ -15,7 +16,6 @@ type Time struct {
 // FromTime is used to create a new model.Time object from a normal gotime object
 func (t1 *Time) FromTime(t time.Time) {
 	t1.Time = t
-
 }
 
 // GetTimeString returns the string version of the time represented by the struct
@@ -50,12 +50,18 @@ func (t1 Time) After(t2 Time) bool {
 	return false
 }
 
-//ByTime is an interface used to sort times
-type ByTime []Time
+// byTime is an interface used to sort times.
+type byTime []Time
 
-func (a ByTime) Len() int      { return len(a) }
-func (a ByTime) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
-func (a ByTime) Less(i, j int) bool {
+func (a byTime) Len() int {
+	return len(a)
+}
+
+func (a byTime) Swap(i, j int) {
+	a[i], a[j] = a[j], a[i]
+}
+
+func (a byTime) Less(i, j int) bool {
 	if a[i].Day < a[j].Day {
 		return true
 	} else if a[i].Day > a[j].Day {
@@ -66,4 +72,10 @@ func (a ByTime) Less(i, j int) bool {
 		}
 		return false
 	}
+}
+
+// Sort sorts a slice of Times.
+// We cannot use sort.Slice because it does not exist in Go 1.7.
+func Sort(times []Time) {
+	sort.Sort(byTime(times))
 }

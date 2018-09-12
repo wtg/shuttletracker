@@ -3,144 +3,86 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	"sort"
 	"strconv"
-	"time"
 
-	"github.com/go-chi/chi"
-
+	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
-
-	"github.com/wtg/shuttletracker/model"
 )
 
 // RoutesHandler finds all of the routes in the database
 func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
-	routes, err := api.db.GetRoutes()
-
+	routes, err := api.ms.Routes()
 	if err != nil {
+		log.WithError(err).Error("unable to get routes")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-
 	WriteJSON(w, routes)
 }
 
 // StopsHandler finds all of the route stops in the database
 func (api *API) StopsHandler(w http.ResponseWriter, r *http.Request) {
-	stops, err := api.db.GetStops()
+	stops, err := api.ms.Stops()
 	if err != nil {
+		log.WithError(err).Error("unable to get stops")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	WriteJSON(w, stops)
 }
 
-func combineCoords(coordsData *[]map[string]float64) []model.Coord {
-	coords := []model.Coord{}
-	for _, c := range *coordsData {
-		coord := model.Coord{
-			Lat: c["lat"],
-			Lng: c["lng"],
-		}
-		coords = append(coords, coord)
-	}
-	return coords
-}
-
 // RoutesCreateHandler adds a new route to the database
 func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
-	var routeData map[string]string
-	var coordsData []map[string]float64
-	err := json.NewDecoder(r.Body).Decode(&routeData)
+	route := &shuttletracker.Route{}
+	err := json.NewDecoder(r.Body).Decode(route)
 	if err != nil {
+		log.WithError(err).Error("unable to decode route")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	err = json.Unmarshal([]byte(routeData["coords"]), &coordsData)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-	coords := combineCoords(&coordsData)
 
-	// Here do the interpolation
-	// now we get the Segment for each segment ( this should be stored in database, just store it inside route for god sake)
-	// Type conversions
-	enabled, _ := strconv.ParseBool(routeData["enabled"])
-	width, _ := strconv.Atoi(routeData["width"])
-	timeIntervals := []model.Time{}
-
-	route := model.Route{
-		Name:         routeData["name"],
-		Description:  routeData["description"],
-		TimeInterval: timeIntervals,
-		Enabled:      enabled,
-		Color:        routeData["color"],
-		Width:        width,
-		Coords:       coords,
-		Created:      time.Now(),
-		Updated:      time.Now()}
-	err = api.db.CreateRoute(&route)
+	err = api.ms.CreateRoute(route)
 	if err != nil {
+		log.WithError(err).Error("unable to create route")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 // RoutesDeleteHandler deletes a route from database
 func (api *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
-
-	id := chi.URLParam(r, "id")
-	log.Debugf("deleting", id)
-	err := api.db.DeleteRoute(id)
-
-	// Error handling
+	id, err := strconv.ParseInt(r.URL.Query().Get("id"), 10, 64)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
-
-//Use this for importing a schedule
-type sched struct {
-	Times []model.Time `json:"times"`
-	ID    string       `json:"id"`
-}
-
-// RoutesScheduler Allows for route active times to be set
-func (api *API) RoutesScheduler(w http.ResponseWriter, r *http.Request) {
-	var times sched
-	err := json.NewDecoder(r.Body).Decode(&times)
-	if err != nil {
-		log.WithError(err).Error("Unable to decode route")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	sort.Sort(model.ByTime(times.Times))
-	route := model.Route{}
-	route, err = api.db.GetRoute(times.ID)
-	route.TimeInterval = times.Times
 
-	err = api.db.ModifyRoute(&route)
+	err = api.ms.DeleteRoute(id)
 	if err != nil {
-		log.WithError(err).Error("Unable to store route into db")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		if err == shuttletracker.ErrRouteNotFound {
+			http.Error(w, "Route not found", http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
 
 // RoutesEditHandler Only handles editing enabled flag for now
 func (api *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
-	route := model.Route{}
-	err := json.NewDecoder(r.Body).Decode(&route)
+	route := &shuttletracker.Route{}
+	err := json.NewDecoder(r.Body).Decode(route)
 	if err != nil {
 		log.WithError(err).Error("Unable to decode route")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	en := route.Enabled
-	route, err = api.db.GetRoute(route.ID)
+	route, err = api.ms.Route(route.ID)
 	route.Enabled = en
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = api.db.ModifyRoute(&route)
+	err = api.ms.ModifyRoute(route)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -149,29 +91,16 @@ func (api *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
 
 // StopsCreateHandler adds a new route stop to the database
 func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
-	var stop model.Stop
-	err := json.NewDecoder(r.Body).Decode(&stop)
+	stop := &shuttletracker.Stop{}
+	err := json.NewDecoder(r.Body).Decode(stop)
 	if err != nil {
-		log.WithError(err).Error("Unable to decode stop")
+		log.WithError(err).Error("unable to decode stop")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	route, err := api.db.GetRoute(stop.RouteID)
+	err = api.ms.CreateStop(stop)
 	if err != nil {
-		log.WithError(err).Error("Unable to get route.")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	err = api.db.CreateStop(&stop)
-	if err != nil {
-		log.WithError(err).Error("Unable to create stop.")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	route.StopsID = append(route.StopsID, stop.ID)
-	err = api.db.ModifyRoute(&route)
-	if err != nil {
-		log.WithError(err).Error("Unable to modify route.")
+		log.WithError(err).Error("unable to create stop")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -179,13 +108,17 @@ func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
-
-	id := chi.URLParam(r, "id")
-	log.Debugf("deleting", id)
-	err := api.db.DeleteStop(id)
-
-	// Error handling
+	id, err := strconv.ParseInt(r.URL.Query().Get("id"), 10, 64)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = api.ms.DeleteStop(id)
+	if err != nil {
+		if err == shuttletracker.ErrStopNotFound {
+			http.Error(w, "Stop not found", http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
