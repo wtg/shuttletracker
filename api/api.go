@@ -119,6 +119,9 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	r.Get("/", IndexHandler)
 	r.Method("GET", "/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
 
+	// iTrak data feed endpoint
+	r.Get("/datafeed", api.DataFeedHandler)
+
 	api.handler = r
 
 	return &api, nil
