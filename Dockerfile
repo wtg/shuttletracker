@@ -1,4 +1,4 @@
-FROM golang:1.10
+FROM golang:1.11
 
 RUN go get -u github.com/kardianos/govendor
 RUN mkdir -p /go/src/github.com/wtg/shuttletracker
