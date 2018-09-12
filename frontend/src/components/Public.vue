@@ -11,7 +11,7 @@
     </div>
     <span style="width: 100%; height: 100%; position: fixed;">
       <div id="mymap"></div>
-
+    <messagebox />
     </span>
 </div>
 </template>
@@ -23,6 +23,7 @@ import Vehicle from '../structures/vehicle';
 import Route from '../structures/route';
 import Stop from '../structures/stop';
 import dropdown from './dropdown.vue';
+import messagebox from './adminmessage.vue';
 import * as L from 'leaflet';
 import { setTimeout, setInterval } from 'timers';
 
@@ -59,11 +60,11 @@ export default Vue.extend({
   },
   mounted() {
     const a  = new InfoService();
-    this.$store.dispatch('grabRotues');
+    this.$store.dispatch('grabRoutes');
     this.$store.dispatch('grabStops');
     this.$store.dispatch('grabVehicles');
     this.$store.dispatch('grabUpdates');
-
+    this.$store.dispatch('grabAdminMesssage');
     setInterval(() => {
       this.$store.dispatch('grabUpdates');
     }, 5000);
@@ -149,6 +150,7 @@ export default Vue.extend({
   },
   components: {
     dropdown,
+    messagebox,
   },
 });
 </script>

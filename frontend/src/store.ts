@@ -7,6 +7,7 @@ import Stop from './structures/stop';
 import Vehicle from './structures/vehicle';
 import * as L from 'leaflet';
 import Update from './structures/update';
+import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 
 Vue.use(Vuex);
 const InfoService = new InfoServiceProvider();
@@ -16,6 +17,7 @@ const store: StoreOptions<StoreState> = {
     Routes: [],
     Stops: [],
     Vehicles: [],
+    adminMessage: undefined,
   },
   mutations: {
     setRoutes(state, routes: Route[]) {
@@ -33,9 +35,10 @@ const store: StoreOptions<StoreState> = {
         let found = false;
         for (let i = 0; i < updates.length; i++) {
           if (Number(vehicle.id) === Number(updates[i].vehicleID)) {
-
+            vehicle.lastUpdate = new Date(updates[i].date) ;
             found = true;
             vehicle.missedUpdates = 0;
+            vehicle.speed = Number(updates[i].speed);
             vehicle.setRoute(undefined);
             for (let j = 0; j < state.Routes.length; j ++) {
               if (state.Routes[j].id === updates[i].RouteID) {
@@ -44,6 +47,7 @@ const store: StoreOptions<StoreState> = {
               }
             }
             vehicle.setLatLng(Number(updates[i].lat), Number(updates[i].lng));
+            vehicle.setHeading(Number(updates[i].heading));
             vehicle.showOnMap(true);
 
             break;
@@ -57,24 +61,29 @@ const store: StoreOptions<StoreState> = {
         }
       });
     },
+    addAdminMessage(state, message: AdminMessageUpdate) {
+      state.adminMessage = message;
+    },
   },
   getters: {
     getRoutePolyLines(state: StoreState): L.Polyline[] {
       const arr = new Array<L.Polyline>();
       if (state.Routes !== undefined && state.Routes.length !== 0) {
         state.Routes.forEach((r: Route) => {
-          const points = new Array<L.LatLng>();
-          if (r.coords !== undefined) {
-            r.coords.forEach((p: {lat: number, lng: number}) => {
-              points.push(new L.LatLng(p.lat, p.lng));
+          if (r.enabled) {
+            const points = new Array<L.LatLng>();
+            if (r.coords !== undefined) {
+              r.coords.forEach((p: {lat: number, lng: number}) => {
+                points.push(new L.LatLng(p.lat, p.lng));
+              });
+            }
+            const line = new L.Polyline(points, {
+              color: r.color,
+              weight: r.width,
+              opacity: 1,
             });
+            arr.push(line);
           }
-          const line = new L.Polyline(points, {
-            color: r.color,
-            weight: r.width,
-            opacity: 1,
-          });
-          arr.push(line);
         });
       }
       return arr;
@@ -98,7 +107,7 @@ const store: StoreOptions<StoreState> = {
     },
   },
   actions: {
-    grabRotues( {commit} ) {
+    grabRoutes( {commit} ) {
       InfoService.GrabRoutes().then((ret: Route[]) => commit('setRoutes', ret));
     },
     grabStops( {commit} ) {
@@ -109,6 +118,9 @@ const store: StoreOptions<StoreState> = {
     },
     grabUpdates( {commit} ) {
       InfoService.GrabUpdates().then((ret: Update[]) => commit('addUpdates', ret));
+    },
+    grabAdminMesssage( {commit} ) {
+      InfoService.GrabAdminMessage().then((ret: AdminMessageUpdate) => commit('addAdminMessage', ret));
     },
   },
 };

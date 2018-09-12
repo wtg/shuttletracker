@@ -32,17 +32,6 @@
             </li>
         </ul>
     </li>
-    <li id="dropdown-menu-item_styling" class="dropdown-menu-item">
-        <p class="dropdown-menu-item_p">Styling</p>
-        <ul id="dropdown-submenu_styling" class="dropdown-submenu" style="display: inline-block;">
-            <li id="dropdown-submenu-item_styling" class="dropdown-submenu-item">
-                <div id="darkmode-icon" class="dropdown-submenu-item_div"><img src="static/images/moon.svg"
-                        class="dropdown-submenu-subitem">
-                    <p class="dropdown-submenu-subitem">Darkmode</p>
-                </div>
-            </li>
-        </ul>
-    </li>
 </ul>
 </li>
 </template>

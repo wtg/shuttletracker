@@ -2,6 +2,7 @@ import Vehicle from '../vehicle';
 import Route from '../route';
 import Stop from '../stop';
 import Update from '../update';
+import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 /**
  * Info service provider grabs the basic information from the api and returns it to the frontend.
  */
@@ -72,19 +73,13 @@ export default class InfoServiceProvider {
         });
     }
 
-    public GrabUpdates(): Promise < Array < {
-        vehicleID: string,
-        lat: string,
-        lng: string,
-        heading: string,
-        speed: string,
-        lock: string,
-        time: string,
-        date: string,
-        status: string,
-        created: string,
-        RouteID: string,
-    } >> {
+    public GrabAdminMessage(): Promise <AdminMessageUpdate> {
+        return fetch('https://shuttles.rpi.edu/adminMessage').then((data) => data.json()).then((ret) => {
+            return new AdminMessageUpdate(ret.id, ret.Type, ret.Message, ret.Display, new Date(ret.Created));
+        });
+    }
+
+    public GrabUpdates(): Promise < Update[] > {
         return fetch('https://shuttles.rpi.edu/updates').then((data) => data.json()).then((data): Update[] => {
             const ret = new Array <Update> ();
             data.forEach((element: Update) => {
