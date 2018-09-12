@@ -16,12 +16,20 @@ import (
 	"github.com/wtg/shuttletracker/log"
 )
 
+type DataFeedResponse struct {
+	Body       []byte
+	StatusCode int
+	Headers    http.Header
+}
+
 // Updater handles periodically grabbing the latest vehicle location data from iTrak.
 type Updater struct {
-	cfg            Config
-	updateInterval time.Duration
-	dataRegexp     *regexp.Regexp
-	ms             shuttletracker.ModelService
+	cfg                  Config
+	updateInterval       time.Duration
+	dataRegexp           *regexp.Regexp
+	ms                   shuttletracker.ModelService
+	mutex                *sync.Mutex
+	lastDataFeedResponse *DataFeedResponse
 }
 
 type Config struct {
@@ -32,8 +40,9 @@ type Config struct {
 // New creates an Updater.
 func New(cfg Config, ms shuttletracker.ModelService) (*Updater, error) {
 	updater := &Updater{
-		cfg: cfg,
-		ms:  ms,
+		cfg:   cfg,
+		ms:    ms,
+		mutex: &sync.Mutex{},
 	}
 
 	interval, err := time.ParseDuration(cfg.UpdateInterval)
@@ -73,6 +82,18 @@ func (u *Updater) Run() {
 	}
 }
 
+func (u *Updater) setLastResponse(dfresp *DataFeedResponse) {
+	u.mutex.Lock()
+	u.lastDataFeedResponse = dfresp
+	u.mutex.Unlock()
+}
+
+func (u *Updater) GetLastResponse() *DataFeedResponse {
+	u.mutex.Lock()
+	defer u.mutex.Unlock()
+	return u.lastDataFeedResponse
+}
+
 // Send a request to iTrak API, get updated shuttle info,
 // store updated records in the database, and remove old records.
 func (u *Updater) update() {
@@ -91,6 +112,13 @@ func (u *Updater) update() {
 		return
 	}
 	resp.Body.Close()
+
+	dfresp := &DataFeedResponse{
+		Body:       body,
+		StatusCode: resp.StatusCode,
+		Headers:    resp.Header,
+	}
+	u.setLastResponse(dfresp)
 
 	delim := "eof"
 	// split the body of response by delimiter
