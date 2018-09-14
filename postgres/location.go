@@ -70,11 +70,11 @@ func (ls *LocationService) DeleteLocationsBefore(before time.Time) (int, error) 
 	return int(n), nil
 }
 
-// LocationsSince returns all Locations since a tracker Time for a certain Vehicle.
+// LocationsSince returns all Locations since a tracker Time for a certain Vehicle, ordered newest to oldest.
 func (ls *LocationService) LocationsSince(vehicleID int64, since time.Time) ([]*shuttletracker.Location, error) {
 	locations := []*shuttletracker.Location{}
 	query := "SELECT l.id, l.tracker_id, l.latitude, l.longitude, l.heading, l.speed, l.time, l.route_id, l.created " +
-		"FROM locations l, vehicles v WHERE l.tracker_id = v.tracker_id AND v.id = $1 AND l.time > $2;"
+		"FROM locations l, vehicles v WHERE l.tracker_id = v.tracker_id AND v.id = $1 AND l.time > $2 ORDER BY l.created DESC;"
 	rows, err := ls.db.Query(query, vehicleID, since)
 	if err != nil {
 		return nil, err
