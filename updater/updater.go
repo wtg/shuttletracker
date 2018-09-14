@@ -63,6 +63,7 @@ func New(cfg Config, ms shuttletracker.ModelService) (*Updater, error) {
 func NewConfig(v *viper.Viper) *Config {
 	cfg := &Config{
 		UpdateInterval: "10s",
+		DataFeed:       "https://shuttles.rpi.edu/datafeed",
 	}
 	v.SetDefault("updater.updateinterval", cfg.UpdateInterval)
 	v.SetDefault("updater.datafeed", cfg.DataFeed)
