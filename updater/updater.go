@@ -95,6 +95,11 @@ func (u *Updater) update() {
 		return
 	}
 
+	if resp.StatusCode != http.StatusOK {
+		log.Errorf("data feed status code %d", resp.StatusCode)
+		return
+	}
+
 	// Read response body content
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
