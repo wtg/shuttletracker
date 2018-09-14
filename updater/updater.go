@@ -16,6 +16,7 @@ import (
 	"github.com/wtg/shuttletracker/log"
 )
 
+// DataFeedResponse contains information from the iTRAK data feed.
 type DataFeedResponse struct {
 	Body       []byte
 	StatusCode int
@@ -80,18 +81,6 @@ func (u *Updater) Run() {
 	for range ticker {
 		u.update()
 	}
-}
-
-func (u *Updater) setLastResponse(dfresp *DataFeedResponse) {
-	u.mutex.Lock()
-	u.lastDataFeedResponse = dfresp
-	u.mutex.Unlock()
-}
-
-func (u *Updater) GetLastResponse() *DataFeedResponse {
-	u.mutex.Lock()
-	defer u.mutex.Unlock()
-	return u.lastDataFeedResponse
 }
 
 // Send a request to iTrak API, get updated shuttle info,
@@ -326,4 +315,17 @@ func itrakTimeDate(itrakTime, itrakDate string) (time.Time, error) {
 
 	combined := itrakDate + " " + itrakTime
 	return time.Parse("date:01022006 time:150405", combined)
+}
+
+func (u *Updater) setLastResponse(dfresp *DataFeedResponse) {
+	u.mutex.Lock()
+	u.lastDataFeedResponse = dfresp
+	u.mutex.Unlock()
+}
+
+// GetLastResponse returns the most recent response from the iTRAK data feed.
+func (u *Updater) GetLastResponse() *DataFeedResponse {
+	u.mutex.Lock()
+	defer u.mutex.Unlock()
+	return u.lastDataFeedResponse
 }
