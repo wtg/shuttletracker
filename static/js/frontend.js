@@ -337,7 +337,7 @@ Vue.component('shuttle-map', {
       if (data !== null) {
         for (var j = 0; j < data.length; j++) {
           for (var k = 0; k < this.ShuttleRoutes.length; k++) {
-            if (this.ShuttleRoutes[k].id === data[j].RouteID) {
+            if (this.ShuttleRoutes[k].id === data[j].route_id) {
               data[j].color = this.ShuttleRoutes[k].color;
               break;
             }
