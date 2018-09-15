@@ -21,7 +21,7 @@ export default class Vehicle {
     public lng: number;
     public heading: number;
     public speed: number;
-    public RouteID: string;
+    public RouteID: number | null;
     public shownOnMap: boolean;
     public map: L.Map | undefined;
     public Route: Route | undefined;
@@ -38,7 +38,7 @@ export default class Vehicle {
         this.lng = 0;
         this.heading = 0;
         this.speed = 0;
-        this.RouteID = '';
+        this.RouteID = null;
         this.marker = new L.Marker([this.lat, this.lng], {
             icon: L.icon({
                 iconUrl: getMarkerString('#FFF', this.heading),

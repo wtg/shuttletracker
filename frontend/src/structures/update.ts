@@ -1,15 +1,15 @@
 // An update to a vehicle
 export default interface Update {
-    vehicleID: string;
-    lat: string;
-    lng: string;
-    heading: string;
-    speed: string;
-    lock: string;
+    id: number;
+    latitude: number;
+    longitude: number;
+    heading: number;
+    speed: number;
     time: string;
     date: string;
     status: string;
     created: string;
-    RouteID: string;
+    route_id: number | null;
+    vehicle_id: number;
 
 }

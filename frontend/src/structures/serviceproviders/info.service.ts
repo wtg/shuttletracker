@@ -11,14 +11,15 @@ export default class InfoServiceProvider {
         return fetch('https://shuttles.rpi.edu/vehicles').then((data) => data.json()).then((data) => {
             const ret = new Array < Vehicle > ();
             data.forEach((element: {
-                vehicleID: number,
-                vehicleName: string,
-                Created: string,
-                Updated: string,
+                id: number,
+                name: string,
+                created: string,
+                updated: string,
                 enabled: boolean,
+                tracker_id: string,
             }) => {
-                ret.push(new Vehicle(element.vehicleID, element.vehicleName,
-                    new Date(element.Created), new Date(element.Updated), element.enabled));
+                ret.push(new Vehicle(element.id, element.name,
+                    new Date(element.created), new Date(element.updated), element.enabled));
             });
             return ret;
         });
@@ -29,21 +30,19 @@ export default class InfoServiceProvider {
         return fetch('https://shuttles.rpi.edu/routes').then((data) => data.json()).then((data) => {
             const ret = new Array < Route > ();
             data.forEach((element: {
-                id: string,
+                id: number,
                 name: string,
                 description: string,
-                intervals: any[],
                 enabled: boolean,
-                active: boolean,
                 color: string,
-                width: string,
-                coords: [{
-                    lat: number,
-                    lng: number,
+                width: number,
+                points: [{
+                    latitude: number,
+                    longitude: number,
                 }],
             }) => {
                 ret.push(new Route(element.id, element.name, element.description,
-                    element.enabled, element.active, element.color, Number(element.width), element.coords));
+                    element.enabled, element.color, Number(element.width), element.points));
             });
             return ret;
         });
@@ -53,21 +52,16 @@ export default class InfoServiceProvider {
         return fetch('https://shuttles.rpi.edu/stops').then((data) => data.json()).then((data) => {
             const ret = new Array < Stop > ();
             data.forEach((element: {
-                id: string,
+                id: number,
                 name: string,
                 description: string,
-                lat: string,
-                lng: string,
-                address: string,
-                startTime: string,
-                endTime: string,
-                enabled: string,
-                routeId: string,
-                segmentIndex: number,
+                latitude: string,
+                longitude: string,
+                created: string,
+                updated: string,
             }) => {
-                ret.push(new Stop(element.id, element.name, element.description, Number(element.lat),
-                    Number(element.lng), element.address, element.startTime, element.endTime,
-                    Boolean(element.enabled), element.routeId, element.segmentIndex));
+                ret.push(new Stop(element.id, element.name, element.description, Number(element.latitude),
+                    Number(element.longitude), element.created, element.updated));
             });
             return ret;
         });
@@ -75,7 +69,7 @@ export default class InfoServiceProvider {
 
     public GrabAdminMessage(): Promise <AdminMessageUpdate> {
         return fetch('https://shuttles.rpi.edu/adminMessage').then((data) => data.json()).then((ret) => {
-            return new AdminMessageUpdate(ret.id, ret.Type, ret.Message, ret.Display, new Date(ret.Created));
+            return new AdminMessageUpdate(0, '', ret.message, ret.enabled, new Date(ret.created));
         });
     }
 

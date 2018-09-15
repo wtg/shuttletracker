@@ -9,9 +9,10 @@
           <img src="~../assets/wtg.svg" />
         </div>
     </div>
+    <live-indicator />
     <span style="width: 100%; height: 100%; position: fixed;">
       <div id="mymap"></div>
-    <messagebox />
+    <messagebox ref="msgbox" />
     </span>
 </div>
 </template>
@@ -24,10 +25,14 @@ import Route from '../structures/route';
 import Stop from '../structures/stop';
 import dropdown from './dropdown.vue';
 import messagebox from './adminmessage.vue';
+import LiveIndicator from './liveindicator.vue';
 import * as L from 'leaflet';
 import { setTimeout, setInterval } from 'timers';
+import getMarkerString from '../structures/leaflet/rotatedMarker';
+import { Position } from 'geojson';
 
 const StopSVG = require('../assets/circle.svg') as string;
+const UserSVG = require('../assets/user.svg') as string;
 
 const StopIcon = L.icon({
   iconUrl: StopSVG,
@@ -48,6 +53,7 @@ export default Vue.extend({
       Map: undefined,
       existingRouteLayers: [],
       initialized: false,
+      legend: new L.Control({ position: 'bottomleft' }),
     } as {
       vehicles: Vehicle[],
       routes: Route[],
@@ -55,7 +61,8 @@ export default Vue.extend({
       ready: boolean,
       Map: L.Map | undefined, // Leaflets types are not always useful
       existingRouteLayers: L.Polyline[],
-      initialized: boolean;
+      initialized: boolean,
+      legend: L.Control,
     });
   },
   mounted() {
@@ -92,12 +99,14 @@ export default Vue.extend({
       }).addTo(this.Map);
 
       this.Map.invalidateSize();
+      this.showUserLocation();
 
     });
     this.renderRoutes();
     this.$store.subscribe((mutation: any, state: any) => {
       if (mutation.type === 'setRoutes') {
         this.renderRoutes();
+        this.updateLegend();
       }
       if (mutation.type === 'setStops') {
         this.renderStops();
@@ -108,6 +117,29 @@ export default Vue.extend({
     });
   },
   methods: {
+    updateLegend() {
+      this.legend.onAdd = (map: L.Map) => {
+        const div = L.DomUtil.create('div', 'info legend');
+        let legendstring = '';
+        this.$store.state.Routes.forEach((route: Route) => {
+          if (route.enabled) {
+            legendstring += `<li><img class="legend-icon" src=` + getMarkerString(route.color, 0) + `
+			      width="12" height="12"> ` +
+            route.name;
+          }
+        });
+        div.innerHTML = `<ul style="list-style:none">
+					<li><img class="legend-icon" src='` + UserSVG + `' width="12" height="12"> You</li>` +
+          legendstring +
+          `<li><img class="legend-icon" src="` + StopSVG + `" width="12" height="12"> Shuttle Stop</li>
+				</ul>`;
+        return div;
+      };
+      if (this.Map !== undefined) {
+        this.legend.addTo(this.Map);
+      }
+
+    },
     routePolyLines(): L.Polyline[] {
       return this.$store.getters.getRoutePolyLines;
     },
@@ -133,7 +165,7 @@ export default Vue.extend({
     },
     renderStops() {
       this.$store.state.Stops.forEach((stop: Stop) => {
-        const marker = L.marker([stop.lat, stop.lng], {icon: StopIcon});
+        const marker = L.marker([stop.latitude, stop.longitude], {icon: StopIcon});
         if (this.Map !== undefined) {
           marker.bindPopup(stop.name);
           marker.addTo(this.Map);
@@ -147,10 +179,37 @@ export default Vue.extend({
         }
       });
     },
+    showUserLocation() {
+      const userIcon = L.icon({
+        iconUrl: 'static/images/user.svg',
+
+        iconSize:     [12, 12], // size of the icon
+        iconAnchor:   [6, 6], // point of the icon which will correspond to marker's location
+        shadowAnchor: [6, 6],  // the same for the shadow
+        popupAnchor:  [0, 0], // point from which the popup should open relative to the iconAnchor
+      });
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(((position) => {
+          const locationMarker = {
+                name: 'You are here',
+                marker: L.marker([position.coords.latitude, position.coords.longitude], {
+                    icon: userIcon,
+                    zIndexOffset: 1000,
+                }),
+          };
+          locationMarker.marker.bindPopup(locationMarker.name);
+          if (this.Map !== undefined) {
+            locationMarker.marker.addTo(this.Map);
+          }
+        }) as PositionCallback);
+      }
+    },
   },
   components: {
     dropdown,
     messagebox,
+    LiveIndicator,
   },
 });
 </script>
@@ -209,6 +268,18 @@ export default Vue.extend({
   align-self: center;
   & img{
     height: 100%;
+  }
+}
+
+.info.legend{
+  background-color: rgba(255, 255, 255, .8);
+  border-width: 1px;
+  border-color: #222334;
+  border-style: solid;
+  padding: 5px;
+
+  & ul{
+    padding-left: 0px;
   }
 }
 </style>

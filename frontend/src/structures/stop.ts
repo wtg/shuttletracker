@@ -2,31 +2,22 @@
  * Stop represents a single stop on a route
  */
 export default class Stop {
-    public id: string;
+    public id: number;
     public name: string;
     public description: string;
-    public lat: number;
-    public lng: number;
-    public address: string;
-    public startTime: string;
-    public endTime: string;
-    public enabled: boolean;
-    public routeID: string;
-    public segmentindex: number;
+    public latitude: number;
+    public longitude: number;
+    public created: string;
+    public updated: string;
 
-    constructor(id: string, name: string, description: string,
-                lat: number, lng: number, address: string, startTime: string,
-                endTime: string, enabled: boolean, routeID: string, segmentindex: number) {
+    constructor(id: number, name: string, description: string,
+                lat: number, lng: number, created: string, updated: string) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.lat = lat;
-        this.lng = lng;
-        this.address = address;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.enabled = enabled;
-        this.routeID = routeID;
-        this.segmentindex = segmentindex;
+        this.latitude = lat;
+        this.longitude = lng;
+        this.created = created;
+        this.updated = updated;
     }
 }

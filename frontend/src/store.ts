@@ -8,6 +8,7 @@ import Vehicle from './structures/vehicle';
 import * as L from 'leaflet';
 import Update from './structures/update';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
+import { SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION } from 'constants';
 
 Vue.use(Vuex);
 const InfoService = new InfoServiceProvider();
@@ -34,19 +35,19 @@ const store: StoreOptions<StoreState> = {
       state.Vehicles.forEach((vehicle: Vehicle) => {
         let found = false;
         for (let i = 0; i < updates.length; i++) {
-          if (Number(vehicle.id) === Number(updates[i].vehicleID)) {
+          if (Number(vehicle.id) === Number(updates[i].vehicle_id)) {
             vehicle.lastUpdate = new Date(updates[i].date) ;
             found = true;
             vehicle.missedUpdates = 0;
             vehicle.speed = Number(updates[i].speed);
             vehicle.setRoute(undefined);
             for (let j = 0; j < state.Routes.length; j ++) {
-              if (state.Routes[j].id === updates[i].RouteID) {
+              if (state.Routes[j].id === updates[i].route_id) {
                 vehicle.setRoute(state.Routes[j]);
                 break;
               }
             }
-            vehicle.setLatLng(Number(updates[i].lat), Number(updates[i].lng));
+            vehicle.setLatLng(Number(updates[i].latitude), Number(updates[i].longitude));
             vehicle.setHeading(Number(updates[i].heading));
             vehicle.showOnMap(true);
 
@@ -73,8 +74,8 @@ const store: StoreOptions<StoreState> = {
           if (r.enabled) {
             const points = new Array<L.LatLng>();
             if (r.coords !== undefined) {
-              r.coords.forEach((p: {lat: number, lng: number}) => {
-                points.push(new L.LatLng(p.lat, p.lng));
+              r.coords.forEach((p: {latitude: number, longitude: number}) => {
+                points.push(new L.LatLng(p.latitude, p.longitude));
               });
             }
             const line = new L.Polyline(points, {
@@ -93,8 +94,8 @@ const store: StoreOptions<StoreState> = {
       if (state.Routes !== undefined && state.Routes.length !== 0) {
         state.Routes.forEach((r: Route) => {
           if (r.coords !== undefined) {
-            r.coords.forEach((p: {lat: number, lng: number}) => {
-              points.push(new L.LatLng(p.lat, p.lng));
+            r.coords.forEach((p: {latitude: number, longitude: number}) => {
+              points.push(new L.LatLng(p.latitude, p.longitude));
             });
           }
         });

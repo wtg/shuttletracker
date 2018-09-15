@@ -11,5 +11,5 @@ const icon: string = `<?xml version="1.0" encoding="UTF-8"?>
 </svg>`;
 
 export default function getMarkerString(color: string, angle: number) {
-    return 'data:image/svg+xml;base64,' + btoa(icon.replace('#33A7FF', '#FFFFFF').replace('HEADING', String(angle)));
+    return 'data:image/svg+xml;base64,' + btoa(icon.replace('#33A7FF', color).replace('HEADING', String(angle)));
 }
