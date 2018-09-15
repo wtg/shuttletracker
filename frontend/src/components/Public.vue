@@ -5,11 +5,20 @@
             <dropdown />
             <li class="title">RPI Shuttle Tracker</li>
         </ul>
+        <div v-if="$store.state.online" class="livebox">
+          <p>Live </p>
+          <div class="pulsate" style=""></div>
+        </div>
+        <div v-if="!$store.state.online" class="livebox">
+          <p>Offline </p>
+          <div class="caution-circle" style=""></div>
+        </div>
         <div class="logo">
-          <img src="~../assets/wtg.svg" />
+          <a href="https://webtech.union.rpi.edu/">
+            <img src="~../assets/wtg.svg" />
+          </a>
         </div>
     </div>
-    <live-indicator />
     <span style="width: 100%; height: 100%; position: fixed;">
       <div id="mymap"></div>
     <messagebox ref="msgbox" />
@@ -25,7 +34,6 @@ import Route from '../structures/route';
 import Stop from '../structures/stop';
 import dropdown from './dropdown.vue';
 import messagebox from './adminmessage.vue';
-import LiveIndicator from './liveindicator.vue';
 import * as L from 'leaflet';
 import { setTimeout, setInterval } from 'timers';
 import getMarkerString from '../structures/leaflet/rotatedMarker';
@@ -94,8 +102,8 @@ export default Vue.extend({
                       'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. ' +
                       'Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under ' +
                       '<a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
-        // maxZoom: 17,
-        // minZoom: 14,
+        maxZoom: 17,
+        minZoom: 14,
       }).addTo(this.Map);
 
       this.Map.invalidateSize();
@@ -209,12 +217,60 @@ export default Vue.extend({
   components: {
     dropdown,
     messagebox,
-    LiveIndicator,
   },
 });
 </script>
 
 <style lang="scss">
+.caution-circle {
+  float:right;
+  width:10px;
+  height:10px;
+  background-color:orange;
+  border-radius:50%;
+}
+.pulsate {
+  float:right;
+  width:10px;
+  height:10px;
+  background-color:blue;
+  border-radius:50%;
+  animation: pulsate 2.5s ease-out;
+  animation-iteration-count: infinite;
+}
+@keyframes pulsate {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+
+  }
+}
+.livebox{
+    p {
+      margin-right: 5px;
+    }
+    position: absolute;
+    height: 20px;
+    right: 10px;
+    top: 40px;
+    background-color: rgba(255, 255, 255, 0.88); 
+    border-color: black;
+    border-style: solid;
+    border-width: 1px;
+    padding-left: 4px;   
+    padding-right: 4px;   
+    justify-self: flex-end;
+    display: flex;
+    flex-flow: row wrap;
+    align-content: space-between;
+    align-items: center;
+    justify-content: space-around;
+}
 
 #mymap{
     height: 100%;
@@ -253,9 +309,11 @@ export default Vue.extend({
       padding: 0px;
 
       & .title {
-        font-size: 22px;
+        font-size: 20px;
+        line-height: 34px;
+        vertical-align: center;
         padding: 0px;
-        margin: 3px 6px 0px;
+        margin: 0px 6px 0px;
         float: left;
       }
     }
@@ -277,7 +335,7 @@ export default Vue.extend({
   border-color: #222334;
   border-style: solid;
   padding: 5px;
-
+  bottom: 25px;
   & ul{
     padding-left: 0px;
   }

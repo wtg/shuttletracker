@@ -3,9 +3,11 @@
 <ul v-if="visible" class="dropdown-menu" style="display: inline-block;">
     <li id="dropdown-submenu-item_styling" class="dropdown-submenu-item">
         <p class="dropdown-menu-item_p">Information</p>
+        <router-link style="text-decoration: none; color: #333333;" to="/about">
         <div id="darkmode-icon" class="dropdown-submenu-item_div">
             <p class="dropdown-submenu-subitem">About</p>
         </div>
+        </router-link>
     </li>
     <li id="dropdown-menu-item_shuttle-schedule" class="dropdown-menu-item">
         <p class="dropdown-menu-item_p">Shuttle Schedules</p>

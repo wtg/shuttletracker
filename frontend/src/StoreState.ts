@@ -9,4 +9,5 @@ export interface StoreState {
     Vehicles: Vehicle[];
     Stops: Stop[];
     adminMessage: AdminMessageUpdate | undefined;
+    online: boolean;
 }

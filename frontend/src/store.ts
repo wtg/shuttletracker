@@ -19,8 +19,12 @@ const store: StoreOptions<StoreState> = {
     Stops: [],
     Vehicles: [],
     adminMessage: undefined,
+    online: true,
   },
   mutations: {
+    setOnline(state, online: boolean) {
+      state.online = online;
+    },
     setRoutes(state, routes: Route[]) {
       state.Routes = routes;
     },
@@ -109,19 +113,29 @@ const store: StoreOptions<StoreState> = {
   },
   actions: {
     grabRoutes( {commit} ) {
-      InfoService.GrabRoutes().then((ret: Route[]) => commit('setRoutes', ret));
+      InfoService.GrabRoutes().then((ret: Route[]) => commit('setRoutes', ret)).catch(() => {
+        commit('setOnline', false);
+      });
     },
     grabStops( {commit} ) {
-      InfoService.GrabStops().then((ret: Stop[]) => commit('setStops', ret));
+      InfoService.GrabStops().then((ret: Stop[]) => commit('setStops', ret)).catch(() => {
+        commit('setOnline', false);
+      });
     },
     grabVehicles( {commit} ) {
-      InfoService.GrabVehicles().then((ret: Vehicle[]) => commit('setVehicles', ret));
+      InfoService.GrabVehicles().then((ret: Vehicle[]) => commit('setVehicles', ret)).catch(() => {
+        commit('setOnline', false);
+      });
     },
     grabUpdates( {commit} ) {
-      InfoService.GrabUpdates().then((ret: Update[]) => commit('addUpdates', ret));
+      InfoService.GrabUpdates().then((ret: Update[]) => commit('addUpdates', ret)).catch(() => {
+        commit('setOnline', false);
+      });
     },
     grabAdminMesssage( {commit} ) {
-      InfoService.GrabAdminMessage().then((ret: AdminMessageUpdate) => commit('addAdminMessage', ret));
+      InfoService.GrabAdminMessage().then((ret: AdminMessageUpdate) => commit('addAdminMessage', ret)).catch(() => {
+        commit('setOnline', false);
+      });
     },
   },
 };

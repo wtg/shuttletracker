@@ -1,6 +1,8 @@
 <template>
   <div id="app">
-    <Public />
+    <keep-alive>
+      <router-view />
+    </keep-alive>
   </div>
 </template>
 
@@ -10,9 +12,7 @@ import Public from './components/Public.vue';
 
 export default Vue.extend({
   name: 'app',
-  components: {
-    Public,
-  },
+
 });
 </script>
 
