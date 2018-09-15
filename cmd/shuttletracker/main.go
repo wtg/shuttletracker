@@ -57,7 +57,7 @@ func Run() {
 	runner.Add(updater)
 
 	// Make API server
-	api, err := api.New(*cfg.API, ms, msg, us)
+	api, err := api.New(*cfg.API, ms, msg, us, updater)
 	if err != nil {
 		log.WithError(err).Error("Could not create API server.")
 		return

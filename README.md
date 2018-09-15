@@ -16,7 +16,6 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 8. Run `createdb shuttletracker` to create a Postgres database.
 9. Rename `conf.json.sample` to `conf.json`
 10. Edit `conf.json` with the following, if necessary:
-   * `Updater.DataFeed`: API with tracking information from iTrak. For RPI, this is a unique API URL that we can get data from. It's private, and a Shuttle Tracker developer can provide it to you.
    * `API.MapboxAPIKey`: Necessary for creating routes through the admin interface. [Create your own token](https://www.mapbox.com/help/how-access-tokens-work/) or ask a Shuttle Tracker developer to provide you with one.
    * `Postgres.URL`: URL where Postgres is located. The provided default typically won't need to be modified.
 
@@ -29,6 +28,8 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 ## Configuration
 
 Shuttle Tracker needs configuration to run properly. The preferred method during development is to create a `conf.json` file. See `conf.json.sample` for an example of what it should contain.
+
+`Updater.DataFeed`: API with tracking information from iTrak. For RPI, this is a unique API URL that we can get data from. It's private, and a Shuttle Tracker developer can provide it to you if necessary. However, by default, Shuttle Tracker will reach out to the instance running at shuttles.rpi.edu to piggyback off of its data feed. This means that most developers will not have to configure this key.
 
 ### Environment variables
 
