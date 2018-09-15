@@ -16,12 +16,21 @@ import (
 	"github.com/wtg/shuttletracker/log"
 )
 
+// DataFeedResponse contains information from the iTRAK data feed.
+type DataFeedResponse struct {
+	Body       []byte
+	StatusCode int
+	Headers    http.Header
+}
+
 // Updater handles periodically grabbing the latest vehicle location data from iTrak.
 type Updater struct {
-	cfg            Config
-	updateInterval time.Duration
-	dataRegexp     *regexp.Regexp
-	ms             shuttletracker.ModelService
+	cfg                  Config
+	updateInterval       time.Duration
+	dataRegexp           *regexp.Regexp
+	ms                   shuttletracker.ModelService
+	mutex                *sync.Mutex
+	lastDataFeedResponse *DataFeedResponse
 }
 
 type Config struct {
@@ -32,8 +41,9 @@ type Config struct {
 // New creates an Updater.
 func New(cfg Config, ms shuttletracker.ModelService) (*Updater, error) {
 	updater := &Updater{
-		cfg: cfg,
-		ms:  ms,
+		cfg:   cfg,
+		ms:    ms,
+		mutex: &sync.Mutex{},
 	}
 
 	interval, err := time.ParseDuration(cfg.UpdateInterval)
@@ -53,6 +63,7 @@ func New(cfg Config, ms shuttletracker.ModelService) (*Updater, error) {
 func NewConfig(v *viper.Viper) *Config {
 	cfg := &Config{
 		UpdateInterval: "10s",
+		DataFeed:       "https://shuttles.rpi.edu/datafeed",
 	}
 	v.SetDefault("updater.updateinterval", cfg.UpdateInterval)
 	v.SetDefault("updater.datafeed", cfg.DataFeed)
@@ -84,6 +95,11 @@ func (u *Updater) update() {
 		return
 	}
 
+	if resp.StatusCode != http.StatusOK {
+		log.Errorf("data feed status code %d", resp.StatusCode)
+		return
+	}
+
 	// Read response body content
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -91,6 +107,13 @@ func (u *Updater) update() {
 		return
 	}
 	resp.Body.Close()
+
+	dfresp := &DataFeedResponse{
+		Body:       body,
+		StatusCode: resp.StatusCode,
+		Headers:    resp.Header,
+	}
+	u.setLastResponse(dfresp)
 
 	delim := "eof"
 	// split the body of response by delimiter
@@ -298,4 +321,17 @@ func itrakTimeDate(itrakTime, itrakDate string) (time.Time, error) {
 
 	combined := itrakDate + " " + itrakTime
 	return time.Parse("date:01022006 time:150405", combined)
+}
+
+func (u *Updater) setLastResponse(dfresp *DataFeedResponse) {
+	u.mutex.Lock()
+	u.lastDataFeedResponse = dfresp
+	u.mutex.Unlock()
+}
+
+// GetLastResponse returns the most recent response from the iTRAK data feed.
+func (u *Updater) GetLastResponse() *DataFeedResponse {
+	u.mutex.Lock()
+	defer u.mutex.Unlock()
+	return u.lastDataFeedResponse
 }
