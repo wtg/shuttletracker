@@ -8,7 +8,7 @@ import AdminMessageUpdate from '@/structures/adminMessageUpdate';
  */
 export default class InfoServiceProvider {
     public GrabVehicles(): Promise < Vehicle[] > {
-        return fetch('https://shuttles.rpi.edu/vehicles').then((data) => data.json()).then((data) => {
+        return fetch('/vehicles').then((data) => data.json()).then((data) => {
             const ret = new Array < Vehicle > ();
             data.forEach((element: {
                 id: number,
@@ -27,7 +27,7 @@ export default class InfoServiceProvider {
     }
 
     public GrabRoutes(): Promise < Route[] > {
-        return fetch('https://shuttles.rpi.edu/routes').then((data) => data.json()).then((data) => {
+        return fetch('/routes').then((data) => data.json()).then((data) => {
             const ret = new Array < Route > ();
             data.forEach((element: {
                 id: number,
@@ -49,7 +49,7 @@ export default class InfoServiceProvider {
     }
 
     public GrabStops(): Promise < Stop[] > {
-        return fetch('https://shuttles.rpi.edu/stops').then((data) => data.json()).then((data) => {
+        return fetch('/stops').then((data) => data.json()).then((data) => {
             const ret = new Array < Stop > ();
             data.forEach((element: {
                 id: number,
@@ -68,13 +68,16 @@ export default class InfoServiceProvider {
     }
 
     public GrabAdminMessage(): Promise <AdminMessageUpdate> {
-        return fetch('https://shuttles.rpi.edu/adminMessage').then((data) => data.json()).then((ret) => {
+        return fetch('/adminMessage').then((data) => data.json()).then((ret) => {
             return new AdminMessageUpdate(0, '', ret.message, ret.enabled, new Date(ret.created));
+        }).catch(() => {
+            return new AdminMessageUpdate(0, '', '', false, new Date());
+
         });
     }
 
     public GrabUpdates(): Promise < Update[] > {
-        return fetch('https://shuttles.rpi.edu/updates').then((data) => data.json()).then((data): Update[] => {
+        return fetch('/updates').then((data) => data.json()).then((data): Update[] => {
             const ret = new Array <Update> ();
             data.forEach((element: Update) => {
                 ret.push(element);
