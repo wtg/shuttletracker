@@ -133,11 +133,10 @@ const store: StoreOptions<StoreState> = {
       });
     },
     grabAdminMesssage( {commit} ) {
-      InfoService.GrabAdminMessage().then((ret: AdminMessageUpdate) => commit('addAdminMessage', ret)).catch(() => {
-        commit('setOnline', false);
-      });
+      InfoService.GrabAdminMessage().then((ret: AdminMessageUpdate) => commit('addAdminMessage', ret));
     },
   },
+
 };
 
 export default new Vuex.Store(store);

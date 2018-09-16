@@ -5,6 +5,7 @@ import (
 
 	"net/http"
 	"net/url"
+	"os/exec"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -23,15 +24,17 @@ type Config struct {
 	Authenticate         bool
 	ListenURL            string
 	MapboxAPIKey         string
+	Dev                  bool
 }
 
 // API is responsible for configuring handlers for HTTP endpoints.
 type API struct {
-	cfg     Config
-	handler http.Handler
-	ms      shuttletracker.ModelService
-	msg     shuttletracker.MessageService
-	updater *updater.Updater
+	cfg            Config
+	handler        http.Handler
+	ms             shuttletracker.ModelService
+	msg            shuttletracker.MessageService
+	updater        *updater.Updater
+	webpackbuilder *exec.Cmd
 }
 
 // New initializes the application given a config and connects to backends.
@@ -42,7 +45,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	if err != nil {
 		return nil, err
 	}
-
+	log.Info(cfg.Dev)
 	// Create API instance to store database session and collections
 	api := API{
 		cfg:     cfg,
@@ -118,9 +121,17 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		r.Get("/getKey/", api.KeyHandler)
 	})
 
-	// Static files
-	r.Get("/", IndexHandler)
 	r.Method("GET", "/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
+	r.Method("GET", "/js/*", http.FileServer(http.Dir("static/")))
+	r.Method("GET", "/css/*", http.FileServer(http.Dir("static/")))
+	r.Method("GET", "/img/*", http.FileServer(http.Dir("static/")))
+	// Static files
+	if api.cfg.Dev {
+		r.Method("GET", "/img/*", http.FileServer(http.Dir("frontend/dist/")))
+		r.Method("GET", "/*", http.FileServer(http.Dir("frontend/dist/")))
+	} else {
+		r.Get("/", api.IndexHandler)
+	}
 
 	// iTRAK data feed endpoint
 	r.Get("/datafeed", api.DataFeedHandler)
@@ -138,6 +149,7 @@ func NewConfig(v *viper.Viper) *Config {
 	v.SetDefault("api.listenurl", cfg.ListenURL)
 	v.SetDefault("api.casurl", cfg.CasURL)
 	v.SetDefault("api.authenticate", cfg.Authenticate)
+	v.SetDefault("api.dev", cfg.Dev)
 	return cfg
 }
 
@@ -145,11 +157,12 @@ func (api *API) Run() {
 	if err := http.ListenAndServe(api.cfg.ListenURL, api.handler); err != nil {
 		log.WithError(err).Error("Unable to serve.")
 	}
+
 }
 
 // IndexHandler serves the index page.
-func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "index.html")
+func (api *API) IndexHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "static/index.html")
 }
 
 // AdminHandler serves the admin page.

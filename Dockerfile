@@ -1,3 +1,13 @@
+FROM node:latest
+
+ADD /frontend /frontend
+
+WORKDIR /frontend
+
+# Install npm dependencies and build
+RUN npm install
+RUN npm run build
+
 FROM golang:1.11
 
 RUN go get -u github.com/kardianos/govendor
@@ -7,6 +17,8 @@ COPY vendor/vendor.json ./vendor/
 RUN govendor sync
 COPY . /go/src/github.com/wtg/shuttletracker
 RUN go install github.com/wtg/shuttletracker/cmd/shuttletracker
+
+COPY --from=0 /frontend/dist /go/src/github.com/wtg/shuttletracker/static/
 
 # Dokku checks http://dokku.viewdocs.io/dokku/deployment/zero-downtime-deploys/
 RUN mkdir /app
