@@ -1,6 +1,10 @@
 package postgres
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"github.com/wtg/shuttletracker"
+)
 
 // UserService is an implementation of shuttletracker.UserService.
 type UserService struct {
@@ -29,4 +33,26 @@ func (us *UserService) UserExists(username string) (bool, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+// Users returns all existing Users..
+func (us *UserService) Users() ([]*shuttletracker.User, error) {
+	var users []*shuttletracker.User
+
+	statement := "SELECT id, username FROM users;"
+	rows, err := us.db.Query(statement)
+	if err != nil {
+		return users, err
+	}
+
+	for rows.Next() {
+		user := &shuttletracker.User{}
+		err := rows.Scan(&user.ID, &user.Username)
+		if err != nil {
+			return users, err
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
 }

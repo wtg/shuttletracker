@@ -19,7 +19,6 @@ var rootCmd = &cobra.Command{
 	Use:   "shuttletracker",
 	Short: "Track RPI's shuttles",
 	Run: func(cmd *cobra.Command, args []string) {
-		// log.SetLevel("info")
 		log.Info("Shuttle Tracker starting...")
 
 		// Config
