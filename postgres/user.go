@@ -23,16 +23,13 @@ CREATE TABLE IF NOT EXISTS users (
 	return err
 }
 
-// UserExists returns whether a User with the specified username exists.
-func (us *UserService) UserExists(username string) (bool, error) {
-	row := us.db.QueryRow("SELECT FROM users WHERE username = $1;", username)
-	err := row.Scan()
-	if err == sql.ErrNoRows {
-		return false, nil
-	} else if err != nil {
-		return false, err
-	}
-	return true, nil
+// CreateUser creates a User.
+func (us *UserService) CreateUser(user *shuttletracker.User) error {
+	statement := "INSERT INTO users (username) " +
+		"VALUES ($1) RETURNING id;"
+	row := us.db.QueryRow(statement, user.Username)
+	err := row.Scan(&user.ID)
+	return err
 }
 
 // Users returns all existing Users..
@@ -55,4 +52,16 @@ func (us *UserService) Users() ([]*shuttletracker.User, error) {
 	}
 
 	return users, nil
+}
+
+// UserExists returns whether a User with the specified username exists.
+func (us *UserService) UserExists(username string) (bool, error) {
+	row := us.db.QueryRow("SELECT FROM users WHERE username = $1;", username)
+	err := row.Scan()
+	if err == sql.ErrNoRows {
+		return false, nil
+	} else if err != nil {
+		return false, err
+	}
+	return true, nil
 }

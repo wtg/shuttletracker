@@ -8,6 +8,7 @@ type User struct {
 
 // UserService is an interface for interacting with Users.
 type UserService interface {
+	CreateUser(*User) error
 	UserExists(username string) (bool, error)
 	Users() ([]*User, error)
 }

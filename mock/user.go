@@ -21,3 +21,9 @@ func (us *UserService) Users() ([]*shuttletracker.User, error) {
 	args := us.Called()
 	return args.Get(0).([]*shuttletracker.User), args.Error(1)
 }
+
+// CreateUser creates a User.
+func (us *UserService) CreateUser(user *shuttletracker.User) error {
+	args := us.Called(user)
+	return args.Error(0)
+}
