@@ -69,6 +69,7 @@ var rootCmd = &cobra.Command{
 	},
 }
 
+// Execute makes the root command runnable.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
