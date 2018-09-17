@@ -32,6 +32,25 @@ func (us *UserService) CreateUser(user *shuttletracker.User) error {
 	return err
 }
 
+// DeleteUser deletes a User by its username.
+func (us *UserService) DeleteUser(username string) error {
+	statement := "DELETE FROM users WHERE username = $1;"
+	result, err := us.db.Exec(statement, username)
+	if err != nil {
+		return err
+	}
+
+	n, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if n == 0 {
+		return shuttletracker.ErrUserNotFound
+	}
+
+	return nil
+}
+
 // Users returns all existing Users..
 func (us *UserService) Users() ([]*shuttletracker.User, error) {
 	var users []*shuttletracker.User

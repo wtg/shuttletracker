@@ -13,9 +13,11 @@ import (
 )
 
 var Add bool
+var Remove bool
 
 func init() {
 	adminsCmd.Flags().BoolVar(&Add, "add", false, "add administrator")
+	adminsCmd.Flags().BoolVar(&Remove, "remove", false, "remove administrator")
 
 	rootCmd.AddCommand(adminsCmd)
 }
@@ -23,9 +25,13 @@ func init() {
 var adminsCmd = &cobra.Command{
 	Use:   "admins",
 	Short: "Manage Shuttle Tracker administrators",
+	Long:  "List, add, or remove Shuttle Tracker administrators by RCS ID.",
 	Args: func(cms *cobra.Command, args []string) error {
-		if Add && len(args) != 1 {
+		if (Add || Remove) && len(args) != 1 {
 			return errors.New("expects exactly one argument")
+		}
+		if Add && Remove {
+			return errors.New("add and remove cannot be combined")
 		}
 		return nil
 	},
@@ -55,6 +61,14 @@ var adminsCmd = &cobra.Command{
 				os.Exit(1)
 			}
 			fmt.Printf("Added %s.\n", username)
+		} else if Remove {
+			username := args[0]
+			err := us.DeleteUser(username)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "Unable to remove admin:", err)
+				os.Exit(1)
+			}
+			fmt.Printf("Removed %s.\n", username)
 		} else {
 			users, err := us.Users()
 			if err != nil {

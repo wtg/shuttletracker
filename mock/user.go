@@ -27,3 +27,9 @@ func (us *UserService) CreateUser(user *shuttletracker.User) error {
 	args := us.Called(user)
 	return args.Error(0)
 }
+
+// DeleteUser deletes a User.
+func (us *UserService) DeleteUser(username string) error {
+	args := us.Called(username)
+	return args.Error(0)
+}
