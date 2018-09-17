@@ -8,7 +8,6 @@ import (
 
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/config"
-	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/postgres"
 )
 
@@ -23,20 +22,20 @@ var adminsCmd = &cobra.Command{
 		// Config
 		cfg, err := config.New()
 		if err != nil {
-			log.WithError(err).Error("unable to read configuration")
+			fmt.Fprintln(os.Stderr, "Unable to read configuration.")
 			os.Exit(1)
 		}
 
 		pg, err := postgres.New(*cfg.Postgres)
 		if err != nil {
-			log.WithError(err).Error("unable to create Postgres")
+			fmt.Fprintln(os.Stderr, "Unable to connect to Postgres:", err)
 			os.Exit(1)
 		}
 
 		var us shuttletracker.UserService = pg
 		users, err := us.Users()
 		if err != nil {
-			log.WithError(err).Error("unable to get users")
+			fmt.Fprintln(os.Stderr, "unable to get users:", err)
 			os.Exit(1)
 		}
 
