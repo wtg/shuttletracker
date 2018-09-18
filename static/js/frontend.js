@@ -730,7 +730,7 @@ Vue.component('title-bar', {
   mounted() { },
   data() {
     return {
-      title: "RPI Shuttle Tracker",
+      title: "🚐",
       showModal: false,
     };
   },
