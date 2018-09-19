@@ -25,7 +25,7 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 12. Install nodejs/npm
 12. Switch to the `./frontend` directory
 13. Run `npm install`
-14. Start watching and building the frontend using `npx vue-cli-service build --watch --mode development`
+14. Start watching and building the frontend using `npx vue-cli-service build --watch --mode development`_Note: This must be running for the shuttle tracker to serve the frontend_ 
 15. Start the app by running `go run cmd/shuttletracker/main.go` in the project root directory.
 16. You can optionally add yourself as an administrator by using the `make-admin.sh` script in the example_database folder, passing it your RCS ID as the first argument.
 17. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel
