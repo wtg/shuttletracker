@@ -54,11 +54,11 @@ func New(cfg Config, ms shuttletracker.ModelService) (*Updater, error) {
 		metrics: &metrics{
 			itrakResponseTime: promauto.NewHistogram(
 				prometheus.HistogramOpts{
-					Name: "shuttletracker_itrak_response_time",
+					Name: "shuttletracker_itrak_request_seconds",
 				}),
 			updateTime: promauto.NewHistogram(
 				prometheus.HistogramOpts{
-					Name: "shuttletracker_update_time",
+					Name: "shuttletracker_update_processing_seconds",
 				})},
 		mutex: &sync.Mutex{},
 	}
