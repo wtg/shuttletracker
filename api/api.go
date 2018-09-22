@@ -55,6 +55,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 
 	r.Use(middleware.DefaultCompress)
 	r.Use(etag)
+	r.Use(prometheusMetrics)
 
 	cli := CreateCASClient(url, us, cfg.Authenticate)
 
