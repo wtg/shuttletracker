@@ -2,12 +2,12 @@ package api
 
 import (
 	"encoding/json"
-
 	"net/http"
 	"net/url"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/viper"
 
 	"github.com/wtg/shuttletracker"
@@ -124,6 +124,9 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 
 	// iTRAK data feed endpoint
 	r.Get("/datafeed", api.DataFeedHandler)
+
+	// Prometheus metrics
+	r.Mount("/metrics", promhttp.Handler())
 
 	api.handler = r
 
