@@ -10,6 +10,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/spf13/viper"
 
 	"github.com/wtg/shuttletracker"
@@ -23,12 +25,18 @@ type DataFeedResponse struct {
 	Headers    http.Header
 }
 
+type metrics struct {
+	itrakResponseTime prometheus.Histogram
+	updateTime        prometheus.Histogram
+}
+
 // Updater handles periodically grabbing the latest vehicle location data from iTrak.
 type Updater struct {
 	cfg                  Config
 	updateInterval       time.Duration
 	dataRegexp           *regexp.Regexp
 	ms                   shuttletracker.ModelService
+	metrics              *metrics
 	mutex                *sync.Mutex
 	lastDataFeedResponse *DataFeedResponse
 }
@@ -41,8 +49,17 @@ type Config struct {
 // New creates an Updater.
 func New(cfg Config, ms shuttletracker.ModelService) (*Updater, error) {
 	updater := &Updater{
-		cfg:   cfg,
-		ms:    ms,
+		cfg: cfg,
+		ms:  ms,
+		metrics: &metrics{
+			itrakResponseTime: promauto.NewHistogram(
+				prometheus.HistogramOpts{
+					Name: "shuttletracker_itrak_response_time",
+				}),
+			updateTime: promauto.NewHistogram(
+				prometheus.HistogramOpts{
+					Name: "shuttletracker_update_time",
+				})},
 		mutex: &sync.Mutex{},
 	}
 
@@ -87,8 +104,10 @@ func (u *Updater) Run() {
 // Send a request to iTrak API, get updated shuttle info,
 // store updated records in the database, and remove old records.
 func (u *Updater) update() {
+
 	// Make request to iTrak data feed
 	client := http.Client{Timeout: time.Second * 5}
+	timer := prometheus.NewTimer(u.metrics.itrakResponseTime)
 	resp, err := client.Get(u.cfg.DataFeed)
 	if err != nil {
 		log.WithError(err).Error("Could not get data feed.")
@@ -106,8 +125,10 @@ func (u *Updater) update() {
 		log.WithError(err).Error("Could not read data feed.")
 		return
 	}
+	timer.ObserveDuration()
 	resp.Body.Close()
 
+	updateTimer := prometheus.NewTimer(u.metrics.updateTime)
 	dfresp := &DataFeedResponse{
 		Body:       body,
 		StatusCode: resp.StatusCode,
@@ -146,6 +167,8 @@ func (u *Updater) update() {
 	if deleted > 0 {
 		log.Debugf("Removed %d old updates.", deleted)
 	}
+
+	updateTimer.ObserveDuration()
 }
 
 // nolint: gocyclo
