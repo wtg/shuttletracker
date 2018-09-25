@@ -16,10 +16,10 @@ func TestStatic(t *testing.T) {
 		path   string
 	}
 	cases := []testCase{
-		// { TODO Need to figure out how to do this test with webpack
-		// 	method: "GET",
-		// 	path:   "/",
-		// },
+		{
+			method: "GET",
+			path:   "/",
+		},
 		{
 			method: "GET",
 			path:   "/static/css/application.css",
