@@ -24,7 +24,7 @@ before_install:
   - go get -u github.com/alecthomas/gometalinter && gometalinter --install
   - go get -u github.com/bradleyfalzon/revgrep/...
   - cd frontend && npm install && npm run build && cd ..
-  - cp -R ./frontend/build/* ./static/
+  - ls
 
 install:
   - go install github.com/wtg/shuttletracker/cmd/shuttletracker
