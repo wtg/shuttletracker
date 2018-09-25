@@ -1,55 +1,53 @@
-jobs:
-  include: 
-    - stage: golang build
-      language: go
+language: go
 
-      go:
-        - 1.7.x
-        - 1.8.x
-        - 1.9.x
-        - 1.10.x
-        - 1.11.x
-        - master
+go:
+  - 1.7.x
+  - 1.8.x
+  - 1.9.x
+  - 1.10.x
+  - 1.11.x
+  - master
 
-      matrix:
-        allow_failures:
-          - go: master
-        fast_finish: true
+matrix:
+  allow_failures:
+    - go: master
+  fast_finish: true
 
-      services:
-        - docker
+services:
+  - docker
 
-      addons:
-        postgresql: "9.6"
+addons:
+  postgresql: "9.6"
 
-      before_install:
-        - go get -u github.com/kardianos/govendor && govendor sync -v
-        - go get -u github.com/alecthomas/gometalinter && gometalinter --install
-        - go get -u github.com/bradleyfalzon/revgrep/...
+before_install:
+  - go get -u github.com/kardianos/govendor && govendor sync -v
+  - go get -u github.com/alecthomas/gometalinter && gometalinter --install
+  - go get -u github.com/bradleyfalzon/revgrep/...
+  - cd frontend && npm install
 
-      install:
-        - go install github.com/wtg/shuttletracker/cmd/shuttletracker
+install:
+  - go install github.com/wtg/shuttletracker/cmd/shuttletracker
 
-      before_script:
-        - psql -c 'create database shuttletracker_test;' -U postgres
+before_script:
+  - psql -c 'create database shuttletracker_test;' -U postgres
 
-      script:
-        - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then gometalinter --vendor ./... 2>&1 | revgrep origin/master; fi
-        - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then gometalinter --vendor ./... || true; fi
-        - ./test.sh
-        - docker build .
+script:
+  - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then gometalinter --vendor ./... 2>&1 | revgrep origin/master; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then gometalinter --vendor ./... || true; fi
+  - ./test.sh
+  - docker build .
 
-      after_success:
-        - bash <(curl -s https://codecov.io/bash)
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 
-      cache:
-        directories:
-          - $GOPATH/src
-          - $GOPATH/pkg
+cache:
+  directories:
+    - $GOPATH/src
+    - $GOPATH/pkg
 
-      before_cache:
-        - rm -rf $GOPATH/src/github.com/wtg/shuttletracker/*
-        - rm -rf $GOPATH/pkg/**/github.com/wtg/shuttletracker/*
+before_cache:
+  - rm -rf $GOPATH/src/github.com/wtg/shuttletracker/*
+  - rm -rf $GOPATH/pkg/**/github.com/wtg/shuttletracker/*
 
-      notifications:
-        email: false
+notifications:
+  email: false
