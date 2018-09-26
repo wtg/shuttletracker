@@ -5,7 +5,6 @@ import (
 
 	"net/http"
 	"net/url"
-	"os/exec"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -29,12 +28,11 @@ type Config struct {
 
 // API is responsible for configuring handlers for HTTP endpoints.
 type API struct {
-	cfg            Config
-	handler        http.Handler
-	ms             shuttletracker.ModelService
-	msg            shuttletracker.MessageService
-	updater        *updater.Updater
-	webpackbuilder *exec.Cmd
+	cfg     Config
+	handler http.Handler
+	ms      shuttletracker.ModelService
+	msg     shuttletracker.MessageService
+	updater *updater.Updater
 }
 
 // New initializes the application given a config and connects to backends.
