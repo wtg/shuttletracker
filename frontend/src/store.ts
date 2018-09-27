@@ -1,14 +1,13 @@
 import Vue from 'vue';
 import Vuex, { StoreOptions } from 'vuex';
-import { StoreState } from './StoreState';
+import { StoreState } from '@/StoreState';
 import Route from '@/structures/route';
-import InfoServiceProvider from './structures/serviceproviders/info.service';
-import Stop from './structures/stop';
-import Vehicle from './structures/vehicle';
+import InfoServiceProvider from '@/structures/serviceproviders/info.service';
+import Stop from '@/structures/stop';
+import Vehicle from '@/structures/vehicle';
 import * as L from 'leaflet';
-import Update from './structures/update';
+import Update from '@/structures/update';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
-import { SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION } from 'constants';
 
 Vue.use(Vuex);
 const InfoService = new InfoServiceProvider();

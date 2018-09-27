@@ -1,7 +1,7 @@
-import Route from './structures/route';
-import Vehicle from './structures/vehicle';
+import Route from '@/structures/route';
+import Vehicle from '@/structures/vehicle';
 import Stop from '@/structures/stop';
-import AdminMessageUpdate from './structures/adminMessageUpdate';
+import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 
 // Define types for the vuex state store
 export interface StoreState {

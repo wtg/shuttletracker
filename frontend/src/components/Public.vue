@@ -39,8 +39,8 @@ import { setTimeout, setInterval } from 'timers';
 import getMarkerString from '../structures/leaflet/rotatedMarker';
 import { Position } from 'geojson';
 
-const StopSVG = require('../assets/circle.svg') as string;
-const UserSVG = require('../assets/user.svg') as string;
+const StopSVG = require('@/assets/circle.svg') as string;
+const UserSVG = require('@/assets/user.svg') as string;
 
 const StopIcon = L.icon({
   iconUrl: StopSVG,

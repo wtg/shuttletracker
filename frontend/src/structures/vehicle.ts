@@ -1,9 +1,9 @@
 import * as L from 'leaflet';
-import Route from './route';
-import getMarkerString from './leaflet/rotatedMarker';
+import Route from '@/structures/route';
+import getMarkerString from '@/structures/leaflet/rotatedMarker';
 import getCardinalDirection from '@/structures/cardinaldirection';
 
-const ShuttleIcon = require('../assets/shuttle.svg') as string;
+const ShuttleIcon = require('@/assets/shuttle.svg') as string;
 const maxMissedUpdatesBeforeHide = 5;
 
 
