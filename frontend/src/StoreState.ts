@@ -1,5 +1,6 @@
 import Route from '@/structures/route';
 import Vehicle from '@/structures/vehicle';
+
 import Stop from '@/structures/stop';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 
