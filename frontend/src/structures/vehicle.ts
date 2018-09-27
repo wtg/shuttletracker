@@ -25,7 +25,6 @@ export default class Vehicle {
     public shownOnMap: boolean;
     public map: L.Map | undefined;
     public Route: Route | undefined;
-    public missedUpdates: number;
     public lastUpdate: Date;
 
     constructor(id: number, name: string, created: Date, updated: Date, enabled: boolean) {
@@ -51,7 +50,6 @@ export default class Vehicle {
         this.shownOnMap = false;
         this.map = undefined;
         this.Route = undefined;
-        this.missedUpdates = 0;
         this.lastUpdate = new Date();
     }
 

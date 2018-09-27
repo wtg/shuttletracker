@@ -41,7 +41,6 @@ const store: StoreOptions<StoreState> = {
           if (Number(vehicle.id) === Number(updates[i].vehicle_id)) {
             vehicle.lastUpdate = new Date(updates[i].date) ;
             found = true;
-            vehicle.missedUpdates = 0;
             vehicle.speed = Number(updates[i].speed);
             vehicle.setRoute(undefined);
             for (let j = 0; j < state.Routes.length; j ++) {
@@ -58,10 +57,7 @@ const store: StoreOptions<StoreState> = {
           }
         }
         if (!found) {
-          vehicle.missedUpdates ++;
-          if (vehicle.missedUpdates > 5) {
-            vehicle.showOnMap(false);
-          }
+          vehicle.showOnMap(false);
         }
       });
     },
