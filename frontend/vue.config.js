@@ -1,5 +1,8 @@
 module.exports = {
+    outputDir: '../static',
+    
     configureWebpack: {
+        
         devServer: {
             proxy: {
                 '/vehicles|/routes|/adminMessage|/updates|/stops': {
