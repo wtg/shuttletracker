@@ -2,6 +2,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     outputDir: '../static',
+    baseUrl: '/static/',
     
     configureWebpack: {
         plugins: [
