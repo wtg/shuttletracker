@@ -1,0 +1,77 @@
+html, body {
+  background-color: #f7f7f7;
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+}
+
+
+.route-description-box{
+  padding: 10px;
+  margin-top:20px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 20px;
+  width: 70%;
+  background-color: white;
+  height: auto;
+}
+
+
+.nav-list{
+  padding: 0;
+}
+
+
+.sidebar{
+}
+.nav-item{
+  text-align: left;
+  padding-left: 10px;
+  overflow-x: hide;
+  padding-top: -5px;
+  padding-bottom: -5px;
+}
+
+.nav-item:hover{
+  cursor: pointer;
+  color: white;
+  background-color: #e74c3c
+}
+
+.selected{
+  color: white;
+  background-color: #e74c3c;
+}
+
+.red{
+  color: #e74c3c;
+}
+
+.slide-fade-enter-active {
+  transition: all .5s ease;
+}
+.slide-fade-leave-active {
+  transition: all 0.1s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+  transform: translateX(-100px);
+  opacity: 0;
+}
+
+.title{
+  padding: 0px;
+  margin-top: 10px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: auto;
+  position: absolute;
+  font-size: 22px;
+  float:left;
+  text-align: center;
+}
