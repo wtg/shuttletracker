@@ -18,7 +18,7 @@ RUN govendor sync
 COPY . /go/src/github.com/wtg/shuttletracker
 RUN go install github.com/wtg/shuttletracker/cmd/shuttletracker
 
-COPY --from=0 /frontend/dist /go/src/github.com/wtg/shuttletracker/static/
+COPY --from=0 /static/ /go/src/github.com/wtg/shuttletracker/static/
 
 # Dokku checks http://dokku.viewdocs.io/dokku/deployment/zero-downtime-deploys/
 RUN mkdir /app
