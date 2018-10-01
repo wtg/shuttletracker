@@ -23,7 +23,6 @@ type Config struct {
 	Authenticate         bool
 	ListenURL            string
 	MapboxAPIKey         string
-	Dev                  bool
 }
 
 // API is responsible for configuring handlers for HTTP endpoints.
@@ -43,7 +42,6 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	if err != nil {
 		return nil, err
 	}
-	log.Info(cfg.Dev)
 	// Create API instance to store database session and collections
 	api := API{
 		cfg:     cfg,
@@ -123,13 +121,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	r.Method("GET", "/js/*", http.FileServer(http.Dir("static/")))
 	r.Method("GET", "/css/*", http.FileServer(http.Dir("static/")))
 	r.Method("GET", "/img/*", http.FileServer(http.Dir("static/")))
-	// Static files
-	if api.cfg.Dev {
-		r.Method("GET", "/img/*", http.FileServer(http.Dir("frontend/dist/")))
-		r.Method("GET", "/*", http.FileServer(http.Dir("frontend/dist/")))
-	} else {
-		r.Get("/", api.IndexHandler)
-	}
+	r.Get("/", api.IndexHandler)
 
 	// iTRAK data feed endpoint
 	r.Get("/datafeed", api.DataFeedHandler)
@@ -147,7 +139,6 @@ func NewConfig(v *viper.Viper) *Config {
 	v.SetDefault("api.listenurl", cfg.ListenURL)
 	v.SetDefault("api.casurl", cfg.CasURL)
 	v.SetDefault("api.authenticate", cfg.Authenticate)
-	v.SetDefault("api.dev", cfg.Dev)
 	return cfg
 }
 
