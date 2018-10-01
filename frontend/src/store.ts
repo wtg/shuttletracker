@@ -12,6 +12,12 @@ import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 Vue.use(Vuex);
 const InfoService = new InfoServiceProvider();
 
+/**
+ * The vuex store will contain all state data for the application, mutations allow modification of the store data
+ * getters allow reactive getting with modifications, and actions allow for asyncronous data collection. Only actions
+ * should be used to make API calls in order to force things to be done in a clean manner.
+ */
+
 const store: StoreOptions<StoreState> = {
   state: {
     Routes: [],

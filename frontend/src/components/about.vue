@@ -17,6 +17,8 @@
     </div>
 </template>
 <script lang="ts">
+// This component is the about window that is displayed when the `about` button on the menu is selected
+
 import Vue from 'vue';
 export default Vue.extend({
 

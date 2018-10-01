@@ -38,6 +38,7 @@
 </li>
 </template>
 <script lang="ts">
+// This component is the dropdown menu displayed on the front page
 import Vue from 'vue';
 export default Vue.extend({
     data() {

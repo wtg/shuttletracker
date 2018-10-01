@@ -27,6 +27,8 @@
 </template>
 
 <script lang="ts">
+// This component handles everything on the shuttle tracker that is publicly facing.
+
 import Vue from 'vue';
 import InfoService from '../structures/serviceproviders/info.service';
 import Vehicle from '../structures/vehicle';

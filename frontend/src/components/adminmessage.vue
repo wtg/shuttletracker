@@ -7,6 +7,8 @@
 </span>
 </template>
 <script lang="ts">
+// This component handles rendering of a single administrator message
+
 import Vue from 'vue';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 export default Vue.extend({

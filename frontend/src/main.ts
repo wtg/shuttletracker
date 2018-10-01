@@ -7,6 +7,9 @@ import '../node_modules/leaflet/dist/leaflet.css';
 
 Vue.config.productionTip = false;
 
+/**
+ * Declare the main Vue instance with components and vuex store.
+ */
 new Vue({
   store,
   router,

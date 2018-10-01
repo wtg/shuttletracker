@@ -1,3 +1,4 @@
+// AdminMessageUpdate represents an update from the backend for the admin message
 export default class AdminMessageUpdate {
 
     public message: string;
