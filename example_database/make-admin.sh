@@ -1,5 +1,11 @@
+# Set the environment variable, RCS_ID,
+# by entering `export RCS_ID=<your_rcs_id>`
+# into a terminal, then run the script
+
 #! /bin/bash
-mongo << EOF
-db.users.insert( {'username': "$1"} );
-quit()
+
+echo "Add admin user to the database"
+
+psql shuttletracker << EOF
+    INSERT INTO users (id, username) VALUES(0, '$RCS_ID');
 EOF

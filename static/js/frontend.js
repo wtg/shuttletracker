@@ -15,28 +15,28 @@ function checkTime(i) {
   return i;
 }
 
-Vue.component('live-indicator',{
+Vue.component('live-indicator', {
   template: `<div id="live" v-bind:style="liveStyle">
     <p>{{lv + " " + text}}</p>
     <div v-if="live" class="pulsate" style=""></div></div>`,
-  data (){
-    return{
+  data() {
+    return {
       liveStyle: {},
       text: "",
-      lv:"Live",
+      lv: "Live",
       live: false
     };
   },
   methods: {
-    update: function(){
+    update: function () {
       live = routeSuccess && vehicleSuccess;
       partial = routeSuccess || vehicleSuccess;
-      if(live === false){
+      if (live === false) {
         this.text = window.lastUpdateTime;
-        this.liveStyle.width="auto";
-        this.live=false;
+        this.liveStyle.width = "auto";
+        this.live = false;
         this.lv = "Last Updated";
-      }else{
+      } else {
         //this.text="Live";
         this.live = true;
         this.lv = "Live";
@@ -48,45 +48,45 @@ Vue.component('live-indicator',{
       }
     }
   },
-  mounted (){
-    setInterval(this.update,1000);
+  mounted() {
+    setInterval(this.update, 1000);
   }
 
 });
 
-Vue.component('message-modal',{
+Vue.component('message-modal', {
   props: ['dim'],
   template:
-  `<div id ="messagebox" @click="modalStyle.display = 'none'" v-if="msg != ''" v-bind:style="modalStyle">
+    `<div id ="messagebox" @click="modalStyle.display = 'none'" v-if="msg != ''" v-bind:style="modalStyle">
   <div style="width: 100%;float:left;" v-html="msg"></div>
   <div style="position:absolute;right:10px;top:6px;color:#333;font-size:20px;">&times;</div>
   </div>`,
-  data (){
+  data() {
     return {
-      modalStyle: {display:"block"},
+      modalStyle: { display: "block" },
       msg: "",
     };
   },
-  mounted (){
+  mounted() {
     let el = this;
 
-    $.get("/adminMessage",function(data){
-      if(data.Display === true){
-        el.msg = data.Message;
+    $.get("/adminMessage", function (data) {
+      if (data.enabled === true) {
+        el.msg = data.message;
       }
     });
 
   }
 });
 
-Vue.component('shuttle-map',{
+Vue.component('shuttle-map', {
   template: `
   <span>
   <div id="mapid" style="height: 100%; z-index:0; filter: invert(0)"></div>
   </div>
   <message-modal dim=100px></message-modal>
   </span>`,
-  mounted(){
+  mounted() {
     this.initMap();
     this.grabStops();
     this.grabVehicles();
@@ -94,8 +94,8 @@ Vue.component('shuttle-map',{
     var b = setInterval(this.grabRoutes, 15000);
 
   },
-  data (){
-    return{
+  data() {
+    return {
       ShuttlesArray: {},
       ShuttleMessages: {},
       ShuttleMap: null,
@@ -105,7 +105,7 @@ Vue.component('shuttle-map',{
       MapBoundPoints: [],
       ShuttleUpdateCounter: 0,
       first: true,
-      legend: L.control({position: 'bottomleft'}),
+      legend: L.control({ position: 'bottomleft' }),
 
 
       ShuttleSVG: `<?xml version="1.0" encoding="UTF-8"?>
@@ -126,20 +126,20 @@ Vue.component('shuttle-map',{
       </svg>`
     };
   },
-  methods:{
-    getShuttleIcon: function(color){
+  methods: {
+    getShuttleIcon: function (color) {
 
       var url = "data:image/svg+xml;base64," + btoa(this.ShuttleSVG.replace("COLOR", color));
       return url;
     },
 
-    getLegendIcon: function(color) {
+    getLegendIcon: function (color) {
 
-		var url = "data:image/svg+xml;base64," + btoa(this.ShuttleSVG.replace("COLOR",color));
-		return url;
-	},
+      var url = "data:image/svg+xml;base64," + btoa(this.ShuttleSVG.replace("COLOR", color));
+      return url;
+    },
 
-	initMap: function(){
+    initMap: function () {
 
       this.ShuttleMap = L.map('mapid', {
         zoomControl: false,
@@ -162,57 +162,57 @@ Vue.component('shuttle-map',{
 
     },
 
-    grabRoutes: function(){
-      $.get( "/routes", this.updateRoutes).fail(function(){routeSuccess = false;});
+    grabRoutes: function () {
+      $.get("/routes", this.updateRoutes).fail(function () { routeSuccess = false; });
     },
 
-	updateLegend () {
-	  let app = this;
-	  app.legend.onAdd = function(map) {
-		  var div = L.DomUtil.create('div','info legend');
-		  var legendstring = "";
-		  var darkModeVal = (document.querySelector('div.titleBar').style.filter === 'invert(0)') ? 0 : 1;
-		    for (i = 0; i < app.ShuttleRoutes.length; i++){
-			  let route = app.ShuttleRoutes[i];
-			  legendstring += `<li><img class="legend-icon" src=` + app.getLegendIcon(route.color)+`
-			  width="12" height="12" style="filter: invert(`+darkModeVal+`)"> `+
-			  route.name;
-		  }
+    updateLegend() {
+      let app = this;
+      app.legend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'info legend');
+        var legendstring = "";
+        var darkModeVal = (document.querySelector('div.titleBar').style.filter === 'invert(0)') ? 0 : 1;
+        for (i = 0; i < app.ShuttleRoutes.length; i++) {
+          let route = app.ShuttleRoutes[i];
+          legendstring += `<li><img class="legend-icon" src=` + app.getLegendIcon(route.color) + `
+			  width="12" height="12" style="filter: invert(`+ darkModeVal + `)"> ` +
+            route.name;
+        }
 
-		  div.innerHTML = `<ul style="list-style:none">
-					<li><img class="legend-icon" src="static/images/user.svg" width="12" height="12" style="filter: invert(`+darkModeVal+`)"> You</li>`+
-					legendstring +
-					`<li><img class="legend-icon" src="static/images/circle.svg" width="12" height="12" style="filter: invert(`+darkModeVal+`)"> Shuttle Stop</li>
+        div.innerHTML = `<ul style="list-style:none">
+					<li><img class="legend-icon" src="static/images/user.svg" width="12" height="12" style="filter: invert(`+ darkModeVal + `)"> You</li>` +
+          legendstring +
+          `<li><img class="legend-icon" src="static/images/circle.svg" width="12" height="12" style="filter: invert(` + darkModeVal + `)"> Shuttle Stop</li>
 				</ul>`;
-		return div;
+        return div;
 
-		};
-	  app.legend.addTo(app.ShuttleMap);
-	},
+      };
+      app.legend.addTo(app.ShuttleMap);
+    },
 
-    updateRoutes: function(data){
+    updateRoutes: function (data) {
       routeSuccess = true;
       var updatedRoute = [];
-      for(var i = 0; i < data.length; i ++){
-        if(data[i].enabled === false || data[i].active === false){
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].enabled === false || data[i].active === false) {
           continue;
         }
         var points = [];
-        for(var j = 0; j < data[i].coords.length; j ++){
-          points.push(new L.LatLng(data[i].coords[j].lat,data[i].coords[j].lng));
+        for (var j = 0; j < data[i].points.length; j++) {
+          points.push(new L.LatLng(data[i].points[j].latitude, data[i].points[j].longitude));
         }
         var polylineOptions = {
           color: data[i].color,
           weight: 3,
           opacity: 1,
         };
-        if(data[i].width === 0){
+        if (data[i].width === 0) {
           polylineOptions.dashArray = '10,10';
         }
 
         var polyline = new L.Polyline(points, polylineOptions);
 
-        var r ={
+        var r = {
           name: data[i].name,
           id: data[i].id,
           description: data[i].description,
@@ -229,7 +229,7 @@ Vue.component('shuttle-map',{
         updatedRoute.push(r);
 
       }
-      for(i = 0; i < this.ShuttleRoutes.length; i ++){
+      for (i = 0; i < this.ShuttleRoutes.length; i++) {
         this.ShuttleMap.removeLayer(this.ShuttleRoutes[i].line);
       }
       this.ShuttleRoutes = updatedRoute;
@@ -238,13 +238,13 @@ Vue.component('shuttle-map',{
     },
 
 
-    drawRoutes: function(){
-      for(i = 0; i < this.ShuttleRoutes.length; i ++){
+    drawRoutes: function () {
+      for (i = 0; i < this.ShuttleRoutes.length; i++) {
         this.ShuttleMap.removeLayer(this.ShuttleRoutes[i].line);
       }
-      if(this.first){
-        for(i = 0; i < this.ShuttleRoutes.length; i ++){
-          for(var j = 0; j < this.ShuttleRoutes[i].points.length; j ++){
+      if (this.first) {
+        for (i = 0; i < this.ShuttleRoutes.length; i++) {
+          for (var j = 0; j < this.ShuttleRoutes[i].points.length; j++) {
             this.MapBoundPoints.push(this.ShuttleRoutes[i].points[j]);
           }
         }
@@ -258,34 +258,34 @@ Vue.component('shuttle-map',{
         this.ShuttleMap.fitBounds(polyline.getBounds());
         this.first = false;
       }
-      for(i = 0; i < this.ShuttleRoutes.length; i ++){
+      for (i = 0; i < this.ShuttleRoutes.length; i++) {
         this.ShuttleMap.addLayer(this.ShuttleRoutes[i].line);
       }
 
     },
 
-    grabStops: function(){
-      $.get( "/stops", this.updateStops).fail(function(){stopsSuccess = false;});
+    grabStops: function () {
+      $.get("/stops", this.updateStops).fail(function () { stopsSuccess = false; });
 
     },
 
-    updateStops: function(data){
+    updateStops: function (data) {
       stopsSuccess = true;
       var stopIcon = L.icon({
         iconUrl: 'static/images/circle.svg',
 
-        iconSize:     [12, 12], // size of the icon
-        iconAnchor:   [6, 6], // point of the icon which will correspond to marker's location
+        iconSize: [12, 12], // size of the icon
+        iconAnchor: [6, 6], // point of the icon which will correspond to marker's location
         shadowAnchor: [6, 6],  // the same for the shadow
-        popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
+        popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
       });
-      for(var i = 0; i < data.length; i ++){
+      for (var i = 0; i < data.length; i++) {
         var stop = {
           name: data[i].name,
           description: data[i].description,
           id: data[i].id,
-          latlng: [data[i].lat, data[i].lng],
-          marker: L.marker([data[i].lat,data[i].lng], {icon: stopIcon})
+          latlng: [data[i].latitude, data[i].longitude],
+          marker: L.marker([data[i].latitude, data[i].longitude], { icon: stopIcon })
         };
         stop.marker.bindPopup(stop.name);
         stop.marker.addTo(this.ShuttleMap).on('click', this.stopClicked);
@@ -294,7 +294,7 @@ Vue.component('shuttle-map',{
     },
 
     grabVehicles: function () {
-      $.get( "/updates", this.updateVehicles).fail(function(){vehicleSuccess = false;});
+      $.get("/updates", this.updateVehicles).fail(function () { vehicleSuccess = false; });
     },
 
     updateVehicles: function (data) {
@@ -311,20 +311,20 @@ Vue.component('shuttle-map',{
       var shuttleIcon = L.icon({
         iconUrl: this.getShuttleIcon("#FFF"),
 
-        iconSize:     [32, 32], // size of the icon
-        iconAnchor:   [16, 16], // point of the icon which will correspond to marker's location
-        popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
+        iconSize: [32, 32], // size of the icon
+        iconAnchor: [16, 16], // point of the icon which will correspond to marker's location
+        popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
       });
 
-      if(this.ShuttleUpdateCounter >= 15){
-        for (var key in this.ShuttlesArray){
+      if (this.ShuttleUpdateCounter >= 15) {
+        for (var key in this.ShuttlesArray) {
           var good = false;
-          for(var i = 0; i < data.length; i ++){
-            if(key == data[i].vehicleID){
+          for (var i = 0; i < data.length; i++) {
+            if (key == data[i].vehicle_id) {
               good = true;
             }
           }
-          if(good === false && this.ShuttlesArray[key] !== null) {
+          if (good === false && this.ShuttlesArray[key] !== null) {
             this.ShuttleMap.removeLayer(this.ShuttlesArray[key].marker);
             this.ShuttlesArray[key] = null;
           }
@@ -334,36 +334,36 @@ Vue.component('shuttle-map',{
         this.ShuttleUpdateCounter = 0;
       }
 
-      if(data !== null){
-        for(var j = 0; j < data.length; j ++){
-          for(var k = 0; k < this.ShuttleRoutes.length; k ++){
-            if (this.ShuttleRoutes[k].id === data[j].RouteID){
+      if (data !== null) {
+        for (var j = 0; j < data.length; j++) {
+          for (var k = 0; k < this.ShuttleRoutes.length; k++) {
+            if (this.ShuttleRoutes[k].id === data[j].route_id) {
               data[j].color = this.ShuttleRoutes[k].color;
               break;
             }
           }
-          if(data[j].color === undefined){
+          if (data[j].color === undefined) {
             data[j].color = "#FFF";
           }
 
-          if (this.ShuttlesArray[data[j].vehicleID] === undefined){
+          if (this.ShuttlesArray[data[j].vehicle_id] === undefined) {
             shuttleIcon.options.iconUrl = this.getShuttleIcon(data[j].color);
-            this.ShuttlesArray[data[j].vehicleID] = {
+            this.ShuttlesArray[data[j].vehicle_id] = {
               data: data[j],
-              marker: L.marker([data[j].lat,data[j].lng], {
+              marker: L.marker([data[j].latitude, data[j].longitude], {
                 icon: shuttleIcon,
-                rotationAngle: parseInt(data[j].heading)-45,rotationOrigin: 'center',
+                rotationAngle: data[j].heading - 45, rotationOrigin: 'center',
                 zIndexOffset: 1000
               }),
               message: ""
             };
-            this.ShuttlesArray[data[j].vehicleID].marker.addTo(this.ShuttleMap);
+            this.ShuttlesArray[data[j].vehicle_id].marker.addTo(this.ShuttleMap);
           } else {
             shuttleIcon.options.iconUrl = this.getShuttleIcon(data[j].color);
-            this.ShuttlesArray[data[j].vehicleID].data = data[j];
-            this.ShuttlesArray[data[j].vehicleID].marker.setIcon(shuttleIcon);
-            this.ShuttlesArray[data[j].vehicleID].marker.setLatLng([data[j].lat,data[j].lng]);
-            this.ShuttlesArray[data[j].vehicleID].marker.setRotationAngle(parseInt(data[j].heading)-45);
+            this.ShuttlesArray[data[j].vehicle_id].data = data[j];
+            this.ShuttlesArray[data[j].vehicle_id].marker.setIcon(shuttleIcon);
+            this.ShuttlesArray[data[j].vehicle_id].marker.setLatLng([data[j].latitude, data[j].longitude]);
+            this.ShuttlesArray[data[j].vehicle_id].marker.setRotationAngle(data[j].heading - 45);
           }
         }
       }
@@ -373,7 +373,7 @@ Vue.component('shuttle-map',{
       this.ShuttleUpdateCounter++;
     },
 
-    cardinalDirection: function(heading) {
+    cardinalDirection: function (heading) {
       if (heading >= 22.5 && heading < 67.5) {
         return "northeast";
       } else if (heading >= 67.5 && heading < 112.5) {
@@ -398,7 +398,7 @@ Vue.component('shuttle-map',{
         vehicleSuccess = true;
         let idToName = {};
         for (let i = 0; i < data.length; i++) {
-          idToName[data[i].vehicleID] = data[i].vehicleName;
+          idToName[data[i].id] = data[i].name;
         }
 
         for (const key in v.ShuttlesArray) {
@@ -406,26 +406,26 @@ Vue.component('shuttle-map',{
           const update = v.ShuttlesArray[key].data;
           const speed = Math.round(update.speed * 100) / 100;
           const date = new Date(update.created);
-          const direction = v.cardinalDirection(parseFloat(update.heading));
+          const direction = v.cardinalDirection(update.heading);
 
           const message = `<b>${idToName[key]}</b><br>` +
-          `Traveling ${direction} at ${speed} mph<br>` +
-          `as of ${date.toLocaleTimeString()}`;
+            `Traveling ${direction} at ${speed} mph<br>` +
+            `as of ${date.toLocaleTimeString()}`;
           v.ShuttlesArray[key].marker.bindPopup(message);
         }
-      }).fail(function() {
+      }).fail(function () {
         vehicleSuccess = false;
       });
     },
 
-    showUserLocation: function(map){
+    showUserLocation: function (map) {
       var userIcon = L.icon({
         iconUrl: 'static/images/user.svg',
 
-        iconSize:     [12, 12], // size of the icon
-        iconAnchor:   [6, 6], // point of the icon which will correspond to marker's location
+        iconSize: [12, 12], // size of the icon
+        iconAnchor: [6, 6], // point of the icon which will correspond to marker's location
         shadowAnchor: [6, 6],  // the same for the shadow
-        popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
+        popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
       });
 
       if (navigator.geolocation) {
@@ -434,7 +434,7 @@ Vue.component('shuttle-map',{
         console.log("Geolocation is either not supported by this browser, or geolocation permissions were not given by the user.");
       }
 
-      function showPosition (position) {
+      function showPosition(position) {
         var locationMarker = {
           name: "You are here",
           marker: L.marker([position.coords.latitude, position.coords.longitude], {
@@ -448,13 +448,13 @@ Vue.component('shuttle-map',{
       }
     },
 
-    stopClicked: function(e){
+    stopClicked: function (e) {
     },
   }
 });
 
-Vue.component('about-modal',{
-  template:`
+Vue.component('about-modal', {
+  template: `
   <div class="modal">
   <div class="modalContent">
     <span class="close" @click="$emit('hidemodal')">&times;</span>
@@ -477,13 +477,13 @@ Vue.component('about-modal',{
   </div>
   `,
   methods: {
-      toggleModal: function(){
-        $(".modal").toggle();
-      }
+    toggleModal: function () {
+      $(".modal").toggle();
     }
+  }
 });
 
-Vue.component('dropdown-menu',{
+Vue.component('dropdown-menu', {
   template: `
 <div class="dropdown" >
   <ul class="dropdown-main">
@@ -524,182 +524,181 @@ Vue.component('dropdown-menu',{
   </ul>
 </div>
 `,
-    mounted() {
-        var vm = this;
+  mounted() {
+    var vm = this;
 
-        window.addEventListener('touchstart', function (event) {vm.dropdownWindowclick(event);});
-        window.addEventListener('mousedown', function (event) {vm.dropdownWindowclick(event);});
-        window.addEventListener('load', function () {vm.loadDarkmode();});
+    window.addEventListener('touchstart', function (event) { vm.dropdownWindowclick(event); });
+    window.addEventListener('mousedown', function (event) { vm.dropdownWindowclick(event); });
+    window.addEventListener('load', function () { vm.loadDarkmode(); });
 
-    },
-  data (){
-    return{
+  },
+  data() {
+    return {
       list_data: [
-          {name: "East: Monday-Thursday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018CampusShuttleScheduleEastRoute.pdf"},
-          {name: "East: Friday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018FridayOnlyEastShuttleSchedule.pdf"},
-          {name: "West: Monday-Thursday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018CampusShuttleScheduleWestRoute.pdf"},
-          {name: "West: Friday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018FridayOnlyWestShuttleSchedule.pdf"},
-          {name: "Weekend Late Night", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018Weekend-LateNightShuttleSchedule.pdf"}
+        { name: "East: Monday-Thursday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018CampusShuttleScheduleEastRoute.pdf" },
+        { name: "East: Friday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018FridayOnlyEastShuttleSchedule.pdf" },
+        { name: "West: Monday-Thursday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018CampusShuttleScheduleWestRoute.pdf" },
+        { name: "West: Friday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018FridayOnlyWestShuttleSchedule.pdf" },
+        { name: "Weekend Late Night", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018Weekend-LateNightShuttleSchedule.pdf" }
       ],
-        title: "RPI Shuttle Tracker",
-        moonicon: "static/images/moon.svg",
-        sunicon: "static/images/sun.svg",
-        darkmodeOn: 0,
-        menuVisibility: 0,
-        dropdownMenuList: document.getElementsByClassName('dropdown-menu'),
-        dropdownSubmenuList: document.getElementsByClassName('dropdown-submenu'),
+      title: "RPI Shuttle Tracker",
+      moonicon: "static/images/moon.svg",
+      sunicon: "static/images/sun.svg",
+      darkmodeOn: 0,
+      menuVisibility: 0,
+      dropdownMenuList: document.getElementsByClassName('dropdown-menu'),
+      dropdownSubmenuList: document.getElementsByClassName('dropdown-submenu'),
 
     };
   },
-    methods: {
-        // following functions involve changing the dark mode state
-        toggleDarkmode: function () {
-            // toggles dark mode for the map portion of the site by applying the 'filter: invert' property
-            // For browsers that implement localStorage, read/write the dark mode toggle from localStorage
-            // LocalStorage only stores keys and values as strings (Thanks JS!)
-            if (typeof(Storage) !== "undefined") {
-                if (localStorage.darkmodeOn === "0") {
-                    this.enableDarkmode();
-                } else if (localStorage.darkmodeOn === "1") {
-                    this.disableDarkmode();
-                } else {
-                    localStorage.darkmodeOn = 1;
-                    this.enableDarkmode();
-                }
-            } else {
-                if (this.darkmodeOn === 0) {
-                    this.enableDarkmode();
-                } else {
-                    this.disableDarkmode();
-                }
-            }
-        },
-        loadDarkmode: function () {
-            // if localStorage is supported, read the value of darkmodeOn (if it exists),
-            // then enable/disable dark mode as needed
-            if (typeof(Storage) !== "undefined") {
-                if (localStorage.darkmodeOn === "0") {
-                    this.disableDarkmode();
-                } else if (localStorage.darkmodeOn === "1") {
-                    this.enableDarkmode();
-                } else {
-                    localStorage.darkmodeOn = 0;
-                    this.disableDarkmode();
-                }
-            }
-        },
-        enableDarkmode: function () {
-            if (typeof(Storage) !== "undefined") {
-                localStorage.darkmodeOn = 1;
-            } else {
-                this.darkmodeOn = 1;
-            }
-            document.querySelector('div#darkmode-icon>img').src = this.sunicon;
-            document.querySelector('div.leaflet-tile-pane').style.filter = 'invert(1)';
-            document.querySelector('div.leaflet-bottom.leaflet-left').style.filter = 'invert(1)';
-            document.querySelector('div.leaflet-bottom.leaflet-right').style.filter = 'invert(1)';
-            document.querySelector('div.titleBar').style.filter = 'invert(1)';
-            // invert specific colors twice to make them normal
-            document.querySelector('ul#titleContent-right').style.filter = 'invert(1)';
-            document.querySelector('ul#titleContent-right>li>div').style.filter = 'invert(1)';
-            document.querySelector('div.pulsate').style.filter = 'invert(1)';
-            var leafletControlLinks = document.querySelectorAll('div.leaflet-control>a');
-            for (var i = 0; i < leafletControlLinks.length; i++) {
-                leafletControlLinks[i].style.filter = 'invert(1)';
-            }
-            var legendIcons = document.querySelectorAll('img.legend-icon');
-            for (var i = 0; i < legendIcons.length; i++) {
-                legendIcons[i].style.filter = 'invert(1)';
-            }
-        },
-        disableDarkmode: function () {
-            if (typeof(Storage) !== "undefined") {
-                localStorage.darkmodeOn = 0;
-            } else {
-                this.darkmodeOn = 0;
-            }
-            document.querySelector('div#darkmode-icon>img').src = this.moonicon;
-            document.querySelector('div.leaflet-tile-pane').style.filter = 'invert(0)';
-            document.querySelector('div.leaflet-bottom.leaflet-left').style.filter = 'invert(0)';
-            document.querySelector('div.leaflet-bottom.leaflet-right').style.filter = 'invert(0)';
-            document.querySelector('div.titleBar').style.filter = 'invert(0)';
-            // reset specific colors to make normal
-            document.querySelector('ul#titleContent-right').style.filter = 'invert(0)';
-            document.querySelector('ul#titleContent-right>li>div').style.filter = 'invert(0)';
-            document.querySelector('div.pulsate').style.filter = 'invert(0)';
-            var leafletControlLinks = document.querySelectorAll('div.leaflet-control>a');
-            for (var i = 0; i < leafletControlLinks.length; i++) {
-                leafletControlLinks[i].style.filter = 'invert(0)';
-            }
-            var legendIcons = document.querySelectorAll('img.legend-icon');
-            for (var i = 0; i < legendIcons.length; i++) {
-                legendIcons[i].style.filter = 'invert(0)';
-            }
-        },
-        // ====================================================================
+  methods: {
+    // following functions involve changing the dark mode state
+    toggleDarkmode: function () {
+      // toggles dark mode for the map portion of the site by applying the 'filter: invert' property
+      // For browsers that implement localStorage, read/write the dark mode toggle from localStorage
+      // LocalStorage only stores keys and values as strings (Thanks JS!)
+      if (typeof (Storage) !== "undefined") {
+        if (localStorage.darkmodeOn === "0") {
+          this.enableDarkmode();
+        } else if (localStorage.darkmodeOn === "1") {
+          this.disableDarkmode();
+        } else {
+          localStorage.darkmodeOn = 1;
+          this.enableDarkmode();
+        }
+      } else {
+        if (this.darkmodeOn === 0) {
+          this.enableDarkmode();
+        } else {
+          this.disableDarkmode();
+        }
+      }
+    },
+    loadDarkmode: function () {
+      // if localStorage is supported, read the value of darkmodeOn (if it exists),
+      // then enable/disable dark mode as needed
+      if (typeof (Storage) !== "undefined") {
+        if (localStorage.darkmodeOn === "0") {
+          this.disableDarkmode();
+        } else if (localStorage.darkmodeOn === "1") {
+          this.enableDarkmode();
+        } else {
+          localStorage.darkmodeOn = 0;
+          this.disableDarkmode();
+        }
+      }
+    },
+    enableDarkmode: function () {
+      if (typeof (Storage) !== "undefined") {
+        localStorage.darkmodeOn = 1;
+      } else {
+        this.darkmodeOn = 1;
+      }
+      document.querySelector('div#darkmode-icon>img').src = this.sunicon;
+      document.querySelector('div.leaflet-tile-pane').style.filter = 'invert(1)';
+      document.querySelector('div.leaflet-bottom.leaflet-left').style.filter = 'invert(1)';
+      document.querySelector('div.leaflet-bottom.leaflet-right').style.filter = 'invert(1)';
+      document.querySelector('div.titleBar').style.filter = 'invert(1)';
+      // invert specific colors twice to make them normal
+      document.querySelector('ul#titleContent-right').style.filter = 'invert(1)';
+      document.querySelector('ul#titleContent-right>li>div').style.filter = 'invert(1)';
+      document.querySelector('div.pulsate').style.filter = 'invert(1)';
+      var leafletControlLinks = document.querySelectorAll('div.leaflet-control>a');
+      for (var i = 0; i < leafletControlLinks.length; i++) {
+        leafletControlLinks[i].style.filter = 'invert(1)';
+      }
+      var legendIcons = document.querySelectorAll('img.legend-icon');
+      for (var i = 0; i < legendIcons.length; i++) {
+        legendIcons[i].style.filter = 'invert(1)';
+      }
+    },
+    disableDarkmode: function () {
+      if (typeof (Storage) !== "undefined") {
+        localStorage.darkmodeOn = 0;
+      } else {
+        this.darkmodeOn = 0;
+      }
+      document.querySelector('div#darkmode-icon>img').src = this.moonicon;
+      document.querySelector('div.leaflet-tile-pane').style.filter = 'invert(0)';
+      document.querySelector('div.leaflet-bottom.leaflet-left').style.filter = 'invert(0)';
+      document.querySelector('div.leaflet-bottom.leaflet-right').style.filter = 'invert(0)';
+      document.querySelector('div.titleBar').style.filter = 'invert(0)';
+      // reset specific colors to make normal
+      document.querySelector('ul#titleContent-right').style.filter = 'invert(0)';
+      document.querySelector('ul#titleContent-right>li>div').style.filter = 'invert(0)';
+      document.querySelector('div.pulsate').style.filter = 'invert(0)';
+      var leafletControlLinks = document.querySelectorAll('div.leaflet-control>a');
+      for (var i = 0; i < leafletControlLinks.length; i++) {
+        leafletControlLinks[i].style.filter = 'invert(0)';
+      }
+      var legendIcons = document.querySelectorAll('img.legend-icon');
+      for (var i = 0; i < legendIcons.length; i++) {
+        legendIcons[i].style.filter = 'invert(0)';
+      }
+    },
+    // ====================================================================
 
 
-        // following functions involve manipulating the dropdown menu
-        dropdownWindowclick: function (event) {
-            // check two parents up in case some don't have a class starting with dropdown
-            if ((typeof event.target.className !== 'undefined'
-                && event.target.className.substr(0, 8) === "dropdown")
-                || (typeof event.target.parentElement.className !== 'undefined'
-                && event.target.parentElement.className.substr(0, 8) === "dropdown")
-                || (typeof event.target.parentElement.parentElement.className !== 'undefined'
-                && event.target.parentElement.parentElement.className.substr(0, 8) === "dropdown"))
-            {
-                // menu was clicked so do nothing
-            } else {
-                this.closeDropdownMenu();
-            }
-        },
-        toggleDropdownMenuVisibility: function() {
-            // 0 is closed, 1 is open
-            if (this.menuVisibility === 0) {
-                this.openDropdownMenu();
-            } else {
-                this.closeDropdownMenu();
-            }
-        },
-        toggleDropdownSubmenuVisibility: function() {
-        },
-        closeDropdownMenu: function () {
-            this.menuVisibility = 0;
-            this.disableDropdownMenuVisibility();
-            this.disableDropdownSubmenuVisibility();
-        },
-        openDropdownMenu: function () {
-            this.menuVisibility = 1;
-            this.enableDropdownMenuVisibility();
-            this.enableDropdownSubmenuVisibility();
-        },
-        disableDropdownMenuVisibility: function() {
-            // close the menu by changing the visibility of all main dropdown menu entries
-            for (var i = 0; i < this.dropdownMenuList.length; i++) {
-                this.dropdownMenuList[i].style.display = 'none';
-            }
-        },
-        disableDropdownSubmenuVisibility: function () {
-            // close the menu by changing the visibility of all the submenu entries for each entry in the main menu
-            for (var i = 0; i < this.dropdownSubmenuList.length; i++) {
-                this.dropdownSubmenuList[i].style.display = 'none';
-            }
-        },
-        enableDropdownMenuVisibility: function () {
-            // close the menu by changing the visibility of all main dropdown menu entries
-            for (var i = 0; i < this.dropdownMenuList.length; i++) {
-                this.dropdownMenuList[i].style.display = 'inline-block';
-            }
-        },
-        enableDropdownSubmenuVisibility: function () {
-            // close the menu by changing the visibility of all the submenu entries for each entry in the main menu
-            for (var i = 0; i < this.dropdownSubmenuList.length; i++) {
-                this.dropdownSubmenuList[i].style.display = 'inline-block';
-            }
-        },
-        // ====================================================================
-    }
+    // following functions involve manipulating the dropdown menu
+    dropdownWindowclick: function (event) {
+      // check two parents up in case some don't have a class starting with dropdown
+      if ((typeof event.target.className !== 'undefined'
+        && event.target.className.substr(0, 8) === "dropdown")
+        || (typeof event.target.parentElement.className !== 'undefined'
+          && event.target.parentElement.className.substr(0, 8) === "dropdown")
+        || (typeof event.target.parentElement.parentElement.className !== 'undefined'
+          && event.target.parentElement.parentElement.className.substr(0, 8) === "dropdown")) {
+        // menu was clicked so do nothing
+      } else {
+        this.closeDropdownMenu();
+      }
+    },
+    toggleDropdownMenuVisibility: function () {
+      // 0 is closed, 1 is open
+      if (this.menuVisibility === 0) {
+        this.openDropdownMenu();
+      } else {
+        this.closeDropdownMenu();
+      }
+    },
+    toggleDropdownSubmenuVisibility: function () {
+    },
+    closeDropdownMenu: function () {
+      this.menuVisibility = 0;
+      this.disableDropdownMenuVisibility();
+      this.disableDropdownSubmenuVisibility();
+    },
+    openDropdownMenu: function () {
+      this.menuVisibility = 1;
+      this.enableDropdownMenuVisibility();
+      this.enableDropdownSubmenuVisibility();
+    },
+    disableDropdownMenuVisibility: function () {
+      // close the menu by changing the visibility of all main dropdown menu entries
+      for (var i = 0; i < this.dropdownMenuList.length; i++) {
+        this.dropdownMenuList[i].style.display = 'none';
+      }
+    },
+    disableDropdownSubmenuVisibility: function () {
+      // close the menu by changing the visibility of all the submenu entries for each entry in the main menu
+      for (var i = 0; i < this.dropdownSubmenuList.length; i++) {
+        this.dropdownSubmenuList[i].style.display = 'none';
+      }
+    },
+    enableDropdownMenuVisibility: function () {
+      // close the menu by changing the visibility of all main dropdown menu entries
+      for (var i = 0; i < this.dropdownMenuList.length; i++) {
+        this.dropdownMenuList[i].style.display = 'inline-block';
+      }
+    },
+    enableDropdownSubmenuVisibility: function () {
+      // close the menu by changing the visibility of all the submenu entries for each entry in the main menu
+      for (var i = 0; i < this.dropdownSubmenuList.length; i++) {
+        this.dropdownSubmenuList[i].style.display = 'inline-block';
+      }
+    },
+    // ====================================================================
+  }
 });
 
 Vue.component('title-bar', {
@@ -728,15 +727,15 @@ Vue.component('title-bar', {
     </ul>
     <about-modal v-if="showModal" @hidemodal="showModal=false"/>
   </div>`,
-    mounted() {},
-    data (){
-      return {
-          title: "RPI Shuttle Tracker",
-          showModal: false,
-      };
-    },
-    methods: {
-    },
+  mounted() { },
+  data() {
+    return {
+      title: "RPI Shuttle Tracker",
+      showModal: false,
+    };
+  },
+  methods: {
+  },
 
 });
 

@@ -170,7 +170,7 @@ Vue.component('route-card', {
 
     deleteRoute: function(id){
       $.ajax({
-           url: '/routes/' + id,
+           url: '/routes?id=' + id,
            type: 'DELETE',
            success: function(result) {
              refresh = true;
@@ -242,17 +242,23 @@ Vue.component('route-create',{
       };
     },
     methods: {
+      createPoints: function (route) {
+        points = [];
+        for (const p of route.getLatLngs()) {
+          points.push({latitude: p.lat, longitude: p.lng});
+        }
+        return points;
+      },
       getJSON: function(){
-        coords = this.drawnRoute.getLatLngs();
+        coords = this.createPoints(this.drawnRoute);
         var toSend = {
           "name":this.name,
           "description":this.description,
-          "startTime":"",
-          "endTime":"",
-          "enabled":this.enabled.toString(),
+          "enabled":this.enabled,
           "color":this.color,
-          "width":this.width.toString(),
-          "coords":JSON.stringify(coords)};
+          "width":this.width,
+          "points": coords
+        };
           return toSend;
       },
       showJSON: function(data){
