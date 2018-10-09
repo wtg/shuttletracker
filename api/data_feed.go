@@ -14,6 +14,7 @@ func (api *API) DataFeedHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Last data feed response does not exist", http.StatusNotFound)
 		return
 	}
+	w.Header().Set("Content-Type", "text/plain")
 	_, err := w.Write(dfresp.Body)
 	if err != nil {
 		log.WithError(err).Error("unable to write")
