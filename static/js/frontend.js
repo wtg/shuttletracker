@@ -535,11 +535,9 @@ Vue.component('dropdown-menu', {
   data() {
     return {
       list_data: [
-        { name: "East: Monday-Thursday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018CampusShuttleScheduleEastRoute.pdf" },
-        { name: "East: Friday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018FridayOnlyEastShuttleSchedule.pdf" },
-        { name: "West: Monday-Thursday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018CampusShuttleScheduleWestRoute.pdf" },
-        { name: "West: Friday", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018FridayOnlyWestShuttleSchedule.pdf" },
-        { name: "Weekend Late Night", link: "http://www.rpi.edu/dept/parking/shuttle/2017-2018Weekend-LateNightShuttleSchedule.pdf" }
+        { name: "East: Monday-Friday", link: "https://info.rpi.edu/sites/default/files/2018-19MonThursCampusShuttleScheduleEastRoute.pdf" },
+        { name: "West: Monday-Friday", link: "https://info.rpi.edu/sites/default/files/2018-19MonThursCampusShuttleScheduleWestRoute.pdf" },
+        { name: "Weekend/Late Night", link: "https://info.rpi.edu/sites/default/files/2018-19WeekendLateNightShuttleSchedule.pdf" }
       ],
       title: "RPI Shuttle Tracker",
       moonicon: "static/images/moon.svg",
