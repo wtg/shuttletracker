@@ -17,7 +17,22 @@ type Route struct {
 	Created     time.Time `json:"created"`
 	Updated     time.Time `json:"updated"`
 	Points      []Point   `json:"points"`
+	// Schedule    RouteSchedule `json:"schedule"`
+	Active bool `json:"active"`
 }
+
+// RouteActiveInterval represents a time interval during which a Route is active.
+type RouteActiveInterval struct {
+	ID        int64        `json:"id"`
+	RouteID   int64        `json:"route_id"`
+	StartDay  time.Weekday `json:"start_day"`
+	StartTime time.Time    `json:"start_time"`
+	EndDay    time.Weekday `json:"end_day"`
+	EndTime   time.Time    `json:"end_time"`
+}
+
+// RouteSchedule represents multiple time intervals during which a Route is active.
+type RouteSchedule []RouteActiveInterval
 
 // Point represents a latitude/longitude pair.
 type Point struct {

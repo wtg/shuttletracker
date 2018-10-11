@@ -40,7 +40,56 @@ CREATE TABLE IF NOT EXISTS routes_stops (
 	stop_id integer REFERENCES stops NOT NULL,
 	"order" integer NOT NULL,
 	UNIQUE (route_id, "order")
-);`
+);
+CREATE TABLE IF NOT EXISTS route_schedules (
+	id serial PRIMARY KEY,
+	route_id integer REFERENCES routes ON DELETE CASCADE NOT NULL,
+	start_day smallint NOT NULL CHECK (start_day >= 0 AND start_day <= 7),
+	start_time time with time zone NOT NULL,
+	end_day smallint NOT NULL CHECK (end_day >= 0 AND end_day <= 7),
+	end_time time with time zone NOT NULL
+);
+CREATE OR REPLACE FUNCTION route_is_active(route_id integer) RETURNS boolean STABLE AS $$
+	SELECT exists(
+		SELECT true FROM
+        route_schedules,
+        (
+			SELECT id,
+			make_timestamptz(
+				extract(year from (current_date - extract(dow from current_date)::int) + start_day)::int,
+				extract(month from (current_date - extract(dow from current_date)::int) + start_day)::int,
+				extract(day from (current_date - extract(dow from current_date)::int) + start_day)::int,
+				extract(hour from start_time)::int,
+				extract(minute from start_time)::int,
+				extract(sec from start_time)
+			) as start,
+			make_timestamptz(
+				extract(year from (current_date - extract(dow from current_date)::int) + end_day)::int,
+				extract(month from (current_date - extract(dow from current_date)::int) + end_day)::int,
+				extract(day from (current_date - extract(dow from current_date)::int) + end_day)::int,
+				extract(hour from end_time)::int,
+				extract(minute from end_time)::int,
+				extract(sec from end_time)
+			) as end
+			FROM route_schedules
+        ) AS timestamps
+        WHERE
+			route_schedules.route_id = route_is_active.route_id
+			AND route_schedules.id = timestamps.id
+			AND now() >= timestamps.start
+			AND now() < timestamps.end
+			OR (
+				NOT EXISTS (
+					SELECT 1 from route_schedules
+					WHERE route_schedules.route_id = route_is_active.route_id
+				) AND EXISTS (
+					SELECT 1 from routes
+					WHERE routes.id = route_is_active.route_id
+				)
+			)
+	);
+$$ LANGUAGE sql;
+`
 	_, err := rs.db.Exec(schema)
 	return err
 }
@@ -82,10 +131,15 @@ func (p *scanPoints) Scan(src interface{}) error {
 // Routes returns all Routes in the database.
 func (rs *RouteService) Routes() ([]*shuttletracker.Route, error) {
 	routes := []*shuttletracker.Route{}
-	query := "SELECT r.id, r.name, r.created, r.updated, r.enabled, r.width, r.color, r.points," +
-		" array_remove(array_agg(rs.stop_id ORDER BY rs.order ASC), NULL) as stop_ids" +
-		" FROM routes r LEFT JOIN routes_stops rs" +
-		" ON r.id = rs.route_id GROUP BY r.id;"
+	query := `
+SELECT r.id, r.name, r.created, r.updated, r.enabled, r.width, r.color, r.points,
+	array_remove(array_agg(rs.stop_id ORDER BY rs.order ASC), NULL) as stop_ids,
+	route_is_active(r.id) as active
+FROM
+	routes r
+LEFT JOIN routes_stops rs ON r.id = rs.route_id
+GROUP BY r.id;
+`
 	rows, err := rs.db.Query(query)
 	if err != nil {
 		return nil, err
@@ -93,7 +147,7 @@ func (rs *RouteService) Routes() ([]*shuttletracker.Route, error) {
 	for rows.Next() {
 		r := &shuttletracker.Route{}
 		p := scanPoints{}
-		err := rows.Scan(&r.ID, &r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, &p, pq.Array(&r.StopIDs))
+		err := rows.Scan(&r.ID, &r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, &p, pq.Array(&r.StopIDs), &r.Active)
 		if err != nil {
 			return nil, err
 		}
@@ -106,7 +160,8 @@ func (rs *RouteService) Routes() ([]*shuttletracker.Route, error) {
 // Route returns the Route with the provided ID.
 func (rs *RouteService) Route(id int64) (*shuttletracker.Route, error) {
 	query := "SELECT r.name, r.created, r.updated, r.enabled, r.width, r.color, r.points," +
-		" array_remove(array_agg(rs.stop_id ORDER BY rs.order ASC), NULL) as stop_ids" +
+		" array_remove(array_agg(rs.stop_id ORDER BY rs.order ASC), NULL) as stop_ids," +
+		" route_is_active(r.id) as active" +
 		" FROM routes r LEFT JOIN routes_stops rs" +
 		" ON r.id = rs.route_id WHERE r.id = $1 GROUP BY r.id;"
 	row := rs.db.QueryRow(query, id)
@@ -114,7 +169,7 @@ func (rs *RouteService) Route(id int64) (*shuttletracker.Route, error) {
 		ID: id,
 	}
 	p := scanPoints{}
-	err := row.Scan(&r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, &p, pq.Array(&r.StopIDs))
+	err := row.Scan(&r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, &p, pq.Array(&r.StopIDs), &r.Active)
 	if err != nil {
 		return nil, err
 	}
