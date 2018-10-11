@@ -375,5 +375,23 @@ func (rs *RouteService) ModifyRoute(route *shuttletracker.Route) error {
 		return err
 	}
 
+	// remove existing route schedule
+	_, err = tx.Exec("DELETE FROM route_schedules WHERE route_id = $1;", route.ID)
+	if err != nil {
+		return err
+	}
+
+	// insert route schedule
+	for _, interval := range route.Schedule {
+		statement = "INSERT INTO route_schedules (route_id, start_day, start_time, end_day, end_time)" +
+			" VALUES ($1, $2, $3, $4, $5) RETURNING id;"
+		row := tx.QueryRow(statement, route.ID, interval.StartDay, interval.StartTime, interval.EndDay, interval.EndTime)
+		err = row.Scan(&interval.ID)
+		if err != nil {
+			return err
+		}
+		interval.RouteID = route.ID
+	}
+
 	return tx.Commit()
 }
