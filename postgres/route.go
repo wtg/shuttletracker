@@ -196,21 +196,52 @@ GROUP BY r.id;
 
 // Route returns the Route with the provided ID.
 func (rs *RouteService) Route(id int64) (*shuttletracker.Route, error) {
+	tx, err := rs.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	// We can't really do anything if rolling back a transaction fails.
+	// nolint: errcheck
+	defer tx.Rollback()
+
 	query := "SELECT r.name, r.created, r.updated, r.enabled, r.width, r.color, r.points," +
 		" array_remove(array_agg(rs.stop_id ORDER BY rs.order ASC), NULL) as stop_ids," +
 		" route_is_active(r.id) as active" +
 		" FROM routes r LEFT JOIN routes_stops rs" +
 		" ON r.id = rs.route_id WHERE r.id = $1 GROUP BY r.id;"
-	row := rs.db.QueryRow(query, id)
+	row := tx.QueryRow(query, id)
 	r := &shuttletracker.Route{
-		ID: id,
+		ID:       id,
+		Schedule: shuttletracker.RouteSchedule{},
 	}
 	p := scanPoints{}
-	err := row.Scan(&r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, &p, pq.Array(&r.StopIDs), &r.Active)
+	err = row.Scan(&r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, &p, pq.Array(&r.StopIDs), &r.Active)
 	if err != nil {
 		return nil, err
 	}
 	r.Points = p.points
+
+	query = "SELECT s.id, s.start_day, s.start_time, s.end_day, s.end_time" +
+		" FROM route_schedules s WHERE s.route_id = $1;"
+	rows, err := tx.Query(query, id)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		interval := shuttletracker.RouteActiveInterval{
+			RouteID: id,
+		}
+		err := rows.Scan(&interval.ID, &interval.StartDay, &interval.StartTime, &interval.EndDay, &interval.EndTime)
+		if err != nil {
+			return nil, err
+		}
+		r.Schedule = append(r.Schedule, interval)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
+	}
 	return r, nil
 }
 
