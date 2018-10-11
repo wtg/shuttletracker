@@ -80,7 +80,7 @@ CREATE OR REPLACE FUNCTION route_is_active(route_id integer) RETURNS boolean STA
 			route_schedules.route_id = route_is_active.route_id
 			AND route_schedules.id = timestamps.id
 			AND now() >= timestamps.start
-			AND now() < timestamps.end
+			AND now() <= timestamps.end
 			OR (
 				NOT EXISTS (
 					SELECT 1 from route_schedules
