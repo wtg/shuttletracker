@@ -47,7 +47,10 @@ CREATE TABLE IF NOT EXISTS route_schedules (
 	start_day smallint NOT NULL CHECK (start_day >= 0 AND start_day <= 7),
 	start_time time with time zone NOT NULL,
 	end_day smallint NOT NULL CHECK (end_day >= 0 AND end_day <= 7),
-	end_time time with time zone NOT NULL
+	end_time time with time zone NOT NULL,
+	CHECK (
+		(start_day = end_day AND start_time < end_time) OR (start_day < end_day)
+	)
 );
 CREATE OR REPLACE FUNCTION route_is_active(route_id integer) RETURNS boolean STABLE AS $$
 	SELECT exists(
