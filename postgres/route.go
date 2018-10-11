@@ -130,7 +130,19 @@ func (p *scanPoints) Scan(src interface{}) error {
 
 // Routes returns all Routes in the database.
 func (rs *RouteService) Routes() ([]*shuttletracker.Route, error) {
+	tx, err := rs.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	// We can't really do anything if rolling back a transaction fails.
+	// nolint: errcheck
+	defer tx.Rollback()
+
 	routes := []*shuttletracker.Route{}
+
+	// This allows us to do faster lookups when retrieving schedule data.
+	idsToRoute := map[int64]*shuttletracker.Route{}
+
 	query := `
 SELECT r.id, r.name, r.created, r.updated, r.enabled, r.width, r.color, r.points,
 	array_remove(array_agg(rs.stop_id ORDER BY rs.order ASC), NULL) as stop_ids,
@@ -140,7 +152,7 @@ FROM
 LEFT JOIN routes_stops rs ON r.id = rs.route_id
 GROUP BY r.id;
 `
-	rows, err := rs.db.Query(query)
+	rows, err := tx.Query(query)
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +164,32 @@ GROUP BY r.id;
 			return nil, err
 		}
 		r.Points = p.points
+		r.Schedule = shuttletracker.RouteSchedule{}
 		routes = append(routes, r)
+		idsToRoute[r.ID] = r
+	}
+
+	query = "SELECT s.id, s.route_id, s.start_day, s.start_time, s.end_day, s.end_time FROM route_schedules s;"
+	rows, err = tx.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		interval := shuttletracker.RouteActiveInterval{}
+		err := rows.Scan(&interval.ID, &interval.RouteID, &interval.StartDay, &interval.StartTime, &interval.EndDay, &interval.EndTime)
+		if err != nil {
+			return nil, err
+		}
+		route, ok := idsToRoute[interval.RouteID]
+		if !ok {
+			return nil, shuttletracker.ErrRouteNotFound
+		}
+		route.Schedule = append(route.Schedule, interval)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
 	}
 	return routes, nil
 }

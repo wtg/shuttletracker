@@ -7,18 +7,18 @@ import (
 
 // Route represents a set of coordinates to draw a path on our tracking map
 type Route struct {
-	ID          int64     `json:"id"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Enabled     bool      `json:"enabled"`
-	Color       string    `json:"color"`
-	Width       int64     `json:"width"`
-	StopIDs     []int64   `json:"stop_ids"`
-	Created     time.Time `json:"created"`
-	Updated     time.Time `json:"updated"`
-	Points      []Point   `json:"points"`
-	// Schedule    RouteSchedule `json:"schedule"`
-	Active bool `json:"active"`
+	ID          int64         `json:"id"`
+	Name        string        `json:"name"`
+	Description string        `json:"description"`
+	Enabled     bool          `json:"enabled"`
+	Color       string        `json:"color"`
+	Width       int64         `json:"width"`
+	StopIDs     []int64       `json:"stop_ids"`
+	Created     time.Time     `json:"created"`
+	Updated     time.Time     `json:"updated"`
+	Points      []Point       `json:"points"`
+	Active      bool          `json:"active"`
+	Schedule    RouteSchedule `json:"schedule"`
 }
 
 // RouteActiveInterval represents a time interval during which a Route is active.
