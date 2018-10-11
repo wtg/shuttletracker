@@ -162,7 +162,7 @@ GROUP BY r.id;
 	for rows.Next() {
 		r := &shuttletracker.Route{}
 		p := scanPoints{}
-		err := rows.Scan(&r.ID, &r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, &p, pq.Array(&r.StopIDs), &r.Active)
+		err = rows.Scan(&r.ID, &r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, &p, pq.Array(&r.StopIDs), &r.Active)
 		if err != nil {
 			return nil, err
 		}
@@ -179,7 +179,7 @@ GROUP BY r.id;
 	}
 	for rows.Next() {
 		interval := shuttletracker.RouteActiveInterval{}
-		err := rows.Scan(&interval.ID, &interval.RouteID, &interval.StartDay, &interval.StartTime, &interval.EndDay, &interval.EndTime)
+		err = rows.Scan(&interval.ID, &interval.RouteID, &interval.StartDay, &interval.StartTime, &interval.EndDay, &interval.EndTime)
 		if err != nil {
 			return nil, err
 		}
@@ -234,7 +234,7 @@ func (rs *RouteService) Route(id int64) (*shuttletracker.Route, error) {
 		interval := shuttletracker.RouteActiveInterval{
 			RouteID: id,
 		}
-		err := rows.Scan(&interval.ID, &interval.StartDay, &interval.StartTime, &interval.EndDay, &interval.EndTime)
+		err = rows.Scan(&interval.ID, &interval.StartDay, &interval.StartTime, &interval.EndDay, &interval.EndTime)
 		if err != nil {
 			return nil, err
 		}
