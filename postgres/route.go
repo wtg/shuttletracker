@@ -57,7 +57,7 @@ CREATE OR REPLACE FUNCTION route_is_active(route_id integer) RETURNS boolean STA
 		SELECT true FROM
         route_schedules,
         (
-			SELECT id,
+			SELECT route_schedules.route_id,
 			make_timestamptz(
 				extract(year from (current_date - extract(dow from current_date)::int) + start_day)::int,
 				extract(month from (current_date - extract(dow from current_date)::int) + start_day)::int,
@@ -77,17 +77,16 @@ CREATE OR REPLACE FUNCTION route_is_active(route_id integer) RETURNS boolean STA
 			FROM route_schedules
         ) AS timestamps
         WHERE
-			route_schedules.route_id = route_is_active.route_id
-			AND route_schedules.id = timestamps.id
+			timestamps.route_id = route_is_active.route_id
 			AND now() >= timestamps.start
 			AND now() <= timestamps.end
 			OR (
-				NOT EXISTS (
-					SELECT 1 from route_schedules
-					WHERE route_schedules.route_id = route_is_active.route_id
-				) AND EXISTS (
+				EXISTS (
 					SELECT 1 from routes
 					WHERE routes.id = route_is_active.route_id
+				) AND NOT EXISTS (
+					SELECT 1 from route_schedules
+					WHERE route_schedules.route_id = route_is_active.route_id
 				)
 			)
 	);
@@ -320,6 +319,13 @@ func (rs *RouteService) CreateRoute(route *shuttletracker.Route) error {
 			return err
 		}
 		interval.RouteID = route.ID
+	}
+
+	// Determine if route is active. Must happen after inserting the route schedule.
+	row = tx.QueryRow("SELECT route_is_active($1);", route.ID)
+	err = row.Scan(&route.Active)
+	if err != nil {
+		return err
 	}
 
 	return tx.Commit()
