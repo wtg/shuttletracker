@@ -144,6 +144,43 @@ func TestModifySchedule(t *testing.T) {
 		t.Error("route is not active")
 	}
 
+	// modify the route schedule and check again
+	route.Schedule = shuttletracker.RouteSchedule{
+		shuttletracker.RouteActiveInterval{
+			StartDay:  time.Sunday,
+			StartTime: time.Date(0, 1, 0, 0, 0, 0, 0, time.UTC),
+			EndDay:    time.Tuesday,
+			EndTime:   time.Date(0, 1, 0, 23, 59, 59, 0, time.UTC),
+		},
+		shuttletracker.RouteActiveInterval{
+			StartDay:  time.Wednesday,
+			StartTime: time.Date(0, 1, 0, 0, 0, 0, 0, time.UTC),
+			EndDay:    time.Saturday,
+			EndTime:   time.Date(0, 1, 0, 23, 59, 59, 0, time.UTC),
+		},
+	}
+	err = pg.ModifyRoute(route)
+	if err != nil {
+		t.Fatalf("unable to modify Route: %s", err)
+	}
+	if len(route.Schedule) != 2 {
+		t.Errorf("wrong schedule length: %d", len(route.Schedule))
+	}
+	if !route.Active {
+		t.Error("route is not active")
+	}
+
+	route, err = pg.Route(route.ID)
+	if err != nil {
+		t.Fatalf("unable to get Route: %s", err)
+	}
+	if len(route.Schedule) != 2 {
+		t.Errorf("wrong schedule length: %d", len(route.Schedule))
+	}
+	if !route.Active {
+		t.Error("route is not active")
+	}
+
 	// delete the route schedule and check again
 	route.Schedule = shuttletracker.RouteSchedule{}
 	err = pg.ModifyRoute(route)
