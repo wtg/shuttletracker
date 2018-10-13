@@ -55,8 +55,7 @@ CREATE TABLE IF NOT EXISTS route_schedules (
 CREATE OR REPLACE FUNCTION route_is_active(route_id integer) RETURNS boolean STABLE AS $$
 	SELECT exists(
 		SELECT true FROM
-        route_schedules,
-        (
+		(
 			SELECT route_schedules.route_id,
 			make_timestamptz(
 				extract(year from (current_date - extract(dow from current_date)::int) + start_day)::int,
@@ -75,8 +74,9 @@ CREATE OR REPLACE FUNCTION route_is_active(route_id integer) RETURNS boolean STA
 				extract(sec from end_time)
 			) as end
 			FROM route_schedules
-        ) AS timestamps
-        WHERE
+		) AS timestamps
+		RIGHT OUTER JOIN routes ON routes.id = timestamps.route_id
+		WHERE
 			timestamps.route_id = route_is_active.route_id
 			AND now() >= timestamps.start
 			AND now() <= timestamps.end
