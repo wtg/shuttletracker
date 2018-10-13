@@ -313,7 +313,7 @@ func (rs *RouteService) CreateRoute(route *shuttletracker.Route) error {
 	for _, interval := range route.Schedule {
 		statement = "INSERT INTO route_schedules (route_id, start_day, start_time, end_day, end_time)" +
 			" VALUES ($1, $2, $3, $4, $5) RETURNING id;"
-		row := tx.QueryRow(statement, route.ID, interval.StartDay, interval.StartTime, interval.EndDay, interval.EndTime)
+		row = tx.QueryRow(statement, route.ID, interval.StartDay, interval.StartTime, interval.EndDay, interval.EndTime)
 		err = row.Scan(&interval.ID)
 		if err != nil {
 			return err
