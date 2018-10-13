@@ -44,6 +44,7 @@ func TestCreateEmptySchedule(t *testing.T) {
 	}
 }
 
+// nolint: gocyclo
 func TestCreateSchedule(t *testing.T) {
 	if testing.Short() {
 		t.SkipNow()
@@ -80,6 +81,22 @@ func TestCreateSchedule(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to get Route: %s", err)
 	}
+	if len(route.Schedule) != 1 {
+		t.Errorf("wrong schedule length: %d", len(route.Schedule))
+	}
+	if !route.Active {
+		t.Error("route is not active")
+	}
+
+	// check that we can get it from all routes
+	routes, err := pg.Routes()
+	if err != nil {
+		t.Fatalf("unable to get Routes: %s", err)
+	}
+	if len(routes) != 1 {
+		t.Fatalf("wrong Routes length: %d", len(routes))
+	}
+	route = routes[0]
 	if len(route.Schedule) != 1 {
 		t.Errorf("wrong schedule length: %d", len(route.Schedule))
 	}
@@ -203,5 +220,71 @@ func TestModifySchedule(t *testing.T) {
 	}
 	if !route.Active {
 		t.Error("route is not active")
+	}
+}
+
+// This test probably doesn't work properly around midnight...
+// nolint: gocyclo
+func TestActiveTransition(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+	pg := setUpPostgres(t)
+	defer tearDownPostgres(t)
+
+	now := time.Now()
+	route := &shuttletracker.Route{
+		Name: "Test Route",
+		Schedule: shuttletracker.RouteSchedule{
+			shuttletracker.RouteActiveInterval{
+				StartDay:  now.Weekday(),
+				StartTime: now,
+				EndDay:    now.Weekday(),
+				EndTime:   now.Add(time.Second),
+			},
+			shuttletracker.RouteActiveInterval{
+				StartDay:  now.Weekday(),
+				StartTime: now.Add(5 * time.Second),
+				EndDay:    now.Weekday(),
+				EndTime:   now.Add(10 * time.Second),
+			},
+		},
+	}
+	err := pg.CreateRoute(route)
+	if err != nil {
+		t.Fatalf("unable to create Route: %s", err)
+	}
+	if !route.Active {
+		t.Error("route is not active")
+	}
+
+	// wait two seconds and then check again...
+	time.Sleep(2 * time.Second)
+	route, err = pg.Route(route.ID)
+	if err != nil {
+		t.Fatalf("unable to get Route: %s", err)
+	}
+	if route.Active {
+		t.Error("route is active")
+	}
+
+	// wait and then check again...
+	time.Sleep(4 * time.Second)
+	route, err = pg.Route(route.ID)
+	if err != nil {
+		t.Fatalf("unable to get Route: %s", err)
+	}
+	if !route.Active {
+		t.Error("route is not active")
+	}
+
+	// wait and then check again...
+	time.Sleep(5 * time.Second)
+	route, err = pg.Route(route.ID)
+	if err != nil {
+		t.Fatalf("unable to get Route: %s", err)
+	}
+	if route.Active {
+		t.Error("route is active")
 	}
 }
