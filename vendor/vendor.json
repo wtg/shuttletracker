@@ -3,10 +3,6 @@
 	"ignore": "test",
 	"package": [
 		{
-			"path": "-h",
-			"revision": ""
-		},
-		{
 			"path": "appengine/cloudsql",
 			"revision": ""
 		},
