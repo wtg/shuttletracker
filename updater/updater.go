@@ -264,7 +264,7 @@ func kphToMPH(kmh float64) float64 {
 }
 
 // GuessRouteForVehicle returns a guess at what route the vehicle is on.
-// It may return an empty route if it does not believe a vehicle is on any route.
+// It returns an empty route if it does not believe that it is on any route.
 // nolint: gocyclo
 func (u *Updater) GuessRouteForVehicle(vehicle *shuttletracker.Vehicle) (route *shuttletracker.Route, err error) {
 	routes, err := u.ms.Routes()
