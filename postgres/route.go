@@ -44,9 +44,9 @@ CREATE TABLE IF NOT EXISTS routes_stops (
 CREATE TABLE IF NOT EXISTS route_schedules (
 	id serial PRIMARY KEY,
 	route_id integer REFERENCES routes ON DELETE CASCADE NOT NULL,
-	start_day smallint NOT NULL CHECK (start_day >= 0 AND start_day <= 7),
+	start_day smallint NOT NULL CHECK (start_day >= 0 AND start_day < 7),
 	start_time time with time zone NOT NULL,
-	end_day smallint NOT NULL CHECK (end_day >= 0 AND end_day <= 7),
+	end_day smallint NOT NULL CHECK (end_day >= 0 AND end_day < 7),
 	end_time time with time zone NOT NULL,
 	CHECK (
 		(start_day = end_day AND start_time < end_time) OR (start_day < end_day)
