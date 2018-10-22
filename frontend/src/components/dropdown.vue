@@ -13,23 +13,15 @@
         <p class="dropdown-menu-item_p">Shuttle Schedules</p>
         <ul id="dropdown-submenu_shuttle-schedule" class="dropdown-submenu" style="display: inline-block;">
             <li id="dropdown-submenu-item_shuttle-schedule" class="dropdown-submenu-item">
-                <p class="dropdown-submenu-item_p"><a target="_blank" rel="noopener noreferrer" href="http://www.rpi.edu/dept/parking/shuttle/2017-2018CampusShuttleScheduleEastRoute.pdf"
-                        class="dropdown-submenu-item_link">East: Monday-Thursday</a></p>
+                <p class="dropdown-submenu-item_p"><a target="_blank" rel="noopener noreferrer" href="https://info.rpi.edu/sites/default/files/2018-19MonThursCampusShuttleScheduleEastRoute.pdf"
+                        class="dropdown-submenu-item_link">East: Monday-Friday</a></p>
             </li>
             <li id="dropdown-submenu-item_shuttle-schedule" class="dropdown-submenu-item">
-                <p class="dropdown-submenu-item_p"><a target="_blank" rel="noopener noreferrer" href="http://www.rpi.edu/dept/parking/shuttle/2017-2018FridayOnlyEastShuttleSchedule.pdf"
-                        class="dropdown-submenu-item_link">East: Friday</a></p>
+                <p class="dropdown-submenu-item_p"><a target="_blank" rel="noopener noreferrer" href="https://info.rpi.edu/sites/default/files/2018-19MonThursCampusShuttleScheduleWestRoute.pdf"
+                        class="dropdown-submenu-item_link">West: Monday-Friday</a></p>
             </li>
             <li id="dropdown-submenu-item_shuttle-schedule" class="dropdown-submenu-item">
-                <p class="dropdown-submenu-item_p"><a target="_blank" rel="noopener noreferrer" href="http://www.rpi.edu/dept/parking/shuttle/2017-2018CampusShuttleScheduleWestRoute.pdf"
-                        class="dropdown-submenu-item_link">West: Monday-Thursday</a></p>
-            </li>
-            <li id="dropdown-submenu-item_shuttle-schedule" class="dropdown-submenu-item">
-                <p class="dropdown-submenu-item_p"><a target="_blank" rel="noopener noreferrer" href="http://www.rpi.edu/dept/parking/shuttle/2017-2018FridayOnlyWestShuttleSchedule.pdf"
-                        class="dropdown-submenu-item_link">West: Friday</a></p>
-            </li>
-            <li id="dropdown-submenu-item_shuttle-schedule" class="dropdown-submenu-item">
-                <p class="dropdown-submenu-item_p"><a target="_blank" rel="noopener noreferrer" href="http://www.rpi.edu/dept/parking/shuttle/2017-2018Weekend-LateNightShuttleSchedule.pdf"
+                <p class="dropdown-submenu-item_p"><a target="_blank" rel="noopener noreferrer" href="https://info.rpi.edu/sites/default/files/2018-19WeekendLateNightShuttleSchedule.pdf"
                         class="dropdown-submenu-item_link">Weekend Late Night</a></p>
             </li>
         </ul>

@@ -257,13 +257,11 @@ export default Vue.extend({
       margin-right: 5px;
     }
     position: absolute;
-    height: 20px;
+    height: 26px;
     right: 10px;
     top: 40px;
-    background-color: rgba(255, 255, 255, 0.88); 
-    border-color: black;
-    border-style: solid;
-    border-width: 1px;
+    box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
+    border-radius: 5px;
     padding-left: 4px;   
     padding-right: 4px;   
     justify-self: flex-end;
@@ -272,6 +270,8 @@ export default Vue.extend({
     align-content: space-between;
     align-items: center;
     justify-content: space-around;
+    background-color: rgba(255, 255, 255, 0.9);
+    
 }
 
 #mymap{
@@ -292,7 +292,7 @@ export default Vue.extend({
     justify-content: space-between;
     flex-flow: row;
     width: 100%;
-    background-color: rgba(255, 255, 255, 0.88);
+    background-color: rgba(255, 255, 255, 0.9);
     box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.8);
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -311,7 +311,7 @@ export default Vue.extend({
       padding: 0px;
 
       & .title {
-        font-size: 20px;
+        font-size: 22px;
         line-height: 34px;
         vertical-align: center;
         padding: 0px;
@@ -332,10 +332,9 @@ export default Vue.extend({
 }
 
 .info.legend{
-  background-color: rgba(255, 255, 255, .8);
-  border-width: 1px;
-  border-color: #222334;
-  border-style: solid;
+  box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, .9);
   padding: 5px;
   bottom: 25px;
   & ul{
