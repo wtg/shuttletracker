@@ -535,7 +535,7 @@ Vue.component('dropdown-menu', {
   data() {
     return {
       list_data: [
-        { name: "East: Monday-Friday", link: "https://info.rpi.edu/sites/default/files/2018-19MonThursCampusShuttleScheduleEastRoute.pdf" },
+        { name: "East: Monday-Friday", link: "schedule_east.html" },
         { name: "West: Monday-Friday", link: "https://info.rpi.edu/sites/default/files/2018-19MonThursCampusShuttleScheduleWestRoute.pdf" },
         { name: "Weekend/Late Night", link: "https://info.rpi.edu/sites/default/files/2018-19WeekendLateNightShuttleSchedule.pdf" }
       ],
