@@ -1,21 +1,39 @@
-<!doctype html>
-<html>
+<!-- component template -->
+<script type="text/x-template" id="grid-template">
+  <table>
+    <thead>
+      <tr>
+        <th v-for="key in columns"
+          @click="sortBy(key)"
+          :class="{active: sortKey == key}">
+          {{key | capitalize}}
+          <span class="arrow"
+            :class="sortOrders[key] > 0 ? 'asc' : 'dsc'">
+          </span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="
+        entry in data
+        | filterBy filterKey
+        | orderBy sortKey sortOrders[sortKey]">
+        <td v-for="key in columns">
+          {{entry[key]}}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</script>
 
-<head>
-    <title>Schedule</title>
-    <link rel="icon" href="/static/images/favicon.ico">
-    <link rel="stylesheet" href="/static/css/application.css">
-    <script src="static/dist/vue/vue.min.js"></script>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1">	
-</head>
-
-<body>
-    <div id="app-vue" style="height:100%;">
-      <title-bar></title-bar>
-      <shuttle-map></shuttle-map>
-    </div>
-    <script src="static/js/schedule_east.js?q=1"></script>
-</body>
-
-</html>
+<!-- demo root element -->
+<div id="demo">
+  <form id="search">
+    Search <input name="query" v-model="searchQuery">
+  </form>
+  <demo-grid
+    :data="gridData"
+    :columns="gridColumns"
+    :filter-key="searchQuery">
+  </demo-grid>
+</div>
