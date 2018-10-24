@@ -1,39 +1,33 @@
-<!-- component template -->
-<script type="text/x-template" id="grid-template">
-  <table>
-    <thead>
-      <tr>
-        <th v-for="key in columns"
-          @click="sortBy(key)"
-          :class="{active: sortKey == key}">
-          {{key | capitalize}}
-          <span class="arrow"
-            :class="sortOrders[key] > 0 ? 'asc' : 'dsc'">
-          </span>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="
-        entry in data
-        | filterBy filterKey
-        | orderBy sortKey sortOrders[sortKey]">
-        <td v-for="key in columns">
-          {{entry[key]}}
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</script>
+<html>
+    <head>
+        <link rel="stylesheet" href="static/dist/schedule/schedule.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script src="static/dist/vue/vue.min.js"></script>
+    </head>
+	
+	<body>
+    <div id="grid">
+		<input type="text" v-model="searchQuery" placeholder="please enter text" />
+        <demo-grid :rows="rowData" :columns="columnData" :filter-key="searchQuery">
+            <!--注意这里不能出现驼峰式-->
+        </demo-grid>
+    </div>
+    <script type="text/x-template" id="grid-template">
+        <table v-if="filterData.length">
+            <thead>
+                <th v-for="col in columns" @click="order(col)">{{col}}
+                    <!--不同的列有不同的排序，需要一个保存列的排序对象setOrder-->
+                    <span class="arrow" :class="setOrder[col] > 0 ? 'asc':'dsc'"></span>
+                </th>
+            </thead>
+            <tbody>
+                <tr v-for="row in filterData">
+                    <td v-for="col in columns">{{row[col]}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <p v-else>No match data...</p>
+    </script>
+	<script src="static/js/south_east.js"></script>
 
-<!-- demo root element -->
-<div id="demo">
-  <form id="search">
-    Search <input name="query" v-model="searchQuery">
-  </form>
-  <demo-grid
-    :data="gridData"
-    :columns="gridColumns"
-    :filter-key="searchQuery">
-  </demo-grid>
-</div>
+</html>
