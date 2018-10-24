@@ -22,7 +22,7 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 
 11. Add data to your database. Example DBs are provided in `example_database`, as well as a simple import/export script to setup the database for you.
     - If using an example database, you might need to check the name of the imported database and change the Postgres URL accordingly.
-12. Install Nodejs/npm
+12. Install Node.js/npm
 12. Switch to the `./frontend` directory
 13. Run `npm install`
 14. Start watching and building the frontend using `npx vue-cli-service build --watch --mode development`_Note: This must be running for the Shuttle Tracker to serve the frontend_ 
