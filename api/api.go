@@ -118,9 +118,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	})
 
 	r.Method("GET", "/static/*", http.StripPrefix("/static/", http.FileServer(staticFileSystem{http.Dir("static/")})))
-	r.Method("GET", "/js/*", http.FileServer(staticFileSystem{http.Dir("static/")}))
-	r.Method("GET", "/css/*", http.FileServer(staticFileSystem{http.Dir("static/")}))
-	r.Method("GET", "/img/*", http.FileServer(staticFileSystem{http.Dir("static/")}))
+
 	r.Get("/", api.IndexHandler)
 
 	// iTRAK data feed endpoint
