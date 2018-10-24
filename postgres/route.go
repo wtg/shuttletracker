@@ -48,6 +48,10 @@ CREATE TABLE IF NOT EXISTS route_schedules (
 	start_time time with time zone NOT NULL,
 	end_day smallint NOT NULL CHECK (end_day >= 0 AND end_day < 7),
 	end_time time with time zone NOT NULL,
+
+	-- Note: active intervals for route schedules for a route cannot wrap around
+	-- the week boundary. This is for simplicity of implementation in the
+	-- route_is_active() function.
 	CHECK (
 		(start_day = end_day AND start_time < end_time) OR (start_day < end_day)
 	)
