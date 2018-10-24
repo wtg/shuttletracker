@@ -36,6 +36,9 @@ var adminsCmd = &cobra.Command{
 		if Add && Remove {
 			return errors.New("add and remove cannot be combined")
 		}
+		if !(Add || Remove) && len(args) > 0 {
+			return errors.New("too many arguments")
+		}
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
