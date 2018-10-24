@@ -1,7 +1,7 @@
 <template>
 <span>
-    <div v-if="(this.message !== undefined && this.message.Display === true) && !hide" id ="messagebox">
-        <div style="width: 100%;float:left;" v-html="this.message.Message"></div>
+    <div v-if="(this.message !== undefined && this.message.enabled === true) && !hide" id ="messagebox">
+        <div style="width: 100%;float:left;" v-html="this.message.message"></div>
         <div @click="hide = !hide" style="cursor: pointer;position:absolute;right:10px;top:6px;color:#333;font-size:20px;">&times;</div>
     </div>
 </span>
