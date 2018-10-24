@@ -18,14 +18,14 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 10. Edit `conf.json` with the following, if necessary:
    * `API.MapboxAPIKey`: Necessary for creating routes through the admin interface. [Create your own token](https://www.mapbox.com/help/how-access-tokens-work/) or ask a Shuttle Tracker developer to provide you with one.
    * `Postgres.URL`: URL where Postgres is located. The provided default typically won't need to be modified.
-   * `Dev`: Whether to serve the frontend in development mode using webpack or to serve files from the static directory, for all development work this should be set to true
+
 
 11. Add data to your database. Example DBs are provided in `example_database`, as well as a simple import/export script to setup the database for you.
     - If using an example database, you might need to check the name of the imported database and change the Postgres URL accordingly.
-12. Install nodejs/npm
+12. Install Nodejs/npm
 12. Switch to the `./frontend` directory
 13. Run `npm install`
-14. Start watching and building the frontend using `npx vue-cli-service build --watch --mode development`_Note: This must be running for the shuttle tracker to serve the frontend_ 
+14. Start watching and building the frontend using `npx vue-cli-service build --watch --mode development`_Note: This must be running for the Shuttle Tracker to serve the frontend_ 
 15. Start the app by running `go run cmd/shuttletracker/main.go` in the project root directory.
 16. You can optionally add yourself as an administrator by using the `make-admin.sh` script in the example_database folder, passing it your RCS ID as the first argument.
 17. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel
