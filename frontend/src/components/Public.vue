@@ -267,7 +267,7 @@ export default Vue.extend({
     justify-self: flex-end;
     display: flex;
     flex-flow: row wrap;
-    align-content: space-between;
+    align-content: center;
     align-items: center;
     justify-content: space-around;
     background-color: rgba(255, 255, 255, 0.9);
