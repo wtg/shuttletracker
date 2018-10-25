@@ -338,6 +338,8 @@ export default Vue.extend({
   padding: 5px;
   bottom: 25px;
   & ul{
+    margin-top: 2px;
+    margin-bottom: 2px;
     padding-left: 0px;
   }
 }
