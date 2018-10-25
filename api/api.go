@@ -120,6 +120,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	r.Method("GET", "/static/*", http.StripPrefix("/static/", http.FileServer(staticFileSystem{http.Dir("static/")})))
 
 	r.Get("/", api.IndexHandler)
+	r.Get("/about", api.IndexHandler)
 
 	// iTRAK data feed endpoint
 	r.Get("/datafeed", api.DataFeedHandler)
