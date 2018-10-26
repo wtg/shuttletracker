@@ -1,10 +1,11 @@
 package log
 
 import (
-	"github.com/Sirupsen/logrus"
 	"path"
 	"runtime"
 	"strings"
+
+	"github.com/Sirupsen/logrus"
 )
 
 var (
@@ -48,7 +49,7 @@ func contextFields(lvl ...int) Fields {
 	packageName := ""
 
 	if len(parts) >= 0 && pl-2 < len(parts) {
-		if parts[pl-2][0] == '(' {
+		if len(parts[pl-2]) > 0 && parts[pl-2][0] == '(' {
 			packageName = strings.Join(parts[0:pl-2], ".")
 		} else {
 			packageName = strings.Join(parts[0:pl-1], ".")
