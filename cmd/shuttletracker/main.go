@@ -39,13 +39,9 @@ func Run() {
 		return
 	}
 
-	// Model service
+	// Ensure service implementations actually implement their interfaces
 	var ms shuttletracker.ModelService = pg
-
-	// Message service
 	var msg shuttletracker.MessageService = pg
-
-	// User service
 	var us shuttletracker.UserService = pg
 
 	// Make shuttle position updater
