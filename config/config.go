@@ -46,5 +46,9 @@ func New() (*Config, error) {
 		return nil, err
 	}
 
+	if v.IsSet("postgres.url") {
+		log.Warn("POSTGRES_URL is deprecated and will be removed in the future. Use DATABASE_URL instead.")
+	}
+
 	return cfg, nil
 }
