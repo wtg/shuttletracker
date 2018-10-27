@@ -16,12 +16,17 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 8. Run `createdb shuttletracker` to create a Postgres database.
 9. Rename `conf.json.sample` to `conf.json`
 10. Edit `conf.json` with the following, if necessary:
-   * `API.MapboxAPIKey`: Necessary for creating routes through the admin interface. [Create your own token](https://www.mapbox.com/help/how-access-tokens-work/) or ask a Shuttle Tracker developer to provide you with one.
-   * `Postgres.URL`: URL where Postgres is located. The provided default typically won't need to be modified.
-11. Build Shuttle Tracker by running `go build -o shuttletracker cmd/shuttletracker/main.go` in the project root directory.
-12. Start the app by running `./shuttletracker` in the project root directory.
-13. You can add yourself as an administrator by using `./shuttletracker admins --add RCS_ID`, replacing `RCS_ID` with your RCS ID. See the "Administrators" section below for more information.
-14. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel
+    - `API.MapboxAPIKey`: Necessary for creating routes through the admin interface. [Create your own token](https://www.mapbox.com/help/how-access-tokens-work/) or ask a Shuttle Tracker developer to provide you with one.
+    - `Postgres.URL`: URL where Postgres is located. The provided default typically won't need to be modified.
+11. Install Node.js and npm.
+12. Switch to the `./frontend` directory.
+13. Run `npm install`
+14. Build the frontend using `npx vue-cli-service build --mode development`
+    - _Note: if you are working on the frontend, you may instead use `npx vue-cli-service build --mode development --watch` in another terminal to continuously watch for changes and rebuild._
+15. Go back up to the project root directory and build Shuttle Tracker by running `go build -o shuttletracker cmd/shuttletracker/main.go`
+16. Start the app by running `./shuttletracker` in the project root directory.
+17. You can add yourself as an administrator by using `./shuttletracker admins --add RCS_ID`, replacing `RCS_ID` with your RCS ID. See the "Administrators" section below for more information.
+18. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel.
 
 ## Configuration
 
