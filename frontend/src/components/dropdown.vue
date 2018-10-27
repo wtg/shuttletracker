@@ -4,7 +4,7 @@
     <li id="dropdown-submenu-item_styling" class="dropdown-submenu-item">
         <p class="dropdown-menu-item_p">Information</p>
         <router-link style="text-decoration: none; color: #333333;" to="/about">
-        <div id="darkmode-icon" class="dropdown-submenu-item_div">
+        <div class="dropdown-submenu-item_div">
             <p class="dropdown-submenu-subitem">About</p>
         </div>
         </router-link>
