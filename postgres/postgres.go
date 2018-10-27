@@ -68,14 +68,17 @@ func New(cfg Config) (*Postgres, error) {
 }
 
 // NewConfig creates a new Config.
-func NewConfig(v *viper.Viper) *Config {
+func NewConfig(v *viper.Viper) (*Config, error) {
 	cfg := &Config{
 		URL: "postgres://localhost/shuttletracker?sslmode=disable",
 	}
 	v.SetDefault("postgres.url", cfg.URL)
 
 	// Allow DATABASE_URL to set the Postgres connection string for ease of deployment.
-	v.BindEnv("postgres.url", "DATABASE_URL")
+	err := v.BindEnv("postgres.url", "DATABASE_URL")
+	if err != nil {
+		return nil, err
+	}
 
-	return cfg
+	return cfg, nil
 }
