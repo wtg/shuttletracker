@@ -73,7 +73,9 @@ func NewConfig(v *viper.Viper) *Config {
 		URL: "postgres://localhost/shuttletracker?sslmode=disable",
 	}
 	v.SetDefault("postgres.url", cfg.URL)
+
+	// Allow DATABASE_URL to set the Postgres connection string for ease of deployment.
 	v.BindEnv("postgres.url", "DATABASE_URL")
-	v.RegisterAlias("database.url", "postgres.url")
+
 	return cfg
 }
