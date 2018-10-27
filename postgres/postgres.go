@@ -8,7 +8,8 @@ import (
 
 /*
 Postgres implements shuttletracker.VehicleService, shuttletracker.RouteService,
-shuttletracker.LoctionService, and shuttletracker.MessageService.
+shuttletracker.StopService, shuttletracker.LoctionService, shuttletracker.MessageService,
+and shuttletracker.UserService.
 */
 type Postgres struct {
 	VehicleService

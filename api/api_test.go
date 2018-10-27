@@ -26,7 +26,7 @@ func TestStatic(t *testing.T) {
 		},
 		{
 			method: "GET",
-			path:   "/static/js/frontend.js",
+			path:   "/static/js/admin.js",
 		},
 	}
 
