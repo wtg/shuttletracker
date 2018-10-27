@@ -7,7 +7,6 @@
 !mock
 !postgres
 !static
-!time
 !updater
 !vendor/vendor.json
 !admin.html

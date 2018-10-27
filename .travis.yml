@@ -36,8 +36,6 @@ script:
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then gometalinter --vendor ./... || true; fi
   - ./test.sh
   - docker build .
-
-after_success:
   - bash <(curl -s https://codecov.io/bash)
 
 cache:
@@ -48,6 +46,3 @@ cache:
 before_cache:
   - rm -rf $GOPATH/src/github.com/wtg/shuttletracker/*
   - rm -rf $GOPATH/pkg/**/github.com/wtg/shuttletracker/*
-
-notifications:
-  email: false

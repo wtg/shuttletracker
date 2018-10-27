@@ -16,19 +16,17 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 8. Run `createdb shuttletracker` to create a Postgres database.
 9. Rename `conf.json.sample` to `conf.json`
 10. Edit `conf.json` with the following, if necessary:
-   * `API.MapboxAPIKey`: Necessary for creating routes through the admin interface. [Create your own token](https://www.mapbox.com/help/how-access-tokens-work/) or ask a Shuttle Tracker developer to provide you with one.
-   * `Postgres.URL`: URL where Postgres is located. The provided default typically won't need to be modified.
-
-
-11. Add data to your database. Example DBs are provided in `example_database`, as well as a simple import/export script to setup the database for you.
-    - If using an example database, you might need to check the name of the imported database and change the Postgres URL accordingly.
-12. Install Node.js/npm
-12. Switch to the `./frontend` directory
+    - `API.MapboxAPIKey`: Necessary for creating routes through the admin interface. [Create your own token](https://www.mapbox.com/help/how-access-tokens-work/) or ask a Shuttle Tracker developer to provide you with one.
+    - `Postgres.URL`: URL where Postgres is located. The provided default typically won't need to be modified.
+11. Install Node.js and npm.
+12. Switch to the `./frontend` directory.
 13. Run `npm install`
-14. Start watching and building the frontend using `npx vue-cli-service build --watch --mode development`_Note: This must be running for the Shuttle Tracker to serve the frontend_ 
-15. Start the app by running `go run cmd/shuttletracker/main.go` in the project root directory.
-16. You can optionally add yourself as an administrator by using the `make-admin.sh` script in the example_database folder, passing it your RCS ID as the first argument.
-17. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel
+14. Build the frontend using `npx vue-cli-service build --mode development`
+    - _Note: if you are working on the frontend, you may instead use `npx vue-cli-service build --mode development --watch` in another terminal to continuously watch for changes and rebuild._
+15. Go back up to the project root directory and build Shuttle Tracker by running `go build -o shuttletracker cmd/shuttletracker/main.go`
+16. Start the app by running `./shuttletracker` in the project root directory.
+17. You can add yourself as an administrator by using `./shuttletracker admins --add RCS_ID`, replacing `RCS_ID` with your RCS ID. See the "Administrators" section below for more information.
+18. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel.
 
 ## Configuration
 
@@ -39,3 +37,25 @@ Shuttle Tracker needs configuration to run properly. The preferred method during
 ### Environment variables
 
 Most keys can be overridden with environment variables. The variables names usually take the format `SECTION_KEY`. For example, overriding database's Mongo URL could be done with a variable named `POSTGRES_URL`.
+
+## Administrators
+
+The admin interface (at `/admin`) is only accessible to users who have been added as administrators. There is a command-line utility to do this: `shuttletracker admins`. It has two flags: `--add RCS_ID` and `--remove RCS_ID`. Replace `RCS_ID` with a valid RCS ID.
+
+### Example usage
+
+```
+> ./shuttletracker admins
+No Shuttle Tracker administrators.
+> ./shuttletracker admins --add kochms
+Added kochms.
+> ./shuttletracker admins --add lyonj4
+Added lyonj4.
+> ./shuttletracker admins
+kochms
+lyonj4
+> ./shuttletracker admins --remove lyonj4
+Removed lyonj4.
+> ./shuttletracker admins
+kochms
+```
