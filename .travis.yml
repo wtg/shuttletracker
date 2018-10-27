@@ -45,6 +45,3 @@ cache:
 before_cache:
   - rm -rf $GOPATH/src/github.com/wtg/shuttletracker/*
   - rm -rf $GOPATH/pkg/**/github.com/wtg/shuttletracker/*
-
-notifications:
-  email: false
