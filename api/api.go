@@ -161,7 +161,7 @@ func (api *API) AdminHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/admin", 301)
 	}
 	w.Header().Set("Cache-Control", "no-cache")
-	http.ServeFile(w, r, "admin.html")
+	http.ServeFile(w, r, "static/admin.html")
 
 }
 
