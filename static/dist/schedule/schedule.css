@@ -1,26 +1,35 @@
+body{
+	background-color: #ffffff 
+}
+
 table {
-            border: 2px solid #42b983;
+            border: 8px solid #990000;
+			border-radius: 8px;
+			background: #66ccff;
+			color: #ffffff;
         }
         
         th {
-            background: #42b983;
+            background: #990000;
             padding: 10px 20px;
         }
         
         td {
             padding: 10px 20px;
             min-width: 120px;
-            background: rgb(231, 226, 226);
+            background: #ce3b3b;
             text-align: center;
         }
         
         input {
             margin-bottom: 7px;
-            border: 1px solid #42b983;
+            border: 4px solid #990000;
+			border-radius: 4px;
             height: 2em;
             line-height: 2em;
             display: inline-block;
             padding: 0 3px;
         }
         
+	
        
