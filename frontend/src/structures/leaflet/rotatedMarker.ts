@@ -1,5 +1,5 @@
 const icon: string = `<?xml version="1.0" encoding="UTF-8"?>
-<svg transform="rotate(HEADING)" width="60px" height="60px" viewBox="0 0 60 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="60px" height="60px" viewBox="0 0 60 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>shuttle</title>
     <defs></defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -10,6 +10,6 @@ const icon: string = `<?xml version="1.0" encoding="UTF-8"?>
     </g>
 </svg>`;
 
-export default function getMarkerString(color: string, angle: number) {
-    return 'data:image/svg+xml;base64,' + btoa(icon.replace('#33A7FF', color).replace('HEADING', String(angle)));
+export default function getMarkerString(color: string) {
+    return 'data:image/svg+xml;base64,' + btoa(icon.replace('#33A7FF', color));
 }
