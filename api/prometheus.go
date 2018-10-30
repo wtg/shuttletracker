@@ -2,33 +2,48 @@ package api
 
 import (
 	"net/http"
-	"strconv"
-	"time"
 
-	"github.com/go-chi/chi/middleware"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var (
-	requests = promauto.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "shuttletracker_http_requests_count",
-		}, []string{"code", "method", "path"},
-	)
-	latency = promauto.NewHistogramVec(
+	inFlightGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "shuttletracker_in_flight_requests",
+		Help: "A gauge of requests currently being served.",
+	})
+
+	// duration is partitioned by the HTTP method and handler. It uses custom
+	// buckets based on the expected request duration.
+	duration = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Name: "shuttletracker_http_latency_seconds",
-		}, []string{"code", "method", "path"},
+			Name:    "shuttletracker_request_duration_seconds",
+			Help:    "A histogram of latencies for requests.",
+			Buckets: []float64{.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10},
+		},
+		[]string{"code", "method"},
+	)
+
+	// responseSize has no labels, making it a zero-dimensional ObserverVec.
+	responseSize = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Name:    "shuttletracker_response_size_bytes",
+			Help:    "A histogram of response sizes for requests.",
+			Buckets: prometheus.ExponentialBuckets(100, 2, 11),
+		},
+		[]string{"code", "method"},
 	)
 )
 
+func init() {
+	prometheus.MustRegister(inFlightGauge, duration, responseSize)
+}
+
 func prometheusMetrics(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-		wrapper := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
-		next.ServeHTTP(wrapper, r)
-		requests.WithLabelValues(strconv.Itoa(wrapper.Status()), r.Method, r.URL.Path).Inc()
-		latency.WithLabelValues(strconv.Itoa(wrapper.Status()), r.Method, r.URL.Path).Observe(float64(time.Since(start).Nanoseconds()) / 1000000000)
-	})
+
+	return promhttp.InstrumentHandlerInFlight(inFlightGauge,
+		promhttp.InstrumentHandlerDuration(duration,
+			promhttp.InstrumentHandlerResponseSize(responseSize, next),
+		),
+	)
 }
