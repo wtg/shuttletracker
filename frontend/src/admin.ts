@@ -1,6 +1,8 @@
 import Vue from 'vue';
+import 'bulma';
 import '@/assets/styles.scss';
 import Admin from '@/Admin.vue';
+import router from '@/adminrouter';
 
 Vue.config.productionTip = false;
 
@@ -11,5 +13,6 @@ console.log('here')
  */
 new Vue({
     render: (h) => h(Admin),
+    router: router,
   }).$mount('#app');
   
