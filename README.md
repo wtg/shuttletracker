@@ -34,7 +34,11 @@ Shuttle Tracker needs configuration to run properly. The preferred method during
 
 ### Environment variables
 
-Most keys can be overridden with environment variables. The variables names usually take the format `SECTION_KEY`. For example, overriding database's Mongo URL could be done with a variable named `POSTGRES_URL`.
+Most keys can be overridden with environment variables. The variables names usually take the format `PACKAGE_KEY`. For example, overriding the iTRAK updater's update interval could be done with a variable named `UPDATER_UPDATEINTERVAL`.
+
+#### Database URL
+
+The database URL is a special case. Following the above convention, it can be set with `POSTGRES_URL`. However, for ease of deployment on Dokku, it can also be set with `DATABASE_URL`.
 
 ## Administrators
 
