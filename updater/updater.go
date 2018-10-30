@@ -286,7 +286,7 @@ func (u *Updater) GuessRouteForVehicle(vehicle *shuttletracker.Vehicle) (route *
 
 	for _, update := range updates {
 		for _, route := range routes {
-			if !route.Enabled {
+			if !route.Enabled || !route.Active {
 				routeDistances[route.ID] += math.Inf(0)
 			}
 			nearestDistance := math.Inf(0)
