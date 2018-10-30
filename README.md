@@ -60,33 +60,31 @@ Most keys can be overridden with environment variables. The variables names usua
 5. Run `go get github.com/wtg/shuttletracker`.  
 6. Install `govendor` by running `go get -u github.com/kardianos/govendor`.  
 7. Switch to the Shuttle Tracker directory (`$GOPATH/src/github.com/wtg/shuttletracker`).  
-8. Run `govendor sync`.
-
+8. Run `govendor sync`.  
 ![Steps 5-8](https://user-images.githubusercontent.com/6248819/47017579-9db76280-d120-11e8-8de5-ab5cbe11e072.png)
-9. Download and run the installer PostgreSQL [from here](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads). Select the latest version. When prompted to set a password, make it something simple, as you will be using this later, for example `shuttle`.  Use default options for everything else. Write down your password.
+9. Download and run the installer PostgreSQL [from here](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads). Select the latest version. When prompted to set a password, make it something simple, as you will be using this later, for example `shuttle`.  Use default options for everything else. Write down your password.  
+![Step 9](https://user-images.githubusercontent.com/6248819/47017593-ac057e80-d120-11e8-8637-18307ebeaf7e.png)  
+![Step 9b](https://user-images.githubusercontent.com/6248819/47017613-b6c01380-d120-11e8-85ee-35442f6ea737.png)  
+![Step 9c](https://user-images.githubusercontent.com/6248819/47017633-c2abd580-d120-11e8-95ab-50088fb38c40.png)  
+10. When complete, open pgAdmin from your search bar. If you do not see pgAdmin restart your computer. In the Object Browser, open Servers, then open your PostgreSQL server. You will need to enter your password from step 8. Once this is done, right click on Databases and select New Database. Name it `shuttletracker` and hit Ok.  
 
-![Step 9](https://user-images.githubusercontent.com/6248819/47017593-ac057e80-d120-11e8-8637-18307ebeaf7e.png)
-![Step 9b](https://user-images.githubusercontent.com/6248819/47017613-b6c01380-d120-11e8-85ee-35442f6ea737.png)
-![Step 9c](https://user-images.githubusercontent.com/6248819/47017633-c2abd580-d120-11e8-95ab-50088fb38c40.png)
-10. When complete, open pgAdmin from your search bar. If you do not see pgAdmin restart your computer. In the Object Browser, open Servers, then open your PostgreSQL server. You will need to enter your password from step 8. Once this is done, right click on Databases and select New Database. Name it `shuttletracker` and hit Ok.
-
-![Step 10](https://user-images.githubusercontent.com/6248819/47017651-d1928800-d120-11e8-849f-535b48215923.png)
-![Step 10b](https://user-images.githubusercontent.com/6248819/47017670-e0793a80-d120-11e8-9c26-473a3da6ddb5.png)
-![Step 10c](https://user-images.githubusercontent.com/6248819/47017687-ecfd9300-d120-11e8-8f43-606e2405f236.png)
+![Step 10](https://user-images.githubusercontent.com/6248819/47017651-d1928800-d120-11e8-849f-535b48215923.png)  
+![Step 10b](https://user-images.githubusercontent.com/6248819/47017670-e0793a80-d120-11e8-9c26-473a3da6ddb5.png)  
+![Step 10c](https://user-images.githubusercontent.com/6248819/47017687-ecfd9300-d120-11e8-8f43-606e2405f236.png)  
 
 11. Navigate to your shuttle tracker directory (`$GOPATH/src/github.com/wtg/shuttletracker`) and rename `conf.json.sample` to `conf.json`  
 12. Edit `conf.json` with the following, if necessary:  
    * `API.MapboxAPIKey`: Necessary for creating routes through the admin interface. [Create your own token](https://www.mapbox.com/help/how-access-tokens-work/) or ask a Shuttle Tracker developer to provide you with one.  
    * `Postgres.URL`: URL where Postgres is located which will be the default with postgres:password@localhost added before the database name, where password is your password from step 8. For example: `"URL": "postgres://postgres:shuttle@localhost/shuttletracker?sslmode=disable"`.  
-
-![Step 12](https://user-images.githubusercontent.com/6248819/47017722-f981eb80-d120-11e8-8ad2-4919c4052dc0.png)
+   
+![Step 12](https://user-images.githubusercontent.com/6248819/47017722-f981eb80-d120-11e8-8ad2-4919c4052dc0.png)  
 13. Open pgAdmin and click on your shuttletracker database once to highlight it. Now select the query button above which has the letters SQL written on it. In the text field write `INSERT INTO users (id, username) VALUES(0, 'Your RCS ID');` and make sure to fill in Your RCS ID which is the same as your email without @rpi.edu. Then hit the execute button which is a green arrow. This will add you as an admin on your local shuttle tracker.  
-
-![Step 13](https://user-images.githubusercontent.com/6248819/47017734-03a3ea00-d121-11e8-831b-92864302ed93.png)
-![Step 13b](https://user-images.githubusercontent.com/6248819/47017748-0ef71580-d121-11e8-894f-f90d31f877a7.png)
+  
+![Step 13](https://user-images.githubusercontent.com/6248819/47017734-03a3ea00-d121-11e8-831b-92864302ed93.png)  
+![Step 13b](https://user-images.githubusercontent.com/6248819/47017748-0ef71580-d121-11e8-894f-f90d31f877a7.png)   
 14. Start the app by running `go run cmd/shuttletracker/main.go` in the command prompt in the project root directory (`$GOPATH/src/github.com/wtg/shuttletracker`).  
 
-![Step 14](https://user-images.githubusercontent.com/6248819/47017759-1cac9b00-d121-11e8-8dcf-be6df1ff09fc.png)
+![Step 14](https://user-images.githubusercontent.com/6248819/47017759-1cac9b00-d121-11e8-8dcf-be6df1ff09fc.png)  
 16. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel.  
 17. Copy the information from [vehicles](https://shuttles.rpi.edu/vehicles), [routes](https://shuttles.rpi.edu/routes), and [stops](https://shuttles.rpi.edu/stops) into the admin panel if you want to mimic the current shuttle tracker site.  
 
