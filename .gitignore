@@ -2,3 +2,4 @@
 /vendor/*/
 /coverage.txt
 /shuttletracker
+/static/*
