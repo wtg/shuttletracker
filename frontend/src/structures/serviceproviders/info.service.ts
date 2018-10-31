@@ -40,9 +40,10 @@ export default class InfoServiceProvider {
                     latitude: number,
                     longitude: number,
                 }],
+                active: boolean,
             }) => {
                 ret.push(new Route(element.id, element.name, element.description,
-                    element.enabled, element.color, Number(element.width), element.points));
+                    element.enabled, element.color, Number(element.width), element.points, element.active));
             });
             return ret;
         });
