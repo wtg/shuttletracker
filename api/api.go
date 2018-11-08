@@ -73,6 +73,11 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		r.Get("/", api.UpdatesHandler)
 	})
 
+	//Hisory
+	r.Route("/history", func(r chi.Router) {
+		r.Get("/", api.HistoryHandler)
+		})
+
 	// Admin message
 	r.Route("/adminMessage", func(r chi.Router) {
 		r.Get("/", api.AdminMessageHandler)
