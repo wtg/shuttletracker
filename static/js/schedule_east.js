@@ -3,7 +3,9 @@
             props: {
                 rows: Array,
                 columns: Array,
-                filterKey: String
+                filterKey: String,
+				filterKey2: String
+			
             },
             data: function() {
                 var colOrders = {}
@@ -21,12 +23,21 @@
                     var data = this.rows.slice()
 					var index = 0
                     var filterKey = this.filterKey && this.filterKey.toLowerCase()
-                    if (filterKey) {
-                        data = data.filter(function(row) {
-							
-                            return Object.keys(row).some(function(key) {
-							
+					var filterKey2 = this.filterKey2 && this.filterKey2.toLowerCase()
+                   if (filterKey) {
+					   //if (filterKey|| filterKey2) {
+                        data = data.filter(function(row) {	
+                            return Object.keys(row).some(function(key) {						
                                 return String(row[key]).toLowerCase().indexOf(filterKey) > -1
+								//  return String(row[key]).toLowerCase().indexOf(filterKey) > -1 ||  
+								//return String(row[key]).toLowerCase().indexOf(filterKey2) > -1
+                            })
+                        })
+                    }
+					if (filterKey2) {
+                        data = data.filter(function(row) {	
+                            return Object.keys(row).some(function(key) {						
+                                return String(row[key]).toLowerCase().indexOf(filterKey2) > -1
                             })
                         })
                     }
@@ -34,7 +45,7 @@
                 }
             },
             methods: {
-                //对一个包含对象的数组的排序，需要提供一个对象键并以此值来进行排序
+				//Make the table order
                 order: function(key) {
                     this.setOrder[key] = this.setOrder[key] * -1
                 },
@@ -46,6 +57,7 @@
             data: {
                 columnData: ['name', 'bus1','bus2'],
                 searchQuery: '',
+				searchQuery2: '',
                 rowData: [{
                     name: 'Union',
                     bus1: '7:00a',
