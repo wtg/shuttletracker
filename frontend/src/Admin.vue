@@ -49,9 +49,9 @@ export default Vue.extend({
   components: {
     routesAdmin,
   },
-  mounted(){
+  mounted() {
     this.$store.dispatch('grabRoutes');
-  }
+  },
 });
 </script>
 

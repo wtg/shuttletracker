@@ -7,7 +7,7 @@ import store from '@/store';
 
 Vue.config.productionTip = false;
 
-console.log('here')
+console.log('here');
 
 /**
  * Declare the main Vue instance with components and vuex store.
@@ -17,4 +17,4 @@ new Vue({
     router,
     store,
   }).$mount('#app');
-  
+

@@ -1,3 +1,5 @@
+import routeScheduleInterval from './routeScheduleInterval';
+
 /**
  * This represents a single route as returned by the shuttle tracker
  */
@@ -8,6 +10,7 @@ export default class Route {
     public enabled: boolean;
     public color: string;
     public width: number;
+    public schedule: routeScheduleInterval[];
     public coords: [{
         latitude: number,
         longitude: number,
@@ -16,7 +19,7 @@ export default class Route {
                 color: string, width: number, coords: [{
                     latitude: number,
                     longitude: number,
-        }]) {
+        }], schedule: routeScheduleInterval[]) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -24,5 +27,6 @@ export default class Route {
         this.color = color;
         this.width = Number(width);
         this.coords = coords;
+        this.schedule = schedule;
     }
 }
