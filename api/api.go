@@ -107,7 +107,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	// Admin
 	r.Route("/admin", func(r chi.Router) {
 		r.Use(cli.casauth)
-		r.Get("/", api.AdminHandler)
+		r.Get("/*", api.AdminHandler)
 		r.Get("/login", api.AdminHandler)
 		r.Get("/logout", cli.logout)
 	})

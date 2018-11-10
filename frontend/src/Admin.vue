@@ -3,30 +3,30 @@
     <nav class="navbar" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
         <a class="navbar-item" href="https://shuttles.rpi.edu">
-          <p>Shuttle iTrak - <span class="has-text-danger">Fleet Management</span></p>
+          <p>Shuttle Tracc - <span class="has-text-danger">Fleet Management</span></p>
         </a>
       </div>
 
       <div id="navbarBasicExample" class="navbar-menu">
         <div class="navbar-start">
-          <router-link to="radmin" class="navbar-item">
+          <router-link to="/admin/routes" class="navbar-item">
             Routes
           </router-link>
-          <router-link to="sadmin" class="navbar-item">
+          <router-link to="/admin/stops" class="navbar-item">
             Stops
           </router-link>
-          <a class="navbar-item">
+          <router-link to="/admin/vehicles" class="navbar-item">
             Vehicles
-          </a>
-          <a class="navbar-item">
+          </router-link >
+          <router-link to="/admin/messages" class="navbar-item">
             Messages
-          </a>
+          </router-link>
         </div>         
 
         <div class="navbar-end">
           <div class="navbar-item">
             <div class="buttons">
-              <a class="button is-light">
+              <a href="/admin/logout" class="button is-light">
                 Log out
               </a>
             </div>
@@ -49,6 +49,9 @@ export default Vue.extend({
   components: {
     routesAdmin,
   },
+  mounted(){
+    this.$store.dispatch('grabRoutes');
+  }
 });
 </script>
 
