@@ -4,10 +4,10 @@ import '@/assets/styles.scss';
 import Admin from '@/Admin.vue';
 import router from '@/adminrouter';
 import store from '@/store';
+import '../node_modules/leaflet/dist/leaflet.css';
 
 Vue.config.productionTip = false;
 
-console.log('here');
 
 /**
  * Declare the main Vue instance with components and vuex store.

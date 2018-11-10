@@ -1,4 +1,4 @@
-const dateToSttr: string[] = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const dateToSttr: string[] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 // A helper class for schedules, corresponds to routeActiveInternal
 export default class routeScheduleInterval {
@@ -19,7 +19,7 @@ export default class routeScheduleInterval {
     }
 
     // Make the interval into a readable string
-    public toString(): string{
-        return dateToSttr[this.startDate] + " at " + this.endTime.getHours() + " to " + dateToSttr[this.endDate] + " at " + this.endTime;
+    public toString(): string {
+        return dateToSttr[this.startDate] + ' at ' + this.endTime.getHours() + ' to ' + dateToSttr[this.endDate] + ' at ' + this.endTime;
     }
 }

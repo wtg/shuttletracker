@@ -19,7 +19,7 @@ export default class Route {
                 color: string, width: number, coords: [{
                     latitude: number,
                     longitude: number,
-        }], schedule: routeScheduleInterval[]) {
+        }],     schedule: routeScheduleInterval[]) {
         this.id = id;
         this.name = name;
         this.description = description;
