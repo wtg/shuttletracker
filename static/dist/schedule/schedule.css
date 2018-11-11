@@ -31,5 +31,13 @@ table {
             padding: 0 3px;
         }
         
+		
+.active{background:gray;color:white;}
+.nav{width: 100%;display: block;float: left;}
+li{float: left;list-style: none;margin-right: 10px;}
+.mutil-query-title{width: 160px;margin-right:20px;float: left;margin-top: 10px;font-size: 18px;font-weight: bold;background: gainsboro;padding: 5px;}
+.mutil-query-title span{padding: 2px;cursor:pointer;}
+li span{cursor:pointer;}
+li span:hover{background-color:red;padding: 2px;clear:both;}
 	
        
