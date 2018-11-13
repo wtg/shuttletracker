@@ -102,13 +102,20 @@ kochms
    * `Postgres.URL`: URL where Postgres is located which will be the default with postgres:password@localhost added before the database name, where password is your password from step 8. For example: `"URL": "postgres://postgres:shuttle@localhost/shuttletracker?sslmode=disable"`.  
    
 ![Step 12](https://user-images.githubusercontent.com/6248819/47017722-f981eb80-d120-11e8-8ad2-4919c4052dc0.png)  
-13. Open pgAdmin and click on your shuttletracker database once to highlight it. Now select the query button above which has the letters SQL written on it. In the text field write `INSERT INTO users (id, username) VALUES(0, 'Your RCS ID');` and make sure to fill in Your RCS ID which is the same as your email without @rpi.edu. Then hit the execute button which is a green arrow. This will add you as an admin on your local shuttle tracker.  
-  
-![Step 13](https://user-images.githubusercontent.com/6248819/47017734-03a3ea00-d121-11e8-831b-92864302ed93.png)  
-![Step 13b](https://user-images.githubusercontent.com/6248819/47017748-0ef71580-d121-11e8-894f-f90d31f877a7.png)   
-14. Start the app by running `go run cmd/shuttletracker/main.go` in the command prompt in the project root directory (`$GOPATH/src/github.com/wtg/shuttletracker`).  
 
-![Step 14](https://user-images.githubusercontent.com/6248819/47017759-1cac9b00-d121-11e8-8dcf-be6df1ff09fc.png)  
-16. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel.  
-17. Copy the information from [vehicles](https://shuttles.rpi.edu/vehicles), [routes](https://shuttles.rpi.edu/routes), and [stops](https://shuttles.rpi.edu/stops) into the admin panel if you want to mimic the current shuttle tracker site.  
+13. Install [Node.js and npm](https://nodejs.org/en/). Download the recommeneded version and install. Restart your command prompt.  
+![Step 13](https://user-images.githubusercontent.com/6248819/48438877-f47d7f80-e752-11e8-9584-e5dd79ec92d2.png)  
+![Step 13b](https://user-images.githubusercontent.com/6248819/48438809-d1eb6680-e752-11e8-99b1-257742e7c559.png)  
+14. Navigate to the frontend directory within the shuttle tracker directory (`$GOPATH/src/github.com/wtg/shuttletracker/frontend`).  
+15. Run `npm install`  
+![Step 14+15](https://user-images.githubusercontent.com/6248819/48438927-1bd44c80-e753-11e8-9eb5-fc4c16795f57.png)  
+16. Build the frontend using `npx vue-cli-service build --mode development`
+    - _Note: if you are working on the frontend, you may instead use `npx vue-cli-service build --mode development --watch` in another terminal to continuously watch for changes and rebuild._  
+![Step 16](https://user-images.githubusercontent.com/6248819/48438998-432b1980-e753-11e8-871c-3e6639e6383f.png)  
+17. Go back up to the project root directory (using `cd ..`) and build Shuttle Tracker by running `go build -o shuttletracker.exe cmd/shuttletracker/main.go`  
+![Step 17](https://user-images.githubusercontent.com/6248819/48439209-ba60ad80-e753-11e8-8e4a-740989a8ca55.png)  
+18. Start the app by running `shuttletracker.exe` in the project root directory.  
+19. Add yourself as an administrator by using `shuttletracker.exe admins --add RCS_ID`, replacing `RCS_ID` with your RCS ID. See the "Administrators" section below for more information.  
+20. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel.  
+21. Copy the information from [vehicles](https://shuttles.rpi.edu/vehicles), [routes](https://shuttles.rpi.edu/routes), and [stops](https://shuttles.rpi.edu/stops) into the admin panel if you want to mimic the current shuttle tracker site.  
 
