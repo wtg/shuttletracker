@@ -1,8 +1,6 @@
-# Shuttle Tracker [![Build Status](https://travis-ci.org/wtg/shuttletracker.svg?branch=master)](https://travis-ci.org/wtg/shuttletracker)&nbsp;[![codecov](https://codecov.io/gh/wtg/shuttletracker/branch/master/graph/badge.svg)](https://codecov.io/gh/wtg/shuttletracker)&nbsp;[![GoDoc](https://godoc.org/github.com/wtg/shuttletracker?status.svg)](https://godoc.org/github.com/wtg/shuttletracker)&nbsp;[![Go Report Card](https://goreportcard.com/badge/github.com/wtg/shuttletracker)](https://goreportcard.com/report/github.com/wtg/shuttletracker)
+# Shuttle Tracker [![Build Status](https://travis-ci.org/wtg/shuttletracker.svg?branch=master)](https://travis-ci.org/wtg/shuttletracker)&nbsp;[![codecov](https://codecov.io/gh/wtg/shuttletracker/branch/master/graph/badge.svg)](https://codecov.io/gh/wtg/shuttletracker)&nbsp;[![GoDoc](https://godoc.org/github.com/wtg/shuttletracker?status.svg)](https://godoc.org/github.com/wtg/shuttletracker)
 
-Tracking and mapping RPI's shuttles with [Go](https://golang.org/), [Vue.js](https://vuejs.org/), and [Postgres](https://www.postgresql.org).
-
-Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
+Tracks and maps RPI's shuttles with [Go](https://golang.org/), [Postgres](https://www.postgresql.org), [Vue.js](https://vuejs.org/), [TypeScript](https://www.typescriptlang.org), and [Leaflet](https://leafletjs.com). Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 
 ## Setting up
 
@@ -25,7 +23,7 @@ Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
     - _Note: if you are working on the frontend, you may instead use `npx vue-cli-service build --mode development --watch` in another terminal to continuously watch for changes and rebuild._
 15. Go back up to the project root directory and build Shuttle Tracker by running `go build -o shuttletracker cmd/shuttletracker/main.go`
 16. Start the app by running `./shuttletracker` in the project root directory.
-17. You can add yourself as an administrator by using `./shuttletracker admins --add RCS_ID`, replacing `RCS_ID` with your RCS ID. See the "Administrators" section below for more information.
+17. Add yourself as an administrator by using `./shuttletracker admins --add RCS_ID`, replacing `RCS_ID` with your RCS ID. See the "Administrators" section below for more information.
 18. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel.
 
 ## Configuration
@@ -36,7 +34,11 @@ Shuttle Tracker needs configuration to run properly. The preferred method during
 
 ### Environment variables
 
-Most keys can be overridden with environment variables. The variables names usually take the format `SECTION_KEY`. For example, overriding database's Mongo URL could be done with a variable named `POSTGRES_URL`.
+Most keys can be overridden with environment variables. The variables names usually take the format `PACKAGE_KEY`. For example, overriding the iTRAK updater's update interval could be done with a variable named `UPDATER_UPDATEINTERVAL`.
+
+#### Database URL
+
+The database URL is a special case. Following the above convention, it can be set with `POSTGRES_URL`. However, for ease of deployment on Dokku, it can also be set with `DATABASE_URL`.
 
 ## Administrators
 
