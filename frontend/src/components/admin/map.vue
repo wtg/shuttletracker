@@ -2,15 +2,15 @@
     <div id="map"></div>
 </template>
 <script lang="ts">
-import Vue from 'vue'
+import Vue from 'vue';
 import * as L from 'leaflet';
 
 export default Vue.extend({
     props: {
         routeLines: {
-            type: Array as () => Array<L.Polyline>,
+            type: Array as () => L.Polyline[],
             default: () => [],
-        }
+        },
     },
     data() {
         return {
@@ -23,14 +23,14 @@ export default Vue.extend({
 
         };
     },
-    watch:{
-        routeLines(){
+    watch: {
+        routeLines() {
             this.renderRoutes();
-        }
+        },
     },
     methods: {
-        mountMap(){
-            if(this.Map === undefined){
+        mountMap() {
+            if (this.Map === undefined) {
                 this.$nextTick(() => {
                     this.Map = L.map('map', {
                         zoomControl: false,
@@ -65,7 +65,7 @@ export default Vue.extend({
                 }
             });
             this.existingRouteLayers = new Array<L.Polyline>();
-            let el = this;
+            const el = this;
             this.routeLines.forEach((line: L.Polyline) => {
                 if (el.Map !== undefined) {
                     el.Map.addLayer(line);
@@ -74,13 +74,13 @@ export default Vue.extend({
             });
         },
     },
-    mounted(){
+    mounted() {
         this.$nextTick(() => {
             this.mountMap();
             this.renderRoutes();
         });
-    }
-})
+    },
+});
 </script>
 
 <style lang="scss" scoped>

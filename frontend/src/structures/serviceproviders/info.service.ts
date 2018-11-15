@@ -56,7 +56,6 @@ export default class InfoServiceProvider {
                 element.schedule.forEach((interval) => {
                     myschedule.push(new routeScheduleInterval(interval.id, interval.route_id, interval.start_day, new Date(interval.start_time), interval.end_day, new Date(interval.end_time)));
                 });
-                console.log(myschedule);
                 ret.push(new Route(element.id, element.name, element.description,
                     element.enabled, element.color, Number(element.width), element.points, myschedule));
             });

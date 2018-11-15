@@ -74,7 +74,7 @@ const store: StoreOptions<StoreState> = {
   getters: {
     getPolyLineByRouteId: (state) => (id: number): L.Polyline | undefined => {
       const arr = new Array<L.Polyline>();
-      let ret = undefined;
+      let ret;
 
       if (state.Routes !== undefined && state.Routes.length !== 0) {
         state.Routes.forEach((r: Route) => {
@@ -90,7 +90,7 @@ const store: StoreOptions<StoreState> = {
               weight: r.width,
               opacity: 1,
             });
-            if(r.id === id){
+            if (r.id === id) {
               ret = line;
             }
           }
