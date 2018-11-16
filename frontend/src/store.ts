@@ -137,6 +137,9 @@ const store: StoreOptions<StoreState> = {
       });
       return line;
     },
+    getRoutes(state: StoreState): Route[]{
+      return state.Routes;
+    }
   },
   actions: {
     grabRoutes( {commit} ) {

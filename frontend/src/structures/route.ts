@@ -11,15 +11,15 @@ export default class Route {
     public color: string;
     public width: number;
     public schedule: routeScheduleInterval[];
-    public coords: [{
+    public coords: {
         latitude: number,
         longitude: number,
-    }];
+    }[];
     constructor(id: number, name: string, description: string, enabled: boolean,
-                color: string, width: number, coords: [{
+                color: string, width: number, coords: {
                     latitude: number,
                     longitude: number,
-        }],     schedule: routeScheduleInterval[]) {
+        }[],     schedule: routeScheduleInterval[]) {
         this.id = id;
         this.name = name;
         this.description = description;
