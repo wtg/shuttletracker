@@ -56,7 +56,7 @@
             </div>
             <div class="field">
                 <label class="label">Schedule Editor</label>
-                <schedule-editor />
+                <schedule-editor v-model="route.schedule" />
             </div>
             <div class="field">
             <div class="control">
