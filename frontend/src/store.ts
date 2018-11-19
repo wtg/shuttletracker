@@ -140,6 +140,9 @@ const store: StoreOptions<StoreState> = {
     getRoutes(state: StoreState): Route[] {
       return state.Routes;
     },
+    getVehicles(state: StoreState): Vehicle[] {
+      return state.Vehicles;
+    },
   },
   actions: {
     grabRoutes( {commit} ) {

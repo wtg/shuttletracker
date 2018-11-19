@@ -20,7 +20,7 @@ export default class InfoServiceProvider {
                 tracker_id: string,
             }) => {
                 ret.push(new Vehicle(element.id, element.name,
-                    new Date(element.created), new Date(element.updated), element.enabled));
+                    new Date(element.created), new Date(element.updated), element.enabled, Number(element.tracker_id)));
             });
             return ret;
         });
@@ -102,8 +102,8 @@ export default class InfoServiceProvider {
     }
 
     public GrabMapboxKey(): Promise<string> {
-        return fetch('/getKey/').then((data) => data.json()).then((data: string)=>{
+        return fetch('/getKey/').then((data) => data.json()).then((data: string) => {
             return data;
-        })
+        });
     }
 }

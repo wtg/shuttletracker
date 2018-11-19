@@ -5,6 +5,7 @@ import stopsAdmin from '@/components/admin/stopsAdmin.vue';
 import vehiclesAdmin from '@/components/admin/vehiclesAdmin.vue';
 import routeOverview from '@/components/admin/routeOverview.vue';
 import routeEditing from '@/components/admin/routeEditing.vue';
+import vehicleEditing from '@/components/admin/vehicleEditing.vue';
 
 Vue.use(Router);
 
@@ -39,8 +40,19 @@ export default new Router({
       },
       {
         path: '/admin/vehicles',
-        name: 'stops',
+        name: 'vehicles overview',
         component: vehiclesAdmin,
+      },
+      {
+        path: '/admin/vehicles/:id/edit',
+        name: 'vehicles',
+        component: vehicleEditing,
+      },
+      {
+        path: '/admin/vehicles/:id/new',
+        name: 'new vehicle',
+        component: vehicleEditing,
+        props: {creation: true},
       },
     ],
   });

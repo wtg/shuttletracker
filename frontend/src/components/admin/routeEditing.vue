@@ -109,7 +109,7 @@ export default Vue.extend({
         drawRoute,
     },
     mounted() {
-        if(this.creation){
+        if (this.creation) {
             return;
         }
         // if the routes are not in the state store yet, wait until they are
@@ -126,7 +126,7 @@ export default Vue.extend({
     },
     watch: {
         $route() {
-            if(this.creation){
+            if (this.creation) {
                 return;
             }
             this.grabMyRoute();

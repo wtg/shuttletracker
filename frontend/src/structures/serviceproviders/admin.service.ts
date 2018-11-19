@@ -1,4 +1,5 @@
 import Route, { RouteInterface } from '../route';
+import Vehicle from '../vehicle';
 
 export default class AdminServiceProvider {
     public static EditRoute(route: Route): Promise<Response> {
@@ -6,5 +7,19 @@ export default class AdminServiceProvider {
             method: 'POST',
             body: JSON.stringify(route as RouteInterface),
         });
+    }
+
+    public static EditVehicle(vehicle: Vehicle): Promise<Response> {
+        return fetch('/vehicles/edit', {
+            method: 'POST',
+            body: JSON.stringify(vehicle.asJSON()),
+        })
+    }
+
+    public static NewVehicle(vehicle: Vehicle): Promise<Response> {
+        return fetch('/vehicles/create', {
+            method: 'POST',
+            body: JSON.stringify(vehicle.asJSON()),
+        })
     }
 }
