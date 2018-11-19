@@ -20,7 +20,7 @@
                         <li v-for="interval in route.schedule" :key="interval.id">{{String(interval)}}</li>
                     </ul></td>
                 <td>{{route.enabled}}</td>
-                <td><button class="button">Edit</button></td>
+                <td><button class="button" @click="$router.push('/admin/routes/' + String(route.id) + '/edit');">Edit</button></td>
                 </tr>
             </tbody>
         </table>

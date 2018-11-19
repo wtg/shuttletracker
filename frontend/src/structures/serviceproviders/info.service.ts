@@ -100,4 +100,10 @@ export default class InfoServiceProvider {
             return ret;
         });
     }
+
+    public GrabMapboxKey(): Promise<string> {
+        return fetch('/getKey/').then((data) => data.json()).then((data: string)=>{
+            return data;
+        })
+    }
 }
