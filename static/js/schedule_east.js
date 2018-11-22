@@ -4,10 +4,12 @@
                 rows: Array,
                 columns: Array,
                 filterKey: String,
-				filterKey2: String
+				filterKey2: String,
+				
 			
             },
-            data: function() {
+            data:
+				function() {
                 var colOrders = {}
                 this.columns.forEach(function(col) {
                     colOrders[col] = 1
@@ -22,17 +24,36 @@
                 filterData: function() {
                     var data = this.rows.slice()
 					var index = 0
+		
+				
                     var filterKey = this.filterKey && this.filterKey.toLowerCase()
 					var filterKey2 = this.filterKey2 && this.filterKey2.toLowerCase()
+					//filterKey1: list.place_condition
+					//filterKey2: list.time_condition
+
+	//Filter Key is a trigger
                    if (filterKey) {
-					   //if (filterKey|| filterKey2) {
-                        data = data.filter(function(row) {	
-                            return Object.keys(row).some(function(key) {						
-                                return String(row[key]).toLowerCase().indexOf(filterKey) > -1
-								//  return String(row[key]).toLowerCase().indexOf(filterKey) > -1 ||  
-								//return String(row[key]).toLowerCase().indexOf(filterKey2) > -1
+					   console.log(list.place_condition)
+					   if (list.place_condition.length > 0){
+						 data = data.filter(function(row) {	
+                            return Object.keys(row).some(function(key) {
+						
+									console.log(String(row[key]).indexOf(list.place_condition[0]) > -1)
+									
+								for(var k=0; k < list.place_condition.length; k++){
+									if (String(row[key]).indexOf(list.place_condition[k]) > -1){
+										return true;
+									}
+									 if (k == list.place_condition.length - 1){
+										 return false;
+									 }
+								}
+
+                              
                             })
                         })
+					}
+									
                     }
 					if (filterKey2) {
                         data = data.filter(function(row) {	
@@ -58,6 +79,7 @@
                 columnData: ['name', 'bus1','bus2'],
                 searchQuery: '',
 				searchQuery2: '',
+				list,
                 rowData: [{
                     name: 'Union',
                     bus1: '7:00a',
@@ -214,8 +236,10 @@
 	condition:[ //Conditions shows to users
 	],
 	place_condition:[ //Place conditions that users choose
+	'Colonie'
 	],
 	time_condition:[//Time conditions that users choose
+	'8:'
 	]
 };
 var count=0;
