@@ -11,7 +11,7 @@
             </thead>
             <tbody>
                 <tr v-for="vehicle in vehicles" :key="vehicle.id">
-                    <th><a>{{vehicle.name}}</a></th>
+                    <th><router-link :to="'/admin/vehicles/' + String(vehicle.id)">{{vehicle.name}}</router-link></th>
                     <th><p>{{vehicle.id}}</p></th>
                     <th><p>{{vehicle.enabled}}</p></th>
                     <th><button @click="$router.push('/admin/vehicles/' + String(vehicle.id) + '/edit')" class="button">Edit</button></th>
