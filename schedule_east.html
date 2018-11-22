@@ -27,9 +27,9 @@
 </div>
 <!-- table-->
     <div id="grid">
-	<input type="text" v-model="searchQuery" placeholder="please enter the location" />
-		<input type="text" v-model="searchQuery2" placeholder="please enter the time" />
-        <demo-grid :rows="rowData" :columns="columnData" :filter-key="searchQuery" :filter-key2="searchQuery2"  >
+	<input type="text" v-model="searchQuery" placeholder="trigger" />
+
+        <demo-grid :rows="rowData" :columns="columnData" :filter-key="searchQuery"  >
         </demo-grid>
 
 		

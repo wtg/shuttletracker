@@ -4,7 +4,7 @@
                 rows: Array,
                 columns: Array,
                 filterKey: String,
-				filterKey2: String,
+			
 				
 			
             },
@@ -27,19 +27,17 @@
 		
 				
                     var filterKey = this.filterKey && this.filterKey.toLowerCase()
-					var filterKey2 = this.filterKey2 && this.filterKey2.toLowerCase()
+					
 					//filterKey1: list.place_condition
 					//filterKey2: list.time_condition
 
 	//Filter Key is a trigger
                    if (filterKey) {
-					   console.log(list.place_condition)
+					   //Place filter
 					   if (list.place_condition.length > 0){
 						 data = data.filter(function(row) {	
                             return Object.keys(row).some(function(key) {
 						
-									console.log(String(row[key]).indexOf(list.place_condition[0]) > -1)
-									
 								for(var k=0; k < list.place_condition.length; k++){
 									if (String(row[key]).indexOf(list.place_condition[k]) > -1){
 										return true;
@@ -53,15 +51,26 @@
                             })
                         })
 					}
-									
-                    }
-					if (filterKey2) {
-                        data = data.filter(function(row) {	
-                            return Object.keys(row).some(function(key) {						
-                                return String(row[key]).toLowerCase().indexOf(filterKey2) > -1
+					 if (list.time_condition.length > 0){
+						 data = data.filter(function(row) {	
+                            return Object.keys(row).some(function(key) {
+						
+								for(var k=0; k < list.time_condition.length; k++){
+									if (String(row[key]).indexOf(list.time_condition[k]) > -1){
+										return true;
+									}
+									 if (k == list.time_condition.length - 1){
+										 return false;
+									 }
+								}
+
+                              
                             })
                         })
+					}
+									
                     }
+
                     return data
                 }
             },
@@ -236,10 +245,10 @@
 	condition:[ //Conditions shows to users
 	],
 	place_condition:[ //Place conditions that users choose
-	'Colonie'
+
 	],
 	time_condition:[//Time conditions that users choose
-	'8:'
+
 	]
 };
 var count=0;
