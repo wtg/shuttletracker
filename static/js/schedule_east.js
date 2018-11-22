@@ -3,7 +3,7 @@
             props: {
                 rows: Array,
                 columns: Array,
-                filterKey: String,
+                filterKey: false,
 			
 				
 			
@@ -24,9 +24,7 @@
                 filterData: function() {
                     var data = this.rows.slice()
 					var index = 0
-		
-				
-                    var filterKey = this.filterKey && this.filterKey.toLowerCase()
+                    var filterKey = this.filterKey
 					
 					//filterKey1: list.place_condition
 					//filterKey2: list.time_condition

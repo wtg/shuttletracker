@@ -27,8 +27,8 @@
 </div>
 <!-- table-->
     <div id="grid">
-	<input type="text" v-model="searchQuery" placeholder="trigger" />
-
+	
+<button v-on:click="searchQuery = true">Search</button>
         <demo-grid :rows="rowData" :columns="columnData" :filter-key="searchQuery"  >
         </demo-grid>
 
