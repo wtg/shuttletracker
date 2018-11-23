@@ -19,12 +19,9 @@
             },
             computed: {
                 filterData: function() {
-                    var data = this.rows.slice()
-					var index = 0
-                    var filterKey = this.filterKey
-					var offset = 4
-
-				//Filter Key is a trigger
+                   var data = this.rows.slice() //hold the data of lists
+                   var filterKey = this.filterKey
+				   //Filter Key is the trigger of searching
                    if (filterKey) {
 					   //Place filter
 					   if (list.place_condition.length > 0){
