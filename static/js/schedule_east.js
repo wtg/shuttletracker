@@ -23,33 +23,28 @@
                    var filterKey = this.filterKey
 				   //Filter Key is the trigger of searching
                    if (filterKey) {
-					   //Place filter
-					   if (list.place_condition.length > 0){
+					   //Filter
 						data = data.filter(function(row) {	
+						//Place filter
 						for(var k=0; k < list.place_condition.length; k++){
 							if (row.name === list.place_condition[k]) {
-								return true;
-							}
-							if (k == list.place_condition.length - 1){
-								return false;
-							}
-						}							    
-                      })
-					}
-					//Time filter
-					if (list.time_condition.length > 0){
-						data = data.filter(function(row) {	
-						for(var k=0; k < list.time_condition.length; k++){
-							if (String(row.bus1).indexOf(list.time_condition[k]) > -1) {
-								return true;
-							}
-							if (k == list.time_condition.length - 1){
-								return false;
-							}
-						}							    
-                      })
-					}
+								if (list.time_condition.length > 0){
+									//Time filter
+									for(var j=0; j < list.time_condition.length; j++){
+										if (row.bus1.indexOf(list.time_condition[j]) > -1) {
+											return true;
+										}
+										
+									}
+									return false;
+								}
 								
+							}
+							
+						}	
+						return false;						
+                      })
+							
                     }
 
                     return data
