@@ -3,10 +3,7 @@
             props: {
                 rows: Array,
                 columns: Array,
-                filterKey: false,
-			
-				
-			
+                filterKey: false,			
             },
             data:
 				function() {
@@ -25,48 +22,37 @@
                     var data = this.rows.slice()
 					var index = 0
                     var filterKey = this.filterKey
-					
-					//filterKey1: list.place_condition
-					//filterKey2: list.time_condition
+					var offset = 4
 
-	//Filter Key is a trigger
+				//Filter Key is a trigger
                    if (filterKey) {
 					   //Place filter
 					   if (list.place_condition.length > 0){
-						 data = data.filter(function(row) {	
-                            return Object.keys(row).some(function(key) {
-						
-								for(var k=0; k < list.place_condition.length; k++){
-									if (String(row[key]).indexOf(list.place_condition[k]) > -1){
-										return true;
-									}
-									 if (k == list.place_condition.length - 1){
-										 return false;
-									 }
-								}
-
-                              
-                            })
-                        })
+						data = data.filter(function(row) {	
+						for(var k=0; k < list.place_condition.length; k++){
+							if (row.name === list.place_condition[k]) {
+								return true;
+							}
+							if (k == list.place_condition.length - 1){
+								return false;
+							}
+						}							    
+                      })
 					}
-					 if (list.time_condition.length > 0){
-						 data = data.filter(function(row) {	
-                            return Object.keys(row).some(function(key) {
-						
-								for(var k=0; k < list.time_condition.length; k++){
-									if (String(row[key]).indexOf(list.time_condition[k]) > -1){
-										return true;
-									}
-									 if (k == list.time_condition.length - 1){
-										 return false;
-									 }
-								}
-
-                              
-                            })
-                        })
+					//Time filter
+					if (list.time_condition.length > 0){
+						data = data.filter(function(row) {	
+						for(var k=0; k < list.time_condition.length; k++){
+							if (String(row.bus1).indexOf(list.time_condition[k]) > -1) {
+								return true;
+							}
+							if (k == list.time_condition.length - 1){
+								return false;
+							}
+						}							    
+                      })
 					}
-									
+								
                     }
 
                     return data
@@ -85,7 +71,6 @@
             data: {
                 columnData: ['name', 'bus1','bus2'],
                 searchQuery: '',
-				searchQuery2: '',
 				list,
                 rowData: [{
                     name: 'Union',
@@ -107,6 +92,18 @@
                     name: 'Union',
                     bus1: '10:19a',
 					bus2: '10:04a'
+                },{
+                    name: 'Tibbits Ave',
+                    bus1: '10:03a',
+					bus2: '10:23a'
+                },{
+                    name: 'B-Lot',
+                    bus1: '10:06a',
+					bus2: '10:26a'
+                }, {
+                    name: 'Colonie',
+                    bus1: '10:09a',
+					bus2: '10:29a'
                 }]
             },
 
