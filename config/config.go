@@ -32,7 +32,12 @@ func New() (*Config, error) {
 	cfg.API = api.NewConfig(v)
 	cfg.Updater = updater.NewConfig(v)
 	cfg.Log = log.NewConfig()
-	cfg.Postgres = postgres.NewConfig(v)
+
+	pgCfg, err := postgres.NewConfig(v)
+	if err != nil {
+		return nil, err
+	}
+	cfg.Postgres = pgCfg
 
 	log.Debugf("All settings: %+v", v.AllSettings())
 

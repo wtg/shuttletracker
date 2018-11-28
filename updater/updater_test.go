@@ -32,4 +32,31 @@ func TestITrakTimeDate(t *testing.T) {
 	if !parsed.Equal(expected) {
 		t.Errorf("got %+v, expected %+v", parsed, expected)
 	}
+
+	parsed, err = itrakTimeDate("time:7", "date:10052018")
+	if err != nil {
+		t.Errorf("unexpected error: %s", err)
+	}
+	expected = time.Date(2018, time.October, 05, 0, 0, 7, 0, time.UTC)
+	if !parsed.Equal(expected) {
+		t.Errorf("got %+v, expected %+v", parsed, expected)
+	}
+
+	parsed, err = itrakTimeDate("time:44", "date:10052018")
+	if err != nil {
+		t.Errorf("unexpected error: %s", err)
+	}
+	expected = time.Date(2018, time.October, 05, 0, 0, 44, 0, time.UTC)
+	if !parsed.Equal(expected) {
+		t.Errorf("got %+v, expected %+v", parsed, expected)
+	}
+
+	parsed, err = itrakTimeDate("time:200", "date:10052018")
+	if err != nil {
+		t.Errorf("unexpected error: %s", err)
+	}
+	expected = time.Date(2018, time.October, 05, 0, 2, 0, 0, time.UTC)
+	if !parsed.Equal(expected) {
+		t.Errorf("got %+v, expected %+v", parsed, expected)
+	}
 }

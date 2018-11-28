@@ -23,6 +23,7 @@ before_install:
   - go get -u github.com/kardianos/govendor && govendor sync -v
   - go get -u github.com/alecthomas/gometalinter && gometalinter --install
   - go get -u github.com/bradleyfalzon/revgrep/...
+  - cd frontend && npm install && npm run build && cd ..
 
 install:
   - go install github.com/wtg/shuttletracker/cmd/shuttletracker
@@ -35,8 +36,6 @@ script:
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then gometalinter --vendor ./... || true; fi
   - ./test.sh
   - docker build .
-
-after_success:
   - bash <(curl -s https://codecov.io/bash)
 
 cache:
@@ -45,8 +44,5 @@ cache:
     - $GOPATH/pkg
 
 before_cache:
-  - rm -rf $GOPATH/src/github.com/wtg/shuttletracker/*
+  - rm -rf $GOPATH/src/github.com/wtg/shuttletracker/{*,.*}
   - rm -rf $GOPATH/pkg/**/github.com/wtg/shuttletracker/*
-
-notifications:
-  email: false
