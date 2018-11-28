@@ -8,8 +8,7 @@ import (
 
 /*
 Postgres implements shuttletracker.VehicleService, shuttletracker.RouteService,
-shuttletracker.StopService, shuttletracker.LoctionService, shuttletracker.MessageService,
-and shuttletracker.UserService.
+shuttletracker.LoctionService, and shuttletracker.MessageService.
 */
 type Postgres struct {
 	VehicleService
@@ -68,17 +67,10 @@ func New(cfg Config) (*Postgres, error) {
 }
 
 // NewConfig creates a new Config.
-func NewConfig(v *viper.Viper) (*Config, error) {
+func NewConfig(v *viper.Viper) *Config {
 	cfg := &Config{
 		URL: "postgres://localhost/shuttletracker?sslmode=disable",
 	}
 	v.SetDefault("postgres.url", cfg.URL)
-
-	// Allow DATABASE_URL to set the Postgres connection string for ease of deployment.
-	err := v.BindEnv("postgres.url", "DATABASE_URL")
-	if err != nil {
-		return nil, err
-	}
-
-	return cfg, nil
+	return cfg
 }

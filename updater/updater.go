@@ -263,7 +263,7 @@ func (u *Updater) GuessRouteForVehicle(vehicle *shuttletracker.Vehicle) (route *
 
 	for _, update := range updates {
 		for _, route := range routes {
-			if !route.Enabled || !route.Active {
+			if !route.Enabled {
 				routeDistances[route.ID] += math.Inf(0)
 			}
 			nearestDistance := math.Inf(0)
@@ -311,14 +311,12 @@ func (u *Updater) GuessRouteForVehicle(vehicle *shuttletracker.Vehicle) (route *
 }
 
 func itrakTimeDate(itrakTime, itrakDate string) (time.Time, error) {
-	// Add leading zeros to the time value if they're missing. time.Parse expects this.
-	if len(itrakTime) < 11 {
-		builder := itrakTime[:5]
-		for i := len(itrakTime); i < 11; i++ {
-			builder += "0"
-		}
-		builder += itrakTime[5:]
-		itrakTime = builder
+	// Add one or two leading zeros to the time value if they're missing.
+	// time.Parse expects this.
+	if len(itrakTime) == 10 {
+		itrakTime = itrakTime[:5] + "0" + itrakTime[5:]
+	} else if len(itrakTime) == 9 {
+		itrakTime = itrakTime[:5] + "00" + itrakTime[5:]
 	}
 
 	combined := itrakDate + " " + itrakTime
