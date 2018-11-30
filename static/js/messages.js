@@ -1,7 +1,7 @@
 
 Vue.component('message-panel', {
   template:
-  `<div class ="column">
+    `<div class ="column">
       <div class="box">
         <div class="notification" v-bind:class="{'is-danger':fail, 'is-white':!fail}">
           <div class="field">
@@ -13,7 +13,7 @@ Vue.component('message-panel', {
           <div class="field">
             <div class="control">
               <label class="checkbox">
-                <input type="checkbox" v-model="display">
+                <input type="checkbox" v-model="enabled">
                 Enabled
               </label>
             </div>
@@ -27,36 +27,36 @@ Vue.component('message-panel', {
       </div>
     </div>
   </div>`,
-  data (){
+  data() {
     return {
       message: "",
-      display: false,
+      enabled: false,
       fail: false
     };
   },
   methods: {
-    send: function(){
+    send: function () {
       let el = this;
-      toSend = {Message: this.message, Display: this.display};
-      $.post("/adminMessage",JSON.stringify(toSend)).then(resp =>{
-        if (resp != "Success"){
+      toSend = { message: this.message, enabled: this.enabled };
+      $.post("/adminMessage", JSON.stringify(toSend)).then(resp => {
+        if (resp != "Success") {
           el.fail = true;
-        }else{
+        } else {
           el.fail = false;
         }
 
       }
-    ).catch(function(){
-      el.fail = true;
-    });
+      ).catch(function () {
+        el.fail = true;
+      });
     }
   },
-  mounted (){
+  mounted() {
     let el = this;
     fetch("/adminMessage").then(
-      ret => {return ret.json();}).then(val =>{
-        el.message = val.Message;
-        el.display = val.Display;
+      ret => { return ret.json(); }).then(val => {
+        el.message = val.message;
+        el.enabled = val.enabled;
       });
   }
 });

@@ -12,17 +12,25 @@ import (
 
 	"github.com/spf13/viper"
 
-	"github.com/wtg/shuttletracker/database"
+	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
-	"github.com/wtg/shuttletracker/model"
 )
+
+// DataFeedResponse contains information from the iTRAK data feed.
+type DataFeedResponse struct {
+	Body       []byte
+	StatusCode int
+	Headers    http.Header
+}
 
 // Updater handles periodically grabbing the latest vehicle location data from iTrak.
 type Updater struct {
-	cfg            Config
-	updateInterval time.Duration
-	db             database.Database
-	dataRegexp     *regexp.Regexp
+	cfg                  Config
+	updateInterval       time.Duration
+	dataRegexp           *regexp.Regexp
+	ms                   shuttletracker.ModelService
+	mutex                *sync.Mutex
+	lastDataFeedResponse *DataFeedResponse
 }
 
 type Config struct {
@@ -31,8 +39,12 @@ type Config struct {
 }
 
 // New creates an Updater.
-func New(cfg Config, db database.Database) (*Updater, error) {
-	updater := &Updater{cfg: cfg, db: db}
+func New(cfg Config, ms shuttletracker.ModelService) (*Updater, error) {
+	updater := &Updater{
+		cfg:   cfg,
+		ms:    ms,
+		mutex: &sync.Mutex{},
+	}
 
 	interval, err := time.ParseDuration(cfg.UpdateInterval)
 	if err != nil {
@@ -51,6 +63,7 @@ func New(cfg Config, db database.Database) (*Updater, error) {
 func NewConfig(v *viper.Viper) *Config {
 	cfg := &Config{
 		UpdateInterval: "10s",
+		DataFeed:       "https://shuttles.rpi.edu/datafeed",
 	}
 	v.SetDefault("updater.updateinterval", cfg.UpdateInterval)
 	v.SetDefault("updater.datafeed", cfg.DataFeed)
@@ -82,6 +95,11 @@ func (u *Updater) update() {
 		return
 	}
 
+	if resp.StatusCode != http.StatusOK {
+		log.Errorf("data feed status code %d", resp.StatusCode)
+		return
+	}
+
 	// Read response body content
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -89,6 +107,13 @@ func (u *Updater) update() {
 		return
 	}
 	resp.Body.Close()
+
+	dfresp := &DataFeedResponse{
+		Body:       body,
+		StatusCode: resp.StatusCode,
+		Headers:    resp.Header,
+	}
+	u.setLastResponse(dfresp)
 
 	delim := "eof"
 	// split the body of response by delimiter
@@ -105,90 +130,108 @@ func (u *Updater) update() {
 	for _, vehicleData := range vehiclesData {
 		wg.Add(1)
 		go func(vehicleData string) {
-			defer wg.Done()
-			match := u.dataRegexp.FindAllStringSubmatch(vehicleData, -1)[0]
-			// Store named capturing group and matching expression as a key value pair
-			result := map[string]string{}
-			for i, item := range match {
-				result[u.dataRegexp.SubexpNames()[i]] = item
-			}
-
-			// Create new vehicle update & insert update into database
-
-			// convert KPH to MPH
-			speedKMH, err := strconv.ParseFloat(strings.Replace(result["speed"], "spd:", "", -1), 64)
-			if err != nil {
-				log.Error(err)
-				return
-			}
-			speedMPH := kphToMPH(speedKMH)
-			speedMPHString := strconv.FormatFloat(speedMPH, 'f', 5, 64)
-
-			route := model.Route{}
-
-			vehicleID := strings.Replace(result["id"], "Vehicle ID:", "", -1)
-			vehicle, err := u.db.GetVehicle(vehicleID)
-			if err == database.ErrVehicleNotFound {
-				log.Warnf("Unknown vehicle ID \"%s\" returned by iTrak. Make sure all vehicles have been added.", vehicleID)
-				return
-			} else if err != nil {
-				log.WithError(err).Error("Unable to fetch vehicle.")
-				return
-			}
-
-			// determine if this is a new update from itrak by comparing timestamps
-			lastUpdate, err := u.db.GetLastUpdateForVehicle(vehicle.VehicleID)
-			if err != nil && err != database.ErrUpdateNotFound {
-				log.WithError(err).Error("Unable to retrieve last update.")
-				return
-			}
-			itrakTime := strings.Replace(result["time"], "time:", "", -1)
-			itrakDate := strings.Replace(result["date"], "date:", "", -1)
-			if err == nil {
-				if lastUpdate.Time == itrakTime && lastUpdate.Date == itrakDate {
-					// Timestamp is not new; don't store update.
-					return
-				}
-			}
-			log.Debugf("Updating %s.", vehicle.VehicleName)
-
-			// vehicle found and no error
-			route, err = u.GuessRouteForVehicle(&vehicle)
-			if err != nil {
-				log.WithError(err).Error("Unable to guess route for vehicle.")
-				return
-			}
-
-			update := model.VehicleUpdate{
-				VehicleID: strings.Replace(result["id"], "Vehicle ID:", "", -1),
-				Lat:       strings.Replace(result["lat"], "lat:", "", -1),
-				Lng:       strings.Replace(result["lng"], "lon:", "", -1),
-				Heading:   strings.Replace(result["heading"], "dir:", "", -1),
-				Speed:     speedMPHString,
-				Lock:      strings.Replace(result["lock"], "lck:", "", -1),
-				Time:      itrakTime,
-				Date:      itrakDate,
-				Status:    strings.Replace(result["status"], "trig:", "", -1),
-				Created:   time.Now(),
-				Route:     route.ID,
-			}
-
-			if err := u.db.CreateUpdate(&update); err != nil {
-				log.WithError(err).Errorf("Could not insert vehicle update.")
-			}
+			u.handleVehicleData(vehicleData)
+			wg.Done()
 		}(vehicleData)
 	}
 	wg.Wait()
 	log.Debugf("Updated vehicles.")
 
 	// Prune updates older than one month
-	deleted, err := u.db.DeleteUpdatesBefore(time.Now().AddDate(0, -1, 0))
+	deleted, err := u.ms.DeleteLocationsBefore(time.Now().AddDate(0, -1, 0))
 	if err != nil {
-		log.WithError(err).Error("Unable to remove old updates.")
+		log.WithError(err).Error("unable to remove old locations")
 		return
 	}
 	if deleted > 0 {
 		log.Debugf("Removed %d old updates.", deleted)
+	}
+}
+
+// nolint: gocyclo
+func (u *Updater) handleVehicleData(vehicleData string) {
+	match := u.dataRegexp.FindAllStringSubmatch(vehicleData, -1)[0]
+	// Store named capturing group and matching expression as a key value pair
+	result := map[string]string{}
+	for i, item := range match {
+		result[u.dataRegexp.SubexpNames()[i]] = item
+	}
+
+	// Create new vehicle update & insert update into database
+
+	itrakID := strings.Replace(result["id"], "Vehicle ID:", "", -1)
+	vehicle, err := u.ms.VehicleWithTrackerID(itrakID)
+	if err == shuttletracker.ErrVehicleNotFound {
+		log.Warnf("Unknown vehicle ID \"%s\" returned by iTrak. Make sure all vehicles have been added.", itrakID)
+		return
+	} else if err != nil {
+		log.WithError(err).Error("Unable to fetch vehicle.")
+		return
+	}
+
+	// determine if this is a new update from itrak by comparing timestamps
+	newTime, err := itrakTimeDate(result["time"], result["date"])
+	if err != nil {
+		log.WithError(err).Error("unable to parse iTRAK time and date")
+		return
+	}
+	lastUpdate, err := u.ms.LatestLocation(vehicle.ID)
+	if err != nil && err != shuttletracker.ErrLocationNotFound {
+		log.WithError(err).Error("unable to retrieve last update")
+		return
+	}
+	if err != shuttletracker.ErrLocationNotFound && newTime.Equal(lastUpdate.Time) {
+		// Timestamp is not new; don't store update.
+		return
+	}
+	log.Debugf("Updating %s.", vehicle.Name)
+
+	// vehicle found and no error
+	route, err := u.GuessRouteForVehicle(vehicle)
+	if err != nil {
+		log.WithError(err).Error("Unable to guess route for vehicle.")
+		return
+	}
+
+	latitude, err := strconv.ParseFloat(strings.Replace(result["lat"], "lat:", "", -1), 64)
+	if err != nil {
+		log.WithError(err).Error("unable to parse latitude as float")
+		return
+	}
+	longitude, err := strconv.ParseFloat(strings.Replace(result["lng"], "lon:", "", -1), 64)
+	if err != nil {
+		log.WithError(err).Error("unable to parse longitude as float")
+		return
+	}
+	heading, err := strconv.ParseFloat(strings.Replace(result["heading"], "dir:", "", -1), 64)
+	if err != nil {
+		log.WithError(err).Error("unable to parse heading as float")
+		return
+	}
+	// convert KPH to MPH
+	speedKMH, err := strconv.ParseFloat(strings.Replace(result["speed"], "spd:", "", -1), 64)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	speedMPH := kphToMPH(speedKMH)
+
+	trackerID := strings.Replace(result["id"], "Vehicle ID:", "", -1)
+
+	update := &shuttletracker.Location{
+		TrackerID: trackerID,
+		Latitude:  latitude,
+		Longitude: longitude,
+		Heading:   heading,
+		Speed:     speedMPH,
+		Time:      newTime,
+	}
+	if route != nil {
+		update.RouteID = &route.ID
+	}
+
+	if err := u.ms.CreateLocation(update); err != nil {
+		log.WithError(err).Errorf("could not create location")
 	}
 }
 
@@ -199,45 +242,36 @@ func kphToMPH(kmh float64) float64 {
 
 // GuessRouteForVehicle returns a guess at what route the vehicle is on.
 // It may return an empty route if it does not believe a vehicle is on any route.
-func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Route, err error) {
-	routes, err := u.db.GetRoutes()
+// nolint: gocyclo
+func (u *Updater) GuessRouteForVehicle(vehicle *shuttletracker.Vehicle) (route *shuttletracker.Route, err error) {
+	routes, err := u.ms.Routes()
 	if err != nil {
-		log.Error(err)
+		return nil, err
 	}
 
-	routeDistances := make(map[string]float64)
+	routeDistances := make(map[int64]float64)
 	for _, route := range routes {
 		routeDistances[route.ID] = 0
 	}
 
-	updates, err := u.db.GetUpdatesForVehicleSince(vehicle.VehicleID, time.Now().Add(time.Minute*-15))
+	updates, err := u.ms.LocationsSince(vehicle.ID, time.Now().Add(time.Minute*-15))
 	if len(updates) < 5 {
 		// Can't make a guess with fewer than 5 updates.
-		log.Debugf("%v has too few recent updates (%d) to guess route.", vehicle.VehicleName, len(updates))
+		log.Debugf("%v has too few recent updates (%d) to guess route.", vehicle.Name, len(updates))
 		return
 	}
 
 	for _, update := range updates {
-		updateLatitude, err := strconv.ParseFloat(update.Lat, 64)
-		if err != nil {
-			log.Error(err)
-		}
-		updateLongitude, err := strconv.ParseFloat(update.Lng, 64)
-		if err != nil {
-			log.Error(err)
-		}
-
 		for _, route := range routes {
 			if !route.Enabled {
 				routeDistances[route.ID] += math.Inf(0)
 			}
 			nearestDistance := math.Inf(0)
-			for _, coord := range route.Coords {
-				distance := math.Sqrt(math.Pow(updateLatitude-coord.Lat, 2) +
-					math.Pow(updateLongitude-coord.Lng, 2))
+			for _, point := range route.Points {
+				distance := math.Sqrt(math.Pow(update.Latitude-point.Latitude, 2) +
+					math.Pow(update.Longitude-point.Longitude, 2))
 				if distance < nearestDistance {
 					nearestDistance = distance
-
 				}
 			}
 			if nearestDistance > .003 {
@@ -248,7 +282,7 @@ func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Rout
 	}
 
 	minDistance := math.Inf(0)
-	var minRouteID string
+	var minRouteID int64
 	for id := range routeDistances {
 		distance := routeDistances[id] / float64(len(updates))
 		if distance < minDistance {
@@ -257,21 +291,47 @@ func (u *Updater) GuessRouteForVehicle(vehicle *model.Vehicle) (route model.Rout
 			// If more than ~5% of the last 100 samples were far away from a route, say the shuttle is not on a route
 			// This is extremely aggressive and requires a shuttle to be on a route for ~5 minutes before it registers as on the route
 			if minDistance > 5 {
-				minRouteID = ""
+				minRouteID = 0
 			}
 		}
 	}
 
 	// not on a route
-	if minRouteID == "" {
-		log.Debugf("%v not on route; distance from nearest: %v", vehicle.VehicleName, minDistance)
-		return model.Route{}, nil
+	if minRouteID == 0 {
+		log.Debugf("%v not on route; distance from nearest: %v", vehicle.Name, minDistance)
+		return nil, nil
 	}
 
-	route, err = u.db.GetRoute(minRouteID)
+	route, err = u.ms.Route(minRouteID)
 	if err != nil {
 		return route, err
 	}
-	log.Debugf("%v on %s route.", vehicle.VehicleName, route.Name)
+	log.Debugf("%v on %s route.", vehicle.Name, route.Name)
 	return route, err
+}
+
+func itrakTimeDate(itrakTime, itrakDate string) (time.Time, error) {
+	// Add one or two leading zeros to the time value if they're missing.
+	// time.Parse expects this.
+	if len(itrakTime) == 10 {
+		itrakTime = itrakTime[:5] + "0" + itrakTime[5:]
+	} else if len(itrakTime) == 9 {
+		itrakTime = itrakTime[:5] + "00" + itrakTime[5:]
+	}
+
+	combined := itrakDate + " " + itrakTime
+	return time.Parse("date:01022006 time:150405", combined)
+}
+
+func (u *Updater) setLastResponse(dfresp *DataFeedResponse) {
+	u.mutex.Lock()
+	u.lastDataFeedResponse = dfresp
+	u.mutex.Unlock()
+}
+
+// GetLastResponse returns the most recent response from the iTRAK data feed.
+func (u *Updater) GetLastResponse() *DataFeedResponse {
+	u.mutex.Lock()
+	defer u.mutex.Unlock()
+	return u.lastDataFeedResponse
 }

@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/wtg/shuttletracker/database"
+	"github.com/wtg/shuttletracker/mock"
 )
 
 func TestStatic(t *testing.T) {
@@ -34,11 +34,13 @@ func TestStatic(t *testing.T) {
 	os.Chdir("..")
 
 	cfg := Config{}
-	db := &database.Mock{}
+	ms := &mock.ModelService{}
+	msg := &mock.MessageService{}
+	us := &mock.UserService{}
 
-	api, err := New(cfg, db)
+	api, err := New(cfg, ms, msg, us, nil)
 	if err != nil {
-		t.Errorf("got error '%s', expected nil", err)
+		t.Errorf("unexpected error: %s", err)
 		return
 	}
 

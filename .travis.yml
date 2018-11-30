@@ -5,22 +5,30 @@ go:
   - 1.8.x
   - 1.9.x
   - 1.10.x
-  - tip
+  - 1.11.x
+  - master
 
 matrix:
   allow_failures:
-    - go: tip
+    - go: master
+  fast_finish: true
 
 services:
   - docker
 
+addons:
+  postgresql: "9.6"
+
 before_install:
-  - go get -u github.com/kardianos/govendor && govendor sync
+  - go get -u github.com/kardianos/govendor && govendor sync -v
   - go get -u github.com/alecthomas/gometalinter && gometalinter --install
   - go get -u github.com/bradleyfalzon/revgrep/...
 
 install:
-  - go install
+  - go install github.com/wtg/shuttletracker/cmd/shuttletracker
+
+before_script:
+  - psql -c 'create database shuttletracker_test;' -U postgres
 
 script:
   - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then gometalinter --vendor ./... 2>&1 | revgrep origin/master; fi

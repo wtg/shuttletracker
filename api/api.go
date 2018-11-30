@@ -10,11 +10,12 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/spf13/viper"
 
-	"github.com/wtg/shuttletracker/database"
+	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
+	"github.com/wtg/shuttletracker/updater"
 )
 
-// Configuration holds the settings for connecting to outside resources.
+// Config holds API settings.
 type Config struct {
 	GoogleMapAPIKey      string
 	GoogleMapMinDistance int
@@ -24,16 +25,18 @@ type Config struct {
 	MapboxAPIKey         string
 }
 
-// App holds references to Mongo resources.
+// API is responsible for configuring handlers for HTTP endpoints.
 type API struct {
 	cfg     Config
-	db      database.Database
 	handler http.Handler
+	ms      shuttletracker.ModelService
+	msg     shuttletracker.MessageService
+	updater *updater.Updater
 }
 
-// InitApp initializes the application given a config and connects to backends.
+// New initializes the application given a config and connects to backends.
 // It also seeds any needed information to the database.
-func New(cfg Config, db database.Database) (*API, error) {
+func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageService, us shuttletracker.UserService, updater *updater.Updater) (*API, error) {
 	// Set up CAS authentication
 	url, err := url.Parse(cfg.CasURL)
 	if err != nil {
@@ -42,8 +45,10 @@ func New(cfg Config, db database.Database) (*API, error) {
 
 	// Create API instance to store database session and collections
 	api := API{
-		cfg: cfg,
-		db:  db,
+		cfg:     cfg,
+		ms:      ms,
+		msg:     msg,
+		updater: updater,
 	}
 
 	r := chi.NewRouter()
@@ -51,8 +56,7 @@ func New(cfg Config, db database.Database) (*API, error) {
 	r.Use(middleware.DefaultCompress)
 	r.Use(etag)
 
-
-	cli := CreateCASClient(url, db)
+	cli := CreateCASClient(url, us, cfg.Authenticate)
 
 	// Vehicles
 	r.Route("/vehicles", func(r chi.Router) {
@@ -61,7 +65,7 @@ func New(cfg Config, db database.Database) (*API, error) {
 			r.Use(cli.casauth)
 			r.Post("/create", api.VehiclesCreateHandler)
 			r.Post("/edit", api.VehiclesEditHandler)
-			r.Delete("/{id:[0-9]+}", api.VehiclesDeleteHandler)
+			r.Delete("/", api.VehiclesDeleteHandler)
 		})
 	})
 
@@ -74,7 +78,6 @@ func New(cfg Config, db database.Database) (*API, error) {
 	r.Route("/adminMessage", func(r chi.Router) {
 		r.Get("/", api.AdminMessageHandler)
 		r.Group(func(r chi.Router) {
-
 			r.Use(cli.casauth)
 			r.Post("/", api.SetAdminMessage)
 		})
@@ -86,21 +89,18 @@ func New(cfg Config, db database.Database) (*API, error) {
 		r.Group(func(r chi.Router) {
 			r.Use(cli.casauth)
 			r.Post("/create", api.RoutesCreateHandler)
-			r.Post("/schedule", api.RoutesScheduler)
 			r.Post("/edit", api.RoutesEditHandler)
-			r.Delete("/{id:.+}", api.RoutesDeleteHandler)
+			r.Delete("/", api.RoutesDeleteHandler)
 		})
 	})
 
 	// Stops
 	r.Route("/stops", func(r chi.Router) {
 		r.Get("/", api.StopsHandler)
-
 		r.Group(func(r chi.Router) {
 			r.Use(cli.casauth)
 			r.Post("/create", api.StopsCreateHandler)
-			r.Delete("/{id:.+}", api.StopsDeleteHandler)
-
+			r.Delete("/", api.StopsDeleteHandler)
 		})
 	})
 
@@ -111,18 +111,19 @@ func New(cfg Config, db database.Database) (*API, error) {
 		r.Get("/", api.AdminHandler)
 		r.Get("/login", api.AdminHandler)
 		r.Get("/logout", cli.logout)
-
 	})
 
 	r.Group(func(r chi.Router) {
 		r.Use(cli.casauth)
-
 		r.Get("/getKey/", api.KeyHandler)
 	})
 
 	// Static files
 	r.Get("/", IndexHandler)
 	r.Method("GET", "/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
+
+	// iTRAK data feed endpoint
+	r.Get("/datafeed", api.DataFeedHandler)
 
 	api.handler = r
 
@@ -169,10 +170,6 @@ func (api *API) KeyHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-}
-
-func (api *API) AdminLogout(w http.ResponseWriter, r *http.Request) {
-
 }
 
 // WriteJSON writes the data as JSON.
