@@ -16,8 +16,8 @@
         <div class="logo">
           <a href="https://webtech.union.rpi.edu/">
             <img src="~../assets/wtg.svg" />
-          </a>
-        </div>
+          </a
+>        </div>
     </div>
     <span style="width: 100%; height: 100%; position: fixed;">
       <div id="mymap"></div>
@@ -35,6 +35,8 @@ import Vehicle from '../structures/vehicle';
 import Route from '../structures/route';
 import Stop from '../structures/stop';
 import dropdown from './dropdown.vue';
+
+
 import messagebox from './adminmessage.vue';
 import * as L from 'leaflet';
 import { setTimeout, setInterval } from 'timers';
@@ -127,19 +129,22 @@ export default Vue.extend({
     });
   },
   methods: {
+    choose() {
+      alert('hi');
+    },
     updateLegend() {
       this.legend.onAdd = (map: L.Map) => {
         const div = L.DomUtil.create('div', 'info legend');
         let legendstring = '';
         this.$store.state.Routes.forEach((route: Route) => {
           if (route.enabled) {
-            legendstring += `<li><img class="legend-icon" src=` + getMarkerString(route.color) + `
-			      width="12" height="12"> ` +
-            route.name;
-          }
+            legendstring += `<li onclick="choose();"><img class="legend-icon" src=` + getMarkerString(route.color) + ` width="12" height="12"> ` +
+            route.name + `</li>`;
+            }
         });
+
         div.innerHTML = `<ul style="list-style:none">
-					<li><img class="legend-icon" src='` + UserSVG + `' width="12" height="12"> You</li>` +
+					<li><img class="legend-icon" src='` + UserSVG + `' width="12" height="12"> You </li>` +
           legendstring +
           `<li><img class="legend-icon" src="` + StopSVG + `" width="12" height="12"> Shuttle Stop</li>
 				</ul>`;
@@ -148,7 +153,6 @@ export default Vue.extend({
       if (this.Map !== undefined) {
         this.legend.addTo(this.Map);
       }
-
     },
     routePolyLines(): L.Polyline[] {
       return this.$store.getters.getRoutePolyLines;
@@ -165,6 +169,7 @@ export default Vue.extend({
           this.Map.removeLayer(line);
         }
       });
+
       this.existingRouteLayers = new Array<L.Polyline>();
       this.routePolyLines().forEach((line: L.Polyline) => {
         if (this.Map !== undefined) {
@@ -341,6 +346,12 @@ export default Vue.extend({
     margin-top: 2px;
     margin-bottom: 2px;
     padding-left: 0px;
+  }
+
+  li.legendButton{
+      padding: 1px;
+      background-color: #e7e7e7;
+      color: black;
   }
 }
 </style>
