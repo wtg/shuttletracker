@@ -51,149 +51,9 @@
         }
 
     })
-	
-var vm = new Vue({
-    el: '#grid',
-    data: {
-        columnData: ['name', 'bus1','bus2'],
-        searchQuery: '',
-		list,
-		rowData : [],
-    },
-	created (){
-		fetch("/static/json/east_normal.json")
-		.then (response => response.json())
-		.then (json => {
-		this.rowData = json.rowData
-		})
-	}
-})
-			
+
 var list={
-	category:[{
-		name:'Stop',
-		items:[{
-			name:'Union',
-			value:'Union',
-			active: false
-			},
-			{
-				name:'Tibbits Ave',
-				value:'Tibbits Ave',
-				active: false
-			},
-			{
-				name:'B-Lot',
-				value:'B-Lot',
-				active: false
-			},
-			{
-				name:'Colonie',
-				value:'Colonie',
-				active: false
-			}
-			]
-		},
-		{
-			name:'Time',
-			items:[
-			{
-				name:'7:00',
-				value:'7:',
-				active: false
-			},
-			{
-				name:'8:00',
-				value:'8:',
-				active: false
-			},
-			{
-				name:'9:00',
-				value:'9:',
-				active: false
-			},
-			{
-				name:'10:00',
-				value:'10:',
-				active: false
-			},
-			{
-				name:'11:00',
-				value:'11:',
-				active: false
-			
-			},
-			{
-				name:'12:00',
-				value:'12:',
-				active: false
-			
-			},
-			{
-				name:'13:00',
-				value:'13:',
-				active: false
-			
-			},
-			{
-				name:'14:00',
-				value:'14:',
-				active: false
-			
-			},
-			{
-				name:'15:00',
-				value:'15:',
-				active: false
-			
-			},
-			{
-				name:'16:00',
-				value:'16:',
-				active: false
-			
-			},
-			{
-				name:'17:00',
-				value:'17:',
-				active: false
-			
-			},
-			{
-				name:'18:00',
-				value:'18:',
-				active: false
-			
-			},
-			{
-				name:'19:00',
-				value:'19:',
-				active: false
-			
-			},
-			{
-				name:'20:00',
-				value:'20:',
-				active: false
-			
-			},
-			{
-				name:'21:00',
-				value:'21:',
-				active: false
-			
-			},
-			{
-				name:'22:00',
-				value:'22:',
-				active: false
-			
-			}
-			]
-		},
-		
-		
-	],
+	category:[],
 	condition:[ //Conditions shows to users
 	],
 	place_condition:[ //Place conditions that users choose
@@ -203,6 +63,30 @@ var list={
 
 	]
 };
+var vm = new Vue({
+    el: '#grid',
+    data: {
+        columnData: ['name', 'bus1','bus2'],
+        searchQuery: '',
+		list,
+		rowData : [],
+    },
+	created (){
+		fetch("/static/json/east_category.json")
+		.then (response => response.json())
+		.then (json => {
+		this.list.category = json.category
+		});
+		fetch("/static/json/east_normal.json")
+		.then (response => response.json())
+		.then (json => {
+		this.rowData = json.rowData
+		});
+		
+	}
+})
+			
+
 var count=0;
 var app =new Vue({
 	el:'#app',
