@@ -1,4 +1,5 @@
 <html>
+
     <head>
         <link rel="stylesheet" href="static/dist/schedule/schedule.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -6,6 +7,8 @@
     </head>
 	
 	<body>
+	
+
 	<!-- multiQuery-->
 	<div id='app'>
 <template v-if='condition.length'>
@@ -25,6 +28,9 @@
 	</div>
 </template>
 </div>
+<!-- Json -->
+
+      
 <!-- table-->
     <div id="grid">
 	
@@ -35,6 +41,8 @@
 		
     </div>
     <script type="text/x-template" id="grid-template">
+	import json from "static/js/list.json"
+	json.forEach(x => { console.log(x.name); });
         <table v-if="filterData.length">
             <thead>
                 <th v-for="col in columns" @click="order(col)">{{col}}

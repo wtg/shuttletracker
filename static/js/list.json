@@ -1,0 +1,21 @@
+{"rowData": [{
+    "name": "Union",
+    "bus1": "7:00a",
+	"bus2": "7:20a"
+	},
+	{
+    "name": "Colonie",
+    "bus1": "7:00a",
+	"bus2": "7:20a"
+	},
+	{
+    "name": "B-Lot",
+    "bus1": "7:00a",
+	"bus2": "7:20a"
+	},
+	{
+	"name": "Union",
+    "bus1": "10:00a",
+	"bus2": "10:20a"
+	}
+]}

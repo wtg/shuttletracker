@@ -64,40 +64,17 @@
                 columnData: ['name', 'bus1','bus2'],
                 searchQuery: '',
 				list,
-                rowData: [{
-                    name: 'Union',
-                    bus1: '7:00a',
-					bus2: '7:20a'
-                }, {
-                    name: 'Tibbits Ave',
-                    bus1: '7:03a',
-					bus2: '7:23a'
-                },{
-                    name: 'B-Lot',
-                    bus1: '7:06a',
-					bus2: '7:26a'
-                }, {
-                    name: 'Colonie',
-                    bus1: '7:09a',
-					bus2: '7:29a'
-                }, {
-                    name: 'Union',
-                    bus1: '10:19a',
-					bus2: '10:04a'
-                },{
-                    name: 'Tibbits Ave',
-                    bus1: '10:03a',
-					bus2: '10:23a'
-                },{
-                    name: 'B-Lot',
-                    bus1: '10:06a',
-					bus2: '10:26a'
-                }, {
-                    name: 'Colonie',
-                    bus1: '10:09a',
-					bus2: '10:29a'
-                }]
+				rowData : [],
             },
+			created (){
+				fetch("/static/js/list.json")
+				.then (response => response.json())
+				.then (json => {
+					this.rowData = json.rowData
+				})
+			}
+		
+			
 
         })
 		
