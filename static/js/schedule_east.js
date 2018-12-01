@@ -1,93 +1,81 @@
  Vue.component('demo-grid', {
-            template: '#grid-template',
-            props: {
-                rows: Array,
-                columns: Array,
-                filterKey: false,			
-            },
-            data:
-				function() {
-                var colOrders = {}
-                this.columns.forEach(function(col) {
-                    colOrders[col] = 1
-                })
-                return {
-                    setOrder: colOrders,
-
-                }
-
-            },
-            computed: {
-                filterData: function() {
-                   var data = this.rows.slice() //hold the data of lists
-                   var filterKey = this.filterKey
-				   //Filter Key is the trigger of searching
-                   if (filterKey) {
-					   //Filter
-						data = data.filter(function(row) {	
-						//Place filter
-						for(var k=0; k < list.place_condition.length; k++){
-							if (row.name === list.place_condition[k]) {
-								if (list.time_condition.length > 0){
-									//Time filter
-									for(var j=0; j < list.time_condition.length; j++){
-										if (row.bus1.indexOf(list.time_condition[j]) > -1) {
-											return true;
-										}
-										
-									}
-									return false;
-								}
-								
-							}
-							
-						}	
-						return false;						
-                      })
-							
-                    }
-
-                    return data
-                }
-            },
-            methods: {
-				//Make the table order
-                order: function(key) {
-                    this.setOrder[key] = this.setOrder[key] * -1
-                },
+    template: '#grid-template',
+    props: {
+        rows: Array,
+        columns: Array,
+        filterKey: false,		
+    },
+    data:
+		function() {
+            var colOrders = {};
+            this.columns.forEach(function(col) {
+                colOrders[col] = 1;
+            })
+            return {
+                setOrder: colOrders,
             }
-
-        })
-        var vm = new Vue({
-            el: '#grid',
-            data: {
-                columnData: ['name', 'bus1','bus2'],
-                searchQuery: '',
-				list,
-				rowData : [],
+        },
+    computed: {
+        filterData: function() {
+            var data = this.rows.slice(); //hold the data of lists
+            var filterKey = this.filterKey;
+			//Filter Key is the trigger of searching
+            if (filterKey) {
+				//Filter
+				data = data.filter(function(row) {	
+				//Place filter
+				for(var k=0; k < list.place_condition.length; k++){
+					if (row.name === list.place_condition[k]) {
+						if (list.time_condition.length > 0){
+							//Time filter
+							for(var j=0; j < list.time_condition.length; j++){
+								if (row.bus1.indexOf(list.time_condition[j]) > -1) {
+									return true;
+								}			
+							}
+							return false;
+						}	
+					}
+				}	
+				return false;						
+				})		
+            }
+            return data;
+        }
+    },
+    methods: {
+		//Make the table order
+        order: function(key) {
+             this.setOrder[key] = this.setOrder[key] * -1;
             },
-			created (){
-				fetch("/static/json/east_normal.json")
-				.then (response => response.json())
-				.then (json => {
-					this.rowData = json.rowData
-				})
-			}
-		
-			
+        }
 
-        })
-		
-		
-		var list={
-	category:[
-		{
-			name:'Stop',
-			items:[
-			{
-				name:'Union',
-				value:'Union',
-				active: false
+    })
+	
+var vm = new Vue({
+    el: '#grid',
+    data: {
+        columnData: ['name', 'bus1','bus2'],
+        searchQuery: '',
+		list,
+		rowData : [],
+    },
+	created (){
+		fetch("/static/json/east_normal.json")
+		.then (response => response.json())
+		.then (json => {
+		this.rowData = json.rowData
+		})
+	}
+})
+			
+var list={
+	category:[{
+		name:'Stop',
+		items:[{
+			name:'Union',
+			value:'Union',
+			active: false
 			},
 			{
 				name:'Tibbits Ave',
@@ -299,6 +287,7 @@ var app =new Vue({
 			});	
 		
 				
-		}
+		},
+		
 	}
 });

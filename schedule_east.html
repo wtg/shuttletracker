@@ -1,61 +1,51 @@
 <html>
-
     <head>
         <link rel="stylesheet" href="static/dist/schedule/schedule.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 		<script src="static/dist/vue/vue.min.js"></script>
     </head>
-	
 	<body>
-	
-
 	<!-- multiQuery-->
-	<div id='app'>
-<template v-if='condition.length'>
-	<div>
-<span>Choose Stop:<span>
-	<span v-for='(item,index) in condition' class='active'>{{item.name}}&nbsp;|&nbsp;</span>
-	</div>
-</template>
-<template v-if='category.length'>
-	<div class='nav' v-for='(items,index) in category'>
-		<div class='mutil-query-title' v-if='items.name' :key="items.id">{{items.name}}<span style='margin-left: 20px;' @click='allIn(index)'>All</span>|<span @click='remove(index)'>Clear</span></div>
-		<ol v-if='items.items.length'>
-			<li v-for='(item,key) in items.items'>
-				<span :class="{'active':item.active}" @click='handle(index,key)' :key='item.id'>{{item.name}}</span>
-			</li>
-		</ol>
-	</div>
-</template>
-</div>
-<!-- Json -->
-
-      
-<!-- table-->
-    <div id="grid">
-	
-	<button v-on:click="searchQuery = true">Search</button>
-        <demo-grid :rows="rowData" :columns="columnData" :filter-key="searchQuery"  >
-        </demo-grid>
-
-		
-    </div>
-    <script type="text/x-template" id="grid-template">
-        <table v-if="filterData.length">
-            <thead>
-                <th v-for="col in columns" @click="order(col)">{{col}}
-                   <!--Set the rder of the table-->
-                    <span class="arrow" :class="setOrder[col] > 0 ? 'asc':'dsc'"></span>
-                </th>
-            </thead>
-            <tbody>
-                <tr v-for="row in filterData">
-                    <td v-for="col in columns">{{row[col]}}</td>
-                </tr>
-            </tbody>
-        </table>
-        <p v-else>No match data...</p>
-    </script>
-	<script src="static/js/schedule_east.js"></script>
-
+		<div id='app'>
+			<span>Choose Stop:</span>
+			<template v-if='condition.length'>
+				<span v-for='(item,index) in condition' class='active'>{{item.name}}&nbsp;|&nbsp;</span>
+			</template>
+			<template v-if='category.length'>
+				<div class='nav' v-for='(items,index) in category'>
+					<div class='mutil-query-title' v-if='items.name' :key="items.id">{{items.name}}
+						<span style='margin-left: 20px;' @click='allIn(index)'>All</span>|<span @click='remove(index)'>Clear</span></div>
+					<ol v-if='items.items.length'>
+						<li v-for='(item,key) in items.items'>
+							<span :class="{'active':item.active}" @click='handle(index,key)' :key='item.id'>{{item.name}}</span>
+						</li>
+					</ol>
+				</div>
+			</template>
+		</div>     
+	<!--Show the table-->
+		<div id="grid">
+			<button v-on:click="searchQuery = true">Search</button>
+				<demo-grid :rows="rowData" :columns="columnData" :filter-key="searchQuery">
+				</demo-grid>
+		</div>
+		<script type="text/x-template" id="grid-template">
+			<table v-if="filterData.length">
+				<thead>
+					<th v-for="col in columns" @click="order(col)">{{col}}
+					<!--Set the rder of the table-->
+						<span class="arrow" :class="setOrder[col] > 0 ? 'asc':'dsc'"></span>
+					</th>
+				</thead>
+				<tbody>
+					<tr v-for="row in filterData">
+						<td v-for="col in columns">{{row[col]}}</td>
+					</tr>
+				</tbody>
+			</table>
+			<!-- No matching data -->
+			<p v-else>No match data...</p>
+		</script>
+		<script src="static/js/schedule_east.js"></script>
+	</body>
 </html>
