@@ -41,8 +41,6 @@
 		
     </div>
     <script type="text/x-template" id="grid-template">
-	import json from "static/js/list.json"
-	json.forEach(x => { console.log(x.name); });
         <table v-if="filterData.length">
             <thead>
                 <th v-for="col in columns" @click="order(col)">{{col}}

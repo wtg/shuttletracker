@@ -67,7 +67,7 @@
 				rowData : [],
             },
 			created (){
-				fetch("/static/js/list.json")
+				fetch("/static/json/east_normal.json")
 				.then (response => response.json())
 				.then (json => {
 					this.rowData = json.rowData
