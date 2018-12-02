@@ -11,6 +11,7 @@ import (
 
 	"github.com/lib/pq"
 	"github.com/wtg/shuttletracker"
+	"github.com/wtg/shuttletracker/log"
 )
 
 // pointsRegex matches points in a Postgres path, e.g. [(42.72283,-73.67964),(42.72297,-73.67948)]
@@ -40,7 +41,62 @@ CREATE TABLE IF NOT EXISTS routes_stops (
 	stop_id integer REFERENCES stops NOT NULL,
 	"order" integer NOT NULL,
 	UNIQUE (route_id, "order")
-);`
+);
+CREATE TABLE IF NOT EXISTS route_schedules (
+	id serial PRIMARY KEY,
+	route_id integer REFERENCES routes ON DELETE CASCADE NOT NULL,
+	start_day smallint NOT NULL CHECK (start_day >= 0 AND start_day < 7),
+	start_time time with time zone NOT NULL,
+	end_day smallint NOT NULL CHECK (end_day >= 0 AND end_day < 7),
+	end_time time with time zone NOT NULL,
+
+	-- Note: active intervals for route schedules for a route cannot wrap around
+	-- the week boundary. This is for simplicity of implementation in the
+	-- route_is_active() function.
+	CHECK (
+		(start_day = end_day AND start_time < end_time) OR (start_day < end_day)
+	)
+);
+CREATE OR REPLACE FUNCTION route_is_active(route_id integer) RETURNS boolean STABLE AS $$
+	SELECT exists(
+		SELECT true FROM
+		(
+			SELECT route_schedules.route_id,
+			make_timestamptz(
+				extract(year from (current_date - extract(dow from current_date)::int) + start_day)::int,
+				extract(month from (current_date - extract(dow from current_date)::int) + start_day)::int,
+				extract(day from (current_date - extract(dow from current_date)::int) + start_day)::int,
+				extract(hour from start_time)::int,
+				extract(minute from start_time)::int,
+				extract(sec from start_time)
+			) as start,
+			make_timestamptz(
+				extract(year from (current_date - extract(dow from current_date)::int) + end_day)::int,
+				extract(month from (current_date - extract(dow from current_date)::int) + end_day)::int,
+				extract(day from (current_date - extract(dow from current_date)::int) + end_day)::int,
+				extract(hour from end_time)::int,
+				extract(minute from end_time)::int,
+				extract(sec from end_time)
+			) as end
+			FROM route_schedules
+		) AS timestamps
+		RIGHT OUTER JOIN routes ON routes.id = timestamps.route_id
+		WHERE
+			timestamps.route_id = route_is_active.route_id
+			AND now() >= timestamps.start
+			AND now() <= timestamps.end
+			OR (
+				EXISTS (
+					SELECT 1 from routes
+					WHERE routes.id = route_is_active.route_id
+				) AND NOT EXISTS (
+					SELECT 1 from route_schedules
+					WHERE route_schedules.route_id = route_is_active.route_id
+				)
+			)
+	);
+$$ LANGUAGE sql;
+`
 	_, err := rs.db.Exec(schema)
 	return err
 }
@@ -81,44 +137,118 @@ func (p *scanPoints) Scan(src interface{}) error {
 
 // Routes returns all Routes in the database.
 func (rs *RouteService) Routes() ([]*shuttletracker.Route, error) {
+	tx, err := rs.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	// We can't really do anything if rolling back a transaction fails.
+	// nolint: errcheck
+	defer tx.Rollback()
+
 	routes := []*shuttletracker.Route{}
-	query := "SELECT r.id, r.name, r.created, r.updated, r.enabled, r.width, r.color, r.points," +
-		" array_remove(array_agg(rs.stop_id ORDER BY rs.order ASC), NULL) as stop_ids" +
-		" FROM routes r LEFT JOIN routes_stops rs" +
-		" ON r.id = rs.route_id GROUP BY r.id;"
-	rows, err := rs.db.Query(query)
+
+	// This allows us to do faster lookups when retrieving schedule data.
+	idsToRoute := map[int64]*shuttletracker.Route{}
+
+	query := `
+SELECT r.id, r.name, r.created, r.updated, r.enabled, r.width, r.color, r.points,
+	array_remove(array_agg(rs.stop_id ORDER BY rs.order ASC), NULL) as stop_ids,
+	route_is_active(r.id) as active
+FROM
+	routes r
+LEFT JOIN routes_stops rs ON r.id = rs.route_id
+GROUP BY r.id;
+`
+	rows, err := tx.Query(query)
 	if err != nil {
 		return nil, err
 	}
 	for rows.Next() {
 		r := &shuttletracker.Route{}
 		p := scanPoints{}
-		err := rows.Scan(&r.ID, &r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, &p, pq.Array(&r.StopIDs))
+		err = rows.Scan(&r.ID, &r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, &p, pq.Array(&r.StopIDs), &r.Active)
 		if err != nil {
 			return nil, err
 		}
 		r.Points = p.points
+		r.Schedule = shuttletracker.RouteSchedule{}
 		routes = append(routes, r)
+		idsToRoute[r.ID] = r
+	}
+
+	query = "SELECT s.id, s.route_id, s.start_day, s.start_time, s.end_day, s.end_time FROM route_schedules s;"
+	rows, err = tx.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		interval := shuttletracker.RouteActiveInterval{}
+		err = rows.Scan(&interval.ID, &interval.RouteID, &interval.StartDay, &interval.StartTime, &interval.EndDay, &interval.EndTime)
+		if err != nil {
+			return nil, err
+		}
+		route, ok := idsToRoute[interval.RouteID]
+		if !ok {
+			return nil, shuttletracker.ErrRouteNotFound
+		}
+		route.Schedule = append(route.Schedule, interval)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
 	}
 	return routes, nil
 }
 
 // Route returns the Route with the provided ID.
 func (rs *RouteService) Route(id int64) (*shuttletracker.Route, error) {
+	tx, err := rs.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	// We can't really do anything if rolling back a transaction fails.
+	// nolint: errcheck
+	defer tx.Rollback()
+
 	query := "SELECT r.name, r.created, r.updated, r.enabled, r.width, r.color, r.points," +
-		" array_remove(array_agg(rs.stop_id ORDER BY rs.order ASC), NULL) as stop_ids" +
+		" array_remove(array_agg(rs.stop_id ORDER BY rs.order ASC), NULL) as stop_ids," +
+		" route_is_active(r.id) as active" +
 		" FROM routes r LEFT JOIN routes_stops rs" +
 		" ON r.id = rs.route_id WHERE r.id = $1 GROUP BY r.id;"
-	row := rs.db.QueryRow(query, id)
+	row := tx.QueryRow(query, id)
 	r := &shuttletracker.Route{
-		ID: id,
+		ID:       id,
+		Schedule: shuttletracker.RouteSchedule{},
 	}
 	p := scanPoints{}
-	err := row.Scan(&r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, &p, pq.Array(&r.StopIDs))
+	err = row.Scan(&r.Name, &r.Created, &r.Updated, &r.Enabled, &r.Width, &r.Color, &p, pq.Array(&r.StopIDs), &r.Active)
 	if err != nil {
 		return nil, err
 	}
 	r.Points = p.points
+
+	query = "SELECT s.id, s.start_day, s.start_time, s.end_day, s.end_time" +
+		" FROM route_schedules s WHERE s.route_id = $1;"
+	rows, err := tx.Query(query, id)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		interval := shuttletracker.RouteActiveInterval{
+			RouteID: id,
+		}
+		err = rows.Scan(&interval.ID, &interval.StartDay, &interval.StartTime, &interval.EndDay, &interval.EndTime)
+		if err != nil {
+			return nil, err
+		}
+		r.Schedule = append(r.Schedule, interval)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
+	}
 	return r, nil
 }
 
@@ -165,11 +295,17 @@ func (rs *RouteService) CreateRoute(route *shuttletracker.Route) error {
 	// We can't really do anything if rolling back a transaction fails.
 	// nolint: errcheck
 	defer tx.Rollback()
-
+	//rset ID to the route.ID
+	statement := "ALTER SEQUENCE routes_id_seq RESTART WITH "+strconv.FormatInt(route.ID, 10)+ ";" //start increament of id seqence from route.ID
+	_, err =tx.Exec(statement);
+	if err != nil {
+		log.WithError(err).Error("reset failed")
+		return err
+	}
 	// insert route
-	statement := "INSERT INTO routes (name, enabled, width, color, points)" +
+	statement = "INSERT INTO routes (name, enabled, width, color, points)" +
 		" VALUES ($1, $2, $3, $4, $5) RETURNING id, created, updated;"
-	row := tx.QueryRow(statement, route.Name, route.Enabled, route.Width, route.Color, valuePoints(route.Points))
+	row := tx.QueryRow(statement,route.Name, route.Enabled, route.Width, route.Color, valuePoints(route.Points))
 	err = row.Scan(&route.ID, &route.Created, &route.Updated)
 	if err != nil {
 		return err
@@ -180,6 +316,25 @@ func (rs *RouteService) CreateRoute(route *shuttletracker.Route) error {
 		" SELECT $1, stop_id, \"order\" - 1 AS \"order\" FROM" +
 		" unnest($2::integer[]) WITH ORDINALITY AS s(stop_id, \"order\");"
 	_, err = tx.Exec(statement, route.ID, pq.Array(route.StopIDs))
+	if err != nil {
+		return err
+	}
+
+	// insert route schedule
+	for _, interval := range route.Schedule {
+		statement = "INSERT INTO route_schedules (route_id, start_day, start_time, end_day, end_time)" +
+			" VALUES ($1, $2, $3, $4, $5) RETURNING id;"
+		row = tx.QueryRow(statement, route.ID, interval.StartDay, interval.StartTime, interval.EndDay, interval.EndTime)
+		err = row.Scan(&interval.ID)
+		if err != nil {
+			return err
+		}
+		interval.RouteID = route.ID
+	}
+
+	// Determine if route is active. Must happen after inserting the route schedule.
+	row = tx.QueryRow("SELECT route_is_active($1);", route.ID)
+	err = row.Scan(&route.Active)
 	if err != nil {
 		return err
 	}
@@ -202,6 +357,15 @@ func (rs *RouteService) DeleteRoute(id int64) error {
 	if n == 0 {
 		return shuttletracker.ErrRouteNotFound
 	}
+
+	//route with id was deleted, next insertion should be start from here (id).
+	statement = "ALTER SEQUENCE routes_id_seq RESTART WITH "+strconv.FormatInt(id, 10)+ ";" //start increament of id seqence from route.ID
+	result, err = rs.db.Exec(statement)
+	if err != nil {
+		log.WithError(err).Error("reset failed")
+		return err
+	}
+	
 
 	return nil
 }
@@ -238,6 +402,24 @@ func (rs *RouteService) ModifyRoute(route *shuttletracker.Route) error {
 	_, err = tx.Exec(statement, route.ID, pq.Array(route.StopIDs))
 	if err != nil {
 		return err
+	}
+
+	// remove existing route schedule
+	_, err = tx.Exec("DELETE FROM route_schedules WHERE route_id = $1;", route.ID)
+	if err != nil {
+		return err
+	}
+
+	// insert route schedule
+	for _, interval := range route.Schedule {
+		statement = "INSERT INTO route_schedules (route_id, start_day, start_time, end_day, end_time)" +
+			" VALUES ($1, $2, $3, $4, $5) RETURNING id;"
+		row := tx.QueryRow(statement, route.ID, interval.StartDay, interval.StartTime, interval.EndDay, interval.EndTime)
+		err = row.Scan(&interval.ID)
+		if err != nil {
+			return err
+		}
+		interval.RouteID = route.ID
 	}
 
 	return tx.Commit()
