@@ -202,8 +202,17 @@ Vue.component('route-json',{
           type: "POST",
           data: toSend,
           contentType: "application/json",
-          complete: function(data){
+          success: function(data){
             $.get( "/routes", this.populateRoutesPanel);
+            refresh = true; //fix the bug that the admin page is not refreshed after adding a route.
+            
+          },
+          //alert if the route with the new ID cannot be added
+          error: function(data,e) {
+            if(data.status==500){
+              var obj = jQuery.parseJSON(toSend);
+              alert("Route with ID "+ String(obj.id) +" cannot be added.");
+            }
           }
         });
       },
