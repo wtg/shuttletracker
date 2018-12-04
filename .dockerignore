@@ -7,10 +7,12 @@
 !mock
 !postgres
 !static
-!time
 !updater
 !vendor/vendor.json
 !admin.html
 !*.go
 !index.html
 !CHECKS
+!frontend
+frontend/node_modules
+frontend/dist

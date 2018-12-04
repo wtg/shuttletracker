@@ -120,4 +120,3 @@ kochms
 19. Add yourself as an administrator by using `shuttletracker.exe admins --add RCS_ID`, replacing `RCS_ID` with your RCS ID. See the "Administrators" section below for more information.  
 20. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel.  
 21. Copy the information from [vehicles](https://shuttles.rpi.edu/vehicles), [routes](https://shuttles.rpi.edu/routes), and [stops](https://shuttles.rpi.edu/stops) into the admin panel if you want to mimic the current shuttle tracker site.  
-
