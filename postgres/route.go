@@ -296,7 +296,7 @@ func (rs *RouteService) CreateRoute(route *shuttletracker.Route) error {
 	// nolint: errcheck
 	defer tx.Rollback()
 	//rset ID to the route.ID
-	statement := "ALTER SEQUENCE routes_id_seq RESTART WITH "+strconv.FormatInt(route.ID, 10)+ ";" //start increament of id seqence from route.ID
+	statement := "ALTER SEQUENCE routes_id_seq RESTART WITH "+strconv.FormatInt(route.ID, 10)+ ";" //fix bug 1, start increament of id seqence from route.ID
 	_, err =tx.Exec(statement);
 	if err != nil {
 		log.WithError(err).Error("reset failed")
