@@ -1,0 +1,132 @@
+{"category":[{
+		"name":"Stop",
+		"items":[{
+				"name":"Union",
+				"value":"Union",
+				"active": false
+			},
+			{
+				"name":"Sage Ave",
+				"value":"Sage Ave",
+				"active": false
+			},
+			{
+				"name":"Blitman",
+				"value":"Blitman",
+				"active": false
+			},
+			{
+				"name":"City Station",
+				"value":"City Station",
+				"active": false
+			},
+			{
+				"name":"Poly Tech",
+				"value":"Poly Tech",
+				"active": false
+			},
+			{
+				"name":"15th & College",
+				"value":"15th & College",
+				"active": false
+			}
+			]
+		},
+		{
+			"name":"Time",
+			"items":[
+			{
+				"name":"7:00",
+				"value":"7:",
+				"active": false
+			},
+			{
+				"name":"8:00",
+				"value":"8:",
+				"active": false
+			},
+			{
+				"name":"9:00",
+				"value":"9:",
+				"active": false
+			},
+			{
+				"name":"10:00",
+				"value":"10:",
+				"active": false
+			},
+			{
+				"name":"11:00",
+				"value":"11:",
+				"active": false
+			
+			},
+			{
+				"name":"12:00",
+				"value":"12:",
+				"active": false
+			
+			},
+			{
+				"name":"13:00",
+				"value":"13:",
+				"active": false
+			
+			},
+			{
+				"name":"14:00",
+				"value":"14:",
+				"active": false
+			
+			},
+			{
+				"name":"15:00",
+				"value":"15:",
+				"active": false
+			
+			},
+			{
+				"name":"16:00",
+				"value":"16:",
+				"active": false
+			
+			},
+			{
+				"name":"17:00",
+				"value":"17:",
+				"active": false
+			
+			},
+			{
+				"name":"18:00",
+				"value":"18:",
+				"active": false
+			
+			},
+			{
+				"name":"19:00",
+				"value":"19:",
+				"active": false
+			
+			},
+			{
+				"name":"20:00",
+				"value":"20:",
+				"active": false
+			
+			},
+			{
+				"name":"21:00",
+				"value":"21:",
+				"active": false
+			
+			},
+			{
+				"name":"22:00",
+				"value":"22:",
+				"active": false
+			
+			}
+			]
+		}			
+]}
