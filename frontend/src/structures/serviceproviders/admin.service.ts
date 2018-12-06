@@ -16,6 +16,12 @@ export default class AdminServiceProvider {
         })
     }
 
+    public static DeleteVehicle(vehicle: Vehicle): Promise<Response> {
+        return fetch('/vehicles?id=' + String(vehicle.id), {
+            method: 'DELETE',
+        })
+    }
+
     public static NewVehicle(vehicle: Vehicle): Promise<Response> {
         return fetch('/vehicles/create', {
             method: 'POST',
