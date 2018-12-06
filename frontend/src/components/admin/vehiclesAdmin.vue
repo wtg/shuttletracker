@@ -16,6 +16,12 @@
                     <th><p>{{vehicle.enabled}}</p></th>
                     <th><button @click="$router.push('/admin/vehicles/' + String(vehicle.id) + '/edit')" class="button">Edit</button></th>
                 </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th><button @click="$router.push('/admin/vehicles/-1/new')" class="button">New</button></th>
+                </tr>
             </tbody>
         </table>
     </div>

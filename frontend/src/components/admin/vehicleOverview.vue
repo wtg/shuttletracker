@@ -13,6 +13,7 @@
                 <p class="has-text-weight-semibold is-size-5">Enabled:</p>
                 <p>{{myVehicle.enabled}}</p>
             </div>
+
         </div>
 </template>
 <script lang="ts">
