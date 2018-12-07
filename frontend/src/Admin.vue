@@ -52,6 +52,7 @@ export default Vue.extend({
   mounted() {
     this.$store.dispatch('grabRoutes');
     this.$store.dispatch('grabVehicles');
+    this.$store.dispatch('grabStops');
   },
 });
 </script>
