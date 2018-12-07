@@ -61,12 +61,12 @@ import AdminServiceProvider from '../../structures/serviceproviders/admin.servic
 export default Vue.extend({
     props: {
         creation: {
-            type: Boolean
-        }
+            type: Boolean,
+        },
     },
-    data(){
+    data() {
         return {
-            vehicle: new Vehicle(0,'',new Date(), new Date(), false, -1),
+            vehicle: new Vehicle(0, '', new Date(), new Date(), false, -1),
             sending: false,
             error: false,
             success: false,
@@ -75,17 +75,17 @@ export default Vue.extend({
             sending: boolean;
             error: boolean;
             success: boolean;
-        }
+        };
     },
     methods: {
-        grabMyVehicle(){
-            if(this.creation){
+        grabMyVehicle() {
+            if (this.creation) {
                 return;
             }
-            for (let i = 0; i < this.$store.getters.getVehicles.length; i ++){
+            for (let i = 0; i < this.$store.getters.getVehicles.length; i ++) {
                 const tempRotue = this.$store.getters.getVehicles[i];
                 const id = this.$route.params.id;
-                if(Number(tempRotue.id) === Number(id)){
+                if (Number(tempRotue.id) === Number(id)) {
                     this.vehicle.id = tempRotue.id;
                     this.vehicle.name = tempRotue.name;
                     this.vehicle.enabled = tempRotue.enabled;
@@ -93,56 +93,56 @@ export default Vue.extend({
                 }
             }
         },
-        send(){
+        send() {
             this.sending = true;
-            if(this.creation){
+            if (this.creation) {
                 AdminServiceProvider.NewVehicle(this.vehicle).then(() => {
                     this.success = true;
-                    this.sending= false;
+                    this.sending = false;
                     this.$store.dispatch('grabVehicles');
-                    setTimeout(()=> {
+                    setTimeout(() => {
                         this.success = false;
-                        this.$router.push('/admin/vehicles')
-                    }, 2000)
-                }).catch((err)=>{
-                    console.log(err)
+                        this.$router.push('/admin/vehicles');
+                    }, 2000);
+                }).catch((err) => {
+                    console.log(err);
                     this.error = true;
                     this.sending = false;
-                    setTimeout(()=>{
+                    setTimeout(() => {
                         this.error = false;
                     }, 2000);
                 });
-            }else{
+            } else {
                 AdminServiceProvider.EditVehicle(this.vehicle).then(() => {
                     this.success = true;
-                    this.sending= false;
+                    this.sending = false;
                     this.$store.dispatch('grabVehicles');
-                    setTimeout(()=> {
+                    setTimeout(() => {
                         this.success = false;
-                    }, 2000)
-                }).catch((err)=>{
-                    console.log(err)
+                    }, 2000);
+                }).catch((err) => {
+                    console.log(err);
                     this.error = true;
                     this.sending = false;
-                    setTimeout(()=>{
+                    setTimeout(() => {
                         this.error = false;
                     }, 2000);
                 });
             }
 
-        }
+        },
     },
     mounted() {
         this.$store.subscribe((mutation) => {
-            if (mutation.type === 'setVehicles'){
+            if (mutation.type === 'setVehicles') {
                 this.grabMyVehicle();
             }
-        })
-        if(this.$store.getters.getVehicles.length !== 0){
+        });
+        if (this.$store.getters.getVehicles.length !== 0) {
             this.grabMyVehicle();
 
         }
-    }
+    },
 
 });
 </script>

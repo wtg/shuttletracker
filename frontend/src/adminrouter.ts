@@ -7,6 +7,7 @@ import routeOverview from '@/components/admin/routeOverview.vue';
 import routeEditing from '@/components/admin/routeEditing.vue';
 import vehicleEditing from '@/components/admin/vehicleEditing.vue';
 import vehicleOverview from '@/components/admin/vehicleOverview.vue';
+import messagesAdmin from '@/components/admin/MessagesAdmin.vue';
 
 Vue.use(Router);
 
@@ -38,6 +39,11 @@ export default new Router({
         path: '/admin/stops',
         name: 'stops',
         component: stopsAdmin,
+      },
+      {
+        path: '/admin/messages',
+        name: 'messages',
+        component: messagesAdmin,
       },
       {
         path: '/admin/vehicles',

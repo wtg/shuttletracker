@@ -52,7 +52,7 @@ export default class Vehicle {
         this.map = undefined;
         this.Route = undefined;
         this.lastUpdate = new Date();
-        this.tracker_id = trackerID; 
+        this.tracker_id = trackerID;
     }
 
     public getMessage(): string {
@@ -132,12 +132,12 @@ export default class Vehicle {
         map.removeLayer(this.marker);
     }
 
-    public asJSON(): {id: number; tracker_id: string; name: string; enabled: boolean }{
+    public asJSON(): {id: number; tracker_id: string; name: string; enabled: boolean } {
         return {
             id: this.id,
             enabled: this.enabled,
             tracker_id: String(this.tracker_id),
             name: this.name,
-        }
+        };
     }
 }

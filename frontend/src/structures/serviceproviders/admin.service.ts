@@ -1,5 +1,6 @@
 import Route, { RouteInterface } from '../route';
 import Vehicle from '../vehicle';
+import AdminMessageUpdate from '../adminMessageUpdate';
 
 export default class AdminServiceProvider {
     public static EditRoute(route: Route): Promise<Response> {
@@ -13,19 +14,26 @@ export default class AdminServiceProvider {
         return fetch('/vehicles/edit', {
             method: 'POST',
             body: JSON.stringify(vehicle.asJSON()),
-        })
+        });
     }
 
     public static DeleteVehicle(vehicle: Vehicle): Promise<Response> {
         return fetch('/vehicles?id=' + String(vehicle.id), {
             method: 'DELETE',
-        })
+        });
     }
 
     public static NewVehicle(vehicle: Vehicle): Promise<Response> {
         return fetch('/vehicles/create', {
             method: 'POST',
             body: JSON.stringify(vehicle.asJSON()),
-        })
+        });
+    }
+
+    public static SetMessage(message: AdminMessageUpdate): Promise<Response> {
+        return fetch('/adminMessage', {
+            method: 'POST',
+            body: JSON.stringify(message),
+        });
     }
 }

@@ -43,14 +43,14 @@ export default Vue.extend({
             return this.$store.state.Vehicles;
         },
     },
-    data (){
+    data() {
         return{
             shouldDelete: false,
             vehicleToDelete: undefined,
         } as {
             shouldDelete: boolean,
             vehicleToDelete: Vehicle | undefined,
-        }
+        };
     },
     components: {
         AreYouSure,
@@ -59,14 +59,14 @@ export default Vue.extend({
         this.$store.dispatch('grabVehicles');
     },
     methods: {
-        vehicleDelete(){
+        vehicleDelete() {
             this.shouldDelete = false;
-            if(this.vehicleToDelete !== undefined){
+            if (this.vehicleToDelete !== undefined) {
                 AdminServiceProvider.DeleteVehicle((this.vehicleToDelete as Vehicle)).then(() => {
                     this.$store.dispatch('grabVehicles');
                 });
             }
-        }
-    }
+        },
+    },
 });
 </script>

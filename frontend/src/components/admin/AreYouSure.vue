@@ -24,16 +24,15 @@
 </template>
 
 <script lang="ts">
-
 // This is an 'are you sure' modal, it is active on the active property, and emits no when close or no is clicked, and emits yes when yes is clicked
-import Vue from 'vue'
+import Vue from 'vue;'
 export default Vue.extend({
     props: {
         active: {
             type: Boolean,
-            default: () => false
-        }
-    }
-    
-})
+            default: () => fals,e
+        ,}
+    ,}
+
+};)
 </script>
