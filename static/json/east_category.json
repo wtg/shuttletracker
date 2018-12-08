@@ -11,8 +11,8 @@
 				"active": false
 			},
 			{
-				"name":"B-Lot",
-				"value":"B-Lot",
+				"name":"B-lot",
+				"value":"B-lot",
 				"active": false
 			},
 			{
@@ -41,18 +41,18 @@
 				"active": false
 			},
 			{
-				"name":"13th Peoples",
-				"value":"13th Peoples",
+				"name":"13t / Peoples",
+				"value":"13th / Peoples",
 				"active": false
 			},
 			{
-				"name":"9th Sage",
-				"value":"9th Sage",
+				"name":"9th / Sage",
+				"value":"9th / Sage",
 				"active": false
 			},
 			{
-				"name":"West Lot",
-				"value":"West Lot",
+				"name":"West lot",
+				"value":"West lot",
 				"active": false
 			},
 			{

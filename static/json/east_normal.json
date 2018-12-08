@@ -1,21 +1,130 @@
 {"rowData": [{
     "name": "Union",
-    "bus1": "7:00a",
-	"bus2": "7:20a"
-	},
-	{
-    "name": "Colonie",
-    "bus1": "7:00a",
-	"bus2": "7:20a"
-	},
-	{
-    "name": "B-Lot",
-    "bus1": "7:00a",
-	"bus2": "7:20a"
+    "stop1": "7:00a",
+	"stop2": "7:20a"
 	},
 	{
 	"name": "Union",
-    "bus1": "10:00a",
-	"bus2": "10:20a"
+	"stop1": "8:05a",
+	"stop2": "8:09a"
+	},
+	{
+    "name": "Tibbits Ave",
+    "stop1": "7:03a",
+	"stop2": "7:23a"
+	},
+	{
+	"name": "Tibbits Ave",
+	"stop1": "8:08a",
+	"stop2": "8:12a"
+	},
+	{
+    "name": "B-lot",
+    "stop1": "7:06a",
+	"stop2": "7:26a"
+	},
+	{
+	"name": "B-lot",
+	"stop1": "8:12a",
+	"stop2": "8:15a"
+	},
+	{
+    "name": "Colonie",
+    "stop1": "7:09a",
+	"stop2": "7:29a"
+	},
+	{
+	"name": "Colonie",
+	"stop1": "8:15a",
+	"stop2": "8:20a"
+	},
+	{
+    "name": "Brinsmade",
+    "stop1": "7:12a",
+	"stop2": "7:32a"
+	},
+	{
+	"name": "Brinsmade",
+	"stop1": "8:18a",
+	"stop2": "8:20a"
+	},
+	{
+    "name": "Sunset 1 & 2",
+    "stop1": "7:13a",
+	"stop2": "7:33a"
+	},
+	{
+	"name": "Sunset 1 & 2",
+	"stop1": "8:20a",
+	"stop2": "8:21a"
+	},
+	{
+    "name": "E-lot",
+    "stop1": "7:15a",
+	"stop2": "7:34a"
+	},
+	{
+	"name": "E-lot",
+	"stop1": "8:22a",
+	"stop2": "8:22a"
+	},
+	{
+    "name": "B-lot",
+    "stop1": "7:16a",
+	"stop2": "7:35a"
+	},
+	{
+	"name": "B-lot",
+	"stop1": "8:23a",
+	"stop2": "8:23a"
+	},
+	{
+    "name": "13th / Peoples",
+    "stop1": "7:18a",
+	"stop2": "7:37a"
+	},
+	{
+	"name": "13th / Peoples",
+	"stop1": "8:24a",
+	"stop2": "8:25a"
+	},
+	{
+    "name": "9th / Sage",
+    "stop1": "7:19a",
+	"stop2": "7:38a"
+	},
+	{
+	"name": "9th / Sage",
+	"stop1": "8:26a",
+	"stop2": "8:27a"
+	},
+	{
+    "name": "West lot",
+    "stop1": "7:20a",
+	"stop2": "7:39a"
+	},
+	{"name": "West lot",
+	"stop1": "8:27a",
+	"stop2": "8:28a"
+	},
+	{
+    "name": "Sage",
+    "stop1": "7:21a",
+	"stop2": "7:40a"
+	},
+	{
+	"name": "Sage",
+	"stop1": "8:28a",
+	"stop2": "8:29a"
+	},
+	{
+    "name": "Union",
+    "stop1": "7:23a",
+	"stop2": "7:42a"
+	},
+	{
+	"name": "Union",
+	"stop1": "8:30a",
+	"stop2": "8:30a"
 	}
 ]}
