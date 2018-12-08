@@ -5,8 +5,23 @@
 		<script src="static/dist/vue/vue.min.js"></script>
     </head>
 	<body>
+	
 	<!-- multiQuery-->
 		<div id='app'>
+			<div style="margin: 0px; padding: 0px; width: 100%; height: 5%;">
+				<div class="titleBar">
+					<ul class="titleContent">
+						<li class="dropdown-main-item">
+							<a href="index.html">
+								<img class="dropdown-icon" src="/frontend/src/admin/images/menu.svg">
+							</a>
+							<!---->
+						</li>
+						<li class="title">RPI Shuttle Tracker</li>
+					</ul>
+					<!---->
+				</div>
+			</div>
 			<span>Choose Stop:</span>
 			<template v-if='condition.length'>
 				<span v-for='(item,index) in condition' class='active'>{{item.name}}&nbsp;|&nbsp;</span>
@@ -22,6 +37,7 @@
 					</ol>
 				</div>
 			</template>
+			</div>
 		</div>     
 	<!--Show the table-->
 		<div id="grid">
