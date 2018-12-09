@@ -29,8 +29,8 @@
 						if (list.time_condition.length > 0){
 							//Time filter
 							for(var j=0; j < list.time_condition.length; j++){
-								if (row.bus1.indexOf(list.time_condition[j]) > -1) {
-									return true;
+								if (row.stop1.indexOf(list.time_condition[j]) > -1) {
+									return true;	
 								}			
 							}
 							return false;
@@ -66,7 +66,7 @@ var list={
 var vm = new Vue({
     el: '#grid',
     data: {
-        columnData: ['name', 'bus1','bus2'],
+        columnData: ['name', 'stop1','stop2'],
         searchQuery: '',
 		list,
 		rowData : [],
