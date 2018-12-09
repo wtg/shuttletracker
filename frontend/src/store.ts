@@ -76,7 +76,7 @@ const store: StoreOptions<StoreState> = {
       const arr = new Array<L.Polyline>();
       if (state.Routes !== undefined && state.Routes.length !== 0) {
         state.Routes.forEach((r: Route) => {
-          if (r.enabled) {
+          if (r.shouldShow()) {
             const points = new Array<L.LatLng>();
             if (r.coords !== undefined) {
               r.coords.forEach((p: {latitude: number, longitude: number}) => {
