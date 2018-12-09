@@ -66,12 +66,12 @@ var list={
 var vm = new Vue({
     el: '#grid',
     data: {
-        columnData: ['name', 'stop1','stop2'],
+        columnData: ['name', 'stop1','stop2'], //Show the length and content of column
         searchQuery: '',
 		list,
 		rowData : [],
     },
-	created (){
+	created (){ //Fetch JSON file
 		fetch("/static/json/east_category.json")
 		.then (response => response.json())
 		.then (json => {
@@ -108,12 +108,12 @@ var app =new Vue({
 					Vue.set(this.list.condition,count++,v);
 					if (index == 0){ //When index is 0, uses choose place. Add condition to place condiiton
 						if (!this.list.place_condition.includes(v.value)){
-							this.list.place_condition.push(v.value)
+							this.list.place_condition.push(v.value);
 						}						
 					}
 					else{//When index is 1, uses choose time. Add condition to place condiiton
 						if (!this.list.time_condition.includes(v.value)){
-							this.list.time_condition.push(v.value)
+							this.list.time_condition.push(v.value);
 						}	
 					}
 						
@@ -155,16 +155,15 @@ var app =new Vue({
 				});					
 				Vue.set(this.list.condition,count++,v);
 				if (index == 0){//When index is 0, uses choose place. Add all conditions in place condiiton
-					this.list.place_condition = []
-					
+					this.list.place_condition = [];	
 					for(var k=0; k < item.length; k++){
-						this.list.place_condition.push(item[k].value)
+						this.list.place_condition.push(item[k].value);
 					}
 				}
 				else {//When index is 0, uses choose place. Add all conditions in place condiiton
-					this.list.time_condition = []
+					this.list.time_condition = [];
 					for(var k=0; k < item.length; k++){
-						this.list.time_condition.push(item[k].value)
+						this.list.time_condition.push(item[k].value);
 					}
 				}
 				

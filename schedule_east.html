@@ -17,12 +17,14 @@
 							</a>
 							<!---->
 						</li>
-						<li class="title">East Shuttle Schedule</li>
+						<li class="title">East Shuttle Schedule</li><br>
+						
 					</ul>
 					<!---->
 				</div>
 			</div>
-			<span>Choose Stop:</span>
+			
+			<span>Choose stop and time, then click Search button:</span>
 			<template v-if='condition.length'>
 				<span v-for='(item,index) in condition' class='active'>{{item.name}}&nbsp;|&nbsp;</span>
 			</template>
