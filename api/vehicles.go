@@ -139,9 +139,9 @@ func (api *API) HistoryHandler(w http.ResponseWriter, r *http.Request){
 		}
 	}
 
-	err = WriteJSON(w, history)
+	writerErr := WriteJSON(w, history)
 	//Errcheck complaining 
-	if err != nil{
+	if writerErr != nil{
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	
