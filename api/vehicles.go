@@ -139,7 +139,7 @@ func (api *API) HistoryHandler(w http.ResponseWriter, r *http.Request){
 		}
 	}
 
-	err := WriteJSON(w, history)
+	err = WriteJSON(w, history)
 	//Errcheck complaining 
 	if err != nil{
 		http.Error(w, err.Error(), http.StatusInternalServerError)
