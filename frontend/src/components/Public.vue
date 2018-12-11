@@ -16,12 +16,13 @@
         <div class="logo">
           <a href="https://webtech.union.rpi.edu/">
             <img src="~../assets/wtg.svg" />
-          </a
->        </div>
+          </a>
+        </div>
     </div>
     <span style="width: 100%; height: 100%; position: fixed;">
       <div id="mymap"></div>
     <messagebox ref="msgbox" />
+    <routelegend />
     </span>
 </div>
 </template>
@@ -36,6 +37,7 @@ import Route from '../structures/route';
 import Stop from '../structures/stop';
 import dropdown from './dropdown.vue';
 
+import routelegend from './legend.vue';
 
 import messagebox from './adminmessage.vue';
 import * as L from 'leaflet';
@@ -118,7 +120,6 @@ export default Vue.extend({
     this.$store.subscribe((mutation: any, state: any) => {
       if (mutation.type === 'setRoutes') {
         this.renderRoutes();
-        this.updateLegend();
       }
       if (mutation.type === 'setStops') {
         this.renderStops();
@@ -131,28 +132,6 @@ export default Vue.extend({
   methods: {
     choose() {
       alert('hi');
-    },
-    updateLegend() {
-      this.legend.onAdd = (map: L.Map) => {
-        const div = L.DomUtil.create('div', 'info legend');
-        let legendstring = '';
-        this.$store.state.Routes.forEach((route: Route) => {
-          if (route.enabled) {
-            legendstring += `<li onclick="choose();"><img class="legend-icon" src=` + getMarkerString(route.color) + ` width="12" height="12"> ` +
-            route.name + `</li>`;
-            }
-        });
-
-        div.innerHTML = `<ul style="list-style:none">
-					<li><img class="legend-icon" src='` + UserSVG + `' width="12" height="12"> You </li>` +
-          legendstring +
-          `<li><img class="legend-icon" src="` + StopSVG + `" width="12" height="12"> Shuttle Stop</li>
-				</ul>`;
-        return div;
-      };
-      if (this.Map !== undefined) {
-        this.legend.addTo(this.Map);
-      }
     },
     routePolyLines(): L.Polyline[] {
       return this.$store.getters.getRoutePolyLines;
@@ -224,6 +203,7 @@ export default Vue.extend({
   components: {
     dropdown,
     messagebox,
+    routelegend,
   },
 });
 </script>
