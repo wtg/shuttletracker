@@ -116,7 +116,7 @@ func (api *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, updates) // it's good to take some REST in our server :)
 }
 
-// HistoryHandler updates for last 30 days to endpoint
+// HistoryHandler returns the last 30 days worth of updates for all enabled vehicles
 func (api *API) HistoryHandler(w http.ResponseWriter, r *http.Request){
 	vehicles, err := api.ms.EnabledVehicles()
 	if err != nil {
@@ -139,9 +139,9 @@ func (api *API) HistoryHandler(w http.ResponseWriter, r *http.Request){
 		}
 	}
 
-	writerErr := WriteJSON(w, history)
+	err = WriteJSON(w, history)
 	//Errcheck complaining 
-	if writerErr != nil{
+	if err != nil{
 		http.Error(w, writerErr.Error(), http.StatusInternalServerError)
 	}
 	
