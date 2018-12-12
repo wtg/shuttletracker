@@ -42,7 +42,6 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	if err != nil {
 		return nil, err
 	}
-
 	// Create API instance to store database session and collections
 	api := API{
 		cfg:     cfg,
@@ -94,6 +93,14 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		})
 	})
 
+
+	// eta
+	r.Route("/eta", func(r chi.Router) {
+		r.Get("/", api.EtaHandler)
+	})
+
+
+
 	// Stops
 	r.Route("/stops", func(r chi.Router) {
 		r.Get("/", api.StopsHandler)
@@ -118,9 +125,10 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		r.Get("/getKey/", api.KeyHandler)
 	})
 
-	// Static files
-	r.Get("/", IndexHandler)
-	r.Method("GET", "/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
+	r.Method("GET", "/static/*", http.StripPrefix("/static/", http.FileServer(staticFileSystem{http.Dir("static/")})))
+
+	r.Get("/", api.IndexHandler)
+	r.Get("/about", api.IndexHandler)
 
 	// iTRAK data feed endpoint
 	r.Get("/datafeed", api.DataFeedHandler)
@@ -145,11 +153,12 @@ func (api *API) Run() {
 	if err := http.ListenAndServe(api.cfg.ListenURL, api.handler); err != nil {
 		log.WithError(err).Error("Unable to serve.")
 	}
+
 }
 
 // IndexHandler serves the index page.
-func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "index.html")
+func (api *API) IndexHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "static/index.html")
 }
 
 // AdminHandler serves the admin page.
