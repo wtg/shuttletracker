@@ -10,6 +10,12 @@ export default class AdminServiceProvider {
         });
     }
 
+    public static DeleteRoute(route: Route): Promise<Response> {
+        return fetch('/routes?id=' + String(route.id), {
+            method: 'DELETE',
+        });
+    }
+
     public static CreateRoute(route: Route): Promise<Response> {
         return fetch('/routes/create', {
             method: 'POST',

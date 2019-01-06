@@ -1,5 +1,6 @@
 <template>
     <div style="margin-top: 50px;" class="container">
+        <are-you-sure @no="shouldDelete = false;" @yes="deleteRoute" :active="shouldDelete"/>
         <table class="table">
             <thead>
                 <tr>
@@ -21,6 +22,8 @@
                     </ul></td>
                 <td>{{route.enabled}}</td>
                 <td><button class="button" @click="$router.push('/admin/routes/' + String(route.id) + '/edit');">Edit</button></td>
+                <td><button class="button is-danger" @click="shouldDelete = true; routeToDelete = route;">Delete</button></td>
+                
                 </tr>
                 <tr>
                     <th></th>
@@ -37,16 +40,38 @@
 <script lang="ts">
 import Vue from 'vue';
 import Route from '../../structures/route';
+import AdminServiceProvider from '../../structures/serviceproviders/admin.service';
+import AreYouSure from '@/components/admin/AreYouSure.vue';
+
 
 export default Vue.extend({
     name: 'routes',
+    data() {
+        return{
+            shouldDelete: false,
+            routeToDelete: undefined,
+        } as {
+            shouldDelete: boolean,
+            routeToDelete: Route | undefined,
+        };
+    },
     computed: {
         routes(): Route[] {
             return this.$store.state.Routes;
         },
     },
     methods: {
-
+        deleteRoute() {
+            this.shouldDelete = false;
+            if (this.routeToDelete !== undefined) {
+                AdminServiceProvider.DeleteRoute(this.routeToDelete).then(() => {
+                    this.$store.dispatch('grabRoutes');
+                });
+            }
+        },
+    },
+    components: {
+        AreYouSure,
     },
 
 });
