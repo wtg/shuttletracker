@@ -65,9 +65,6 @@ export default Vue.extend({
             default: () => [],
         },
     },
-    mounted() {
-        console.log('test');
-    },
     methods: {
         addAndUpdate() {
             const tmp: RotueScheduleInterval[] = this.value;

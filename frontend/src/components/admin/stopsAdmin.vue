@@ -39,8 +39,8 @@ export default Vue.extend({
     computed: {
         stops(): Stop[] {
             return this.$store.state.Stops;
-        }
-    }
+        },
+    },
 
 });
 </script>

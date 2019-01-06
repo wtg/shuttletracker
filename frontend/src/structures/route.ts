@@ -8,7 +8,7 @@ export interface RouteInterface {
     color: string;
     width: number;
     schedule: routeScheduleInterval[];
-    coords: Array<{
+    points: Array<{
         latitude: number,
         longitude: number,
     }>;
@@ -25,12 +25,12 @@ export default class Route implements RouteInterface {
     public color: string;
     public width: number;
     public schedule: routeScheduleInterval[];
-    public coords: Array<{
+    public points: Array<{
         latitude: number,
         longitude: number,
     }>;
     constructor(id: number, name: string, description: string, enabled: boolean,
-                color: string, width: number, coords: Array<{
+                color: string, width: number, points: Array<{
                     latitude: number,
                     longitude: number,
         }>,     schedule: routeScheduleInterval[]) {
@@ -40,7 +40,7 @@ export default class Route implements RouteInterface {
         this.enabled = enabled;
         this.color = color;
         this.width = Number(width);
-        this.coords = coords;
+        this.points = points;
         this.schedule = schedule;
     }
 

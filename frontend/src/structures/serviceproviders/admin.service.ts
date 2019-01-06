@@ -10,6 +10,13 @@ export default class AdminServiceProvider {
         });
     }
 
+    public static CreateRoute(route: Route): Promise<Response> {
+        return fetch('/routes/create', {
+            method: 'POST',
+            body: JSON.stringify(route as RouteInterface),
+        });
+    }
+
     public static EditVehicle(vehicle: Vehicle): Promise<Response> {
         return fetch('/vehicles/edit', {
             method: 'POST',

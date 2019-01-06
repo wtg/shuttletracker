@@ -1,9 +1,16 @@
 <template>
-    <div id="map"></div>
+    <span>
+        <div>
+        <button @click="popWaypoint" class="button is-info undo">Undo</button>
+        <p>({{this.RoutingWaypoints.length}}) Waypoints</p>
+        </div>
+        <div id="map"></div>
+    </span>
 </template>
 <script lang="ts">
 import Vue from 'vue';
 import * as L from 'leaflet';
+import 'leaflet-routing-machine';
 
 export default Vue.extend({
     props: {
@@ -16,11 +23,19 @@ export default Vue.extend({
         return {
             Map: undefined,
             existingRouteLayers: [],
-
+            RoutingControl: undefined,
+            APIKey: 'pk.eyJ1Ijoiamx5b24xIiwiYSI6ImNqNmR4ZTVmejAwaTEzM3FsMmU0d2RmYjIifQ._VUaEMHioVwJIf11PzIqAQ',
+            drawnRoute: undefined,
+            RoutingWaypoints: [],
+            RoutePolyLine: undefined,
         } as {
             Map: L.Map | undefined;
             existingRouteLayers: L.Polyline[];
-
+            RoutingControl: L.Routing.Control | undefined;
+            APIKey: string;
+            drawnRoute: any;
+            RoutingWaypoints: any[];
+            RoutePolyLine: undefined | L.Polyline;
         };
     },
     watch: {
@@ -29,6 +44,15 @@ export default Vue.extend({
         },
     },
     methods: {
+        createRoutePoints() {
+            const points: any = [];
+            const latlngs = (this as any).RoutePolyLine.getLatLngs();
+            latlngs.forEach((pt: L.LatLng) => {
+                points.push({latitude: pt.lat, longitude: pt.lng});
+            });
+            this.$emit('points', points);
+
+        },
         mountMap() {
             if (this.Map === undefined) {
                 this.$nextTick(() => {
@@ -39,24 +63,43 @@ export default Vue.extend({
 
                     this.Map.setView([42.728172, -73.678803], 15.3);
 
-                    this.Map.addControl(L.control.attribution({
-                        position: 'bottomright',
-                        prefix: '',
-                    }));
                     L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png', {
-                        attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
-                                    'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. ' +
-                                    'Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under ' +
-                                    '<a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
                         maxZoom: 17,
                         minZoom: 14,
                     }).addTo(this.Map);
+                    this.RoutingControl = L.Routing.control({
+                        waypoints: [
 
+                        ],
+                        // @ts-ignore
+                        createMarker: () => {}, // @ts-ignore
+                        // @ts-ignore
+                        router: L.Routing.mapbox(this.APIKey),
+                        routeWhileDragging: true,
+                    });
+                    const el = this;
+
+                    this.RoutingControl.on('routeselected', (e) => {
+                        (el as any).RoutePolyLine = L.polyline(e.route.coordinates, {color: 'blue'});
+                        (el as any).createRoutePoints();
+                    });
+
+                    this.RoutingControl.addTo(this.Map);
+                    this.RoutingWaypoints = [];
+                    this.Map.on('click', (e: any) => {
+                            (el as any).RoutingWaypoints.push((e as any).latlng);
+                            (el as any).RoutingControl.setWaypoints((el as any).RoutingWaypoints);
+
+                    });
                     this.Map.invalidateSize();
                     this.renderRoutes();
 
                 });
             }
+        },
+        popWaypoint() {
+            (this as any).RoutingWaypoints.splice(-1, 1);
+            (this as any).RoutingControl.setWaypoints(this.RoutingWaypoints);
         },
         renderRoutes(): any {
             this.existingRouteLayers.forEach((line) => {
@@ -83,9 +126,14 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
     #map{
         width: 100%;
         height: 500px;
     }
+    
+    .leaflet-bar {
+        display: none !important;
+    }
+
 </style>

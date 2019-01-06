@@ -10,7 +10,7 @@
                 <p>Route saved successfully</p>
             </div>
             <map-view v-if="(routePolyLine !== undefined) && !creation" :route-lines="[routePolyLine]"></map-view>
-            <draw-route />
+            <draw-route @points="setPoints" v-if="creation"/>
         </div>
         <div class="form-horizontal column" >
             <!-- Text input-->
@@ -142,25 +142,46 @@ export default Vue.extend({
         },
     },
     methods: {
+        setPoints(points: Array<{latitude: number, longitude: number}>) {
+            this.route.points = points;
+        },
         send() {
             this.sending = true;
             if (!this.formValid) {
                 return;
             }
-            AdminServiceProvider.EditRoute(this.route).then(() => {
-                this.sending = false;
-                this.success = true;
-                this.$store.dispatch('grabRoutes');
-                setTimeout(() => {
-                    this.success = false;
-                }, 2000);
-            }).catch(() => {
-                this.failure = true;
-                this.sending = false;
-                setTimeout(() => {
-                    this.failure = false;
-                }, 2000);
-            });
+            if (!this.creation) {
+                AdminServiceProvider.EditRoute(this.route).then(() => {
+                    this.sending = false;
+                    this.success = true;
+                    this.$store.dispatch('grabRoutes');
+                    setTimeout(() => {
+                        this.success = false;
+                    }, 2000);
+                }).catch(() => {
+                    this.failure = true;
+                    this.sending = false;
+                    setTimeout(() => {
+                        this.failure = false;
+                    }, 2000);
+                });
+            } else {
+                AdminServiceProvider.CreateRoute(this.route).then(() => {
+                    this.sending = false;
+                    this.success = true;
+                    this.$store.dispatch('grabRoutes');
+                    setTimeout(() => {
+                        this.success = false;
+                    }, 2000);
+                }).catch(() => {
+                    this.failure = true;
+                    this.sending = false;
+                    setTimeout(() => {
+                        this.failure = false;
+                    }, 2000);
+                });
+            }
+
         },
         setEnabled(val: boolean) {
             this.route.enabled = val;
@@ -170,14 +191,14 @@ export default Vue.extend({
             for (let i = 0; i < this.$store.getters.getRoutes.length; i ++) {
                 const testRoute = this.$store.getters.getRoutes[i];
                 const id = this.$route.params.id;
-                if (Number(testRoute.id) == Number(id)) {
+                if (Number(testRoute.id) === Number(id)) {
                     this.route.id = testRoute.id;
                     this.route.name = testRoute.name;
                     this.route.enabled = testRoute.enabled;
                     this.route.color = testRoute.color;
                     this.route.width = testRoute.width;
                     this.route.description = testRoute.description;
-                    this.route.coords = testRoute.coords;
+                    this.route.points = testRoute.points;
                     this.route.schedule = testRoute.schedule.slice();
                 }
                 this.routePolyLine = this.$store.getters.getPolyLineByRouteId(testRoute.id);

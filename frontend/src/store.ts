@@ -80,8 +80,8 @@ const store: StoreOptions<StoreState> = {
         state.Routes.forEach((r: Route) => {
           if (r.enabled) {
             const points = new Array<L.LatLng>();
-            if (r.coords !== undefined) {
-              r.coords.forEach((p: {latitude: number, longitude: number}) => {
+            if (r.points !== undefined) {
+              r.points.forEach((p: {latitude: number, longitude: number}) => {
                 points.push(new L.LatLng(p.latitude, p.longitude));
               });
             }
@@ -104,8 +104,8 @@ const store: StoreOptions<StoreState> = {
         state.Routes.forEach((r: Route) => {
           if (r.enabled) {
             const points = new Array<L.LatLng>();
-            if (r.coords !== undefined) {
-              r.coords.forEach((p: {latitude: number, longitude: number}) => {
+            if (r.points !== undefined) {
+              r.points.forEach((p: {latitude: number, longitude: number}) => {
                 points.push(new L.LatLng(p.latitude, p.longitude));
               });
             }
@@ -124,8 +124,8 @@ const store: StoreOptions<StoreState> = {
       const points = new Array<L.LatLng>();
       if (state.Routes !== undefined && state.Routes.length !== 0) {
         state.Routes.forEach((r: Route) => {
-          if (r.coords !== undefined) {
-            r.coords.forEach((p: {latitude: number, longitude: number}) => {
+          if (r.points !== undefined) {
+            r.points.forEach((p: {latitude: number, longitude: number}) => {
               points.push(new L.LatLng(p.latitude, p.longitude));
             });
           }

@@ -13,7 +13,7 @@
             </thead>
             <tbody>
                 <tr v-for="route in routes" :key="route.id">
-                <th><router-link to="/admin/routes/1/">{{route.name}}</router-link></th>
+                <th><router-link :to='"/admin/routes/" + String(route.id) + "/"' >{{route.name}}</router-link></th>
                 <td>{{route.id}}</td>
                 <td>{{route.description}}</td>
                 <td><ul>
@@ -21,6 +21,14 @@
                     </ul></td>
                 <td>{{route.enabled}}</td>
                 <td><button class="button" @click="$router.push('/admin/routes/' + String(route.id) + '/edit');">Edit</button></td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th><button @click="$router.push('/admin/routes/-1/new')" class="button is-success">New</button></th>
                 </tr>
             </tbody>
         </table>

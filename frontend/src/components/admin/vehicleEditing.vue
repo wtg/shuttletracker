@@ -105,7 +105,6 @@ export default Vue.extend({
                         this.$router.push('/admin/vehicles');
                     }, 2000);
                 }).catch((err) => {
-                    console.log(err);
                     this.error = true;
                     this.sending = false;
                     setTimeout(() => {
@@ -121,7 +120,6 @@ export default Vue.extend({
                         this.success = false;
                     }, 2000);
                 }).catch((err) => {
-                    console.log(err);
                     this.error = true;
                     this.sending = false;
                     setTimeout(() => {
