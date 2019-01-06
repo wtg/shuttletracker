@@ -48,6 +48,7 @@ export default class Vehicle {
                 popupAnchor: [0, 0],   // point from which the popup should open relative to the iconAnchor
             }),
             zIndexOffset: 1000,
+            // @ts-ignore
             rotationOrigin: 'center',
         });
         this.shownOnMap = false;
@@ -93,6 +94,7 @@ export default class Vehicle {
 
     public setHeading(heading: number) {
         this.heading = heading - 45;
+        // @ts-ignore
         this.marker.setRotationAngle(this.heading);
         this.marker.bindPopup(this.getMessage());
     }

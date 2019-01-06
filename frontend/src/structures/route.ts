@@ -30,11 +30,12 @@ export default class Route implements RouteInterface {
         latitude: number,
         longitude: number,
     }>;
+
     constructor(id: number, name: string, description: string, enabled: boolean,
                 color: string, width: number, points: Array<{
-                    latitude: number,
-                    longitude: number,
-        }>, schedule: routeScheduleInterval[], active: boolean) {
+            latitude: number,
+            longitude: number,
+        }>,     schedule: routeScheduleInterval[], active: boolean) {
 
         this.active = active;
         this.id = id;
@@ -46,5 +47,11 @@ export default class Route implements RouteInterface {
         this.points = points;
         this.schedule = schedule;
     }
+
+    public shouldShow(): boolean {
+        return this.enabled && this.active;
+    }
+
+
 
 }
