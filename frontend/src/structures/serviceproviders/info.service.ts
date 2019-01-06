@@ -51,13 +51,14 @@ export default class InfoServiceProvider {
                         end_time: Date;
                     }
                 ],
+                active: boolean,
             }) => {
                 const myschedule: routeScheduleInterval[] = [];
                 element.schedule.forEach((interval) => {
                     myschedule.push(new routeScheduleInterval(interval.id, interval.route_id, interval.start_day, new Date(interval.start_time), interval.end_day, new Date(interval.end_time)));
                 });
                 ret.push(new Route(element.id, element.name, element.description,
-                    element.enabled, element.color, Number(element.width), element.points, myschedule));
+                    element.enabled, element.color, Number(element.width), element.points, myschedule, element.active));
             });
             return ret;
         });

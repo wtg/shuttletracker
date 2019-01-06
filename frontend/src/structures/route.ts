@@ -25,6 +25,7 @@ export default class Route implements RouteInterface {
     public color: string;
     public width: number;
     public schedule: routeScheduleInterval[];
+    public active: boolean;
     public points: Array<{
         latitude: number,
         longitude: number,
@@ -33,7 +34,9 @@ export default class Route implements RouteInterface {
                 color: string, width: number, points: Array<{
                     latitude: number,
                     longitude: number,
-        }>,     schedule: routeScheduleInterval[]) {
+        }>, schedule: routeScheduleInterval[], active: boolean) {
+
+        this.active = active;
         this.id = id;
         this.name = name;
         this.description = description;

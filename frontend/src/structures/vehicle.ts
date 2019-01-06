@@ -2,6 +2,7 @@ import * as L from 'leaflet';
 import Route from '@/structures/route';
 import getMarkerString from '@/structures/leaflet/rotatedMarker';
 import getCardinalDirection from '@/structures/cardinalDirection';
+import 'leaflet-rotatedmarker';
 
 const ShuttleIcon = require('@/assets/shuttle.svg') as string;
 const maxMissedUpdatesBeforeHide = 5;
@@ -41,12 +42,13 @@ export default class Vehicle {
         this.RouteID = null;
         this.marker = new L.Marker([this.lat, this.lng], {
             icon: L.icon({
-                iconUrl: getMarkerString('#FFF', this.heading),
-                iconSize:     [32, 32], // size of the icon
-                iconAnchor:   [16, 16], // point of the icon which will correspond to marker's location
-                popupAnchor:  [0, 0],   // point from which the popup should open relative to the iconAnchor
+                iconUrl: getMarkerString('#FFF'),
+                iconSize: [32, 32], // size of the icon
+                iconAnchor: [16, 16], // point of the icon which will correspond to marker's location
+                popupAnchor: [0, 0],   // point from which the popup should open relative to the iconAnchor
             }),
             zIndexOffset: 1000,
+            rotationOrigin: 'center',
         });
         this.shownOnMap = false;
         this.map = undefined;
@@ -57,11 +59,13 @@ export default class Vehicle {
 
     public getMessage(): string {
         const speed = Math.round(this.speed * 100) / 100;
-        const date = new Date(this.created);
         const direction = getCardinalDirection(this.heading + 45);
-        return `<b>` + this.name + `</b><br>` +
-            `Traveling ` + direction + ` at ` + speed + ` mph<br>` +
-            `as of ` + date.toLocaleTimeString();
+        let message = `<b>${this.name}</b><br>`
+            + `Traveling ${direction} at ${speed} mph`;
+        if (this.lastUpdate !== undefined) {
+            message += '<br>as of ' + this.lastUpdate.toLocaleTimeString();
+        }
+        return message;
     }
 
     public addToMap(map: L.Map) {
@@ -89,23 +93,17 @@ export default class Vehicle {
 
     public setHeading(heading: number) {
         this.heading = heading - 45;
-        if (this.Route) {
-            this.marker.setIcon(L.icon(({
-                iconUrl: getMarkerString(this.Route.color, this.heading),
-                rotationOrigin: 'center',
-            } as L.IconOptions)));
-        }
+        this.marker.setRotationAngle(this.heading);
         this.marker.bindPopup(this.getMessage());
-
     }
 
     public setRoute(r: Route | undefined) {
         if (r === undefined) {
             this.marker.setIcon(L.icon({
-                iconUrl: getMarkerString('#FFF', this.heading),
-                iconSize:     [32, 32], // size of the icon
-                iconAnchor:   [16, 16], // point of the icon which will correspond to marker's location
-                popupAnchor:  [0, 0],   // point from which the popup should open relative to the iconAnchor
+                iconUrl: getMarkerString('#FFF'),
+                iconSize: [32, 32], // size of the icon
+                iconAnchor: [16, 16], // point of the icon which will correspond to marker's location
+                popupAnchor: [0, 0],   // point from which the popup should open relative to the iconAnchor
             }));
 
             return;
@@ -113,10 +111,10 @@ export default class Vehicle {
         this.Route = r;
         this.RouteID = r.id;
         this.marker.setIcon(L.icon({
-            iconUrl: getMarkerString(r.color, this.heading),
-            iconSize:     [32, 32], // size of the icon
-            iconAnchor:   [16, 16], // point of the icon which will correspond to marker's location
-            popupAnchor:  [0, 0],   // point from which the popup should open relative to the iconAnchor
+            iconUrl: getMarkerString(r.color),
+            iconSize: [32, 32], // size of the icon
+            iconAnchor: [16, 16], // point of the icon which will correspond to marker's location
+            popupAnchor: [0, 0],   // point from which the popup should open relative to the iconAnchor
         }));
         this.marker.bindPopup(this.getMessage());
 

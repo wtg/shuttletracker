@@ -132,8 +132,8 @@ export default Vue.extend({
         const div = L.DomUtil.create('div', 'info legend');
         let legendstring = '';
         this.$store.state.Routes.forEach((route: Route) => {
-          if (route.enabled) {
-            legendstring += `<li><img class="legend-icon" src=` + getMarkerString(route.color, 0) + `
+          if (route.shouldShow()) {
+            legendstring += `<li><img class="legend-icon" src=` + getMarkerString(route.color) + `
 			      width="12" height="12"> ` +
             route.name;
           }

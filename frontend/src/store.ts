@@ -45,7 +45,7 @@ const store: StoreOptions<StoreState> = {
         let found = false;
         for (let i = 0; i < updates.length; i++) {
           if (Number(vehicle.id) === Number(updates[i].vehicle_id)) {
-            vehicle.lastUpdate = new Date(updates[i].date) ;
+            vehicle.lastUpdate = new Date(updates[i].time);
             found = true;
             vehicle.speed = Number(updates[i].speed);
             vehicle.setRoute(undefined);
@@ -102,7 +102,7 @@ const store: StoreOptions<StoreState> = {
       const arr = new Array<L.Polyline>();
       if (state.Routes !== undefined && state.Routes.length !== 0) {
         state.Routes.forEach((r: Route) => {
-          if (r.enabled) {
+          if (r.shouldShow()) {
             const points = new Array<L.LatLng>();
             if (r.points !== undefined) {
               r.points.forEach((p: {latitude: number, longitude: number}) => {

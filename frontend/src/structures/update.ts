@@ -6,10 +6,8 @@ export default interface Update {
     heading: number;
     speed: number;
     time: string;
-    date: string;
     status: string;
     created: string;
     route_id: number | null;
     vehicle_id: number;
-
 }
