@@ -5,9 +5,15 @@
         <a class="navbar-item" href="https://shuttles.rpi.edu">
           <p>Shuttle Tracc - <span class="has-text-danger">Fleet Management</span></p>
         </a>
+        <a @click="menuVisible = !menuVisible" role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
       </div>
 
-      <div id="navbarBasicExample" class="navbar-menu">
+      <div id="navbarBasicExample" class="navbar-menu" :class="{'is-active': menuVisible}">
+        
         <div class="navbar-start">
           <router-link to="/admin/routes" class="navbar-item">
             Routes
@@ -48,6 +54,13 @@ export default Vue.extend({
   name: 'admin',
   components: {
     routesAdmin,
+  },
+  data(){
+    return {
+      menuVisible: false,
+    }as {
+      menuVisible: boolean;
+    }
   },
   mounted() {
     this.$store.dispatch('grabRoutes');
