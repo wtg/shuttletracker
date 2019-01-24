@@ -55,12 +55,12 @@ export default Vue.extend({
   components: {
     routesAdmin,
   },
-  data(){
+  data() {
     return {
       menuVisible: false,
     }as {
       menuVisible: boolean;
-    }
+    };
   },
   mounted() {
     this.$store.dispatch('grabRoutes');

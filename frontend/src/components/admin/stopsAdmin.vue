@@ -1,6 +1,5 @@
 <template>
     <div style="margin-top: 50px;" class="container">
-        <!-- <are-y ou-sure @no="shouldDelete = false;" @yes="vehicleDelete" :active="false"/> -->
         <table class="table">
             <thead>
                 <tr>

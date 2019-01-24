@@ -166,12 +166,18 @@ export default Vue.extend({
                     }, 2000);
                 });
             } else {
-                AdminServiceProvider.CreateRoute(this.route).then(() => {
+                AdminServiceProvider.CreateRoute(this.route).then((resp) => {
+                    // Handle 500 errors here
+                    if (resp.status === 500) {
+                        throw new Error('bad response');
+                    }
                     this.sending = false;
                     this.success = true;
                     this.$store.dispatch('grabRoutes');
                     setTimeout(() => {
                         this.success = false;
+                        this.$router.push('/admin/routes');
+
                     }, 2000);
                 }).catch(() => {
                     this.failure = true;
