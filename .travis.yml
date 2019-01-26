@@ -32,8 +32,8 @@ before_script:
   - psql -c 'create database shuttletracker_test;' -U postgres
 
 script:
-  - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then gometalinter --vendor ./... 2>&1 | revgrep origin/master; fi
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then gometalinter --vendor ./... || true; fi
+  - if [ "$TRAVIS_PULL_REQUEST" != "false" && "go version go1.8.7 linux/amd64" = "$(go version)" && "go version go1.7.6 linux/amd64" = "$(go version)" ]; then gometalinter --vendor ./... 2>&1 | revgrep origin/master; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" && "go version go1.8.7 linux/amd64" = "$(go version)" && "go version go1.7.6 linux/amd64" = "$(go version)" ]; then gometalinter --vendor ./... || true; fi
   - ./test.sh
   - docker build .
   - bash <(curl -s https://codecov.io/bash)
