@@ -2,9 +2,9 @@
   <div id="admin">
     <nav class="navbar" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
-        <a class="navbar-item" href="https://shuttles.rpi.edu">
+        <router-link class="navbar-item" :to="'/admin/routes'">
           <p>Shuttle Tracc - <span class="has-text-danger">Fleet Management</span></p>
-        </a>
+        </router-link>
         <a @click="menuVisible = !menuVisible" role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false">
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>

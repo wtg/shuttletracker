@@ -22,11 +22,11 @@ func TestStatic(t *testing.T) {
 		},
 		{
 			method: "GET",
-			path:   "/static/css/application.css",
+			path:   "/admin/routes",
 		},
 		{
 			method: "GET",
-			path:   "/static/js/admin.js",
+			path:   "/admin/stops",
 		},
 	}
 
