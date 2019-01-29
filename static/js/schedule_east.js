@@ -29,7 +29,8 @@
 						if (list.time_condition.length > 0){
 							//Time filter
 							for(var j=0; j < list.time_condition.length; j++){
-								if (row.stop1.indexOf(list.time_condition[j]) > -1) {
+								if (row.stop1.match(list.time_condition[j])) {
+								
 									return true;	
 								}			
 							}
