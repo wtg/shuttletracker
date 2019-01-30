@@ -115,3 +115,36 @@ func (api *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 	// Convert updates to JSON
 	WriteJSON(w, updates) // it's good to take some REST in our server :)
 }
+
+// HistoryHandler returns the last 30 days worth of updates for all enabled vehicles
+func (api *API) HistoryHandler(w http.ResponseWriter, r *http.Request){
+	vehicles, err := api.ms.EnabledVehicles()
+	if err != nil {
+		log.WithError(err).Error("Unable to get enabled vehicles")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	history := make([][]*shuttletracker.Location, 0, len(vehicles))
+	for _, vehicle := range vehicles {
+		since := time.Now().Add(time.Minute * -43200)
+		vehicleUpdates, err := api.ms.LocationsSince(vehicle.ID, since)
+		if err != nil{
+			log.WithError(err).Error("Unable to get last vehicle update.")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if len(vehicleUpdates) > 0 {
+			history = append(history, vehicleUpdates)
+		}
+	}
+
+	writerErr := WriteJSON(w, history)
+	//Errcheck complaining 
+	if writerErr != nil{
+		http.Error(w, writerErr.Error(), http.StatusInternalServerError)
+	}
+	
+
+
+}
