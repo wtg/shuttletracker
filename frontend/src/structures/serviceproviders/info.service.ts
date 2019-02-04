@@ -3,6 +3,7 @@ import Route from '../route';
 import Stop from '../stop';
 import Update from '../update';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
+import routeScheduleInterval from '../routeScheduleInterval';
 /**
  * Info service provider grabs the basic information from the api and returns it to the frontend.
  */
@@ -19,7 +20,7 @@ export default class InfoServiceProvider {
                 tracker_id: string,
             }) => {
                 ret.push(new Vehicle(element.id, element.name,
-                    new Date(element.created), new Date(element.updated), element.enabled));
+                    new Date(element.created), new Date(element.updated), element.enabled, Number(element.tracker_id)));
             });
             return ret;
         });
@@ -40,10 +41,24 @@ export default class InfoServiceProvider {
                     latitude: number,
                     longitude: number,
                 }],
+                schedule: [
+                    {
+                        id: number;
+                        route_id: number;
+                        start_day: number;
+                        start_time: Date;
+                        end_day: number;
+                        end_time: Date;
+                    }
+                ],
                 active: boolean,
             }) => {
+                const myschedule: routeScheduleInterval[] = [];
+                element.schedule.forEach((interval) => {
+                    myschedule.push(new routeScheduleInterval(interval.id, interval.route_id, interval.start_day, new Date(interval.start_time), interval.end_day, new Date(interval.end_time)));
+                });
                 ret.push(new Route(element.id, element.name, element.description,
-                    element.enabled, element.color, Number(element.width), element.points, element.active));
+                    element.enabled, element.color, Number(element.width), element.points, myschedule, element.active));
             });
             return ret;
         });
@@ -84,6 +99,12 @@ export default class InfoServiceProvider {
                 ret.push(element);
             });
             return ret;
+        });
+    }
+
+    public GrabMapboxKey(): Promise<string> {
+        return fetch('/getKey/').then((data) => data.json()).then((data: string) => {
+            return data;
         });
     }
 }

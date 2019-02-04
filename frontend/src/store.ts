@@ -72,14 +72,40 @@ const store: StoreOptions<StoreState> = {
     },
   },
   getters: {
+    getPolyLineByRouteId: (state) => (id: number): L.Polyline | undefined => {
+      const arr = new Array<L.Polyline>();
+      let ret;
+
+      if (state.Routes !== undefined && state.Routes.length !== 0) {
+        state.Routes.forEach((r: Route) => {
+          if (r.enabled) {
+            const points = new Array<L.LatLng>();
+            if (r.points !== undefined) {
+              r.points.forEach((p: {latitude: number, longitude: number}) => {
+                points.push(new L.LatLng(p.latitude, p.longitude));
+              });
+            }
+            const line = new L.Polyline(points, {
+              color: r.color,
+              weight: r.width,
+              opacity: 1,
+            });
+            if (r.id === id) {
+              ret = line;
+            }
+          }
+        });
+      }
+      return ret;
+    },
     getRoutePolyLines(state: StoreState): L.Polyline[] {
       const arr = new Array<L.Polyline>();
       if (state.Routes !== undefined && state.Routes.length !== 0) {
         state.Routes.forEach((r: Route) => {
           if (r.shouldShow()) {
             const points = new Array<L.LatLng>();
-            if (r.coords !== undefined) {
-              r.coords.forEach((p: {latitude: number, longitude: number}) => {
+            if (r.points !== undefined) {
+              r.points.forEach((p: {latitude: number, longitude: number}) => {
                 points.push(new L.LatLng(p.latitude, p.longitude));
               });
             }
@@ -98,8 +124,8 @@ const store: StoreOptions<StoreState> = {
       const points = new Array<L.LatLng>();
       if (state.Routes !== undefined && state.Routes.length !== 0) {
         state.Routes.forEach((r: Route) => {
-          if (r.coords !== undefined) {
-            r.coords.forEach((p: {latitude: number, longitude: number}) => {
+          if (r.points !== undefined) {
+            r.points.forEach((p: {latitude: number, longitude: number}) => {
               points.push(new L.LatLng(p.latitude, p.longitude));
             });
           }
@@ -110,6 +136,12 @@ const store: StoreOptions<StoreState> = {
         opacity: 1,
       });
       return line;
+    },
+    getRoutes(state: StoreState): Route[] {
+      return state.Routes;
+    },
+    getVehicles(state: StoreState): Vehicle[] {
+      return state.Vehicles;
     },
   },
   actions: {
