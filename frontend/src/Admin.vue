@@ -3,7 +3,7 @@
     <nav class="navbar" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
         <router-link class="navbar-item" :to="'/admin/routes'">
-          <p>Shuttle Tracc - <span class="has-text-danger">Fleet Management</span></p>
+          <p>Shuttle Tracker - <span class="has-text-danger">Fleet Management</span></p>
         </router-link>
         <a @click="menuVisible = !menuVisible" role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false">
           <span aria-hidden="true"></span>

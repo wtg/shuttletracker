@@ -9,7 +9,7 @@
             <div v-if="success" class="notification is-success">
                 <p>Route saved successfully</p>
             </div>
-            <map-view v-if="(routePolyLine !== undefined) && !creation" :route-lines="[routePolyLine]"></map-view>
+            <map-view v-if="false && (routePolyLine !== undefined) && !creation" :route-lines="[routePolyLine]"></map-view>
             <draw-route @points="setPoints" v-if="creation"/>
         </div>
         <div class="form-horizontal column" >
@@ -50,15 +50,15 @@
 
             <!-- Multiple Radios -->
             <div class="field">
-            <label class="label" for="enabled">Enabled/Disabled</label>
+            <label class="label" for="enabled">Show on map</label>
             <div class="control">
                 <label class="radio" for="enabled-0">
                 <input @click="setEnabled(true);" :checked="route.enabled" type="radio" name="enabled" id="enabled-0" value="enabled">
-                enabled
+                yes
                 </label>
                 <label class="radio" for="enabled-1">
                 <input @click="setEnabled(false);" :checked="!route.enabled" type="radio" name="enabled" id="enabled-1" value="disabled">
-                disabled
+                no
                 </label>
             </div>
             </div>

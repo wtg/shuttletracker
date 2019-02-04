@@ -15,6 +15,10 @@ export default new Router({
     mode: 'history',
     routes: [
       {
+        path: '/admin',
+        redirect: '/admin/routes/',
+      },
+      {
         path: '/admin/routes/',
         name: 'routes',
         component: routesAdmin,
