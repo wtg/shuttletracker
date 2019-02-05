@@ -112,7 +112,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	// Admin
 	r.Route("/admin", func(r chi.Router) {
 		r.Use(cli.casauth)
-		r.Get("/", api.AdminHandler)
+		r.Get("/*", api.AdminHandler)
 		r.Get("/login", api.AdminHandler)
 		r.Get("/logout", cli.logout)
 	})
@@ -166,7 +166,7 @@ func (api *API) AdminHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/admin", 301)
 	}
 	w.Header().Set("Cache-Control", "no-cache")
-	http.ServeFile(w, r, "admin.html")
+	http.ServeFile(w, r, "static/admin.html")
 
 }
 

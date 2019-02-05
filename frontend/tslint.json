@@ -17,6 +17,8 @@
     "no-consecutive-blank-lines": false,
     "no-var-requires": false,
     "max-line-length": false,
-    "prefer-for-of": false
+    "prefer-for-of": false,
+    "variable-name": false,
+    "no-empty": false
   }
 }

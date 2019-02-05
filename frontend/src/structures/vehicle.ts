@@ -26,9 +26,10 @@ export default class Vehicle {
     public shownOnMap: boolean;
     public map: L.Map | undefined;
     public Route: Route | undefined;
-    public lastUpdate: Date | undefined;
+    public lastUpdate: Date;
+    public tracker_id: number;
 
-    constructor(id: number, name: string, created: Date, updated: Date, enabled: boolean) {
+    constructor(id: number, name: string, created: Date, updated: Date, enabled: boolean, trackerID: number) {
         this.id = id;
         this.name = name;
         this.created = created;
@@ -52,7 +53,8 @@ export default class Vehicle {
         this.shownOnMap = false;
         this.map = undefined;
         this.Route = undefined;
-        this.lastUpdate = undefined;
+        this.lastUpdate = new Date();
+        this.tracker_id = trackerID;
     }
 
     public getMessage(): string {
@@ -126,5 +128,14 @@ export default class Vehicle {
 
     public removeFromMap(map: L.Map) {
         map.removeLayer(this.marker);
+    }
+
+    public asJSON(): {id: number; tracker_id: string; name: string; enabled: boolean } {
+        return {
+            id: this.id,
+            enabled: this.enabled,
+            tracker_id: String(this.tracker_id),
+            name: this.name,
+        };
     }
 }
