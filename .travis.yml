@@ -1,10 +1,6 @@
 language: go
 
 go:
-  - 1.7.x
-  - 1.8.x
-  - 1.9.x
-  - 1.10.x
   - 1.11.x
   - master
 
@@ -21,7 +17,7 @@ addons:
 
 before_install:
   - go get -u github.com/kardianos/govendor && govendor sync -v
-  - if [ "go version go1.8.7 linux/amd64" != "$(go version)" ] && [ "go version go1.7.6 linux/amd64" != "$(go version)" ]; then go get -u github.com/alecthomas/gometalinter && gometalinter --install; fi
+  - go get -u github.com/alecthomas/gometalinter && gometalinter --install
   - go get -u github.com/bradleyfalzon/revgrep/...
   - cd frontend && npm install && npm run build && cd ..
 
@@ -32,8 +28,8 @@ before_script:
   - psql -c 'create database shuttletracker_test;' -U postgres
 
 script:
-  - if [ "$TRAVIS_PULL_REQUEST" != "false" ] && [ "go version go1.8.7 linux/amd64" != "$(go version)" ] && [ "go version go1.7.6 linux/amd64" != "$(go version)" ]; then gometalinter --vendor ./... 2>&1 | revgrep origin/master; fi
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "go version go1.8.7 linux/amd64" != "$(go version)" ] && [ "go version go1.7.6 linux/amd64" != "$(go version)" ]; then gometalinter --vendor ./... || true; fi
+  - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then gometalinter --vendor ./... 2>&1 | revgrep origin/master; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then gometalinter --vendor ./... || true; fi
   - ./test.sh
   - docker build .
   - bash <(curl -s https://codecov.io/bash)

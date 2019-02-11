@@ -3,12 +3,13 @@
 !auth
 !cmd
 !config
+!go.mod
+!go.sum
 !log
 !mock
 !postgres
 !static
 !updater
-!vendor/vendor.json
 !admin.html
 !*.go
 !index.html
