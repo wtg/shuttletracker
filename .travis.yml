@@ -20,7 +20,7 @@ addons:
 
 before_install:
   - curl -L https://git.io/vp6lP | sh
-  - go install github.com/bradleyfalzon/revgrep/...
+  - GO111MODULE=off go install github.com/bradleyfalzon/revgrep/...
   - cd frontend && npm install && npm run build && cd ..
 
 install:
@@ -30,8 +30,8 @@ before_script:
   - psql -c 'create database shuttletracker_test;' -U postgres
 
 script:
-  - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then gometalinter --vendor ./... 2>&1 | revgrep origin/master; fi
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then gometalinter --vendor ./... || true; fi
+  - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then ./bin/gometalinter --vendor ./... 2>&1 | revgrep origin/master; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./bin/gometalinter --vendor ./... || true; fi
   - ./test.sh
   - docker build .
   - bash <(curl -s https://codecov.io/bash)
