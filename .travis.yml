@@ -20,7 +20,7 @@ addons:
 
 before_install:
   - curl -L https://git.io/vp6lP | sh
-  - GO111MODULE=off go install github.com/bradleyfalzon/revgrep/...
+  - GO111MODULE=off go get -u github.com/bradleyfalzon/revgrep/...
   - cd frontend && npm install && npm run build && cd ..
 
 install:
