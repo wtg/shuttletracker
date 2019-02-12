@@ -19,7 +19,7 @@ addons:
   postgresql: "9.6"
 
 before_install:
-  - go get -u github.com/alecthomas/gometalinter && gometalinter --install
+  - curl -L https://git.io/vp6lP | sh
   - go get -u github.com/bradleyfalzon/revgrep/...
   - cd frontend && npm install && npm run build && cd ..
 
