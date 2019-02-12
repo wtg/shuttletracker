@@ -20,7 +20,7 @@ addons:
 
 before_install:
   - curl -L https://git.io/vp6lP | sh
-  - go get -u github.com/bradleyfalzon/revgrep/...
+  - go install github.com/bradleyfalzon/revgrep/...
   - cd frontend && npm install && npm run build && cd ..
 
 install:
