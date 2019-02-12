@@ -4,7 +4,7 @@ Tracks and maps RPI's shuttles with [Go](https://golang.org/), [Postgres](https:
 
 ## Setting up
 
-1. [Install Go](https://golang.org/doc/install). Shuttle Tracker requires Go 1.11 or newer, and we recommend using the latest Go stable release.
+1. [Install Go](https://golang.org/doc/install). Shuttle Tracker requires Go 1.11 or newer, and we recommend using the latest stable Go release.
 2. Clone the repository to your computer. On macOS, Linux, or WSL, this can be done with `git clone git@github.com:wtg/shuttletracker.git`. If you receive a "permission denied" error, ensure you have [added your SSH key to your GitHub account](https://help.github.com/articles/connecting-to-github-with-ssh/).
 3. Ensure you have [Postgres downloaded](https://www.postgresql.org/download/), installed, and running. On macOS, Homebrew makes this easy.
 4. Run `createdb shuttletracker` to create a Postgres database.
