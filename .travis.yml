@@ -16,7 +16,6 @@ addons:
   postgresql: "9.6"
 
 before_install:
-  - go get -u github.com/kardianos/govendor && govendor sync -v
   - go get -u github.com/alecthomas/gometalinter && gometalinter --install
   - go get -u github.com/bradleyfalzon/revgrep/...
   - cd frontend && npm install && npm run build && cd ..
