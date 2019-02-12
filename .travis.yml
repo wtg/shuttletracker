@@ -30,8 +30,8 @@ before_script:
   - psql -c 'create database shuttletracker_test;' -U postgres
 
 script:
-  - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then go mod vendor && PATH="$(pwd)/bin:$PATH" ./bin/gometalinter --vendor ./... 2>&1 | revgrep origin/master; fi
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then go mod vendor && PATH="$(pwd)/bin:$PATH" ./bin/gometalinter --vendor ./... || true; fi
+  - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then go mod vendor && GO111MODULE=off PATH="$(pwd)/bin:$PATH" ./bin/gometalinter --vendor ./... 2>&1 | revgrep origin/master; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then go mod vendor && GO111MODULE=off PATH="$(pwd)/bin:$PATH" ./bin/gometalinter --vendor ./... || true; fi
   - ./test.sh
   - docker build .
   - bash <(curl -s https://codecov.io/bash)
