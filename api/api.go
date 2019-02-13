@@ -43,13 +43,17 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	if err != nil {
 		return nil, err
 	}
+
+	// Set up fusion manager
+	fm := newFusionManager()
+
 	// Create API instance to store database session and collections
 	api := API{
 		cfg:     cfg,
 		ms:      ms,
 		msg:     msg,
 		updater: updater,
-		fm:      &fusionManager{},
+		fm:      fm,
 	}
 
 	r := chi.NewRouter()
