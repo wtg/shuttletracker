@@ -108,6 +108,9 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		})
 	})
 
+	// Fusion
+	r.HandleFunc("/fusion", api.WebSocketHandler)
+
 	r.Get("/logout/", cli.logout)
 	// Admin
 	r.Route("/admin", func(r chi.Router) {

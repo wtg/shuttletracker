@@ -7,6 +7,9 @@ import (
 	"hash"
 	"io"
 	"net/http"
+	"net"
+	"errors"
+	"bufio"
 
 	"github.com/wtg/shuttletracker/log"
 )
@@ -20,6 +23,13 @@ type etagResponseWriter struct {
 
 func (e *etagResponseWriter) Write(p []byte) (int, error) {
 	return e.w.Write(p)
+}
+
+func (e *etagResponseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	if w, ok := e.ResponseWriter.(http.Hijacker); ok {
+		return w.Hijack()
+	}
+	return nil, nil, errors.New("writer does not implement http.Hijacker")
 }
 
 func etag(next http.Handler) http.Handler {
