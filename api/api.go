@@ -32,6 +32,7 @@ type API struct {
 	ms      shuttletracker.ModelService
 	msg     shuttletracker.MessageService
 	updater *updater.Updater
+	fm      *fusionManager
 }
 
 // New initializes the application given a config and connects to backends.
@@ -48,6 +49,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		ms:      ms,
 		msg:     msg,
 		updater: updater,
+		fm:      &fusionManager{},
 	}
 
 	r := chi.NewRouter()
@@ -76,7 +78,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	//Hisory
 	r.Route("/history", func(r chi.Router) {
 		r.Get("/", api.HistoryHandler)
-		})
+	})
 
 	// Admin message
 	r.Route("/adminMessage", func(r chi.Router) {
@@ -110,6 +112,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 
 	// Fusion
 	r.HandleFunc("/fusion", api.WebSocketHandler)
+	r.Handle("/fusion/debug", api.fm)
 
 	r.Get("/logout/", cli.logout)
 	// Admin
