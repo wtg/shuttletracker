@@ -46,6 +46,10 @@ export default class Fusion {
     }
 
     startGeolocation() {
+        if (!("geolocation" in navigator)) {
+            console.log("Client does not support geolocation.")
+            return;
+        }
         const options = { enableHighAccuracy: true, maximumAge: 0 };
         navigator.geolocation.watchPosition(
             position => {
