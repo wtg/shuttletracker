@@ -95,19 +95,39 @@ func (fm *fusionManager) handleNewPositions() {
 }
 
 func (fm *fusionManager) debugHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "fusionManager debug\n\n")
+	_, err := fmt.Fprint(w, "fusionManager debug\n\n")
+	if err != nil {
+		log.WithError(err).Error("unable to write response")
+		return
+	}
 
-	fmt.Fprintf(w, "%d tracks\n", len(fm.tracks))
+	_, err = fmt.Fprintf(w, "%d tracks\n", len(fm.tracks))
+	if err != nil {
+		log.WithError(err).Error("unable to write response")
+		return
+	}
 
 	numPositions := 0
 	for _, track := range fm.tracks {
 		numPositions += len(track)
 	}
-	fmt.Fprintf(w, "%d positions\n\n", numPositions)
+	_, err = fmt.Fprintf(w, "%d positions\n\n", numPositions)
+	if err != nil {
+		log.WithError(err).Error("unable to write response")
+		return
+	}
 
-	fmt.Fprintf(w, "%d clients:\n", len(fm.clients))
+	_, err = fmt.Fprintf(w, "%d clients:\n", len(fm.clients))
+	if err != nil {
+		log.WithError(err).Error("unable to write response")
+		return
+	}
 	for _, client := range fm.clients {
-		fmt.Fprintf(w, "%+v\n", client)
+		_, err = fmt.Fprintf(w, "%+v\n", client)
+		if err != nil {
+			log.WithError(err).Error("unable to write response")
+			return
+		}
 	}
 }
 
