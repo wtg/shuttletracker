@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -31,19 +32,21 @@ type fusionClient struct {
 }
 
 type fusionManager struct {
-	clients         []*fusionClient
-	tracks          map[string][]fusionPosition
-	newConnChan     chan *websocket.Conn
-	newPositionChan chan fusionPosition
+	clients          []*fusionClient
+	tracks           map[string][]fusionPosition
+	newConnChan      chan *websocket.Conn
+	newPositionChan  chan fusionPosition
+	removeClientChan chan *fusionClient
 }
 
 func newFusionManager() *fusionManager {
 	fm := &fusionManager{
-		newConnChan:     make(chan *websocket.Conn),
-		newPositionChan: make(chan fusionPosition),
-		tracks:          map[string][]fusionPosition{},
+		newConnChan:      make(chan *websocket.Conn),
+		newPositionChan:  make(chan fusionPosition),
+		removeClientChan: make(chan *fusionClient),
+		tracks:           map[string][]fusionPosition{},
 	}
-	go fm.handleNewConns()
+	go fm.clientsLoop()
 	go fm.handleNewPositions()
 	return fm
 }
@@ -58,11 +61,31 @@ func (fm *fusionManager) addClient(conn *websocket.Conn) error {
 	return nil
 }
 
-func (fm *fusionManager) handleNewConns() {
-	for conn := range fm.newConnChan {
-		err := fm.addClient(conn)
-		if err != nil {
-			log.WithError(err).Error("unable to add client")
+func (fm *fusionManager) removeClient(client *fusionClient) error {
+	for i, c := range fm.clients {
+		if client == c {
+			fm.clients = append(fm.clients[:i], fm.clients[i+1:]...)
+			return nil
+		}
+	}
+	return errors.New("client not found")
+}
+
+// clientsLoop selects over the channels related to clients appearing or going away:
+// newConnChan and removeClientChan.
+func (fm *fusionManager) clientsLoop() {
+	for {
+		select {
+		case conn := <-fm.newConnChan:
+			err := fm.addClient(conn)
+			if err != nil {
+				log.WithError(err).Error("unable to add client")
+			}
+		case client := <-fm.removeClientChan:
+			err := fm.removeClient(client)
+			if err != nil {
+				log.WithError(err).Error("umable to remove client")
+			}
 		}
 	}
 }
@@ -72,7 +95,7 @@ func (fm *fusionManager) handleClient(client *fusionClient) {
 		_, r, err := client.conn.NextReader()
 		if err != nil {
 			log.WithError(err).Error("unable to get reader")
-			return
+			break
 		}
 		dec := json.NewDecoder(r)
 		fp := fusionPosition{}
@@ -85,6 +108,9 @@ func (fm *fusionManager) handleClient(client *fusionClient) {
 		fm.newPositionChan <- fp
 		// client.positions = append(client.positions, fp)
 	}
+
+	// remove client since the connection is dead
+	fm.removeClientChan <- client
 }
 
 func (fm *fusionManager) handleNewPositions() {
