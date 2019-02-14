@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi"
 	"github.com/gorilla/websocket"
 
 	"github.com/wtg/shuttletracker/log"
@@ -17,17 +18,16 @@ var upgrader = websocket.Upgrader{
 }
 
 type fusionPosition struct {
-	Latitude  float64  `json:"latitude"`
-	Longitude float64  `json:"longitude"`
-	Speed     *float64 `json:"speed"` // meters per second
-	Heading   *float64 `json:"heading"`
-	Track     string   `json:"track"`
-	Time      time.Time
+	Latitude  float64   `json:"latitude"`
+	Longitude float64   `json:"longitude"`
+	Speed     *float64  `json:"speed"` // meters per second
+	Heading   *float64  `json:"heading"`
+	Track     string    `json:"track"`
+	Time      time.Time `json:"time"`
 }
 
 type fusionClient struct {
 	conn *websocket.Conn
-	uuid string
 }
 
 type fusionManager struct {
@@ -89,12 +89,12 @@ func (fm *fusionManager) handleClient(client *fusionClient) {
 
 func (fm *fusionManager) handleNewPositions() {
 	for pos := range fm.newPositionChan {
-		log.Infof("new position: %+v", pos)
+		log.Debugf("new position: %+v", pos)
 		fm.tracks[pos.Track] = append(fm.tracks[pos.Track], pos)
 	}
 }
 
-func (fm *fusionManager) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (fm *fusionManager) debugHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "fusionManager debug\n\n")
 
 	fmt.Fprintf(w, "%d tracks\n", len(fm.tracks))
@@ -111,7 +111,18 @@ func (fm *fusionManager) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (api *API) WebSocketHandler(w http.ResponseWriter, r *http.Request) {
+func (fm *fusionManager) exportHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	enc := json.NewEncoder(w)
+	err := enc.Encode(fm.tracks)
+	if err != nil {
+		log.WithError(err).Error("unable to encode")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (fm *fusionManager) webSocketHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.WithError(err).Error("unable to upgrade connection")
@@ -119,5 +130,12 @@ func (api *API) WebSocketHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	api.fm.newConnChan <- conn
+	fm.newConnChan <- conn
+}
+func (fm *fusionManager) router(auth func(http.Handler) http.Handler) http.Handler {
+	r := chi.NewRouter()
+	r.HandleFunc("/", fm.webSocketHandler)
+	r.With(auth).Get("/debug", fm.debugHandler)
+	r.With(auth).Get("/export", fm.exportHandler)
+	return r
 }

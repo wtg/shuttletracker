@@ -115,8 +115,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	})
 
 	// Fusion
-	r.HandleFunc("/fusion", api.WebSocketHandler)
-	r.Handle("/fusion/debug", api.fm)
+	r.Mount("/fusion", api.fm.router(cli.casauth))
 
 	r.Get("/logout/", cli.logout)
 	// Admin
