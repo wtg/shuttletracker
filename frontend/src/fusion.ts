@@ -12,16 +12,16 @@ class SocketManager {
     createSocket() {
         const ws = new WebSocket(this.url);
         ws.onopen = event => {
-            console.log("socket connected", event);
+            // console.log("socket connected", event);
         };
         ws.onmessage = event => {
-            console.log(event);
+            // console.log(event);
         }
         ws.onerror = event => {
-            console.log("socket error", event);
+            // console.log("socket error", event);
         };
         ws.onclose = event => {
-            console.log("socket closed", event);
+            // console.log("socket closed", event);
             this.ws = this.createSocket();
         };
         return ws;
@@ -59,7 +59,7 @@ export default class Fusion {
                 this.ws.send(JSON.stringify(data));
             },
             error => {
-                console.log("could not get position", error);
+                // console.log("could not get position", error);
             }, options
         )
     }
