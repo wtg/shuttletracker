@@ -39,7 +39,8 @@ export default class Fusion {
     constructor() {
         console.log("Fusion created.");
 
-        this.ws = new SocketManager("ws://localhost:8080/fusion");
+        const wsURL = this.relativeWSURL("fusion");
+        this.ws = new SocketManager(wsURL);
 
         // this.startSocket();
         this.startGeolocation();
@@ -78,5 +79,16 @@ export default class Fusion {
             d = Math.floor(d / 16);
             return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
         });
+    }
+
+    relativeWSURL(wsURL: string) {
+        let url = "";
+        if (window.location.protocol == "https:") {
+            url += "wss:";
+        } else {
+            url += "ws:";
+        }
+        url += "//" + window.location.host + window.location.pathname;
+        return url + wsURL
     }
 }
