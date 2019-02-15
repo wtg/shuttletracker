@@ -6,11 +6,12 @@
     </div>
 </span>
 </template>
-<script lang="ts">
-// This component handles rendering of a single administrator message
 
+<script lang="ts">
 import Vue from 'vue';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
+
+// This component handles rendering of a single administrator message
 export default Vue.extend({
     data() {
         return {
@@ -24,8 +25,11 @@ export default Vue.extend({
     },
 });
 </script>
+
+
 <style lang="scss">
 
+// CSS styling for admin messages  
 #messagebox {
   max-height: 150px;
   overflow-y: auto;

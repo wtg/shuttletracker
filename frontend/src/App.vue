@@ -2,11 +2,9 @@
   <div id="app">
     <keep-alive>
       <router-view />
-
     </keep-alive>
   </div>
 </template>
-
 
 <script lang="ts">
 import Vue from 'vue';

@@ -5,6 +5,7 @@
             <dropdown />
             <li class="title">RPI Shuttle Tracker</li>
         </ul>
+
         <div v-if="$store.state.online" class="livebox">
           <p>Live </p>
           <div class="pulsate" style=""></div>
@@ -13,16 +14,20 @@
           <p>Offline </p>
           <div class="caution-circle" style=""></div>
         </div>
+
         <div class="logo">
           <a href="https://webtech.union.rpi.edu/">
             <img src="~../assets/wtg.svg" />
           </a>
         </div>
+
     </div>
+
     <span style="width: 100%; height: 100%; position: fixed;">
       <div id="mymap"></div>
     <messagebox ref="msgbox" />
     </span>
+
 </div>
 </template>
 
@@ -75,6 +80,7 @@ export default Vue.extend({
       legend: L.Control,
     });
   },
+
   mounted() {
     const a  = new InfoService();
     this.$store.dispatch('grabRoutes');
@@ -126,6 +132,7 @@ export default Vue.extend({
       }
     });
   },
+
   methods: {
     updateLegend() {
       this.legend.onAdd = (map: L.Map) => {
@@ -148,11 +155,12 @@ export default Vue.extend({
       if (this.Map !== undefined) {
         this.legend.addTo(this.Map);
       }
-
     },
+
     routePolyLines(): L.Polyline[] {
       return this.$store.getters.getRoutePolyLines;
     },
+
     renderRoutes() {
       if (this.routePolyLines().length > 0 && !this.initialized) {
         if (this.Map !== undefined && !this.$store.getters.getBoundsPolyLine.isEmpty()) {
@@ -173,6 +181,7 @@ export default Vue.extend({
         }
       });
     },
+
     renderStops() {
       this.$store.state.Stops.forEach((stop: Stop) => {
         const marker = L.marker([stop.latitude, stop.longitude], {icon: StopIcon});
@@ -182,6 +191,7 @@ export default Vue.extend({
         }
       });
     },
+
     addVehicles() {
       this.$store.state.Vehicles.forEach((veh: Vehicle) => {
         if (this.Map !== undefined) {
@@ -189,6 +199,7 @@ export default Vue.extend({
         }
       });
     },
+
     showUserLocation() {
       const userIcon = L.icon({
         iconUrl: 'static/images/user.svg',
@@ -216,6 +227,7 @@ export default Vue.extend({
       }
     },
   },
+
   components: {
     dropdown,
     messagebox,
@@ -223,7 +235,10 @@ export default Vue.extend({
 });
 </script>
 
+ 
 <style lang="scss">
+
+// CSS Styling of LIVE Indicator when the App is offline
 .caution-circle {
   float:right;
   width:10px;
@@ -231,6 +246,8 @@ export default Vue.extend({
   background-color:orange;
   border-radius:50%;
 }
+
+// CSS styling to pulsate the blue circle of the LIVE indicator
 .pulsate {
   float:right;
   width:10px;
@@ -249,9 +266,10 @@ export default Vue.extend({
   }
   100% {
     opacity: 0;
-
   }
 }
+
+// CSS styling for the LIVE indicator box
 .livebox{
     p {
       margin-right: 5px;
@@ -271,7 +289,6 @@ export default Vue.extend({
     align-items: center;
     justify-content: space-around;
     background-color: rgba(255, 255, 255, 0.9);
-    
 }
 
 #mymap{
@@ -279,7 +296,6 @@ export default Vue.extend({
     width: 100%;
     position: relative;
     filter: invert(0);
-    
 }
 
 .titleBar {
