@@ -1,0 +1,74 @@
+[
+ {
+  "id": 358002,
+  "tracker_id": "1831394663",
+  "latitude": 42.73174,
+  "longitude": -73.6704,
+  "heading": 332,
+  "speed": 6.772945880889893,
+  "time": "2018-11-27T21:37:00Z",
+  "created": "2018-11-27T21:37:01.405825Z",
+  "vehicle_id": 1,
+  "route_id": 2
+ },
+ {
+  "id": 358004,
+  "tracker_id": "1831394614",
+  "latitude": 42.73794,
+  "longitude": -73.68421,
+  "heading": 129,
+  "speed": 0.062137119472026825,
+  "time": "2018-11-27T21:36:51Z",
+  "created": "2018-11-27T21:37:07.303332Z",
+  "vehicle_id": 4,
+  "route_id": null
+ },
+ {
+  "id": 358003,
+  "tracker_id": "1831394611",
+  "latitude": 42.723,
+  "longitude": -73.6803,
+  "heading": 117,
+  "speed": 5.778751850128174,
+  "time": "2018-11-27T21:36:34Z",
+  "created": "2018-11-27T21:37:01.410601Z",
+  "vehicle_id": 5,
+  "route_id": 1
+ },
+ {
+  "id": 357988,
+  "tracker_id": "1632187564",
+  "latitude": 42.73134,
+  "longitude": -73.68007,
+  "heading": 99,
+  "speed": 13.297343254089355,
+  "time": "2018-11-27T21:34:44Z",
+  "created": "2018-11-27T21:34:46.44388Z",
+  "vehicle_id": 6,
+  "route_id": 2
+ },
+ {
+  "id": 358001,
+  "tracker_id": "1831144492",
+  "latitude": 42.73262,
+  "longitude": -73.6716,
+  "heading": 9,
+  "speed": 14.35367488861084,
+  "time": "2018-11-27T21:36:37Z",
+  "created": "2018-11-27T21:36:40.153034Z",
+  "vehicle_id": 8,
+  "route_id": 2
+ },
+ {
+  "id": 358000,
+  "tracker_id": "1831394595",
+  "latitude": 42.73361,
+  "longitude": -73.68571,
+  "heading": 235,
+  "speed": 10.93613338470459,
+  "time": "2018-11-27T21:36:35Z",
+  "created": "2018-11-27T21:36:37.240892Z",
+  "vehicle_id": 9,
+  "route_id": 1
+ }
+]

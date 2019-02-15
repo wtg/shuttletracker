@@ -1,0 +1,146 @@
+[
+ {
+  "id": 1,
+  "latitude": 42.73029109316892,
+  "longitude": -73.67655873298646,
+  "created": "2018-09-14T18:06:36.80459Z",
+  "updated": "2018-09-14T18:06:36.80459Z",
+  "name": "Student Union",
+  "description": "Shuttle stop in front of the Student Union"
+ },
+ {
+  "id": 2,
+  "latitude": 42.73122891680935,
+  "longitude": -73.6801850795746,
+  "created": "2018-09-14T18:08:53.108779Z",
+  "updated": "2018-09-14T18:08:53.108779Z",
+  "name": "Troy Building Crosswalk",
+  "description": "Stop by the crosswalk near the Troy Building"
+ },
+ {
+  "id": 4,
+  "latitude": 42.731039777048615,
+  "longitude": -73.67890298366548,
+  "created": "2018-09-14T18:16:17.666239Z",
+  "updated": "2018-09-14T18:16:17.666239Z",
+  "name": "Sage",
+  "description": "Stop on Sage Ave. by the '87 gym"
+ },
+ {
+  "id": 5,
+  "latitude": 42.73154414846215,
+  "longitude": -73.68135452270509,
+  "created": "2018-09-14T18:18:20.172953Z",
+  "updated": "2018-09-14T18:18:20.172953Z",
+  "name": "West Hall",
+  "description": "Stop near West Hall"
+ },
+ {
+  "id": 6,
+  "latitude": 42.732875984510734,
+  "longitude": -73.68250197168891,
+  "created": "2018-09-14T18:20:03.407759Z",
+  "updated": "2018-09-14T18:20:03.407759Z",
+  "name": "9th and Sage",
+  "description": "Stop at the intersection of 9th Street and Sage Ave."
+ },
+ {
+  "id": 8,
+  "latitude": 42.73154808884768,
+  "longitude": -73.68611276149751,
+  "created": "2018-09-14T18:23:08.228503Z",
+  "updated": "2018-09-14T18:23:08.228503Z",
+  "name": "Blitman Residence Commons",
+  "description": "Stop at Blitman Residence Commons"
+ },
+ {
+  "id": 10,
+  "latitude": 42.72729626727797,
+  "longitude": -73.68729776140755,
+  "created": "2018-09-14T18:25:09.76202Z",
+  "updated": "2018-09-14T18:25:09.76202Z",
+  "name": "6th Ave. and City Station",
+  "description": "Stop at 6th Ave. and City Station"
+ },
+ {
+  "id": 11,
+  "latitude": 42.72272099751333,
+  "longitude": -73.67979347705842,
+  "created": "2018-09-14T18:27:10.750342Z",
+  "updated": "2018-09-14T18:27:10.750342Z",
+  "name": "Polytechnic Residence Commons",
+  "description": "Stop at Polytechnic Residence Commons"
+ },
+ {
+  "id": 12,
+  "latitude": 42.726823386814196,
+  "longitude": -73.67809295654298,
+  "created": "2018-09-14T18:28:48.291128Z",
+  "updated": "2018-09-14T18:28:48.291128Z",
+  "name": "15th and College Ave.",
+  "description": "Stop at 15th and College Ave."
+ },
+ {
+  "id": 13,
+  "latitude": 42.73328577446417,
+  "longitude": -73.67845773696901,
+  "created": "2018-09-14T18:30:14.642251Z",
+  "updated": "2018-09-14T18:30:14.642251Z",
+  "name": "13th and Peoples Ave.",
+  "description": "Stop at 13th and Peoples Ave."
+ },
+ {
+  "id": 14,
+  "latitude": 42.73637487312414,
+  "longitude": -73.67058759924475,
+  "created": "2018-09-14T18:32:06.957047Z",
+  "updated": "2018-09-14T18:32:06.957047Z",
+  "name": "Colonie Apartments",
+  "description": "Stop at Colonie Apartments"
+ },
+ {
+  "id": 15,
+  "latitude": 42.73565383452506,
+  "longitude": -73.66511642932893,
+  "created": "2018-09-14T18:33:57.852451Z",
+  "updated": "2018-09-14T18:33:57.852451Z",
+  "name": "Brinsmade Terrace",
+  "description": "Stop at Brinsmade Terrace"
+ },
+ {
+  "id": 16,
+  "latitude": 42.734507247684064,
+  "longitude": -73.66339445114137,
+  "created": "2018-09-14T18:34:33.713026Z",
+  "updated": "2018-09-14T18:34:33.713026Z",
+  "name": "Beman Lane",
+  "description": "Stop at Beman Lane"
+ },
+ {
+  "id": 17,
+  "latitude": 42.73265532726045,
+  "longitude": -73.66520762443544,
+  "created": "2018-09-14T18:36:14.854088Z",
+  "updated": "2018-09-14T18:36:14.854088Z",
+  "name": "Sunset Terrace",
+  "description": "Stop at Sunset Terrace"
+ },
+ {
+  "id": 18,
+  "latitude": 42.73172934631104,
+  "longitude": -73.66986393928529,
+  "created": "2018-09-14T18:38:55.904693Z",
+  "updated": "2018-09-14T18:38:55.904693Z",
+  "name": "BARH",
+  "description": "Stop at BARH"
+ },
+ {
+  "id": 19,
+  "latitude": 42.725010644975015,
+  "longitude": -73.67067933082582,
+  "created": "2018-09-14T18:41:46.352066Z",
+  "updated": "2018-09-14T18:41:46.352066Z",
+  "name": "Tibbits Ave.",
+  "description": "Stop at Tibbits Ave."
+ }
+]
