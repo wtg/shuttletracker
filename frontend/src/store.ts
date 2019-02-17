@@ -32,6 +32,16 @@ const store: StoreOptions<StoreState> = {
     },
     setRoutes(state, routes: Route[]) {
       state.Routes = routes;
+
+      // also ensure that vehicles consider being on any newly-returned routes
+      state.Vehicles.forEach((vehicle: Vehicle) => {
+        state.Routes.forEach((route: Route) => {
+          if (vehicle.RouteID === route.id) {
+            vehicle.setRoute(route);
+            return;
+          }
+        });
+      });
     },
     setStops(state, Stops: Stop[]) {
       state.Stops = Stops;
