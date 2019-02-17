@@ -93,8 +93,6 @@ export default Vue.extend({
         attributionControl: false,
       });
 
-      this.Map.setView([42.728172, -73.678803], 15.3);
-
       this.Map.addControl(L.control.attribution({
           position: 'bottomright',
           prefix: '',
