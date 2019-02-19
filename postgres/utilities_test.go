@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-const url = "postgres://postgres@localhost/shuttletracker_test?sslmode=disable"
+const url = "postgres://localhost/shuttletracker_test?sslmode=disable"
 
 func setUpPostgres(t *testing.T) *Postgres {
 	// determine if this database is clean
@@ -37,7 +37,7 @@ func tearDownPostgres(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to open database: %s", err)
 	}
-	_, err = db.Exec("drop schema public cascade; create schema public authorization postgres;")
+	_, err = db.Exec("drop schema public cascade; create schema public;")
 	if err != nil {
 		t.Fatalf("unable to clear database: %s", err)
 	}
