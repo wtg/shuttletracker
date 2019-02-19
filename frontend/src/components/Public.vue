@@ -283,42 +283,40 @@ export default Vue.extend({
 }
 
 .titleBar {
-    height: 34px;
-    float: none;
-    position: absolute;
+  height: 34px;
+  float: none;
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  align-content: space-around;
+  justify-content: space-between;
+  flex-flow: row;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.8);
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  & .titleContent {
+    height: 100%;
     z-index: 1;
+    width: auto;
+    list-style: none;
+    position: relative;
+    top: 0px;
+    margin: 0px;
+    padding: 0px;
     display: flex;
-    align-content: space-around;
-    justify-content: space-between;
-    flex-flow: row;
-    width: 100%;
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.8);
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
 
-    & .titleContent {
-      height: 100%;
-      z-index: 1;
-      width: auto;
-      list-style: none;
-      position: relative;
-      top: 0px;
-      margin: 0px;
+    & .title {
+      font-size: 22px;
       padding: 0px;
-
-      & .title {
-        font-size: 22px;
-        line-height: 34px;
-        vertical-align: center;
-        padding: 0px;
-        margin: 0px 6px 0px;
-        float: left;
-      }
+      margin: auto 6px;
     }
+  }
 }
 
 .logo {
@@ -326,7 +324,7 @@ export default Vue.extend({
   float: right;
   padding-right: 10px;
   align-self: center;
-  & img{
+  & img {
     height: 100%;
   }
 }

@@ -1,7 +1,8 @@
 <template>
-<li @click="visible = !visible;" class="dropdown-main-item"><a class="dropdown-icon"><img src="~../assets/menu.svg" class="dropdown-icon"></a>
-<ul v-if="visible" class="dropdown-menu" style="display: inline-block;">
-    <li id="dropdown-submenu-item_styling" class="dropdown-submenu-item">
+  <li @click="visible = !visible;" class="dropdown-main-item">
+    <img src="~../assets/icon.svg" class="dropdown-icon">
+    <ul v-if="visible" class="dropdown-menu" style="display: inline-block;">
+      <li id="dropdown-submenu-item_styling" class="dropdown-submenu-item">
         <p class="dropdown-menu-item_p">Information</p>
         <router-link style="text-decoration: none; color: #333333;" to="/about">
         <div class="dropdown-submenu-item_div">
@@ -49,43 +50,34 @@ export default Vue.extend({
     list-style: none none;
     }
 
-    ul.dropdown-main {
-    position: relative;
-    margin: 0;
-    padding: 0;
+ul.dropdown-main {
+  position: relative;
+  margin: 0;
+  padding: 0;
 
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    }
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
 
-    li.dropdown-main-item {
-    background-color: rgb(221, 221, 221);
-    width: 34px;
-    float: left;
-    }
+li.dropdown-main-item {
+  background-color: rgb(221, 221, 221);
+  width: 34px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-    li.dropdown-main-item:hover {
-    background-color: rgba(226, 226, 226, 0.85);
-    cursor: pointer;
-    }
+li.dropdown-main-item:hover {
+  background-color: rgba(226, 226, 226, 0.85);
+  cursor: pointer;
+}
 
-    a.dropdown-icon {
-    color: rgb(51, 51, 51);
-    display: block;
-    font-weight: 700;
-    font-size: 12px;
-    line-height: 32px;
-    text-decoration: none;
-    height: 34px;
-    }
-
-    img.dropdown-icon {
-    box-sizing: border-box;
-    padding: 5px;
-    }
+.dropdown-icon {
+  height: 75%;
+}
 
     ul.dropdown-menu {
     background-color: rgba(238, 238, 238, 0.90);
