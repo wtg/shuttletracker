@@ -329,14 +329,12 @@ export default Vue.extend({
     top: 0px;
     margin: 0px;
     padding: 0px;
+    display: flex;
 
     & .title {
       font-size: 22px;
-      line-height: 34px;
-      vertical-align: center;
       padding: 0px;
-      margin: 0px 6px 0px;
-      float: left;
+      margin: auto 6px;
     }
   }
 }
