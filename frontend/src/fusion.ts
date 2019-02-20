@@ -47,7 +47,7 @@ export default class Fusion {
 
     constructor() {
         console.log('Fusion created.');
-        const wsURL = this.relativeWSURL('fusion');
+        const wsURL = this.relativeWSURL('fusion/');
         this.ws = new SocketManager(wsURL);
     }
 
