@@ -29,32 +29,32 @@
 <script lang="ts">
 // This component handles everything on the shuttle tracker that is publicly facing.
 
-import Vue from "vue";
-import InfoService from "../structures/serviceproviders/info.service";
-import Vehicle from "../structures/vehicle";
-import Route from "../structures/route";
-import Stop from "../structures/stop";
-import dropdown from "./dropdown.vue";
-import messagebox from "./adminmessage.vue";
-import * as L from "leaflet";
-import { setTimeout, setInterval } from "timers";
-import getMarkerString from "../structures/leaflet/rotatedMarker";
-import { Position } from "geojson";
-import Fusion from "@/fusion.ts";
+import Vue from 'vue';
+import InfoService from '../structures/serviceproviders/info.service';
+import Vehicle from '../structures/vehicle';
+import Route from '../structures/route';
+import Stop from '../structures/stop';
+import dropdown from './dropdown.vue';
+import messagebox from './adminmessage.vue';
+import * as L from 'leaflet';
+import { setTimeout, setInterval } from 'timers';
+import getMarkerString from '../structures/leaflet/rotatedMarker';
+import { Position } from 'geojson';
+import Fusion from '@/fusion.ts';
 
-const StopSVG = require("@/assets/circle.svg") as string;
-const UserSVG = require("@/assets/user.svg") as string;
+const StopSVG = require('@/assets/circle.svg') as string;
+const UserSVG = require('@/assets/user.svg') as string;
 
 const StopIcon = L.icon({
   iconUrl: StopSVG,
   iconSize: [12, 12], // size of the icon
   iconAnchor: [6, 6], // point of the icon which will correspond to marker's location
   shadowAnchor: [6, 6], // the same for the shadow
-  popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
+  popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
 });
 
 export default Vue.extend({
-  name: "Public",
+  name: 'Public',
   data() {
     return {
       vehicles: [],
@@ -64,46 +64,46 @@ export default Vue.extend({
       Map: undefined,
       existingRouteLayers: [],
       initialized: false,
-      legend: new L.Control({ position: "bottomleft" })
+      legend: new L.Control({ position: 'bottomleft' }),
     } as {
-      vehicles: Vehicle[];
-      routes: Route[];
-      stops: Stop[];
-      ready: boolean;
-      Map: L.Map | undefined; // Leaflets types are not always useful
-      existingRouteLayers: L.Polyline[];
-      initialized: boolean;
-      legend: L.Control;
-    };
+        vehicles: Vehicle[];
+        routes: Route[];
+        stops: Stop[];
+        ready: boolean;
+        Map: L.Map | undefined; // Leaflets types are not always useful
+        existingRouteLayers: L.Polyline[];
+        initialized: boolean;
+        legend: L.Control;
+      };
   },
   mounted() {
     const a = new InfoService();
-    this.$store.dispatch("grabRoutes");
-    this.$store.dispatch("grabStops");
-    this.$store.dispatch("grabVehicles");
-    this.$store.dispatch("grabUpdates");
-    this.$store.dispatch("grabAdminMesssage");
+    this.$store.dispatch('grabRoutes');
+    this.$store.dispatch('grabStops');
+    this.$store.dispatch('grabVehicles');
+    this.$store.dispatch('grabUpdates');
+    this.$store.dispatch('grabAdminMesssage');
     setInterval(() => {
-      this.$store.dispatch("grabUpdates");
+      this.$store.dispatch('grabUpdates');
     }, 5000);
 
     this.$nextTick(() => {
       this.ready = true;
-      this.Map = L.map("mymap", {
+      this.Map = L.map('mymap', {
         zoomControl: false,
-        attributionControl: false
+        attributionControl: false,
       });
 
       this.Map.setView([42.728172, -73.678803], 15.3);
 
       this.Map.addControl(
         L.control.attribution({
-          position: "bottomright",
-          prefix: ""
-        })
+          position: 'bottomright',
+          prefix: '',
+        }),
       );
       L.tileLayer(
-        "https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png",
+        'https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png',
         {
           attribution:
             'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
@@ -111,8 +111,8 @@ export default Vue.extend({
             'Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under ' +
             '<a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
           maxZoom: 17,
-          minZoom: 14
-        }
+          minZoom: 14,
+        },
       ).addTo(this.Map);
 
       this.Map.invalidateSize();
@@ -120,25 +120,25 @@ export default Vue.extend({
     });
     this.renderRoutes();
     this.$store.subscribe((mutation: any, state: any) => {
-      if (mutation.type === "setRoutes") {
+      if (mutation.type === 'setRoutes') {
         this.renderRoutes();
         this.updateLegend();
       }
-      if (mutation.type === "setStops") {
+      if (mutation.type === 'setStops') {
         this.renderStops();
       }
-      if (mutation.type === "setVehicles") {
+      if (mutation.type === 'setVehicles') {
         this.addVehicles();
       }
     });
 
-    new Fusion();
+    new Fusion().start();
   },
   methods: {
     updateLegend() {
       this.legend.onAdd = (map: L.Map) => {
-        const div = L.DomUtil.create("div", "info legend");
-        let legendstring = "";
+        const div = L.DomUtil.create('div', 'info legend');
+        let legendstring = '';
         this.$store.state.Routes.forEach((route: Route) => {
           if (route.shouldShow()) {
             legendstring +=
@@ -178,7 +178,7 @@ export default Vue.extend({
           this.Map.fitBounds(this.$store.getters.getBoundsPolyLine.getBounds());
         }
       }
-      this.existingRouteLayers.forEach(line => {
+      this.existingRouteLayers.forEach((line) => {
         if (this.Map !== undefined) {
           this.Map.removeLayer(line);
         }
@@ -194,7 +194,7 @@ export default Vue.extend({
     renderStops() {
       this.$store.state.Stops.forEach((stop: Stop) => {
         const marker = L.marker([stop.latitude, stop.longitude], {
-          icon: StopIcon
+          icon: StopIcon,
         });
         if (this.Map !== undefined) {
           marker.bindPopup(stop.name);
@@ -211,25 +211,25 @@ export default Vue.extend({
     },
     showUserLocation() {
       const userIcon = L.icon({
-        iconUrl: "static/images/user.svg",
+        iconUrl: 'static/images/user.svg',
 
         iconSize: [12, 12], // size of the icon
         iconAnchor: [6, 6], // point of the icon which will correspond to marker's location
         shadowAnchor: [6, 6], // the same for the shadow
-        popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
+        popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
       });
 
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position => {
+        navigator.geolocation.getCurrentPosition(((position) => {
           const locationMarker = {
-            name: "You are here",
+            name: 'You are here',
             marker: L.marker(
               [position.coords.latitude, position.coords.longitude],
               {
                 icon: userIcon,
-                zIndexOffset: 1000
-              }
-            )
+                zIndexOffset: 1000,
+              },
+            ),
           };
           locationMarker.marker.bindPopup(locationMarker.name);
           if (this.Map !== undefined) {
@@ -237,12 +237,12 @@ export default Vue.extend({
           }
         }) as PositionCallback);
       }
-    }
+    },
   },
   components: {
     dropdown,
-    messagebox
-  }
+    messagebox,
+  },
 });
 </script>
 
