@@ -1,29 +1,29 @@
 <template>
-<div style="padding: 0px; margin: 0px;width: 100%; height: 100%;">
+  <div style="padding: 0px; margin: 0px;width: 100%; height: 100%;">
     <div class="titleBar">
-        <ul class="titleContent">
-            <dropdown />
-            <li class="title">RPI Shuttle Tracker</li>
-        </ul>
-        <div v-if="$store.state.online" class="livebox">
-          <p>Live </p>
-          <div class="pulsate" style=""></div>
-        </div>
-        <div v-if="!$store.state.online" class="livebox">
-          <p>Offline </p>
-          <div class="caution-circle" style=""></div>
-        </div>
-        <div class="logo">
-          <a href="https://webtech.union.rpi.edu/">
-            <img src="~../assets/wtg.svg" />
-          </a>
-        </div>
+      <ul class="titleContent">
+        <dropdown/>
+        <li class="title">RPI Shuttle Tracker</li>
+      </ul>
+      <div v-if="$store.state.online" class="livebox">
+        <p>Live</p>
+        <div class="pulsate" style></div>
+      </div>
+      <div v-if="!$store.state.online" class="livebox">
+        <p>Offline</p>
+        <div class="caution-circle" style></div>
+      </div>
+      <div class="logo">
+        <a href="https://webtech.union.rpi.edu/">
+          <img src="~../assets/wtg.svg">
+        </a>
+      </div>
     </div>
     <span style="width: 100%; height: 100%; position: fixed;">
       <div id="mymap"></div>
-    <messagebox ref="msgbox" />
+      <messagebox ref="msgbox"/>
     </span>
-</div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -40,22 +40,23 @@ import * as L from 'leaflet';
 import { setTimeout, setInterval } from 'timers';
 import getMarkerString from '../structures/leaflet/rotatedMarker';
 import { Position } from 'geojson';
+import Fusion from '@/fusion.ts';
 
 const StopSVG = require('@/assets/circle.svg') as string;
 const UserSVG = require('@/assets/user.svg') as string;
 
 const StopIcon = L.icon({
   iconUrl: StopSVG,
-  iconSize:     [12, 12], // size of the icon
-  iconAnchor:   [6, 6], // point of the icon which will correspond to marker's location
-  shadowAnchor: [6, 6],  // the same for the shadow
-  popupAnchor:  [0, 0], // point from which the popup should open relative to the iconAnchor
+  iconSize: [12, 12], // size of the icon
+  iconAnchor: [6, 6], // point of the icon which will correspond to marker's location
+  shadowAnchor: [6, 6], // the same for the shadow
+  popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
 });
 
 export default Vue.extend({
   name: 'Public',
   data() {
-    return ({
+    return {
       vehicles: [],
       routes: [],
       stops: [],
@@ -65,18 +66,18 @@ export default Vue.extend({
       initialized: false,
       legend: new L.Control({ position: 'bottomleft' }),
     } as {
-      vehicles: Vehicle[],
-      routes: Route[],
-      stops: Stop[],
-      ready: boolean,
-      Map: L.Map | undefined, // Leaflets types are not always useful
-      existingRouteLayers: L.Polyline[],
-      initialized: boolean,
-      legend: L.Control,
-    });
+        vehicles: Vehicle[];
+        routes: Route[];
+        stops: Stop[];
+        ready: boolean;
+        Map: L.Map | undefined; // Leaflets types are not always useful
+        existingRouteLayers: L.Polyline[];
+        initialized: boolean;
+        legend: L.Control;
+      };
   },
   mounted() {
-    const a  = new InfoService();
+    const a = new InfoService();
     this.$store.dispatch('grabRoutes');
     this.$store.dispatch('grabStops');
     this.$store.dispatch('grabVehicles');
@@ -95,22 +96,27 @@ export default Vue.extend({
 
       this.Map.setView([42.728172, -73.678803], 15.3);
 
-      this.Map.addControl(L.control.attribution({
+      this.Map.addControl(
+        L.control.attribution({
           position: 'bottomright',
           prefix: '',
-      }));
-      L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png', {
-        attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
-                      'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. ' +
-                      'Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under ' +
-                      '<a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
-        maxZoom: 17,
-        minZoom: 14,
-      }).addTo(this.Map);
+        }),
+      );
+      L.tileLayer(
+        'https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png',
+        {
+          attribution:
+            'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
+            'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. ' +
+            'Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under ' +
+            '<a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
+          maxZoom: 17,
+          minZoom: 14,
+        },
+      ).addTo(this.Map);
 
       this.Map.invalidateSize();
       this.showUserLocation();
-
     });
     this.renderRoutes();
     this.$store.subscribe((mutation: any, state: any) => {
@@ -125,6 +131,8 @@ export default Vue.extend({
         this.addVehicles();
       }
     });
+
+    new Fusion().start();
   },
   methods: {
     updateLegend() {
@@ -133,29 +141,39 @@ export default Vue.extend({
         let legendstring = '';
         this.$store.state.Routes.forEach((route: Route) => {
           if (route.shouldShow()) {
-            legendstring += `<li><img class="legend-icon" src=` + getMarkerString(route.color) + `
+            legendstring +=
+              `<li><img class="legend-icon" src=` +
+              getMarkerString(route.color) +
+              `
 			      width="12" height="12"> ` +
-            route.name;
+              route.name;
           }
         });
-        div.innerHTML = `<ul style="list-style:none">
-					<li><img class="legend-icon" src='` + UserSVG + `' width="12" height="12"> You</li>` +
+        div.innerHTML =
+          `<ul style="list-style:none">
+					<li><img class="legend-icon" src='` +
+          UserSVG +
+          `' width="12" height="12"> You</li>` +
           legendstring +
-          `<li><img class="legend-icon" src="` + StopSVG + `" width="12" height="12"> Shuttle Stop</li>
+          `<li><img class="legend-icon" src="` +
+          StopSVG +
+          `" width="12" height="12"> Shuttle Stop</li>
 				</ul>`;
         return div;
       };
       if (this.Map !== undefined) {
         this.legend.addTo(this.Map);
       }
-
     },
     routePolyLines(): L.Polyline[] {
       return this.$store.getters.getRoutePolyLines;
     },
     renderRoutes() {
       if (this.routePolyLines().length > 0 && !this.initialized) {
-        if (this.Map !== undefined && !this.$store.getters.getBoundsPolyLine.isEmpty()) {
+        if (
+          this.Map !== undefined &&
+          !this.$store.getters.getBoundsPolyLine.isEmpty()
+        ) {
           this.initialized = true;
           this.Map.fitBounds(this.$store.getters.getBoundsPolyLine.getBounds());
         }
@@ -175,7 +193,9 @@ export default Vue.extend({
     },
     renderStops() {
       this.$store.state.Stops.forEach((stop: Stop) => {
-        const marker = L.marker([stop.latitude, stop.longitude], {icon: StopIcon});
+        const marker = L.marker([stop.latitude, stop.longitude], {
+          icon: StopIcon,
+        });
         if (this.Map !== undefined) {
           marker.bindPopup(stop.name);
           marker.addTo(this.Map);
@@ -193,20 +213,23 @@ export default Vue.extend({
       const userIcon = L.icon({
         iconUrl: 'static/images/user.svg',
 
-        iconSize:     [12, 12], // size of the icon
-        iconAnchor:   [6, 6], // point of the icon which will correspond to marker's location
-        shadowAnchor: [6, 6],  // the same for the shadow
-        popupAnchor:  [0, 0], // point from which the popup should open relative to the iconAnchor
+        iconSize: [12, 12], // size of the icon
+        iconAnchor: [6, 6], // point of the icon which will correspond to marker's location
+        shadowAnchor: [6, 6], // the same for the shadow
+        popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
       });
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(((position) => {
           const locationMarker = {
-                name: 'You are here',
-                marker: L.marker([position.coords.latitude, position.coords.longitude], {
-                    icon: userIcon,
-                    zIndexOffset: 1000,
-                }),
+            name: 'You are here',
+            marker: L.marker(
+              [position.coords.latitude, position.coords.longitude],
+              {
+                icon: userIcon,
+                zIndexOffset: 1000,
+              },
+            ),
           };
           locationMarker.marker.bindPopup(locationMarker.name);
           if (this.Map !== undefined) {
@@ -225,18 +248,18 @@ export default Vue.extend({
 
 <style lang="scss">
 .caution-circle {
-  float:right;
-  width:10px;
-  height:10px;
-  background-color:orange;
-  border-radius:50%;
+  float: right;
+  width: 10px;
+  height: 10px;
+  background-color: orange;
+  border-radius: 50%;
 }
 .pulsate {
-  float:right;
-  width:10px;
-  height:10px;
-  background-color:blue;
-  border-radius:50%;
+  float: right;
+  width: 10px;
+  height: 10px;
+  background-color: blue;
+  border-radius: 50%;
   animation: pulsate 2.5s ease-out;
   animation-iteration-count: infinite;
 }
@@ -249,37 +272,34 @@ export default Vue.extend({
   }
   100% {
     opacity: 0;
-
   }
 }
-.livebox{
-    p {
-      margin-right: 5px;
-    }
-    position: absolute;
-    height: 26px;
-    right: 10px;
-    top: 40px;
-    box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
-    border-radius: 5px;
-    padding-left: 4px;   
-    padding-right: 4px;   
-    justify-self: flex-end;
-    display: flex;
-    flex-flow: row wrap;
-    align-content: center;
-    align-items: center;
-    justify-content: space-around;
-    background-color: rgba(255, 255, 255, 0.9);
-    
+.livebox {
+  p {
+    margin-right: 5px;
+  }
+  position: absolute;
+  height: 26px;
+  right: 10px;
+  top: 40px;
+  box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
+  border-radius: 5px;
+  padding-left: 4px;
+  padding-right: 4px;
+  justify-self: flex-end;
+  display: flex;
+  flex-flow: row wrap;
+  align-content: center;
+  align-items: center;
+  justify-content: space-around;
+  background-color: rgba(255, 255, 255, 0.9);
 }
 
-#mymap{
-    height: 100%;
-    width: 100%;
-    position: relative;
-    filter: invert(0);
-    
+#mymap {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  filter: invert(0);
 }
 
 .titleBar {
@@ -329,13 +349,13 @@ export default Vue.extend({
   }
 }
 
-.info.legend{
+.info.legend {
   box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
   border-radius: 5px;
-  background-color: rgba(255, 255, 255, .9);
+  background-color: rgba(255, 255, 255, 0.9);
   padding: 5px;
   bottom: 25px;
-  & ul{
+  & ul {
     margin-top: 2px;
     margin-bottom: 2px;
     padding-left: 0px;
