@@ -32,6 +32,16 @@ const store: StoreOptions<StoreState> = {
     },
     setRoutes(state, routes: Route[]) {
       state.Routes = routes;
+
+      // also ensure that vehicles consider being on any newly-returned routes
+      state.Vehicles.forEach((vehicle: Vehicle) => {
+        state.Routes.forEach((route: Route) => {
+          if (vehicle.RouteID === route.id) {
+            vehicle.setRoute(route);
+            return;
+          }
+        });
+      });
     },
     setStops(state, Stops: Stop[]) {
       state.Stops = Stops;
@@ -40,7 +50,7 @@ const store: StoreOptions<StoreState> = {
       state.Vehicles = vehicles;
     },
     addUpdates(state, updates: Update[]) {
-      const toHide = new Array<Vehicle> ();
+      const toHide = new Array<Vehicle>();
       state.Vehicles.forEach((vehicle: Vehicle) => {
         let found = false;
         for (let i = 0; i < updates.length; i++) {
@@ -49,7 +59,7 @@ const store: StoreOptions<StoreState> = {
             found = true;
             vehicle.speed = Number(updates[i].speed);
             vehicle.setRoute(undefined);
-            for (let j = 0; j < state.Routes.length; j ++) {
+            for (let j = 0; j < state.Routes.length; j++) {
               if (state.Routes[j].id === updates[i].route_id) {
                 vehicle.setRoute(state.Routes[j]);
                 break;
@@ -81,7 +91,7 @@ const store: StoreOptions<StoreState> = {
           if (r.enabled) {
             const points = new Array<L.LatLng>();
             if (r.points !== undefined) {
-              r.points.forEach((p: {latitude: number, longitude: number}) => {
+              r.points.forEach((p: { latitude: number, longitude: number }) => {
                 points.push(new L.LatLng(p.latitude, p.longitude));
               });
             }
@@ -105,7 +115,7 @@ const store: StoreOptions<StoreState> = {
           if (r.shouldShow()) {
             const points = new Array<L.LatLng>();
             if (r.points !== undefined) {
-              r.points.forEach((p: {latitude: number, longitude: number}) => {
+              r.points.forEach((p: { latitude: number, longitude: number }) => {
                 points.push(new L.LatLng(p.latitude, p.longitude));
               });
             }
@@ -124,8 +134,8 @@ const store: StoreOptions<StoreState> = {
       const points = new Array<L.LatLng>();
       if (state.Routes !== undefined && state.Routes.length !== 0) {
         state.Routes.forEach((r: Route) => {
-          if (r.points !== undefined) {
-            r.points.forEach((p: {latitude: number, longitude: number}) => {
+          if (r.shouldShow() && r.points !== undefined) {
+            r.points.forEach((p: { latitude: number, longitude: number }) => {
               points.push(new L.LatLng(p.latitude, p.longitude));
             });
           }
@@ -145,27 +155,27 @@ const store: StoreOptions<StoreState> = {
     },
   },
   actions: {
-    grabRoutes( {commit} ) {
+    grabRoutes({ commit }) {
       InfoService.GrabRoutes().then((ret: Route[]) => commit('setRoutes', ret)).catch(() => {
         commit('setOnline', false);
       });
     },
-    grabStops( {commit} ) {
+    grabStops({ commit }) {
       InfoService.GrabStops().then((ret: Stop[]) => commit('setStops', ret)).catch(() => {
         commit('setOnline', false);
       });
     },
-    grabVehicles( {commit} ) {
+    grabVehicles({ commit }) {
       InfoService.GrabVehicles().then((ret: Vehicle[]) => commit('setVehicles', ret)).catch(() => {
         commit('setOnline', false);
       });
     },
-    grabUpdates( {commit} ) {
+    grabUpdates({ commit }) {
       InfoService.GrabUpdates().then((ret: Update[]) => commit('addUpdates', ret)).catch(() => {
         commit('setOnline', false);
       });
     },
-    grabAdminMesssage( {commit} ) {
+    grabAdminMesssage({ commit }) {
       InfoService.GrabAdminMessage().then((ret: AdminMessageUpdate) => commit('addAdminMessage', ret));
     },
   },
