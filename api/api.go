@@ -32,7 +32,6 @@ type API struct {
 	ms      shuttletracker.ModelService
 	msg     shuttletracker.MessageService
 	updater *updater.Updater
-	fm      *fusionManager
 }
 
 // New initializes the application given a config and connects to backends.
@@ -43,17 +42,12 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	if err != nil {
 		return nil, err
 	}
-
-	// Set up fusion manager
-	fm := newFusionManager()
-
 	// Create API instance to store database session and collections
 	api := API{
 		cfg:     cfg,
 		ms:      ms,
 		msg:     msg,
 		updater: updater,
-		fm:      fm,
 	}
 
 	r := chi.NewRouter()
@@ -82,7 +76,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	//Hisory
 	r.Route("/history", func(r chi.Router) {
 		r.Get("/", api.HistoryHandler)
-	})
+		})
 
 	// Admin message
 	r.Route("/adminMessage", func(r chi.Router) {
@@ -114,9 +108,6 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		})
 	})
 
-	// Fusion
-	r.Mount("/fusion", api.fm.router(cli.casauth))
-
 	r.Get("/logout/", cli.logout)
 	// Admin
 	r.Route("/admin", func(r chi.Router) {
@@ -135,6 +126,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 
 	r.Get("/", api.IndexHandler)
 	r.Get("/about", api.IndexHandler)
+	r.Get("/tv", api.IndexHandler)
 
 	// iTRAK data feed endpoint
 	r.Get("/datafeed", api.DataFeedHandler)
