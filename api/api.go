@@ -135,6 +135,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 
 	r.Get("/", api.IndexHandler)
 	r.Get("/about", api.IndexHandler)
+	r.Get("/myc", api.IndexHandler)
 
 	// iTRAK data feed endpoint
 	r.Get("/datafeed", api.DataFeedHandler)
