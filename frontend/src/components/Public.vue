@@ -208,7 +208,7 @@ export default Vue.extend({
     },
     showUserLocation() {
       const userIcon = L.icon({
-        iconUrl: 'static/images/user.svg',
+        iconUrl: UserSVG,
 
         iconSize: [12, 12], // size of the icon
         iconAnchor: [6, 6], // point of the icon which will correspond to marker's location
