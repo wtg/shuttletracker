@@ -70,6 +70,19 @@ export default class Fusion {
         });
     }
 
+    public sendBusButton() {
+        const ls = UserLocationService.getInstance();
+        const pos = ls.getCurrentLocation();
+        const data = {
+            type: 'bus_button',
+            message: {
+                latitude: pos.coords.latitude,
+                longitude: pos.coords.longitude,
+            },
+        };
+        this.ws.send(JSON.stringify(data));
+    }
+
     private generateUUID() {
         let d = new Date().getTime();
         if (typeof performance !== 'undefined' && typeof performance.now === 'function') {

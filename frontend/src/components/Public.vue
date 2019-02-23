@@ -19,7 +19,7 @@
         </a>
       </div>
     </div>
-    <bus-button v-on:bus-click="spawn" v-if="this.message !== undefined && this.message.enabled === false" style="position: fixed; right: 25px; bottom: 35px; z-index: 2000;" />
+    <bus-button v-on:bus-click="busClicked()" v-if="this.message !== undefined && this.message.enabled === false" style="position: fixed; right: 25px; bottom: 35px; z-index: 2000;" />
     <span style="width: 100%; height: 100%; position: fixed;">
       <div id="mymap"></div>
       <messagebox ref="msgbox"/>
@@ -71,6 +71,7 @@ export default Vue.extend({
       initialized: false,
       legend: new L.Control({ position: 'bottomleft' }),
       locationMarker: undefined,
+      fusion: new Fusion(),
     } as {
         vehicles: Vehicle[];
         routes: Route[];
@@ -82,6 +83,7 @@ export default Vue.extend({
         legend: L.Control;
         locationMarker: L.Marker | undefined;
         userShuttleidCount: number;
+        fusion: Fusion;
       };
   },
   mounted() {
@@ -139,7 +141,7 @@ export default Vue.extend({
       }
     });
 
-    new Fusion().start();
+    this.fusion.start();
   },
   computed: {
     message(): AdminMessageUpdate {
@@ -283,6 +285,9 @@ export default Vue.extend({
           }
       });
 
+    },
+    busClicked() {
+      this.fusion.sendBusButton();
     },
   },
   components: {
