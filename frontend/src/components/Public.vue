@@ -19,7 +19,7 @@
         </a>
       </div>
     </div>
-    <bus-button v-if="this.message !== undefined && this.message.enabled === false" style="position: fixed; right: 25px; bottom: 35px; z-index: 2000;" />
+    <bus-button v-on:bus-click="spawn" v-if="this.message !== undefined && this.message.enabled === false" style="position: fixed; right: 25px; bottom: 35px; z-index: 2000;" />
     <span style="width: 100%; height: 100%; position: fixed;">
       <div id="mymap"></div>
       <messagebox ref="msgbox"/>
@@ -67,6 +67,7 @@ export default Vue.extend({
       ready: false,
       Map: undefined,
       existingRouteLayers: [],
+      userShuttleidCount: 0,
       initialized: false,
       legend: new L.Control({ position: 'bottomleft' }),
       locationMarker: undefined,
@@ -80,6 +81,7 @@ export default Vue.extend({
         initialized: boolean;
         legend: L.Control;
         locationMarker: L.Marker | undefined;
+        userShuttleidCount: number;
       };
   },
   mounted() {
@@ -145,6 +147,9 @@ export default Vue.extend({
     },
   },
   methods: {
+    spawn(){
+      this.spawnShuttleAtPosition(UserLocationService.getInstance().getCurrentLocation());
+    },
     updateLegend() {
       this.legend.onAdd = (map: L.Map) => {
         const div = L.DomUtil.create('div', 'info legend');
@@ -220,7 +225,30 @@ export default Vue.extend({
       });
     },
     spawnShuttleAtPosition(position: any) {
+      this.userShuttleidCount ++;
+      const busIcon = L.divIcon({
+        html: `<span style="font-size: 30px; bottom: 30px; right: 30px;" class="shuttleusericon shuttleusericon` + String(this.userShuttleidCount) +  `" >🚐</span>`,
 
+        iconSize: [24, 24], // size of the icon
+        iconAnchor: [24, 24], // point of the icon which will correspond to marker's location
+        shadowAnchor: [6, 6], // the same for the shadow
+        popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
+      });
+      let x = L.marker(
+        [position.coords.latitude, position.coords.longitude],
+        {
+          icon: busIcon,
+          zIndexOffset: 1000,
+        },
+      );
+      if (this.Map !== undefined) {
+        x.addTo(this.Map);
+        setTimeout(()=> {
+          if(this.Map != undefined){
+            this.Map.removeLayer(x)
+          }
+        }, 1000)
+      }
     },
     showUserLocation() {
       const userIcon = new L.Icon({
@@ -234,6 +262,7 @@ export default Vue.extend({
 
 
       UserLocationService.getInstance().registerCallback((position) => {
+        this.spawnShuttleAtPosition(position);
         if (this.locationMarker === undefined) {
           this.locationMarker = L.marker(
               [position.coords.latitude, position.coords.longitude],
@@ -378,5 +407,32 @@ export default Vue.extend({
     margin-bottom: 2px;
     padding-left: 0px;
   }
+}
+
+.shuttleusericon{
+  background-color: transparent;
+  border: none;
+  -webkit-animation-name: fadeOutUp !important;
+  animation-name: fadeOutUp !important;
+  animation-duration: 2s;
+}
+
+@keyframes fadeOutUp {
+   0% {
+      opacity: 1;
+      transform: translateY(0);
+   }
+   100% {
+      opacity: 0;
+      transform: translateY(40px);
+   }
+} 
+
+.leaflet-div-icon {
+  background: transparent !important;
+  border: none !important;
+  width: 30px !important;
+  height: 30px !important;
+
 }
 </style>

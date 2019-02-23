@@ -10,6 +10,7 @@ export default class UserLocationService {
 
     private static instance: UserLocationService;
     private callbacks: Array<((pos: Position) => any)>;
+    private currentPosition: Position | undefined;
 
     private constructor() {
         console.log('Location service active.');
@@ -22,8 +23,8 @@ export default class UserLocationService {
         this.callbacks.push(callback);
     }
 
-    public getCurrentLocation(): Position {
-        return this.getCurrentLocation();
+    public getCurrentLocation(): Position | undefined{
+        return this.currentPosition;
     }
 
     private startGeolocation() {
@@ -34,6 +35,7 @@ export default class UserLocationService {
         const options = { enableHighAccuracy: true, maximumAge: 0 };
         navigator.geolocation.watchPosition(
             (position: Position) => {
+                this.currentPosition = position;
                 for (let i = 0; i < this.callbacks.length; i ++) {
                     this.callbacks[i](position);
                 }
