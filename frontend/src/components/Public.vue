@@ -264,7 +264,6 @@ export default Vue.extend({
 
 
       UserLocationService.getInstance().registerCallback((position) => {
-        this.spawnShuttleAtPosition(position);
         if (this.locationMarker === undefined) {
           this.locationMarker = L.marker(
               [position.coords.latitude, position.coords.longitude],
