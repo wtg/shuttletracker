@@ -19,6 +19,7 @@
         </a>
       </div>
     </div>
+    <bus-button v-if="this.message !== undefined && this.message.enabled === false" style="position: fixed; right: 25px; bottom: 35px; z-index: 2000;" />
     <span style="width: 100%; height: 100%; position: fixed;">
       <div id="mymap"></div>
       <messagebox ref="msgbox"/>
@@ -41,7 +42,9 @@ import { setTimeout, setInterval } from 'timers';
 import getMarkerString from '../structures/leaflet/rotatedMarker';
 import { Position } from 'geojson';
 import Fusion from '@/fusion.ts';
-import UserLocationService from '@/userlocation.service';
+import UserLocationService from '@/structures/userlocation.service';
+import BusButton from '@/components/busbutton.vue';
+import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 
 const StopSVG = require('@/assets/circle.svg') as string;
 const UserSVG = require('@/assets/user.svg') as string;
@@ -136,6 +139,11 @@ export default Vue.extend({
 
     new Fusion().start();
   },
+  computed: {
+    message(): AdminMessageUpdate {
+        return this.$store.state.adminMessage;
+    },
+  },
   methods: {
     updateLegend() {
       this.legend.onAdd = (map: L.Map) => {
@@ -211,8 +219,11 @@ export default Vue.extend({
         }
       });
     },
+    spawnShuttleAtPosition(position: any) {
+
+    },
     showUserLocation() {
-      const userIcon = L.icon({
+      const userIcon = new L.Icon({
         iconUrl: UserSVG,
 
         iconSize: [12, 12], // size of the icon
@@ -220,6 +231,8 @@ export default Vue.extend({
         shadowAnchor: [6, 6], // the same for the shadow
         popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
       });
+
+
       UserLocationService.getInstance().registerCallback((position) => {
         if (this.locationMarker === undefined) {
           this.locationMarker = L.marker(
@@ -229,6 +242,7 @@ export default Vue.extend({
                 zIndexOffset: 1000,
               },
             );
+
         }
         const locationMarkerOptions = {
             name: 'You are here',
@@ -245,6 +259,7 @@ export default Vue.extend({
   components: {
     dropdown,
     messagebox,
+    BusButton,
   },
 });
 </script>
