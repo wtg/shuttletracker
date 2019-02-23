@@ -46,19 +46,21 @@ type fusionManager struct {
 	clients          []*fusionClient
 	tracks           map[string][]fusionPosition
 	newConnChan      chan *websocket.Conn
-	newPositionChan  chan fusionPosition
 	removeClientChan chan *fusionClient
+	positionChan     chan fusionPosition
+	busButtonChan    chan fusionBusButton
 }
 
 func newFusionManager() *fusionManager {
 	fm := &fusionManager{
 		newConnChan:      make(chan *websocket.Conn),
-		newPositionChan:  make(chan fusionPosition),
 		removeClientChan: make(chan *fusionClient),
+		positionChan:     make(chan fusionPosition),
+		busButtonChan:    make(chan fusionBusButton),
 		tracks:           map[string][]fusionPosition{},
 	}
 	go fm.clientsLoop()
-	go fm.handleNewPositions()
+	go fm.messagesLoop()
 	return fm
 }
 
@@ -135,7 +137,15 @@ func (fm *fusionManager) handleClient(client *fusionClient) {
 				break
 			}
 			fp.Time = time.Now()
-			fm.newPositionChan <- fp
+			fm.positionChan <- fp
+		case "bus_button":
+			fbb := fusionBusButton{}
+			err = json.Unmarshal(message, &fbb)
+			if err != nil {
+				log.WithError(err).Error("unable to decode fusionBusButton")
+				break
+			}
+			fm.busButtonChan <- fbb
 		default:
 			log.WithError(err).Errorf("unknown message type \"%s\"", messageType)
 		}
@@ -145,10 +155,15 @@ func (fm *fusionManager) handleClient(client *fusionClient) {
 	fm.removeClientChan <- client
 }
 
-func (fm *fusionManager) handleNewPositions() {
-	for pos := range fm.newPositionChan {
-		log.Debugf("new position: %+v", pos)
-		fm.tracks[pos.Track] = append(fm.tracks[pos.Track], pos)
+func (fm *fusionManager) messagesLoop() {
+	for {
+		select {
+		case pos := <-fm.positionChan:
+			log.Debugf("new position: %+v", pos)
+			fm.tracks[pos.Track] = append(fm.tracks[pos.Track], pos)
+		case bb := <-fm.busButtonChan:
+			log.Debugf("new bus button: %+v", bb)
+		}
 	}
 }
 
