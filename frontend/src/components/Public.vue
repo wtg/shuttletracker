@@ -41,6 +41,7 @@ import { setTimeout, setInterval } from 'timers';
 import getMarkerString from '../structures/leaflet/rotatedMarker';
 import { Position } from 'geojson';
 import Fusion from '@/fusion.ts';
+import UserLocationService from '@/userlocation.service';
 
 const StopSVG = require('@/assets/circle.svg') as string;
 const UserSVG = require('@/assets/user.svg') as string;
@@ -77,6 +78,8 @@ export default Vue.extend({
       };
   },
   mounted() {
+    let ls = UserLocationService.getInstance();
+
     const a = new InfoService();
     this.$store.dispatch('grabRoutes');
     this.$store.dispatch('grabStops');
@@ -215,9 +218,7 @@ export default Vue.extend({
         shadowAnchor: [6, 6], // the same for the shadow
         popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
       });
-
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(((position) => {
+      UserLocationService.getInstance().registerCallback((position) => {
           const locationMarker = {
             name: 'You are here',
             marker: L.marker(
@@ -232,8 +233,8 @@ export default Vue.extend({
           if (this.Map !== undefined) {
             locationMarker.marker.addTo(this.Map);
           }
-        }) as PositionCallback);
-      }
+      });
+
     },
   },
   components: {
