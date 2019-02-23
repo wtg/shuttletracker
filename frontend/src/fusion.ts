@@ -73,6 +73,10 @@ export default class Fusion {
     public sendBusButton() {
         const ls = UserLocationService.getInstance();
         const pos = ls.getCurrentLocation();
+        if (!pos) {
+            // client geolocation isn't enabled or known
+            return;
+        }
         const data = {
             type: 'bus_button',
             message: {

@@ -163,6 +163,21 @@ func (fm *fusionManager) messagesLoop() {
 			fm.tracks[pos.Track] = append(fm.tracks[pos.Track], pos)
 		case bb := <-fm.busButtonChan:
 			log.Debugf("new bus button: %+v", bb)
+			fme := fusionMessageEnvelope{
+				Type:    "bus_button",
+				Message: bb,
+			}
+			b, err := json.Marshal(fme)
+			if err != nil {
+				log.WithError(err).Error("unable to marshal")
+				continue
+			}
+			for _, client := range fm.clients {
+				err = client.conn.WriteMessage(websocket.TextMessage, b)
+				if err != nil {
+					log.WithError(err).Error("unable to write")
+				}
+			}
 		}
 	}
 }
