@@ -3,11 +3,17 @@ import UserLocationService from '@/structures/userlocation.service';
 // SocketManager wraps a WebSocket in order to provide guarantees about
 // reliability, reconnections, retries, etc.
 class SocketManager {
-    public ws: WebSocket | null = null;
-    public url: string;
+    private ws: WebSocket | null = null;
+    private url: string;
+    private callbacks: Array<(event: Event) => any>;
 
     constructor(url: string) {
         this.url = url;
+        this.callbacks = new Array<(event: Event) => any>();
+    }
+
+    public registerMessageReceivedEventCallback(callback: (event: Event) => any) {
+        this.callbacks.push(callback);
     }
 
     public open() {
@@ -30,7 +36,11 @@ class SocketManager {
                 resolve(ws);
             };
             ws.onmessage = (event) => {
-                // console.log(event);
+                console.log(event);
+                for (const callback of this.callbacks) {
+                    console.log("hi");
+                    callback(event);
+                }
             };
             ws.onerror = (event) => {
                 // console.log("socket error", event);
@@ -68,6 +78,11 @@ export default class Fusion {
             };
             this.ws.send(JSON.stringify(data));
         });
+    }
+
+    public registerMessageReceivedCallback(callback: (event: Event) => any) {
+        console.log("cb" + callback);
+        this.ws.registerMessageReceivedEventCallback(callback);
     }
 
     public sendBusButton() {

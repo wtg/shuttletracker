@@ -142,6 +142,7 @@ export default Vue.extend({
     });
 
     this.fusion.start();
+    this.fusion.registerMessageReceivedCallback(this.saucyspawn);
   },
   computed: {
     message(): AdminMessageUpdate {
@@ -151,6 +152,15 @@ export default Vue.extend({
   methods: {
     spawn(){
       this.spawnShuttleAtPosition(UserLocationService.getInstance().getCurrentLocation());
+    },
+    saucyspawn(event: any){
+      console.log(event.data);
+      if (JSON.parse(event.data).type !== "bus_button") {
+        return;
+      }
+      const pos = JSON.parse(event.data).message;
+      console.log(pos);
+      this.spawnShuttleAtPosition(pos);
     },
     updateLegend() {
       this.legend.onAdd = (map: L.Map) => {
@@ -228,6 +238,8 @@ export default Vue.extend({
     },
     spawnShuttleAtPosition(position: any) {
       this.userShuttleidCount ++;
+      console.log("here")
+      console.log(position);
       const busIcon = L.divIcon({
         html: `<span style="font-size: 30px; bottom: 30px; right: 30px;" class="shuttleusericon shuttleusericon` + String(this.userShuttleidCount) +  `" >🚐</span>`,
 
@@ -237,7 +249,7 @@ export default Vue.extend({
         popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
       });
       let x = L.marker(
-        [position.coords.latitude, position.coords.longitude],
+        [position.latitude, position.longitude],
         {
           icon: busIcon,
           zIndexOffset: 1000,
@@ -246,6 +258,7 @@ export default Vue.extend({
       if (this.Map !== undefined) {
         x.addTo(this.Map);
         setTimeout(()=> {
+          console.log("here")
           if(this.Map != undefined){
             this.Map.removeLayer(x)
           }
