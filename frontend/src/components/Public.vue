@@ -41,6 +41,7 @@ import { setTimeout, setInterval } from 'timers';
 import getMarkerString from '../structures/leaflet/rotatedMarker';
 import { Position } from 'geojson';
 import Fusion from '@/fusion.ts';
+import UserLocationService from '@/userlocation.service';
 
 const StopSVG = require('@/assets/circle.svg') as string;
 const UserSVG = require('@/assets/user.svg') as string;
@@ -65,6 +66,7 @@ export default Vue.extend({
       existingRouteLayers: [],
       initialized: false,
       legend: new L.Control({ position: 'bottomleft' }),
+      locationMarker: undefined,
     } as {
         vehicles: Vehicle[];
         routes: Route[];
@@ -74,9 +76,12 @@ export default Vue.extend({
         existingRouteLayers: L.Polyline[];
         initialized: boolean;
         legend: L.Control;
+        locationMarker: L.Marker | undefined;
       };
   },
   mounted() {
+    const ls = UserLocationService.getInstance();
+
     const a = new InfoService();
     this.$store.dispatch('grabRoutes');
     this.$store.dispatch('grabStops');
@@ -215,25 +220,26 @@ export default Vue.extend({
         shadowAnchor: [6, 6], // the same for the shadow
         popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
       });
-
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(((position) => {
-          const locationMarker = {
-            name: 'You are here',
-            marker: L.marker(
+      UserLocationService.getInstance().registerCallback((position) => {
+        if (this.locationMarker === undefined) {
+          this.locationMarker = L.marker(
               [position.coords.latitude, position.coords.longitude],
               {
                 icon: userIcon,
                 zIndexOffset: 1000,
               },
-            ),
+            );
+        }
+        const locationMarkerOptions = {
+            name: 'You are here',
+            marker: this.locationMarker,
           };
-          locationMarker.marker.bindPopup(locationMarker.name);
-          if (this.Map !== undefined) {
-            locationMarker.marker.addTo(this.Map);
+        locationMarkerOptions.marker.bindPopup(locationMarkerOptions.name);
+        if (this.Map !== undefined) {
+            locationMarkerOptions.marker.addTo(this.Map);
           }
-        }) as PositionCallback);
-      }
+      });
+
     },
   },
   components: {

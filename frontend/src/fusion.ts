@@ -1,3 +1,5 @@
+import UserLocationService from './userlocation.service';
+
 // SocketManager wraps a WebSocket in order to provide guarantees about
 // reliability, reconnections, retries, etc.
 class SocketManager {
@@ -52,33 +54,20 @@ export default class Fusion {
 
     public start() {
         this.ws.open();
-        this.startGeolocation();
-    }
-
-    private startGeolocation() {
-        if (!('geolocation' in navigator)) {
-            console.log('Client does not support geolocation.');
-            return;
-        }
-        const options = { enableHighAccuracy: true, maximumAge: 0 };
-        navigator.geolocation.watchPosition(
-            (position) => {
-                const data = {
-                    type: 'position',
-                    message: {
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude,
-                        heading: position.coords.heading,
-                        speed: position.coords.speed,
-                        track: this.track,
-                    },
-                };
-                this.ws.send(JSON.stringify(data));
-            },
-            (error) => {
-                // console.log("could not get position", error);
-            }, options,
-        );
+        // register location callback
+        UserLocationService.getInstance().registerCallback((position) => {
+            const data = {
+                type: 'position',
+                message: {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    heading: position.coords.heading,
+                    speed: position.coords.speed,
+                    track: this.track,
+                },
+            };
+            this.ws.send(JSON.stringify(data));
+        });
     }
 
     private generateUUID() {
