@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -18,6 +19,11 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
+type fusionMessageEnvelope struct {
+	Type    string      `json:"type"`
+	Message interface{} `json:"message"`
+}
+
 type fusionPosition struct {
 	Latitude  float64   `json:"latitude"`
 	Longitude float64   `json:"longitude"`
@@ -25,6 +31,11 @@ type fusionPosition struct {
 	Heading   *float64  `json:"heading"`
 	Track     string    `json:"track"`
 	Time      time.Time `json:"time"`
+}
+
+type fusionBusButton struct {
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"latitude"`
 }
 
 type fusionClient struct {
@@ -90,6 +101,19 @@ func (fm *fusionManager) clientsLoop() {
 	}
 }
 
+func decodeFusionMessage(r io.Reader) (string, json.RawMessage, error) {
+	var message json.RawMessage
+	fm := fusionMessageEnvelope{
+		Message: &message,
+	}
+	dec := json.NewDecoder(r)
+	err := dec.Decode(&fm)
+	if err != nil {
+		return "", message, err
+	}
+	return fm.Type, message, nil
+}
+
 func (fm *fusionManager) handleClient(client *fusionClient) {
 	for {
 		_, r, err := client.conn.NextReader()
@@ -97,16 +121,24 @@ func (fm *fusionManager) handleClient(client *fusionClient) {
 			log.WithError(err).Error("unable to get reader")
 			break
 		}
-		dec := json.NewDecoder(r)
-		fp := fusionPosition{}
-		err = dec.Decode(&fp)
+		messageType, message, err := decodeFusionMessage(r)
 		if err != nil {
 			log.WithError(err).Error("unable to decode message")
+			break
 		}
-		fp.Time = time.Now()
-		// log.Infof("received message %+v", fp)
-		fm.newPositionChan <- fp
-		// client.positions = append(client.positions, fp)
+		switch messageType {
+		case "position":
+			fp := fusionPosition{}
+			err = json.Unmarshal(message, &fp)
+			if err != nil {
+				log.WithError(err).Error("unable to decode fusionPosition")
+				break
+			}
+			fp.Time = time.Now()
+			fm.newPositionChan <- fp
+		default:
+			log.WithError(err).Errorf("unknown message type \"%s\"", messageType)
+		}
 	}
 
 	// remove client since the connection is dead

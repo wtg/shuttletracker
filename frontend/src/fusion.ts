@@ -48,7 +48,6 @@ export default class Fusion {
     public track = this.generateUUID();
 
     constructor() {
-        console.log('Fusion created.');
         const wsURL = this.relativeWSURL('fusion/');
         this.ws = new SocketManager(wsURL);
     }
@@ -58,20 +57,18 @@ export default class Fusion {
         // register location callback
         UserLocationService.getInstance().registerCallback((position) => {
             const data = {
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-                heading: position.coords.heading,
-                speed: position.coords.speed,
-                track: this.track,
+                type: 'position',
+                message: {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    heading: position.coords.heading,
+                    speed: position.coords.speed,
+                    track: this.track,
+                },
             };
             this.ws.send(JSON.stringify(data));
         });
     }
-
-    public updateLocation(pos: Position) {
-
-    }
-
 
     private generateUUID() {
         let d = new Date().getTime();
