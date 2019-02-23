@@ -22,6 +22,10 @@ export default class UserLocationService {
         this.callbacks.push(callback);
     }
 
+    public getCurrentLocation(): Position {
+        return this.getCurrentLocation();
+    }
+
     private startGeolocation() {
         if (!('geolocation' in navigator)) {
             console.log('Client does not support geolocation.');

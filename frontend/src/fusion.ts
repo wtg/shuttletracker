@@ -1,4 +1,4 @@
-import UserLocationService from './userlocation.service';
+import UserLocationService from '@/structures/userlocation.service';
 
 // SocketManager wraps a WebSocket in order to provide guarantees about
 // reliability, reconnections, retries, etc.
