@@ -66,6 +66,7 @@ export default Vue.extend({
       existingRouteLayers: [],
       initialized: false,
       legend: new L.Control({ position: 'bottomleft' }),
+      locationMarker: undefined,
     } as {
         vehicles: Vehicle[];
         routes: Route[];
@@ -75,10 +76,11 @@ export default Vue.extend({
         existingRouteLayers: L.Polyline[];
         initialized: boolean;
         legend: L.Control;
+        locationMarker: L.Marker | undefined;
       };
   },
   mounted() {
-    let ls = UserLocationService.getInstance();
+    const ls = UserLocationService.getInstance();
 
     const a = new InfoService();
     this.$store.dispatch('grabRoutes');
@@ -219,19 +221,22 @@ export default Vue.extend({
         popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
       });
       UserLocationService.getInstance().registerCallback((position) => {
-          const locationMarker = {
-            name: 'You are here',
-            marker: L.marker(
+        if (this.locationMarker === undefined) {
+          this.locationMarker = L.marker(
               [position.coords.latitude, position.coords.longitude],
               {
                 icon: userIcon,
                 zIndexOffset: 1000,
               },
-            ),
+            );
+        }
+        const locationMarkerOptions = {
+            name: 'You are here',
+            marker: this.locationMarker,
           };
-          locationMarker.marker.bindPopup(locationMarker.name);
-          if (this.Map !== undefined) {
-            locationMarker.marker.addTo(this.Map);
+        locationMarkerOptions.marker.bindPopup(locationMarkerOptions.name);
+        if (this.Map !== undefined) {
+            locationMarkerOptions.marker.addTo(this.Map);
           }
       });
 
