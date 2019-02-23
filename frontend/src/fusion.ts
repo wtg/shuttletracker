@@ -46,7 +46,6 @@ export default class Fusion {
     public track = this.generateUUID();
 
     constructor() {
-        console.log('Fusion created.');
         const wsURL = this.relativeWSURL('fusion/');
         this.ws = new SocketManager(wsURL);
     }
@@ -65,11 +64,14 @@ export default class Fusion {
         navigator.geolocation.watchPosition(
             (position) => {
                 const data = {
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                    heading: position.coords.heading,
-                    speed: position.coords.speed,
-                    track: this.track,
+                    type: 'position',
+                    message: {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        heading: position.coords.heading,
+                        speed: position.coords.speed,
+                        track: this.track,
+                    },
                 };
                 this.ws.send(JSON.stringify(data));
             },
