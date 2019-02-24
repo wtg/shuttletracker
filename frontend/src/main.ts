@@ -4,6 +4,7 @@ import store from '@/store';
 import router from '@/index';
 import '@/assets/styles.scss';
 import '../node_modules/leaflet/dist/leaflet.css';
+import 'typeface-open-sans';
 
 Vue.config.productionTip = false;
 

@@ -44,8 +44,8 @@
 import Vue from 'vue';
 export default Vue.extend({});
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .container {
-  margin: 20px;
+  padding: 20px;
 }
 </style>

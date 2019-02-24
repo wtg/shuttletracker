@@ -1,5 +1,5 @@
 <template>
-  <div style="padding: 0px; margin: 0px;width: 100%; height: 100%;">
+  <div style="padding: 0px; margin: 0px;width: 100%;">
     <div class="titleBar">
       <ul class="titleContent">
         <dropdown/>
@@ -20,7 +20,7 @@
       </div>
     </div>
     <bus-button v-on:bus-click="busClicked()" v-if="this.message !== undefined && this.message.enabled === false" style="position: fixed; right: 25px; bottom: 35px; z-index: 2000;" />
-    <span style="width: 100%; height: 100%; position: fixed;">
+    <span style="width: 100%; height: 100%;">
       <div id="mymap"></div>
       <messagebox ref="msgbox"/>
     </span>
