@@ -38,7 +38,7 @@ class SocketManager {
             ws.onmessage = (event) => {
                 console.log(event);
                 for (const callback of this.callbacks) {
-                    console.log("hi");
+                    console.log('hi');
                     callback(event);
                 }
             };
@@ -81,7 +81,7 @@ export default class Fusion {
     }
 
     public registerMessageReceivedCallback(callback: (event: Event) => any) {
-        console.log("cb" + callback);
+        console.log('cb' + callback);
         this.ws.registerMessageReceivedEventCallback(callback);
     }
 

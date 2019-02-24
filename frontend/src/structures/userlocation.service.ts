@@ -23,7 +23,7 @@ export default class UserLocationService {
         this.callbacks.push(callback);
     }
 
-    public getCurrentLocation(): Position | undefined{
+    public getCurrentLocation(): Position | undefined {
         return this.currentPosition;
     }
 
