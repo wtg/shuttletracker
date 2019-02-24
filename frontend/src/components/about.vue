@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="parent content">
     <router-link to="/">Back</router-link>
     <h2>About Shuttle Tracker</h2>
     <p>
@@ -45,7 +45,10 @@ import Vue from 'vue';
 export default Vue.extend({});
 </script>
 <style lang="scss" scoped>
-.container {
+.parent {
   padding: 20px;
+}
+p {
+  margin-bottom: 1em;
 }
 </style>

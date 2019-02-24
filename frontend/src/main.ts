@@ -1,11 +1,16 @@
 import Vue from 'vue';
+import 'leaflet/dist/leaflet.css';
+import 'typeface-open-sans';
+import Buefy from 'buefy';
+import 'buefy/dist/buefy.css';
+import '@fortawesome/fontawesome-free/css/all.css';
+
 import App from '@/App.vue';
 import store from '@/store';
 import router from '@/index';
 import '@/assets/styles.scss';
-import '../node_modules/leaflet/dist/leaflet.css';
-import 'typeface-open-sans';
 
+Vue.use(Buefy);
 Vue.config.productionTip = false;
 
 /**

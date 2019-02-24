@@ -1,8 +1,17 @@
 <template>
   <ul>
-    <router-link tag="li" to="/">Map</router-link>
-    <router-link tag="li" to="/schedules">Schedules</router-link>
-    <router-link tag="li" to="/settings">Settings</router-link>
+    <router-link tag="li" to="/">
+      <span class="fas fa-location-arrow"></span>
+      Map
+    </router-link>
+    <router-link tag="li" to="/schedules">
+      <span class="fas fa-list-ul"></span>
+      Schedules
+    </router-link>
+    <router-link tag="li" to="/settings">
+      <span class="fas fa-cog"></span>
+      Settings
+    </router-link>
   </ul>
 </template>
 

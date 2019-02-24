@@ -16,7 +16,7 @@ export default Vue.extend({
   name: 'app',
   components: {
     TabBar,
-  }
+  },
 });
 </script>
 

@@ -80,6 +80,9 @@ const store: StoreOptions<StoreState> = {
     addAdminMessage(state, message: AdminMessageUpdate) {
       state.adminMessage = message;
     },
+    initializeSettings(state) {
+
+    },
   },
   getters: {
     getPolyLineByRouteId: (state) => (id: number): L.Polyline | undefined => {
