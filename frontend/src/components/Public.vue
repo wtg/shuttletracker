@@ -19,7 +19,7 @@
         </a>
       </div>
     </div>
-    <bus-button v-on:bus-click="busClicked()" v-if="this.message !== undefined && this.message.enabled === false" style="position: fixed; right: 25px; bottom: 35px; z-index: 2000;" />
+    <bus-button id="busbutton" v-on:bus-click="busClicked()" v-if="this.message !== undefined && this.message.enabled === false" />
     <span style="width: 100%; height: 100%; position: fixed;">
       <div id="mymap"></div>
       <messagebox ref="msgbox"/>
@@ -150,12 +150,12 @@ export default Vue.extend({
     },
   },
   methods: {
-    spawn(){
+    spawn() {
       this.spawnShuttleAtPosition(UserLocationService.getInstance().getCurrentLocation());
     },
-    saucyspawn(event: any){
+    saucyspawn(event: any) {
       console.log(event.data);
-      if (JSON.parse(event.data).type !== "bus_button") {
+      if (JSON.parse(event.data).type !== 'bus_button') {
         return;
       }
       const pos = JSON.parse(event.data).message;
@@ -238,7 +238,7 @@ export default Vue.extend({
     },
     spawnShuttleAtPosition(position: any) {
       this.userShuttleidCount ++;
-      console.log("here")
+      console.log('here');
       console.log(position);
       const busIcon = L.divIcon({
         html: `<span style="font-size: 30px; bottom: 30px; right: 30px;" class="shuttleusericon shuttleusericon` + String(this.userShuttleidCount) +  `" >🚐</span>`,
@@ -248,7 +248,7 @@ export default Vue.extend({
         shadowAnchor: [6, 6], // the same for the shadow
         popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
       });
-      let x = L.marker(
+      const x = L.marker(
         [position.latitude, position.longitude],
         {
           icon: busIcon,
@@ -257,12 +257,12 @@ export default Vue.extend({
       );
       if (this.Map !== undefined) {
         x.addTo(this.Map);
-        setTimeout(()=> {
-          console.log("here")
-          if(this.Map != undefined){
-            this.Map.removeLayer(x)
+        setTimeout(() => {
+          console.log('here');
+          if (this.Map !== undefined) {
+            this.Map.removeLayer(x);
           }
-        }, 1000)
+        }, 1000);
       }
     },
     showUserLocation() {
@@ -451,5 +451,11 @@ export default Vue.extend({
   width: 30px !important;
   height: 30px !important;
 
+}
+#busbutton{
+  position: fixed; 
+  right: 25px; 
+  bottom: 35px; 
+  z-index: 2000;
 }
 </style>
