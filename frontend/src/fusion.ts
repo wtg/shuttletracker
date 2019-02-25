@@ -6,14 +6,13 @@ import store from '@/store';
 class SocketManager {
     private ws: WebSocket | null = null;
     private url: string;
-    private callbacks: Array<(event: Event) => any>;
+    private callbacks = new Array<(data: any) => any>();
 
     constructor(url: string) {
         this.url = url;
-        this.callbacks = new Array<(event: Event) => any>();
     }
 
-    public registerMessageReceivedEventCallback(callback: (event: Event) => any) {
+    public registerMessageReceivedCallback(callback: (data: any) => any) {
         this.callbacks.push(callback);
     }
 
@@ -38,7 +37,7 @@ class SocketManager {
             };
             ws.onmessage = (event) => {
                 for (const callback of this.callbacks) {
-                    callback(event);
+                    callback(event.data);
                 }
             };
             ws.onerror = (event) => {
@@ -55,10 +54,17 @@ class SocketManager {
 export default class Fusion {
     public ws: SocketManager;
     public track = this.generateUUID();
+    private callbacks = Array<(message: {}) => any>();
 
     constructor() {
         const wsURL = this.relativeWSURL('fusion/');
         this.ws = new SocketManager(wsURL);
+        this.ws.registerMessageReceivedCallback((data) => {
+            const message = JSON.parse(data);
+            for (const callback of this.callbacks) {
+                callback(message);
+            }
+        });
     }
 
     public start() {
@@ -82,8 +88,8 @@ export default class Fusion {
         });
     }
 
-    public registerMessageReceivedCallback(callback: (event: Event) => any) {
-        this.ws.registerMessageReceivedEventCallback(callback);
+    public registerMessageReceivedCallback(callback: (message: {}) => any) {
+        this.callbacks.push(callback);
     }
 
     public sendBusButton() {

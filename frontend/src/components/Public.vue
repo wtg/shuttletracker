@@ -139,12 +139,11 @@ export default Vue.extend({
     spawn() {
       this.spawnShuttleAtPosition(UserLocationService.getInstance().getCurrentLocation());
     },
-    saucyspawn(event: any) {
-      if (JSON.parse(event.data).type !== 'bus_button') {
+    saucyspawn(message: any) {
+      if (message.type !== 'bus_button') {
         return;
       }
-      const pos = JSON.parse(event.data).message;
-      this.spawnShuttleAtPosition(pos);
+      this.spawnShuttleAtPosition(message.message);
     },
     updateLegend() {
       this.legend.onAdd = (map: L.Map) => {
