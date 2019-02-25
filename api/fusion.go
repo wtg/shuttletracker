@@ -19,12 +19,6 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-// connReq helps pass a WebSocket conn and its associated HTTP request through a channel
-type connReq struct {
-	conn *websocket.Conn
-	req  *http.Request
-}
-
 type fusionMessageEnvelope struct {
 	Type    string      `json:"type"`
 	Message interface{} `json:"message"`
@@ -53,7 +47,7 @@ type fusionClient struct {
 type fusionManager struct {
 	clients          []*fusionClient
 	tracks           map[string][]fusionPosition
-	newConnChan      chan connReq
+	addClientChan    chan *fusionClient
 	removeClientChan chan *fusionClient
 	positionChan     chan fusionPosition
 	busButtonChan    chan fusionBusButton
@@ -62,7 +56,7 @@ type fusionManager struct {
 
 func newFusionManager() *fusionManager {
 	fm := &fusionManager{
-		newConnChan:      make(chan connReq),
+		addClientChan:    make(chan *fusionClient),
 		removeClientChan: make(chan *fusionClient),
 		positionChan:     make(chan fusionPosition),
 		busButtonChan:    make(chan fusionBusButton),
@@ -73,13 +67,7 @@ func newFusionManager() *fusionManager {
 	return fm
 }
 
-func (fm *fusionManager) addClient(c connReq) error {
-	client := &fusionClient{
-		conn:            c.conn,
-		lastMessageTime: time.Now(),
-		userAgent:       c.req.UserAgent(),
-	}
-
+func (fm *fusionManager) addClient(client *fusionClient) error {
 	fm.clients = append(fm.clients, client)
 	go fm.handleClient(client)
 	return nil
@@ -100,7 +88,7 @@ func (fm *fusionManager) removeClient(client *fusionClient) error {
 func (fm *fusionManager) clientsLoop() {
 	for {
 		select {
-		case c := <-fm.newConnChan:
+		case c := <-fm.addClientChan:
 			err := fm.addClient(c)
 			if err != nil {
 				log.WithError(err).Error("unable to add client")
@@ -260,11 +248,12 @@ func (fm *fusionManager) webSocketHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	c := connReq{
-		conn: conn,
-		req:  r,
+	c := &fusionClient{
+		conn:            conn,
+		lastMessageTime: time.Now(),
+		userAgent:       r.UserAgent(),
 	}
-	fm.newConnChan <- c
+	fm.addClientChan <- c
 }
 func (fm *fusionManager) router(auth func(http.Handler) http.Handler) http.Handler {
 	r := chi.NewRouter()
