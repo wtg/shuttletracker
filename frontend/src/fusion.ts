@@ -1,4 +1,5 @@
 import UserLocationService from '@/structures/userlocation.service';
+import store from '@/store';
 
 // SocketManager wraps a WebSocket in order to provide guarantees about
 // reliability, reconnections, retries, etc.
@@ -66,6 +67,9 @@ export default class Fusion {
         this.ws.open();
         // register location callback
         UserLocationService.getInstance().registerCallback((position) => {
+            if (!store.state.settings.fusionPositionEnabled) {
+                return;
+            }
             const data = {
                 type: 'position',
                 message: {

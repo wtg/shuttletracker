@@ -25,6 +25,10 @@ const store: StoreOptions<StoreState> = {
     Vehicles: [],
     adminMessage: undefined,
     online: true,
+    settings: {
+      busButtonEnabled: false,
+      fusionPositionEnabled: true,
+    }
   },
   mutations: {
     setOnline(state, online: boolean) {
@@ -81,7 +85,19 @@ const store: StoreOptions<StoreState> = {
       state.adminMessage = message;
     },
     initializeSettings(state) {
-
+      const savedSettings = localStorage.getItem('st_settings')
+      if (!savedSettings) {
+        return;
+      }
+      state.settings = Object.assign(state.settings, JSON.parse(savedSettings));
+    },
+    setSettingsBusButtonEnabled(state, value: boolean) {
+      state.settings.busButtonEnabled = value;
+      localStorage.setItem('st_settings', JSON.stringify(state.settings));
+    },
+    setSettingsFusionPositionEnabled(state, value: boolean) {
+      state.settings.fusionPositionEnabled = value;
+      localStorage.setItem('st_settings', JSON.stringify(state.settings));
     },
   },
   getters: {

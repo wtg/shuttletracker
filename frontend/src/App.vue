@@ -1,8 +1,10 @@
 <template>
   <div id="app">
-    <keep-alive>
-      <router-view id="router-view"></router-view>
-    </keep-alive>
+    <div id="view-wrapper">
+      <keep-alive>
+        <router-view id="router-view"></router-view>
+      </keep-alive>
+    </div>
     <tab-bar></tab-bar>   
   </div>
 </template>
@@ -25,9 +27,13 @@ export default Vue.extend({
   width: 100%;
   height: 100%;
 }
-#router-view {
+#view-wrapper {
   height: calc(100% - 40px);
-  overflow: scroll;
   box-sizing: border-box;
+}
+#router-view {
+  overflow: scroll;
+  -webkit-overflow-scrolling: touch;
+  height: 100%;
 }
 </style>

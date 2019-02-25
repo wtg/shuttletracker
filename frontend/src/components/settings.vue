@@ -3,11 +3,11 @@
     <h2 class="title">Settings</h2>
     <hr>
     <div class="field">
-      <b-switch>Send position updates</b-switch>
+      <b-switch v-model="fusionPositionEnabled">Send position updates</b-switch>
       <p class="help">Use your location to help make Shuttle Tracker more accurate.</p>
     </div>
     <div class="field">
-      <b-switch>Bus button</b-switch>
+      <b-switch v-model="busButtonEnabled">Bus button</b-switch>
       <p class="help">Place a bus on other users' maps.</p>
     </div>
 
@@ -19,7 +19,26 @@
 <script lang="ts">
 import Vue from 'vue';
 
-export default Vue.extend({});
+export default Vue.extend({
+  computed: {
+    busButtonEnabled: {
+      get(): boolean {
+        return this.$store.state.settings.busButtonEnabled;
+      },
+      set(value: boolean) {
+        this.$store.commit('setSettingsBusButtonEnabled', value);
+      }
+    },
+    fusionPositionEnabled: {
+      get(): boolean {
+        return this.$store.state.settings.fusionPositionEnabled;
+      },
+      set(value: boolean) {
+        this.$store.commit('setSettingsFusionPositionEnabled', value);
+      }
+    }
+  }
+});
 </script>
 
 <style lang="scss" scoped>
