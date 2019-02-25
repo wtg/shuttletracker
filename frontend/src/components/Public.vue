@@ -270,6 +270,8 @@ export default Vue.extend({
               },
             );
 
+        } else {
+          this.locationMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
         }
         const locationMarkerOptions = {
             name: 'You are here',
