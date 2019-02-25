@@ -1,29 +1,13 @@
 <template>
-  <div style="padding: 0px; margin: 0px;width: 100%;">
+  <div class="parent">
     <div class="titleBar">
-      <ul class="titleContent">
-        <dropdown/>
-        <li class="title">RPI Shuttle Tracker</li>
-      </ul>
-      <div v-if="$store.state.online" class="livebox">
-        <p>Live</p>
-        <div class="pulsate" style></div>
-      </div>
-      <div v-if="!$store.state.online" class="livebox">
-        <p>Offline</p>
-        <div class="caution-circle" style></div>
-      </div>
-      <div class="logo">
-        <a href="https://webtech.union.rpi.edu/">
-          <img src="~../assets/wtg.svg">
-        </a>
-      </div>
+      <img src="~../assets/icon.svg">
     </div>
-    <bus-button id="busbutton" v-on:bus-click="busClicked()" v-if="this.message !== undefined && this.message.enabled === false" />
-    <span style="width: 100%; height: 100%;">
-      <div id="mymap"></div>
+    <div id="mymap"></div>
+    <span>
       <messagebox ref="msgbox"/>
     </span>
+    <bus-button id="busbutton" v-on:bus-click="busClicked()" v-if="this.message !== undefined && this.message.enabled === false" />
   </div>
 </template>
 
@@ -35,7 +19,6 @@ import InfoService from '../structures/serviceproviders/info.service';
 import Vehicle from '../structures/vehicle';
 import Route from '../structures/route';
 import Stop from '../structures/stop';
-import dropdown from './dropdown.vue';
 import messagebox from './adminmessage.vue';
 import * as L from 'leaflet';
 import { setTimeout, setInterval } from 'timers';
@@ -303,7 +286,6 @@ export default Vue.extend({
     },
   },
   components: {
-    dropdown,
     messagebox,
     BusButton,
   },
@@ -311,105 +293,38 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-.caution-circle {
-  float: right;
-  width: 10px;
-  height: 10px;
-  background-color: orange;
-  border-radius: 50%;
-}
-.pulsate {
-  float: right;
-  width: 10px;
-  height: 10px;
-  background-color: blue;
-  border-radius: 50%;
-  animation: pulsate 2.5s ease-out;
-  animation-iteration-count: infinite;
-}
-@keyframes pulsate {
-  0% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-.livebox {
-  p {
-    margin-right: 5px;
-  }
-  position: absolute;
-  height: 26px;
-  right: 10px;
-  top: 40px;
-  box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
-  border-radius: 5px;
-  padding-left: 4px;
-  padding-right: 4px;
-  justify-self: flex-end;
+.parent {
+  padding: 0px;
+  margin: 0px;
+  width: 100%;
   display: flex;
-  flex-flow: row wrap;
-  align-content: center;
-  align-items: center;
-  justify-content: space-around;
-  background-color: rgba(255, 255, 255, 0.9);
+  flex-direction: column;
 }
 
 #mymap {
-  height: 100%;
-  width: 100%;
-  position: relative;
-  filter: invert(0);
+  flex: 1;
+  z-index: 0
 }
 
 .titleBar {
-  height: 34px;
-  float: none;
-  position: absolute;
-  z-index: 1;
+  height: 40px;
   display: flex;
-  align-content: space-around;
   justify-content: space-between;
-  flex-flow: row;
+  align-items: center;
   width: 100%;
-  background-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.8);
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+  border-bottom: 0.5px solid #eee;
+  box-shadow: 0 -3px 8px 0 #ddd;
   user-select: none;
+  background: white;
+  z-index: 1;
 
-  & .titleContent {
-    height: 100%;
-    z-index: 1;
-    width: auto;
-    list-style: none;
-    position: relative;
-    top: 0px;
-    margin: 0px;
-    padding: 0px;
-    display: flex;
-
-    & .title {
-      font-size: 22px;
-      padding: 0px;
-      margin: auto 6px;
-    }
-  }
-}
-
-.logo {
-  height: 24px;
-  float: right;
-  padding-right: 10px;
-  align-self: center;
-  & img {
-    height: 100%;
+  img {
+    flex: 1;
+    height: 70%;
   }
 }
 
@@ -419,6 +334,7 @@ export default Vue.extend({
   background-color: rgba(255, 255, 255, 0.9);
   padding: 5px;
   bottom: 25px;
+
   & ul {
     margin-top: 2px;
     margin-bottom: 2px;

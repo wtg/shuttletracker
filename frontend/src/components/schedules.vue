@@ -32,13 +32,13 @@ export default Vue.extend({
         {
           url: "https://info.rpi.edu/sites/default/files/2018-19MonThursCampusShuttleScheduleEastRoute.pdf",
           name: "East Campus",
-          caption: "Monday–Friday, 8 am–11 pm",
+          caption: "Monday–Friday, 7 am–11 pm",
           color: "green",
         },
         {
           url: "https://info.rpi.edu/sites/default/files/2018-19MonThursCampusShuttleScheduleWestRoute.pdf",
           name: "West Campus",
-          caption: "Monday–Friday, 8 am–11 pm",
+          caption: "Monday–Friday, 7 am–11 pm",
           color: "red",
         },
         {

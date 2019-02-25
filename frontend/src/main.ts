@@ -3,7 +3,10 @@ import 'leaflet/dist/leaflet.css';
 import 'typeface-open-sans';
 import Buefy from 'buefy';
 import 'buefy/dist/buefy.css';
-import '@fortawesome/fontawesome-free/css/all.css';
+
+// only include the specific fontawesome icons that we use
+import '@fortawesome/fontawesome-free/css/fontawesome.css';
+import '@fortawesome/fontawesome-free/css/solid.css';
 
 import App from '@/App.vue';
 import store from '@/store';

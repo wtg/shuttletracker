@@ -34,7 +34,7 @@ ul {
   justify-content: space-evenly;
   align-items: center;
   width: 100%;
-  border-top: 1px solid #eee;
+  border-top: 0.5px solid #eee;
   box-shadow: 0 3px 8px 0 #ddd;
   font-size: 13px;
   user-select: none;
