@@ -21,7 +21,7 @@ export default Vue.extend({
   },
 });
 </script>
-
+ddciwhci
 <style lang="scss">
 @import "~bulma/sass/utilities/_all";
 
@@ -50,13 +50,14 @@ $colors: (
 #app {
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 #view-wrapper {
   height: calc(100% - 40px);
   box-sizing: border-box;
 }
 #router-view {
-  overflow: scroll;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   height: 100%;
 }
