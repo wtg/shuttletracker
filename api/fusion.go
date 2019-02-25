@@ -19,6 +19,12 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
+// connReq helps pass a WebSocket conn and its associated HTTP request through a channel
+type connReq struct {
+	conn *websocket.Conn
+	req  *http.Request
+}
+
 type fusionMessageEnvelope struct {
 	Type    string      `json:"type"`
 	Message interface{} `json:"message"`
@@ -39,13 +45,15 @@ type fusionBusButton struct {
 }
 
 type fusionClient struct {
-	conn *websocket.Conn
+	conn            *websocket.Conn
+	lastMessageTime time.Time
+	userAgent       string
 }
 
 type fusionManager struct {
 	clients          []*fusionClient
 	tracks           map[string][]fusionPosition
-	newConnChan      chan *websocket.Conn
+	newConnChan      chan connReq
 	removeClientChan chan *fusionClient
 	positionChan     chan fusionPosition
 	busButtonChan    chan fusionBusButton
@@ -53,7 +61,7 @@ type fusionManager struct {
 
 func newFusionManager() *fusionManager {
 	fm := &fusionManager{
-		newConnChan:      make(chan *websocket.Conn),
+		newConnChan:      make(chan connReq),
 		removeClientChan: make(chan *fusionClient),
 		positionChan:     make(chan fusionPosition),
 		busButtonChan:    make(chan fusionBusButton),
@@ -64,9 +72,11 @@ func newFusionManager() *fusionManager {
 	return fm
 }
 
-func (fm *fusionManager) addClient(conn *websocket.Conn) error {
+func (fm *fusionManager) addClient(c connReq) error {
 	client := &fusionClient{
-		conn: conn,
+		conn:            c.conn,
+		lastMessageTime: time.Now(),
+		userAgent:       c.req.UserAgent(),
 	}
 
 	fm.clients = append(fm.clients, client)
@@ -89,8 +99,8 @@ func (fm *fusionManager) removeClient(client *fusionClient) error {
 func (fm *fusionManager) clientsLoop() {
 	for {
 		select {
-		case conn := <-fm.newConnChan:
-			err := fm.addClient(conn)
+		case c := <-fm.newConnChan:
+			err := fm.addClient(c)
 			if err != nil {
 				log.WithError(err).Error("unable to add client")
 			}
@@ -120,9 +130,13 @@ func (fm *fusionManager) handleClient(client *fusionClient) {
 	for {
 		_, r, err := client.conn.NextReader()
 		if err != nil {
-			log.WithError(err).Error("unable to get reader")
+			// did the client e.g. close the tab? then we expect a normal error
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
+				log.WithError(err).Error("unable to get reader")
+			}
 			break
 		}
+		client.lastMessageTime = time.Now()
 		messageType, message, err := decodeFusionMessage(r)
 		if err != nil {
 			log.WithError(err).Error("unable to decode message")
@@ -211,7 +225,7 @@ func (fm *fusionManager) debugHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for _, client := range fm.clients {
-		_, err = fmt.Fprintf(w, "%+v\n", client)
+		_, err = fmt.Fprintf(w, "%s\t%s\n", client.lastMessageTime.Format(time.RFC3339), client.userAgent)
 		if err != nil {
 			log.WithError(err).Error("unable to write response")
 			return
@@ -238,7 +252,11 @@ func (fm *fusionManager) webSocketHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	fm.newConnChan <- conn
+	c := connReq{
+		conn: conn,
+		req:  r,
+	}
+	fm.newConnChan <- c
 }
 func (fm *fusionManager) router(auth func(http.Handler) http.Handler) http.Handler {
 	r := chi.NewRouter()
