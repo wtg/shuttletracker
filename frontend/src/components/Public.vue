@@ -224,10 +224,10 @@ export default Vue.extend({
       console.log('here');
       console.log(position);
       const busIcon = L.divIcon({
-        html: `<span style="font-size: 30px; bottom: 30px; right: 30px;" class="shuttleusericon shuttleusericon` + String(this.userShuttleidCount) +  `" >🚐</span>`,
+        html: `<span class="shuttleusericon shuttleusericon` + String(this.userShuttleidCount) +  `" >🚐</span>`,
 
-        iconSize: [24, 24], // size of the icon
-        iconAnchor: [24, 24], // point of the icon which will correspond to marker's location
+        iconSize: [20, 20], // size of the icon
+        iconAnchor: [10, 10], // point of the icon which will correspond to marker's location
         shadowAnchor: [6, 6], // the same for the shadow
         popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
       });
@@ -347,8 +347,10 @@ export default Vue.extend({
   background-color: transparent;
   border: none;
   animation: fadeOutUp 2s ease;
-  font-size: 100px;
   display: block;
+  font-size: 20px; 
+  bottom: 0px; 
+  right: 0px;
 }
 
 @keyframes fadeOutUp {
@@ -365,8 +367,8 @@ export default Vue.extend({
 .leaflet-div-icon {
   background: transparent !important;
   border: none !important;
-  width: 30px !important;
-  height: 30px !important;
+  width: 20px !important;
+  height: 20px !important;
 
 }
 #busbutton{
