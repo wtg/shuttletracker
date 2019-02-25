@@ -10,4 +10,9 @@ export interface StoreState {
     Stops: Stop[];
     adminMessage: AdminMessageUpdate | undefined;
     online: boolean;
+    settings: {
+        busButtonEnabled: boolean,
+        fusionPositionEnabled: boolean,
+    };
+    geolocationDenied: boolean;
 }
