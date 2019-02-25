@@ -21,7 +21,6 @@ export default Vue.extend({
   },
 });
 </script>
-ddciwhci
 <style lang="scss">
 @import "~bulma/sass/utilities/_all";
 
