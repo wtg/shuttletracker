@@ -1,5 +1,5 @@
 <template>
-  <div style="padding: 0px; margin: 0px;width: 100%;">
+  <div style="padding: 0px; margin: 0px;width: 100%; position: relative;">
     <div class="titleBar">
       <ul class="titleContent">
         <dropdown/>
@@ -453,7 +453,7 @@ export default Vue.extend({
 
 }
 #busbutton{
-  position: fixed; 
+  position: absolute; 
   right: 25px; 
   bottom: 35px; 
   z-index: 2000;
