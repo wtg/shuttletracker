@@ -245,7 +245,7 @@ export default Vue.extend({
           if (this.Map !== undefined) {
             this.Map.removeLayer(x);
           }
-        }, 1000);
+        }, 2000);
       }
     },
     showUserLocation() {
@@ -345,9 +345,9 @@ export default Vue.extend({
 .shuttleusericon{
   background-color: transparent;
   border: none;
-  -webkit-animation-name: fadeOutUp !important;
-  animation-name: fadeOutUp !important;
-  animation-duration: 2s;
+  animation: fadeOutUp 2s ease;
+  font-size: 100px;
+  display: block;
 }
 
 @keyframes fadeOutUp {
@@ -357,7 +357,7 @@ export default Vue.extend({
    }
    100% {
       opacity: 0;
-      transform: translateY(40px);
+      transform: translateY(-40px);
    }
 } 
 
