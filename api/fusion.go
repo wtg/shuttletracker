@@ -57,6 +57,7 @@ type fusionManager struct {
 	removeClientChan chan *fusionClient
 	positionChan     chan fusionPosition
 	busButtonChan    chan fusionBusButton
+	busButtonCount   uint64
 }
 
 func newFusionManager() *fusionManager {
@@ -177,6 +178,7 @@ func (fm *fusionManager) messagesLoop() {
 			fm.tracks[pos.Track] = append(fm.tracks[pos.Track], pos)
 		case bb := <-fm.busButtonChan:
 			log.Debugf("new bus button: %+v", bb)
+			fm.busButtonCount++
 			fme := fusionMessageEnvelope{
 				Type:    "bus_button",
 				Message: bb,
@@ -213,7 +215,13 @@ func (fm *fusionManager) debugHandler(w http.ResponseWriter, r *http.Request) {
 	for _, track := range fm.tracks {
 		numPositions += len(track)
 	}
-	_, err = fmt.Fprintf(w, "%d positions\n\n", numPositions)
+	_, err = fmt.Fprintf(w, "%d positions\n", numPositions)
+	if err != nil {
+		log.WithError(err).Error("unable to write response")
+		return
+	}
+
+	_, err = fmt.Fprintf(w, "%d bus buttons\n\n", fm.busButtonCount)
 	if err != nil {
 		log.WithError(err).Error("unable to write response")
 		return
