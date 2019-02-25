@@ -27,7 +27,7 @@ export default Vue.extend({
       },
       set(value: boolean) {
         this.$store.commit('setSettingsBusButtonEnabled', value);
-      }
+      },
     },
     fusionPositionEnabled: {
       get(): boolean {
@@ -35,9 +35,9 @@ export default Vue.extend({
       },
       set(value: boolean) {
         this.$store.commit('setSettingsFusionPositionEnabled', value);
-      }
-    }
-  }
+      },
+    },
+  },
 });
 </script>
 

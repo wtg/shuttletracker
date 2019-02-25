@@ -27,3 +27,4 @@ new Vue({
     this.$store.commit('initializeSettings');
   },
 }).$mount('#app');
+

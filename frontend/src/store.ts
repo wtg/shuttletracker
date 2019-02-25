@@ -28,7 +28,7 @@ const store: StoreOptions<StoreState> = {
     settings: {
       busButtonEnabled: false,
       fusionPositionEnabled: true,
-    }
+    },
   },
   mutations: {
     setOnline(state, online: boolean) {
@@ -85,7 +85,7 @@ const store: StoreOptions<StoreState> = {
       state.adminMessage = message;
     },
     initializeSettings(state) {
-      const savedSettings = localStorage.getItem('st_settings')
+      const savedSettings = localStorage.getItem('st_settings');
       if (!savedSettings) {
         return;
       }

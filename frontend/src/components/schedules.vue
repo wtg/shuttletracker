@@ -30,26 +30,26 @@ export default Vue.extend({
     return {
       links: [
         {
-          url: "https://info.rpi.edu/sites/default/files/2018-19MonThursCampusShuttleScheduleEastRoute.pdf",
-          name: "East Campus",
-          caption: "Monday–Friday, 7 am–11 pm",
-          color: "green",
+          url: 'https://info.rpi.edu/sites/default/files/2018-19MonThursCampusShuttleScheduleEastRoute.pdf',
+          name: 'East Campus',
+          caption: 'Monday–Friday, 7 am–11 pm',
+          color: 'green',
         },
         {
-          url: "https://info.rpi.edu/sites/default/files/2018-19MonThursCampusShuttleScheduleWestRoute.pdf",
-          name: "West Campus",
-          caption: "Monday–Friday, 7 am–11 pm",
-          color: "red",
+          url: 'https://info.rpi.edu/sites/default/files/2018-19MonThursCampusShuttleScheduleWestRoute.pdf',
+          name: 'West Campus',
+          caption: 'Monday–Friday, 7 am–11 pm',
+          color: 'red',
         },
         {
-          url: "https://info.rpi.edu/sites/default/files/2018-19WeekendLateNightShuttleSchedule.pdf",
-          name: "Weekend/Late Night",
-          caption: "Friday–Sunday, 8 pm–4 am",
-          color: "purple",
+          url: 'https://info.rpi.edu/sites/default/files/2018-19WeekendLateNightShuttleSchedule.pdf',
+          name: 'Weekend/Late Night',
+          caption: 'Friday–Sunday, 8 pm–4 am',
+          color: 'purple',
         },
       ],
-    }
-  }
+    };
+  },
 });
 </script>
 

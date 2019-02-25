@@ -133,7 +133,7 @@ export default Vue.extend({
     },
     busButtonActive(): boolean {
       return this.$store.getters.getBusButtonVisible;
-    }
+    },
   },
   methods: {
     spawn() {
@@ -221,7 +221,7 @@ export default Vue.extend({
       });
     },
     spawnShuttleAtPosition(position: any) {
-      if(!this.busButtonActive){
+      if (!this.busButtonActive) {
         return;
       }
       this.userShuttleidCount ++;
