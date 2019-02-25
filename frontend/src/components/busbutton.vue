@@ -13,6 +13,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 
 .bus-button{
+    touch-action: manipulation;
     border: 1px solid #ccc;
     border-radius: 50%;
     box-shadow: 0 4px 8px 0 #ddd;
