@@ -132,7 +132,7 @@ export default Vue.extend({
         return this.$store.state.adminMessage;
     },
     busButtonActive(): boolean {
-      return this.$store.state.settings.busButtonEnabled;
+      return this.$store.getters.getBusButtonVisible;
     }
   },
   methods: {

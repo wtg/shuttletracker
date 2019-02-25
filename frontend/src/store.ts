@@ -101,6 +101,13 @@ const store: StoreOptions<StoreState> = {
     },
   },
   getters: {
+    getBusButtonVisible(state: StoreState): boolean {
+      if (state.adminMessage === undefined) {
+        return state.settings.busButtonEnabled;
+      } else {
+        return state.settings.busButtonEnabled && !state.adminMessage.enabled;
+      }
+    },
     getPolyLineByRouteId: (state) => (id: number): L.Polyline | undefined => {
       const arr = new Array<L.Polyline>();
       let ret;
