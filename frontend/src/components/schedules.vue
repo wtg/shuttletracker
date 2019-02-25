@@ -1,6 +1,6 @@
 <template>
   <div class="parent">
-    <h2 class="title">Schedules</h2>
+    <h1 class="title">Schedules</h1>
     <p class="subtitle">
       Official shuttle schedules from the Parking and Transportation office.
     </p>
