@@ -3,12 +3,12 @@
     <h1 class="title">Settings</h1>
     <hr>
     <div class="field">
-      <b-switch v-model="fusionPositionEnabled">Send position updates</b-switch>
+      <b-switch v-model="fusionPositionEnabled" v-bind:disabled="geolocationDenied">Send position updates</b-switch>
       <p class="help">Use your location to help make Shuttle Tracker more accurate for everyone. Your location is gathered anonymously while Shuttle Tracker is open.</p>
     </div>
     <div class="field">
       <b-switch v-model="busButtonEnabled">Bus button</b-switch>
-      <p class="help">Place a bus on other users' maps.</p>
+      <p class="help">Place a bus on other users' maps and let others place buses on your map.</p>
     </div>
 
     <router-link to="/about">About and privacy policy</router-link>
@@ -30,10 +30,15 @@ export default Vue.extend({
     },
     fusionPositionEnabled: {
       get(): boolean {
-        return this.$store.state.settings.fusionPositionEnabled;
+        return this.$store.state.settings.fusionPositionEnabled && !this.$store.state.geolocationDenied;
       },
       set(value: boolean) {
         this.$store.commit('setSettingsFusionPositionEnabled', value);
+      },
+    },
+    geolocationDenied: {
+      get(): boolean {
+        return this.$store.state.geolocationDenied;
       },
     },
   },

@@ -29,6 +29,7 @@ const store: StoreOptions<StoreState> = {
       busButtonEnabled: false,
       fusionPositionEnabled: true,
     },
+    geolocationDenied: false,
   },
   mutations: {
     setOnline(state, online: boolean) {
@@ -99,14 +100,19 @@ const store: StoreOptions<StoreState> = {
       state.settings.fusionPositionEnabled = value;
       localStorage.setItem('st_settings', JSON.stringify(state.settings));
     },
+    setGeolocationDenied(state, value: boolean) {
+      state.geolocationDenied = value;
+    },
   },
   getters: {
-    getBusButtonVisible(state: StoreState): boolean {
+    getBusButtonVisible(state: StoreState, getters): boolean {
+      return getters.getBusButtonShowBuses && !state.geolocationDenied;
+    },
+    getBusButtonShowBuses(state: StoreState): boolean {
       if (state.adminMessage === undefined) {
         return state.settings.busButtonEnabled;
-      } else {
-        return state.settings.busButtonEnabled && !state.adminMessage.enabled;
       }
+      return state.settings.busButtonEnabled && !state.adminMessage.enabled;
     },
     getPolyLineByRouteId: (state) => (id: number): L.Polyline | undefined => {
       const arr = new Array<L.Polyline>();

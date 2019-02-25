@@ -13,6 +13,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import TabBar from '@/components/tabBar.vue';
+import UserLocationService from '@/structures/userlocation.service';
+
+UserLocationService.getInstance();
 
 export default Vue.extend({
   name: 'app',

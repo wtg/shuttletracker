@@ -29,6 +29,7 @@ export default Vue.extend({
     font-size: 20px;
     text-decoration: none;
     cursor: pointer;
+    outline: 0;
 
     &:hover{
         background-color: #fff;

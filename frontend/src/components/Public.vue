@@ -7,7 +7,7 @@
     <span>
       <messagebox ref="msgbox"/>
     </span>
-    <bus-button id="busbutton" v-on:bus-click="busClicked()" v-if="this.message !== undefined && this.message.enabled === false && busButtonActive" />
+    <bus-button id="busbutton" v-on:bus-click="busClicked()" v-if="busButtonActive" />
   </div>
 </template>
 
@@ -24,7 +24,7 @@ import * as L from 'leaflet';
 import { setTimeout, setInterval } from 'timers';
 import getMarkerString from '../structures/leaflet/rotatedMarker';
 import { Position } from 'geojson';
-import Fusion from '@/fusion.ts';
+import Fusion from '@/fusion';
 import UserLocationService from '@/structures/userlocation.service';
 import BusButton from '@/components/busbutton.vue';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
@@ -221,7 +221,7 @@ export default Vue.extend({
       });
     },
     spawnShuttleAtPosition(position: any) {
-      if (!this.busButtonActive) {
+      if (!this.$store.getters.getBusButtonShowBuses) {
         return;
       }
       this.userShuttleidCount ++;

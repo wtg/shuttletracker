@@ -14,4 +14,5 @@ export interface StoreState {
         busButtonEnabled: boolean,
         fusionPositionEnabled: boolean,
     };
+    geolocationDenied: boolean;
 }

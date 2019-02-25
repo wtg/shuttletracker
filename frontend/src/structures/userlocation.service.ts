@@ -1,3 +1,5 @@
+import store from '@/store';
+
 // UserLocationService allows callbacks to be registered on user location updates
 export default class UserLocationService {
 
@@ -36,12 +38,14 @@ export default class UserLocationService {
         navigator.geolocation.watchPosition(
             (position: Position) => {
                 this.currentPosition = position;
-                for (let i = 0; i < this.callbacks.length; i ++) {
+                for (let i = 0; i < this.callbacks.length; i++) {
                     this.callbacks[i](position);
                 }
             },
             (error) => {
-                // console.log("could not get position", error);
+                if (error.code === 1) {
+                    store.commit('setGeolocationDenied', true);
+                }
             }, options,
         );
     }
