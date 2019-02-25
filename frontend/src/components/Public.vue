@@ -140,12 +140,10 @@ export default Vue.extend({
       this.spawnShuttleAtPosition(UserLocationService.getInstance().getCurrentLocation());
     },
     saucyspawn(event: any) {
-      console.log(event.data);
       if (JSON.parse(event.data).type !== 'bus_button') {
         return;
       }
       const pos = JSON.parse(event.data).message;
-      console.log(pos);
       this.spawnShuttleAtPosition(pos);
     },
     updateLegend() {
@@ -245,7 +243,6 @@ export default Vue.extend({
       if (this.Map !== undefined) {
         x.addTo(this.Map);
         setTimeout(() => {
-          console.log('here');
           if (this.Map !== undefined) {
             this.Map.removeLayer(x);
           }

@@ -37,9 +37,7 @@ class SocketManager {
                 resolve(ws);
             };
             ws.onmessage = (event) => {
-                console.log(event);
                 for (const callback of this.callbacks) {
-                    console.log('hi');
                     callback(event);
                 }
             };
