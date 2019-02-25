@@ -2,3 +2,5 @@
 /coverage.txt
 /shuttletracker
 /static/*
+shuttletracker.exe
+conf.json
