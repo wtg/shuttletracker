@@ -60,7 +60,8 @@ export default class Vehicle {
     public getMessage(): string {
         const speed = Math.round(this.speed * 100) / 100;
         const direction = getCardinalDirection(this.heading + 45);
-        let message = `<b>${this.name}</b><br>`
+        const routeOnMsg = this.Route === undefined ? "" : `on route <i>${this.Route.name}</i>`;
+        let message = `<b>${this.name}</b> ${routeOnMsg}<br>`
             + `Traveling ${direction} at ${speed} mph`;
         if (this.lastUpdate !== undefined) {
             message += '<br>as of ' + this.lastUpdate.toLocaleTimeString();
