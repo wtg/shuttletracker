@@ -14,8 +14,10 @@
             </p>
           </header>
           <div class="card-content">
-            <p>{{ link.caption }}</p>
-            <a class="" target="_blank" rel="noopener noreferrer" v-bind:href="link.url">View PDF</a>
+            <div class="caption">
+              <p v-for="line in link.caption" v-bind:key="line">{{ line }}</p>
+            </div>
+            <a target="_blank" rel="noopener noreferrer" v-bind:href="link.url">View PDF</a>
           </div>
         </div>
       </div>
@@ -32,19 +34,19 @@ export default Vue.extend({
         {
           url: 'https://info.rpi.edu/sites/default/files/2018-19MonThursCampusShuttleScheduleEastRoute.pdf',
           name: 'East Campus',
-          caption: 'Monday–Friday, 7 am–11 pm',
+          caption: ['Monday–Friday, 7 am–11 pm', 'Weekends: 9:30 am–5 pm'],
           color: 'green',
         },
         {
           url: 'https://info.rpi.edu/sites/default/files/2018-19MonThursCampusShuttleScheduleWestRoute.pdf',
           name: 'West Campus',
-          caption: 'Monday–Friday, 7 am–11 pm',
+          caption: ['Monday–Friday, 7 am–11 pm', 'Weekends: 9:30 am–5 pm'],
           color: 'red',
         },
         {
           url: 'https://info.rpi.edu/sites/default/files/2018-19WeekendLateNightShuttleSchedule.pdf',
           name: 'Weekend/Late Night',
-          caption: 'Friday–Sunday, 8 pm–4 am',
+          caption: ['Friday–Sunday, 8 pm–4 am'],
           color: 'purple',
         },
       ],
@@ -56,5 +58,8 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .parent {
   padding: 20px;
+}
+.caption {
+  margin-bottom: 1em;
 }
 </style>
