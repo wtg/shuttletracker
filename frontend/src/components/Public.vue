@@ -7,7 +7,7 @@
     <span>
       <messagebox ref="msgbox"/>
     </span>
-    <bus-button id="busbutton" v-on:bus-click="busClicked()" v-if="this.message !== undefined && this.message.enabled === false" />
+    <bus-button id="busbutton" v-on:bus-click="busClicked()" v-if="this.message !== undefined && this.message.enabled === false && busButtonActive" />
   </div>
 </template>
 
@@ -131,6 +131,9 @@ export default Vue.extend({
     message(): AdminMessageUpdate {
         return this.$store.state.adminMessage;
     },
+    busButtonActive(): boolean {
+      return this.$store.state.settings.busButtonEnabled;
+    }
   },
   methods: {
     spawn() {
@@ -220,9 +223,10 @@ export default Vue.extend({
       });
     },
     spawnShuttleAtPosition(position: any) {
+      if(!this.busButtonActive){
+        return;
+      }
       this.userShuttleidCount ++;
-      console.log('here');
-      console.log(position);
       const busIcon = L.divIcon({
         html: `<span class="shuttleusericon shuttleusericon` + String(this.userShuttleidCount) +  `" >🚐</span>`,
 
