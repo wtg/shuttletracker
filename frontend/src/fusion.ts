@@ -83,7 +83,6 @@ export default class Fusion {
     }
 
     public registerMessageReceivedCallback(callback: (event: Event) => any) {
-        console.log('cb' + callback);
         this.ws.registerMessageReceivedEventCallback(callback);
     }
 
