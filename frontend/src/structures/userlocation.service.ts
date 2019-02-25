@@ -15,7 +15,6 @@ export default class UserLocationService {
     private currentPosition: Position | undefined;
 
     private constructor() {
-        console.log('Location service active.');
         this.callbacks = new Array<((pos: Position) => any)>();
         this.startGeolocation();
     }
