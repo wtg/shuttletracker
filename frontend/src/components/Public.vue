@@ -352,6 +352,7 @@ export default Vue.extend({
   font-size: 20px; 
   bottom: 0px; 
   right: 0px;
+  z-index: 2000 !important;
 }
 
 @keyframes fadeOutUp {
