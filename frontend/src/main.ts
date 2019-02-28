@@ -1,20 +1,22 @@
 import Vue from 'vue';
-import 'leaflet/dist/leaflet.css';
-import 'typeface-open-sans';
 import Buefy from 'buefy';
-import 'buefy/dist/buefy.css';
 
 // @ts-ignore
 import VueAnalytics from 'vue-analytics';
 
-// only include the specific fontawesome icons that we use
+// styles
 import '@fortawesome/fontawesome-free/css/fontawesome.css';
-import '@fortawesome/fontawesome-free/css/solid.css';
+import '@fortawesome/fontawesome-free/css/solid.css'; // only include the specific fontawesome icons that we use
+import 'typeface-open-sans';
+import 'leaflet/dist/leaflet.css';
+import 'buefy/dist/buefy.css';
+
+import '@/assets/vars.scss';
+import '@/assets/styles.scss';
 
 import App from '@/App.vue';
 import store from '@/store';
 import router from '@/index';
-import '@/assets/styles.scss';
 
 Vue.config.productionTip = false;
 
