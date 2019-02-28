@@ -3,7 +3,8 @@
 >Relative velocity:  the amount of vehicles minus one, then multiply by the average 
 velocity, then add the current velocity, finally the sum divided by the amount of vehicle.
 
->Different from reading data from json file, this time I directly read  time data from the https://shuttles.rpi.edu/history and 
+>Different from reading data from json file the last semester, this time I directly read time data from the 
+https://shuttles.rpi.edu/history and 
 https://shuttles.rpi.edu/updates, which makes the estimated calculations more precise. When calculating with the average 
 velocity based on the historical data, there are two choices for calculating average velocity: 1. Average velocity 
 for all the data records in the history endpoint. 2. First find average velocities for each shuttle, then find the average 
