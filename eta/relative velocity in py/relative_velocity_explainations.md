@@ -1,4 +1,6 @@
-## Relative Velocity Explanations
+## Relative Velocity Explanations Documentation
+
+###Defination and Calculation choice###
 
 >Relative velocity defination: the amount of vehicles minus one, then multiply by the average 
 velocity, then add the current velocity, finally the sum divided by the amount of vehicle. And the estimated time are drived from the relative velosity. see below.
@@ -13,4 +15,8 @@ velocity of these 11 shuttle. I think the second one is better, since later we m
 
 >For the first step, I will roughly collect just ONE relative velocity to apply for all shuttles for all stops. Later, when we are done with that phase, I will find the real time relative velocity for each shuttle, so we can have more precise result.
 
+
+###Relative Velocity VS Real Time Velocity###
+
+>The reason why we are not using real time velocity from the end point https://shuttles.rpi.edu/updates is because this endpoint updates every 5 minutes, so the velocity show upon the web page actually is not that "real time". So we implement the historical endpoint https://shuttles.rpi.edu/history that collect the real time velocity for the past 30 days, which shows a consistency of the shuttle operation, since the data for overal performance of a single shuttle for past 30 days is more reliable than how it performs in a single day or single hour.
 
