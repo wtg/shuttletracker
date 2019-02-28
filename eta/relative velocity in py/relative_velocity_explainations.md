@@ -18,5 +18,5 @@ velocity of these 11 shuttle. I think the second one is better, since later we m
 
 ###Relative Velocity VS Real Time Velocity###
 
->The reason why we are not using real time velocity from the end point https://shuttles.rpi.edu/updates is because this endpoint updates every 5 minutes, so the velocity show upon the web page actually is not that "real time". So we implement the historical endpoint https://shuttles.rpi.edu/history that collect the real time velocity for the past 30 days, which shows a consistency of the shuttle operation, since the data for overal performance of a single shuttle for past 30 days is more reliable than how it performs in a single day or single hour.
-
+>The reason why we are not using real time velocity from the end point https://shuttles.rpi.edu/updates is because this endpoint updates every 5 minutes, so the velocity show upon the web page actually is not that "real time". So we implement the historical endpoint https://shuttles.rpi.edu/history that collect the real time velocity for the past 30 days, which shows a consistency of the shuttle operation, since the data for overal performance of a single shuttle for past 30 days is more reliable than how it performs in a single day or single hour. Based on the image below, we can see as the value of "n" increase, the velocity become more accurate.
+<img width="353" alt="iii" src="https://user-images.githubusercontent.com/42976354/53599249-bdea3a00-3b74-11e9-8641-e24a32753b75.PNG">
