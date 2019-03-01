@@ -25,6 +25,11 @@ const store: StoreOptions<StoreState> = {
     Vehicles: [],
     adminMessage: undefined,
     online: true,
+    settings: {
+      busButtonEnabled: false,
+      fusionPositionEnabled: true,
+    },
+    geolocationDenied: false,
   },
   mutations: {
     setOnline(state, online: boolean) {
@@ -32,6 +37,16 @@ const store: StoreOptions<StoreState> = {
     },
     setRoutes(state, routes: Route[]) {
       state.Routes = routes;
+
+      // also ensure that vehicles consider being on any newly-returned routes
+      state.Vehicles.forEach((vehicle: Vehicle) => {
+        state.Routes.forEach((route: Route) => {
+          if (vehicle.RouteID === route.id) {
+            vehicle.setRoute(route);
+            return;
+          }
+        });
+      });
     },
     setStops(state, Stops: Stop[]) {
       state.Stops = Stops;
@@ -40,7 +55,7 @@ const store: StoreOptions<StoreState> = {
       state.Vehicles = vehicles;
     },
     addUpdates(state, updates: Update[]) {
-      const toHide = new Array<Vehicle> ();
+      const toHide = new Array<Vehicle>();
       state.Vehicles.forEach((vehicle: Vehicle) => {
         let found = false;
         for (let i = 0; i < updates.length; i++) {
@@ -49,7 +64,7 @@ const store: StoreOptions<StoreState> = {
             found = true;
             vehicle.speed = Number(updates[i].speed);
             vehicle.setRoute(undefined);
-            for (let j = 0; j < state.Routes.length; j ++) {
+            for (let j = 0; j < state.Routes.length; j++) {
               if (state.Routes[j].id === updates[i].route_id) {
                 vehicle.setRoute(state.Routes[j]);
                 break;
@@ -70,16 +85,69 @@ const store: StoreOptions<StoreState> = {
     addAdminMessage(state, message: AdminMessageUpdate) {
       state.adminMessage = message;
     },
+    initializeSettings(state) {
+      const savedSettings = localStorage.getItem('st_settings');
+      if (!savedSettings) {
+        return;
+      }
+      state.settings = Object.assign(state.settings, JSON.parse(savedSettings));
+    },
+    setSettingsBusButtonEnabled(state, value: boolean) {
+      state.settings.busButtonEnabled = value;
+      localStorage.setItem('st_settings', JSON.stringify(state.settings));
+    },
+    setSettingsFusionPositionEnabled(state, value: boolean) {
+      state.settings.fusionPositionEnabled = value;
+      localStorage.setItem('st_settings', JSON.stringify(state.settings));
+    },
+    setGeolocationDenied(state, value: boolean) {
+      state.geolocationDenied = value;
+    },
   },
   getters: {
-    getRoutePolyLines(state: StoreState): L.Polyline[] {
+    getBusButtonVisible(state: StoreState, getters): boolean {
+      return getters.getBusButtonShowBuses && !state.geolocationDenied;
+    },
+    getBusButtonShowBuses(state: StoreState): boolean {
+      if (state.adminMessage === undefined) {
+        return state.settings.busButtonEnabled;
+      }
+      return state.settings.busButtonEnabled && !state.adminMessage.enabled;
+    },
+    getPolyLineByRouteId: (state) => (id: number): L.Polyline | undefined => {
       const arr = new Array<L.Polyline>();
+      let ret;
+
       if (state.Routes !== undefined && state.Routes.length !== 0) {
         state.Routes.forEach((r: Route) => {
           if (r.enabled) {
             const points = new Array<L.LatLng>();
-            if (r.coords !== undefined) {
-              r.coords.forEach((p: {latitude: number, longitude: number}) => {
+            if (r.points !== undefined) {
+              r.points.forEach((p: { latitude: number, longitude: number }) => {
+                points.push(new L.LatLng(p.latitude, p.longitude));
+              });
+            }
+            const line = new L.Polyline(points, {
+              color: r.color,
+              weight: r.width,
+              opacity: 1,
+            });
+            if (r.id === id) {
+              ret = line;
+            }
+          }
+        });
+      }
+      return ret;
+    },
+    getRoutePolyLines(state: StoreState): L.Polyline[] {
+      const arr = new Array<L.Polyline>();
+      if (state.Routes !== undefined && state.Routes.length !== 0) {
+        state.Routes.forEach((r: Route) => {
+          if (r.shouldShow()) {
+            const points = new Array<L.LatLng>();
+            if (r.points !== undefined) {
+              r.points.forEach((p: { latitude: number, longitude: number }) => {
                 points.push(new L.LatLng(p.latitude, p.longitude));
               });
             }
@@ -98,8 +166,8 @@ const store: StoreOptions<StoreState> = {
       const points = new Array<L.LatLng>();
       if (state.Routes !== undefined && state.Routes.length !== 0) {
         state.Routes.forEach((r: Route) => {
-          if (r.coords !== undefined) {
-            r.coords.forEach((p: {latitude: number, longitude: number}) => {
+          if (r.shouldShow() && r.points !== undefined) {
+            r.points.forEach((p: { latitude: number, longitude: number }) => {
               points.push(new L.LatLng(p.latitude, p.longitude));
             });
           }
@@ -111,29 +179,35 @@ const store: StoreOptions<StoreState> = {
       });
       return line;
     },
+    getRoutes(state: StoreState): Route[] {
+      return state.Routes;
+    },
+    getVehicles(state: StoreState): Vehicle[] {
+      return state.Vehicles;
+    },
   },
   actions: {
-    grabRoutes( {commit} ) {
+    grabRoutes({ commit }) {
       InfoService.GrabRoutes().then((ret: Route[]) => commit('setRoutes', ret)).catch(() => {
         commit('setOnline', false);
       });
     },
-    grabStops( {commit} ) {
+    grabStops({ commit }) {
       InfoService.GrabStops().then((ret: Stop[]) => commit('setStops', ret)).catch(() => {
         commit('setOnline', false);
       });
     },
-    grabVehicles( {commit} ) {
+    grabVehicles({ commit }) {
       InfoService.GrabVehicles().then((ret: Vehicle[]) => commit('setVehicles', ret)).catch(() => {
         commit('setOnline', false);
       });
     },
-    grabUpdates( {commit} ) {
+    grabUpdates({ commit }) {
       InfoService.GrabUpdates().then((ret: Update[]) => commit('addUpdates', ret)).catch(() => {
         commit('setOnline', false);
       });
     },
-    grabAdminMesssage( {commit} ) {
+    grabAdminMesssage({ commit }) {
       InfoService.GrabAdminMessage().then((ret: AdminMessageUpdate) => commit('addAdminMessage', ret));
     },
   },

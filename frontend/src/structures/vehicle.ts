@@ -26,9 +26,10 @@ export default class Vehicle {
     public shownOnMap: boolean;
     public map: L.Map | undefined;
     public Route: Route | undefined;
-    public lastUpdate: Date | undefined;
+    public lastUpdate: Date;
+    public tracker_id: number;
 
-    constructor(id: number, name: string, created: Date, updated: Date, enabled: boolean) {
+    constructor(id: number, name: string, created: Date, updated: Date, enabled: boolean, trackerID: number) {
         this.id = id;
         this.name = name;
         this.created = created;
@@ -52,13 +53,15 @@ export default class Vehicle {
         this.shownOnMap = false;
         this.map = undefined;
         this.Route = undefined;
-        this.lastUpdate = undefined;
+        this.lastUpdate = new Date();
+        this.tracker_id = trackerID;
     }
 
     public getMessage(): string {
         const speed = Math.round(this.speed * 100) / 100;
         const direction = getCardinalDirection(this.heading + 45);
-        let message = `<b>${this.name}</b><br>`
+        const routeOnMsg = this.Route === undefined ? '' : `on route <i>${this.Route.name}</i>`;
+        let message = `<b>${this.name}</b> ${routeOnMsg}<br>`
             + `Traveling ${direction} at ${speed} mph`;
         if (this.lastUpdate !== undefined) {
             message += '<br>as of ' + this.lastUpdate.toLocaleTimeString();
@@ -126,5 +129,14 @@ export default class Vehicle {
 
     public removeFromMap(map: L.Map) {
         map.removeLayer(this.marker);
+    }
+
+    public asJSON(): { id: number; tracker_id: string; name: string; enabled: boolean } {
+        return {
+            id: this.id,
+            enabled: this.enabled,
+            tracker_id: String(this.tracker_id),
+            name: this.name,
+        };
     }
 }
