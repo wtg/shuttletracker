@@ -1,13 +1,8 @@
-## Relative Velocity Explanations
+###Explanation for the Distance Calculation Algorithm###
 
->Relative velocity:  the amount of vehicles minus one, then multiply by the average 
-velocity, then add the current velocity, finally the sum divided by the amount of vehicle.
+>Point to Point: How I calculate the length of each route is to divide each route to small line segment, point to point. I calculated the length of each line segments then add then up.  
+<img width="410" alt="distancego" src="https://user-images.githubusercontent.com/42976354/53600051-9ac08a00-3b76-11e9-86b9-8436737848b7.PNG">
 
->Different from reading data from json file the last semester, this time I directly read time data from the 
-https://shuttles.rpi.edu/history and 
-https://shuttles.rpi.edu/updates, which makes the estimated calculations more precise. When calculating with the average 
-velocity based on the historical data, there are two choices for calculating average velocity: 1. Average velocity 
-for all the data records in the history endpoint. 2. First find average velocities for each shuttle, then find the average 
-velocity of these 11 shuttle. I think the second one is better, since later we may need the individual data for each shuttle.
+<img width="484" alt="disgo" src="https://user-images.githubusercontent.com/42976354/53601270-b6795f80-3b79-11e9-9786-089364849c4c.PNG">
 
 
