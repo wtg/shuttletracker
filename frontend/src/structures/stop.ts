@@ -1,6 +1,9 @@
 import * as L from 'leaflet';
 import Route from '@/structures/route';
 
+/**
+ * SVG used for representing a stop on the map and in the legend
+ */
 export const StopSVG = require('@/assets/circle.svg') as string;
 
 /**
