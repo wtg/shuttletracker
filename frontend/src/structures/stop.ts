@@ -41,7 +41,7 @@ export default class Stop {
     public getMessage(): string {
         const msg = this.name +
                   ` is${this.routesOn.length > 0 ? ' on' : 'n\'t on a'} route${this.routesOn.length > 1 ? 's' : ''} `
-                  + this.routesOn.map((route: Route) => route.name).join(', ');
+                  + this.routesOn.map((route: Route) => `<i>${route.name}</i>`).join(', ');
         return msg;
     }
 

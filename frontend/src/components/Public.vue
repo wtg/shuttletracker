@@ -109,8 +109,6 @@ export default Vue.extend({
         this.renderStops();
         this.updateLegend();
       }
-      // if (mutation.type === 'setStops') {
-      // }
       if (mutation.type === 'setVehicles') {
         this.addVehicles();
       }
