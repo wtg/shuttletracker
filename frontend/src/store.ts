@@ -47,6 +47,17 @@ const store: StoreOptions<StoreState> = {
           }
         });
       });
+
+      // set any routes on existing stops
+      state.Stops.forEach((stop: Stop) => {
+        state.Routes.forEach((route: Route) => {
+          if (route.containsStop(stop.id) && route.active) {
+            // Do I need to clear the route array on stops first? Will it just
+            // keep pushing routes (even if they've already been added?)
+            stop.addRoute(route);
+          }
+        });
+      });
     },
     setStops(state, Stops: Stop[]) {
       state.Stops = Stops;
