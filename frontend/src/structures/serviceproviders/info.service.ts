@@ -1,6 +1,6 @@
 import Vehicle from '../vehicle';
 import Route from '../route';
-import Stop from '../stop';
+import { Stop } from '../stop';
 import Update from '../update';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 import routeScheduleInterval from '../routeScheduleInterval';

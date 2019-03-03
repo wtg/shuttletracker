@@ -18,7 +18,7 @@ import Vue from 'vue';
 import InfoService from '../structures/serviceproviders/info.service';
 import Vehicle from '../structures/vehicle';
 import Route from '../structures/route';
-import Stop from '../structures/stop';
+import { Stop, StopSVG } from '../structures/stop';
 import messagebox from './adminmessage.vue';
 import * as L from 'leaflet';
 import { setTimeout, setInterval } from 'timers';
@@ -29,9 +29,7 @@ import UserLocationService from '@/structures/userlocation.service';
 import BusButton from '@/components/busbutton.vue';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 
-// Maybe these SVG's/assets should be moved into state or some kind of config?
 const UserSVG = require('@/assets/user.svg') as string;
-const StopSVG = require('@/assets/circle.svg') as string;
 
 export default Vue.extend({
   name: 'Public',

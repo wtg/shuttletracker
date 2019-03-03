@@ -1,12 +1,12 @@
 import * as L from 'leaflet';
 import Route from '@/structures/route';
 
-const StopSVG = require('@/assets/circle.svg') as string;
+export const StopSVG = require('@/assets/circle.svg') as string;
 
 /**
  * Stop represents a single stop on a route
  */
-export default class Stop {
+export class Stop {
     public id: number;
     public name: string;
     public description: string;

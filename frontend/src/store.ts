@@ -3,7 +3,7 @@ import Vuex, { StoreOptions } from 'vuex';
 import { StoreState } from '@/StoreState';
 import Route from '@/structures/route';
 import InfoServiceProvider from '@/structures/serviceproviders/info.service';
-import Stop from '@/structures/stop';
+import { Stop } from '@/structures/stop';
 import Vehicle from '@/structures/vehicle';
 import * as L from 'leaflet';
 import Update from '@/structures/update';
