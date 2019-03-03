@@ -23,6 +23,10 @@ type Config struct {
 	Authenticate         bool
 	ListenURL            string
 	MapboxAPIKey         string
+
+	// OSRMUpstreamURL is where Shuttle Tracker can find an OSRM instance for ETAs.
+	// It proxies requests to /api/osrm to this URL.
+	OSRMUpstreamURL string
 }
 
 // API is responsible for configuring handlers for HTTP endpoints.
@@ -33,6 +37,7 @@ type API struct {
 	msg     shuttletracker.MessageService
 	updater *updater.Updater
 	fm      *fusionManager
+	osrmUpstreamURL *url.URL
 }
 
 // New initializes the application given a config and connects to backends.
@@ -47,6 +52,12 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	// Set up fusion manager
 	fm := newFusionManager()
 
+	// Parse OSRM URL
+	osrmURL, err := url.Parse(cfg.OSRMUpstreamURL)
+	if err != nil {
+		return nil, err
+	}
+
 	// Create API instance to store database session and collections
 	api := API{
 		cfg:     cfg,
@@ -54,6 +65,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		msg:     msg,
 		updater: updater,
 		fm:      fm,
+		osrmUpstreamURL: osrmURL,
 	}
 
 	r := chi.NewRouter()
@@ -141,6 +153,10 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	// iTRAK data feed endpoint
 	r.Get("/datafeed", api.DataFeedHandler)
 
+	// OSRM reverse proxy
+	const osrmProxyURL = "/api/osrm"
+	r.Mount(osrmProxyURL, api.createOSRMProxy(osrmProxyURL))
+
 	api.handler = r
 
 	return &api, nil
@@ -150,10 +166,12 @@ func NewConfig(v *viper.Viper) *Config {
 	cfg := &Config{
 		ListenURL:    "0.0.0.0:8080",
 		Authenticate: true,
+		OSRMUpstreamURL: "https://shuttles.rpi.edu/api/osrm",
 	}
 	v.SetDefault("api.listenurl", cfg.ListenURL)
 	v.SetDefault("api.casurl", cfg.CasURL)
 	v.SetDefault("api.authenticate", cfg.Authenticate)
+	v.SetDefault("api.osrmupstreamurl", cfg.OSRMUpstreamURL)
 	return cfg
 }
 
@@ -161,7 +179,6 @@ func (api *API) Run() {
 	if err := http.ListenAndServe(api.cfg.ListenURL, api.handler); err != nil {
 		log.WithError(err).Error("Unable to serve.")
 	}
-
 }
 
 // IndexHandler serves the index page.
@@ -178,7 +195,6 @@ func (api *API) AdminHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Cache-Control", "no-cache")
 	http.ServeFile(w, r, "static/admin.html")
-
 }
 
 //KeyHandler sends Mapbox api key to authenticated user

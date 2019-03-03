@@ -30,9 +30,6 @@ var rootCmd = &cobra.Command{
 
 		runner := runner.New()
 
-		// Log
-		log.SetLevel(cfg.Log.Level)
-
 		pg, err := postgres.New(*cfg.Postgres)
 		if err != nil {
 			log.WithError(err).Error("unable to create Postgres")

@@ -31,15 +31,13 @@ func New() (*Config, error) {
 
 	cfg.API = api.NewConfig(v)
 	cfg.Updater = updater.NewConfig(v)
-	cfg.Log = log.NewConfig()
+	cfg.Log = log.NewConfig(v)
 
 	pgCfg, err := postgres.NewConfig(v)
 	if err != nil {
 		return nil, err
 	}
 	cfg.Postgres = pgCfg
-
-	log.Debugf("All settings: %+v", v.AllSettings())
 
 	v.SetConfigName("conf")
 	v.AddConfigPath(".")
@@ -50,6 +48,14 @@ func New() (*Config, error) {
 	if err := v.Unmarshal(&cfg); err != nil {
 		return nil, err
 	}
+
+	// Special case for setting log level after reading config
+	log.SetLevel(cfg.Log.Level)
+	log.Debugf("All settings: %+v", v.AllSettings())
+	log.Debugf("API configuration: %+v", cfg.API)
+	log.Debugf("Updater configuration: %+v", cfg.Updater)
+	log.Debugf("Log configuration: %+v", cfg.Log)
+	log.Debugf("Postgres configuration: %+v", cfg.Postgres)
 
 	return cfg, nil
 }
