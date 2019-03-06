@@ -1,28 +1,13 @@
 <template>
-  <div style="padding: 0px; margin: 0px;width: 100%; height: 100%;">
+  <div class="parent">
     <div class="titleBar">
-      <ul class="titleContent">
-        <dropdown/>
-        <li class="title">RPI Shuttle Tracker</li>
-      </ul>
-      <div v-if="$store.state.online" class="livebox">
-        <p>Live</p>
-        <div class="pulsate" style></div>
-      </div>
-      <div v-if="!$store.state.online" class="livebox">
-        <p>Offline</p>
-        <div class="caution-circle" style></div>
-      </div>
-      <div class="logo">
-        <a href="https://webtech.union.rpi.edu/">
-          <img src="~../assets/wtg.svg">
-        </a>
-      </div>
+      <img src="~../assets/icon.svg">
     </div>
-    <span style="width: 100%; height: 100%; position: fixed;">
-      <div id="mymap"></div>
+    <div id="mymap"></div>
+    <span>
       <messagebox ref="msgbox"/>
     </span>
+    <bus-button id="busbutton" v-on:bus-click="busClicked()" v-if="busButtonActive" />
   </div>
 </template>
 
@@ -34,13 +19,15 @@ import InfoService from '../structures/serviceproviders/info.service';
 import Vehicle from '../structures/vehicle';
 import Route from '../structures/route';
 import Stop from '../structures/stop';
-import dropdown from './dropdown.vue';
 import messagebox from './adminmessage.vue';
 import * as L from 'leaflet';
 import { setTimeout, setInterval } from 'timers';
 import getMarkerString from '../structures/leaflet/rotatedMarker';
 import { Position } from 'geojson';
-import Fusion from '@/fusion.ts';
+import Fusion from '@/fusion';
+import UserLocationService from '@/structures/userlocation.service';
+import BusButton from '@/components/busbutton.vue';
+import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 
 const StopSVG = require('@/assets/circle.svg') as string;
 const UserSVG = require('@/assets/user.svg') as string;
@@ -63,8 +50,11 @@ export default Vue.extend({
       ready: false,
       Map: undefined,
       existingRouteLayers: [],
+      userShuttleidCount: 0,
       initialized: false,
       legend: new L.Control({ position: 'bottomleft' }),
+      locationMarker: undefined,
+      fusion: new Fusion(),
     } as {
         vehicles: Vehicle[];
         routes: Route[];
@@ -74,9 +64,14 @@ export default Vue.extend({
         existingRouteLayers: L.Polyline[];
         initialized: boolean;
         legend: L.Control;
+        locationMarker: L.Marker | undefined;
+        userShuttleidCount: number;
+        fusion: Fusion;
       };
   },
   mounted() {
+    const ls = UserLocationService.getInstance();
+
     const a = new InfoService();
     this.$store.dispatch('grabRoutes');
     this.$store.dispatch('grabStops');
@@ -129,9 +124,27 @@ export default Vue.extend({
       }
     });
 
-    new Fusion().start();
+    this.fusion.start();
+    this.fusion.registerMessageReceivedCallback(this.saucyspawn);
+  },
+  computed: {
+    message(): AdminMessageUpdate {
+        return this.$store.state.adminMessage;
+    },
+    busButtonActive(): boolean {
+      return this.$store.getters.getBusButtonVisible;
+    },
   },
   methods: {
+    spawn() {
+      this.spawnShuttleAtPosition(UserLocationService.getInstance().getCurrentLocation());
+    },
+    saucyspawn(message: any) {
+      if (message.type !== 'bus_button') {
+        return;
+      }
+      this.spawnShuttleAtPosition(message.message);
+    },
     updateLegend() {
       this.legend.onAdd = (map: L.Map) => {
         const div = L.DomUtil.create('div', 'info legend');
@@ -206,8 +219,37 @@ export default Vue.extend({
         }
       });
     },
+    spawnShuttleAtPosition(position: any) {
+      if (!this.$store.getters.getBusButtonShowBuses) {
+        return;
+      }
+      this.userShuttleidCount ++;
+      const busIcon = L.divIcon({
+        html: `<span class="shuttleusericon shuttleusericon` + String(this.userShuttleidCount) +  `" >🚐</span>`,
+
+        iconSize: [20, 20], // size of the icon
+        iconAnchor: [10, 10], // point of the icon which will correspond to marker's location
+        shadowAnchor: [6, 6], // the same for the shadow
+        popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
+      });
+      const x = L.marker(
+        [position.latitude, position.longitude],
+        {
+          icon: busIcon,
+          zIndexOffset: 1000,
+        },
+      );
+      if (this.Map !== undefined) {
+        x.addTo(this.Map);
+        setTimeout(() => {
+          if (this.Map !== undefined) {
+            this.Map.removeLayer(x);
+          }
+        }, 2000);
+      }
+    },
     showUserLocation() {
-      const userIcon = L.icon({
+      const userIcon = new L.Icon({
         iconUrl: UserSVG,
 
         iconSize: [12, 12], // size of the icon
@@ -216,133 +258,76 @@ export default Vue.extend({
         popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
       });
 
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(((position) => {
-          const locationMarker = {
-            name: 'You are here',
-            marker: L.marker(
+
+      UserLocationService.getInstance().registerCallback((position) => {
+        if (this.locationMarker === undefined) {
+          this.locationMarker = L.marker(
               [position.coords.latitude, position.coords.longitude],
               {
                 icon: userIcon,
                 zIndexOffset: 1000,
               },
-            ),
+            );
+
+        } else {
+          this.locationMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
+        }
+        const locationMarkerOptions = {
+            name: 'You are here',
+            marker: this.locationMarker,
           };
-          locationMarker.marker.bindPopup(locationMarker.name);
-          if (this.Map !== undefined) {
-            locationMarker.marker.addTo(this.Map);
+        locationMarkerOptions.marker.bindPopup(locationMarkerOptions.name);
+        if (this.Map !== undefined) {
+            locationMarkerOptions.marker.addTo(this.Map);
           }
-        }) as PositionCallback);
-      }
+      });
+
+    },
+    busClicked() {
+      this.fusion.sendBusButton();
     },
   },
   components: {
-    dropdown,
     messagebox,
+    BusButton,
   },
 });
 </script>
 
 <style lang="scss">
-.caution-circle {
-  float: right;
-  width: 10px;
-  height: 10px;
-  background-color: orange;
-  border-radius: 50%;
-}
-.pulsate {
-  float: right;
-  width: 10px;
-  height: 10px;
-  background-color: blue;
-  border-radius: 50%;
-  animation: pulsate 2.5s ease-out;
-  animation-iteration-count: infinite;
-}
-@keyframes pulsate {
-  0% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-.livebox {
-  p {
-    margin-right: 5px;
-  }
-  position: absolute;
-  height: 26px;
-  right: 10px;
-  top: 40px;
-  box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
-  border-radius: 5px;
-  padding-left: 4px;
-  padding-right: 4px;
-  justify-self: flex-end;
+.parent {
+  padding: 0px;
+  margin: 0px;
+  width: 100%;
+  position: relative;
   display: flex;
-  flex-flow: row wrap;
-  align-content: center;
-  align-items: center;
-  justify-content: space-around;
-  background-color: rgba(255, 255, 255, 0.9);
+  flex-direction: column;
 }
 
 #mymap {
-  height: 100%;
-  width: 100%;
-  position: relative;
-  filter: invert(0);
+  flex: 1;
+  z-index: 0
 }
 
 .titleBar {
-  height: 34px;
-  float: none;
-  position: absolute;
-  z-index: 1;
+  height: 40px;
   display: flex;
-  align-content: space-around;
   justify-content: space-between;
-  flex-flow: row;
+  align-items: center;
   width: 100%;
-  background-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.8);
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+  border-bottom: 0.5px solid #eee;
+  box-shadow: 0 -3px 8px 0 #ddd;
   user-select: none;
+  background: white;
+  z-index: 1;
 
-  & .titleContent {
-    height: 100%;
-    z-index: 1;
-    width: auto;
-    list-style: none;
-    position: relative;
-    top: 0px;
-    margin: 0px;
-    padding: 0px;
-    display: flex;
-
-    & .title {
-      font-size: 22px;
-      padding: 0px;
-      margin: auto 6px;
-    }
-  }
-}
-
-.logo {
-  height: 24px;
-  float: right;
-  padding-right: 10px;
-  align-self: center;
-  & img {
-    height: 100%;
+  img {
+    flex: 1;
+    height: 70%;
   }
 }
 
@@ -352,10 +337,47 @@ export default Vue.extend({
   background-color: rgba(255, 255, 255, 0.9);
   padding: 5px;
   bottom: 25px;
+
   & ul {
     margin-top: 2px;
     margin-bottom: 2px;
     padding-left: 0px;
   }
+}
+
+.shuttleusericon{
+  background-color: transparent;
+  border: none;
+  animation: fadeOutUp 2s ease;
+  display: block;
+  font-size: 20px; 
+  bottom: 0px; 
+  right: 0px;
+  z-index: 2000 !important;
+}
+
+@keyframes fadeOutUp {
+   0% {
+      opacity: 1;
+      transform: translateY(0);
+   }
+   100% {
+      opacity: 0;
+      transform: translateY(-40px);
+   }
+} 
+
+.leaflet-div-icon {
+  background: transparent !important;
+  border: none !important;
+  width: 20px !important;
+  height: 20px !important;
+
+}
+#busbutton{
+  position: absolute; 
+  right: 25px; 
+  bottom: 35px; 
+  z-index: 2000;
 }
 </style>

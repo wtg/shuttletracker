@@ -25,6 +25,11 @@ const store: StoreOptions<StoreState> = {
     Vehicles: [],
     adminMessage: undefined,
     online: true,
+    settings: {
+      busButtonEnabled: false,
+      fusionPositionEnabled: true,
+    },
+    geolocationDenied: false,
   },
   mutations: {
     setOnline(state, online: boolean) {
@@ -80,8 +85,35 @@ const store: StoreOptions<StoreState> = {
     addAdminMessage(state, message: AdminMessageUpdate) {
       state.adminMessage = message;
     },
+    initializeSettings(state) {
+      const savedSettings = localStorage.getItem('st_settings');
+      if (!savedSettings) {
+        return;
+      }
+      state.settings = Object.assign(state.settings, JSON.parse(savedSettings));
+    },
+    setSettingsBusButtonEnabled(state, value: boolean) {
+      state.settings.busButtonEnabled = value;
+      localStorage.setItem('st_settings', JSON.stringify(state.settings));
+    },
+    setSettingsFusionPositionEnabled(state, value: boolean) {
+      state.settings.fusionPositionEnabled = value;
+      localStorage.setItem('st_settings', JSON.stringify(state.settings));
+    },
+    setGeolocationDenied(state, value: boolean) {
+      state.geolocationDenied = value;
+    },
   },
   getters: {
+    getBusButtonVisible(state: StoreState, getters): boolean {
+      return getters.getBusButtonShowBuses && !state.geolocationDenied;
+    },
+    getBusButtonShowBuses(state: StoreState): boolean {
+      if (state.adminMessage === undefined) {
+        return state.settings.busButtonEnabled;
+      }
+      return state.settings.busButtonEnabled && !state.adminMessage.enabled;
+    },
     getPolyLineByRouteId: (state) => (id: number): L.Polyline | undefined => {
       const arr = new Array<L.Polyline>();
       let ret;
