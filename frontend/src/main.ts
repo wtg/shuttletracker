@@ -17,8 +17,9 @@ Vue.use(Buefy);
 Vue.config.productionTip = false;
 
 /**
- * Declare the main Vue instance with components and vuex store.
- */
+  Declare the main Vue instance with components and vuex store.
+**/
+
 new Vue({
   store,
   router,

@@ -1,14 +1,34 @@
 <template>
   <div class="parent">
     <div class="titleBar">
-      <img src="~../assets/icon.svg">
+        <ul class="titleContent">
+            <dropdown />
+            <li class="title">RPI Shuttle Tracker</li>
+        </ul>
+
+        <div v-if="$store.state.online" class="livebox">
+          <p>Live </p>
+          <div class="pulsate" style=""></div>
+        </div>
+        <div v-if="!$store.state.online" class="livebox">
+          <p>Offline </p>
+          <div class="caution-circle" style=""></div>
+        </div>
+
+        <div class="logo">
+          <a href="https://webtech.union.rpi.edu/">
+            <img src="~../assets/wtg.svg" />
+          </a>
+        </div>
+
     </div>
-    <div id="mymap"></div>
-    <span>
-      <messagebox ref="msgbox"/>
+
+    <span style="width: 100%; height: 100%; position: fixed;">
+      <div id="mymap"></div>
+    <messagebox ref="msgbox" />
     </span>
-    <bus-button id="busbutton" v-on:bus-click="busClicked()" v-if="busButtonActive" />
-  </div>
+
+</div>
 </template>
 
 <script lang="ts">
@@ -69,6 +89,7 @@ export default Vue.extend({
         fusion: Fusion;
       };
   },
+
   mounted() {
     const ls = UserLocationService.getInstance();
 
@@ -135,6 +156,7 @@ export default Vue.extend({
       return this.$store.getters.getBusButtonVisible;
     },
   },
+
   methods: {
     spawn() {
       this.spawnShuttleAtPosition(UserLocationService.getInstance().getCurrentLocation());
@@ -175,9 +197,11 @@ export default Vue.extend({
         this.legend.addTo(this.Map);
       }
     },
+
     routePolyLines(): L.Polyline[] {
       return this.$store.getters.getRoutePolyLines;
     },
+
     renderRoutes() {
       if (this.routePolyLines().length > 0 && !this.initialized) {
         if (
@@ -201,6 +225,7 @@ export default Vue.extend({
         }
       });
     },
+
     renderStops() {
       this.$store.state.Stops.forEach((stop: Stop) => {
         const marker = L.marker([stop.latitude, stop.longitude], {
@@ -212,41 +237,13 @@ export default Vue.extend({
         }
       });
     },
+
     addVehicles() {
       this.$store.state.Vehicles.forEach((veh: Vehicle) => {
         if (this.Map !== undefined) {
           veh.addToMap(this.Map);
         }
       });
-    },
-    spawnShuttleAtPosition(position: any) {
-      if (!this.$store.getters.getBusButtonShowBuses) {
-        return;
-      }
-      this.userShuttleidCount ++;
-      const busIcon = L.divIcon({
-        html: `<span class="shuttleusericon shuttleusericon` + String(this.userShuttleidCount) +  `" >🚐</span>`,
-
-        iconSize: [20, 20], // size of the icon
-        iconAnchor: [10, 10], // point of the icon which will correspond to marker's location
-        shadowAnchor: [6, 6], // the same for the shadow
-        popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
-      });
-      const x = L.marker(
-        [position.latitude, position.longitude],
-        {
-          icon: busIcon,
-          zIndexOffset: 1000,
-        },
-      );
-      if (this.Map !== undefined) {
-        x.addTo(this.Map);
-        setTimeout(() => {
-          if (this.Map !== undefined) {
-            this.Map.removeLayer(x);
-          }
-        }, 2000);
-      }
     },
     showUserLocation() {
       const userIcon = new L.Icon({
@@ -287,6 +284,7 @@ export default Vue.extend({
       this.fusion.sendBusButton();
     },
   },
+
   components: {
     messagebox,
     BusButton,
@@ -294,19 +292,67 @@ export default Vue.extend({
 });
 </script>
 
+ 
 <style lang="scss">
-.parent {
-  padding: 0px;
-  margin: 0px;
-  width: 100%;
-  position: relative;
-  display: flex;
-  flex-direction: column;
+
+// CSS Styling of LIVE Indicator when the App is offline
+.caution-circle {
+  float:right;
+  width:10px;
+  height:10px;
+  background-color:orange;
+  border-radius:50%;
 }
 
-#mymap {
-  flex: 1;
-  z-index: 0
+// CSS styling to pulsate the blue circle of the LIVE indicator
+.pulsate {
+  float:right;
+  width:10px;
+  height:10px;
+  background-color:blue;
+  border-radius:50%;
+  animation: pulsate 2.5s ease-out;
+  animation-iteration-count: infinite;
+}
+@keyframes pulsate {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+// CSS styling for the LIVE indicator box
+.livebox{
+    p {
+      margin-right: 5px;
+    }
+    position: absolute;
+    height: 26px;
+    right: 10px;
+    top: 40px;
+    box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
+    border-radius: 5px;
+    padding-left: 4px;   
+    padding-right: 4px;   
+    justify-self: flex-end;
+    display: flex;
+    flex-flow: row wrap;
+    align-content: center;
+    align-items: center;
+    justify-content: space-around;
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+#mymap{
+    height: 100%;
+    width: 100%;
+    position: relative;
+    filter: invert(0);
 }
 
 .titleBar {

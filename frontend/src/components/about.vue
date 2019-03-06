@@ -38,17 +38,18 @@
     </p>
   </div>
 </template>
+
+
 <script lang="ts">
 // This component is the about window that is displayed when the `about` button on the menu is selected
 
 import Vue from 'vue';
 export default Vue.extend({});
 </script>
-<style lang="scss" scoped>
-.parent {
-  padding: 20px;
-}
-p {
-  margin-bottom: 1em;
-}
+
+//  
+<style lang="scss">
+    .container{
+        margin: 20px;
+    }
 </style>

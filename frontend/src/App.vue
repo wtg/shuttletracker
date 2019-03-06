@@ -1,14 +1,10 @@
 <template>
   <div id="app">
-    <div id="view-wrapper">
-      <keep-alive>
-        <router-view id="router-view"></router-view>
-      </keep-alive>
-    </div>
-    <tab-bar></tab-bar>   
+    <keep-alive>
+      <router-view />
+    </keep-alive>
   </div>
 </template>
-
 
 <script lang="ts">
 import Vue from 'vue';
