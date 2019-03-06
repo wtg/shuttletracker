@@ -73,7 +73,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		r.Get("/", api.UpdatesHandler)
 	})
 
-	//Hisory
+	// History
 	r.Route("/history", func(r chi.Router) {
 		r.Get("/", api.HistoryHandler)
 		})

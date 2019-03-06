@@ -1,14 +1,23 @@
 <template>
-    <div id="app">
-        <div id ="title"> QUEUE </div>
-        <ul>
-            <li id="time"> Shuttle Time 1 </li>
-            <li id="time"> Shuttle Time 2 </li>
-            <li id="time"> Shuttle Time 3 </li>
-            <li id="time"> Shuttle Time 4 </li>
-            <li id="time"> Shuttle Time 5 </li>
-        </ul>
+    <div id="app" v-if="$store.state.online">
+        <div id="east">
+            <ul>  
+                <li id="type"> EAST  </li>
+                <li id="time"> Shuttle Time 1 </li>
+                <li id="time"> Shuttle Time 2 </li>
+                <li id="time"> Shuttle Time 3 </li>
+            </ul>
+        </div>
+        <div id="west">
+            <ul>
+                <li id="type"> WEST </li>
+                <li id="time"> Shuttle Time 1 </li>
+                <li id="time"> Shuttle Time 2 </li>
+                <li id="time"> Shuttle Time 3 </li>
+            </ul>
+        </div>
     </div>
+    <div v-else> Shuttles Services are currently down </div>
 </template>
 
 <script lang="ts">
@@ -21,9 +30,6 @@ export default Vue.extend({
 
 // CSS Styling for the Shuttle Time Queue
 <style scoped>
-    #title{
-        font-size:80px;
-    }
     #app{
         margin-left:25px;
         float:left;
@@ -32,12 +38,24 @@ export default Vue.extend({
         bottom:80px;
         position:relative;
         text-align:center;
-        background-color:red;
     }
     #time{
         font-size:40px;
     }
     ul {
         padding-left:0;
+    }
+    #east{
+        float:left;
+        padding-left:130px;
+        padding-top:30px;
+    }
+    #west{
+        float:right;
+        padding-right:130px;
+        padding-top:30px;
+    }
+    #type{
+        font-size:80px;
     }
 </style>
