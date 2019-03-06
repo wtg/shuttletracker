@@ -1,6 +1,5 @@
 {
   "Updater": {
-    "DataFeed": "",
     "UpdateInterval": "3s"
   },
   "API": {
