@@ -16,6 +16,7 @@ github.com/hashicorp/hcl v0.0.0-20170509225359-392dba7d905e h1:KJWs1uTCkN3E/J5of
 github.com/hashicorp/hcl v0.0.0-20170509225359-392dba7d905e/go.mod h1:oZtUIOe8dh44I2q6ScRibXws4Ajl+d+nod3AaR9vL5w=
 github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NHg9XEKhtSvM=
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
+github.com/kardianos/govendor v1.0.9/go.mod h1:yvmR6q9ZZ7nSF5Wvh40v0wfP+3TwwL8zYQp+itoZSVM=
 github.com/kochman/runner v0.0.0-20170814050456-307fc031d779 h1:SNQIpBiNgPWciqNyOhmLrg3Zersbt3H/EKCZTtIiFfk=
 github.com/kochman/runner v0.0.0-20170814050456-307fc031d779/go.mod h1:mVqbtmiJregdVIxw3ZoFR4MMRYncnKadOkWYBI6BeiA=
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=

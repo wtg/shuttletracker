@@ -10,6 +10,7 @@ require (
 	github.com/gorilla/websocket v1.4.0
 	github.com/hashicorp/hcl v0.0.0-20170509225359-392dba7d905e // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
+	github.com/kardianos/govendor v1.0.9 // indirect
 	github.com/kochman/runner v0.0.0-20170814050456-307fc031d779
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/lib/pq v0.0.0-20180327071824-d34b9ff171c2

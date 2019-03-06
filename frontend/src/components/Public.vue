@@ -8,6 +8,7 @@
       <messagebox ref="msgbox"/>
     </span>
     <bus-button id="busbutton" v-on:bus-click="busClicked()" v-if="busButtonActive" />
+    <tab-bar></tab-bar>
   </div>
 </template>
 
@@ -15,6 +16,7 @@
 // This component handles everything on the shuttle tracker that is publicly facing.
 
 import Vue from 'vue';
+import TabBar from '@/components/tabBar.vue';
 import InfoService from '../structures/serviceproviders/info.service';
 import Vehicle from '../structures/vehicle';
 import Route from '../structures/route';
@@ -290,6 +292,7 @@ export default Vue.extend({
   components: {
     messagebox,
     BusButton,
+    TabBar,
   },
 });
 </script>

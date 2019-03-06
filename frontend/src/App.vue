@@ -4,24 +4,19 @@
       <keep-alive>
         <router-view id="router-view"></router-view>
       </keep-alive>
-    </div>
-    <tab-bar></tab-bar>   
+    </div>  
   </div>
 </template>
 
 
 <script lang="ts">
 import Vue from 'vue';
-import TabBar from '@/components/tabBar.vue';
 import UserLocationService from '@/structures/userlocation.service';
 
 UserLocationService.getInstance();
 
 export default Vue.extend({
   name: 'app',
-  components: {
-    TabBar,
-  },
 });
 </script>
 <style lang="scss">

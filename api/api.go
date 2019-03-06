@@ -79,7 +79,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		r.Get("/", api.UpdatesHandler)
 	})
 
-	//Hisory
+	//History
 	r.Route("/history", func(r chi.Router) {
 		r.Get("/", api.HistoryHandler)
 	})
@@ -118,6 +118,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	r.Mount("/fusion", api.fm.router(cli.casauth))
 
 	r.Get("/logout/", cli.logout)
+	
 	// Admin
 	r.Route("/admin", func(r chi.Router) {
 		r.Use(cli.casauth)
@@ -137,6 +138,8 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	r.Get("/about", api.IndexHandler)
 	r.Get("/schedules", api.IndexHandler)
 	r.Get("/settings", api.IndexHandler)
+
+	r.Get("/tvpanel", api.IndexHandler)
 
 	// iTRAK data feed endpoint
 	r.Get("/datafeed", api.DataFeedHandler)
