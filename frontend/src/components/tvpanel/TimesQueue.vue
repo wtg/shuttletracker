@@ -35,7 +35,7 @@ export default Vue.extend({
         float:left;
         height:700px;
         width:48%;
-        top:200px;
+        top:159px;
         position:relative;
         text-align:center;
         color:black;

@@ -52,10 +52,12 @@ $colors: (
 #view-wrapper {
   height: calc(100% - 40px);
   box-sizing: border-box;
+  overflow:hidden;
 }
 #router-view {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   height: 100%;
+  overflow:hidden;
 }
 </style>

@@ -1,8 +1,11 @@
 <template>
   <div>
-    <p id="title-RPI">RPI Shuttle Tracker</p> 
+    <p id="title-RPI">Shuttle Tracker</p> 
       <TimesQueue />
       <Map />
+    <div class="titleBar bot">
+      <img src="~../assets/icon.svg">
+    </div>
   </div>
 </template>
 
@@ -33,5 +36,10 @@ html, body {
     top:100px;
     font-size:75px;
     color:black;
+}
+.bot {
+  position:absolute;
+  bottom:0px;
+  height:60px;
 }
 </style>
