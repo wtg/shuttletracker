@@ -75,6 +75,8 @@ func (u *Updater) Run() {
 	log.Debug("Updater started.")
 	ticker := time.Tick(u.updateInterval)
 
+	go u.calculateInitialETAs()
+
 	// Do one initial update.
 	u.update()
 
@@ -233,6 +235,8 @@ func (u *Updater) handleVehicleData(vehicleData string) {
 	if err := u.ms.CreateLocation(update); err != nil {
 		log.WithError(err).Errorf("could not create location")
 	}
+
+	u.calculateETAs(vehicle)
 }
 
 // Convert kmh to mph
