@@ -13,6 +13,7 @@ import (
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/postgres"
 	"github.com/wtg/shuttletracker/updater"
+	"github.com/wtg/shuttletracker/eta"
 )
 
 var rootCmd = &cobra.Command{
@@ -52,6 +53,13 @@ var rootCmd = &cobra.Command{
 			return
 		}
 		runner.Add(updater)
+
+		etaManager, err := eta.NewManager(*cfg.ETA, ms, updater)
+		if err != nil {
+			log.WithError(err).Error("unable to create ETA manager")
+			return
+		}
+		_ = etaManager
 
 		// Make API server
 		api, err := api.New(*cfg.API, ms, msg, us, updater)

@@ -1,4 +1,4 @@
-package updater
+package eta
 
 import (
 	"net/http"
@@ -12,9 +12,11 @@ import (
 	"sync"
 
 	"github.com/wcharczuk/go-chart"
+	"github.com/spf13/viper"
 
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
+	"github.com/wtg/shuttletracker/updater"
 )
 
 const osrmBaseURL = "http://127.0.0.1:8080/api/osrm"
@@ -45,8 +47,13 @@ type point struct {
 	lng float64
 }
 
+type Config struct {
+	DataFeed       string
+	UpdateInterval string
+}
 
-func NewETAManager(ms shuttletracker.ModelService) *ETAManager {
+// NewManager creates an ETAManager.
+func NewManager(cfg Config, ms shuttletracker.ModelService, updater *updater.Updater) (*ETAManager, error) {
 	em := &ETAManager{
 		ms: ms,
 		sm: &sync.Mutex{},
@@ -54,8 +61,25 @@ func NewETAManager(ms shuttletracker.ModelService) *ETAManager {
 		em: &sync.Mutex{},
 		etas: []VehicleETA{},
 	}
-	go em.start()
-	return em
+
+	// subscribe to new Locations with Updater
+	updater.Subscribe(em.locationSubscriber)
+
+	return em, nil
+}
+
+func NewConfig(v *viper.Viper) *Config {
+	cfg := &Config{
+		// UpdateInterval: "10s",
+		// DataFeed:       "https://shuttles.rpi.edu/datafeed",
+	}
+	// v.SetDefault("updater.updateinterval", cfg.UpdateInterval)
+	// v.SetDefault("updater.datafeed", cfg.DataFeed)
+	return cfg
+}
+
+func (em *ETAManager) locationSubscriber(loc *shuttletracker.Location) {
+	log.Infof("ETAManager got location: %+v", loc)
 }
 
 func (em *ETAManager) start() {
@@ -155,7 +179,7 @@ func snapPointToSegmentIndex(point shuttletracker.Point, segments [][]shuttletra
 	return minIndex
 }
 
-func (u *Updater) snapLocationsToRoads(locations []*shuttletracker.Location) ([]point, error) {
+func (em *ETAManager) snapLocationsToRoads(locations []*shuttletracker.Location) ([]point, error) {
 	coords := strings.Builder{}
 	for i, loc := range locations {
 		coords.WriteString(strconv.FormatFloat(loc.Longitude, 'f', -1, 64))
@@ -276,11 +300,11 @@ func findMinimumDistanceIndices(points []shuttletracker.Point, locs []*shuttletr
 // determines if a track has traversed a route in the order of its stops. if a stop was missing,
 // it is ignored. this is because of stops that are close together often not having enough locations.
 // only two stops may be dropped before we bail out.
-func (u *Updater) stopsVisitedInOrder(route *shuttletracker.Route, locDists []locationDistance) (bool, error) {
+func (em *ETAManager) stopsVisitedInOrder(route *shuttletracker.Route, locDists []locationDistance) (bool, error) {
 	// return true
 	stopPoints := make([]shuttletracker.Point, len(route.StopIDs))
 	for i, stopID := range route.StopIDs {
-		stop, err := u.ms.Stop(stopID)
+		stop, err := em.ms.Stop(stopID)
 		if err != nil {
 			return false, err
 		}
@@ -366,7 +390,7 @@ func crossTrackDistance(p shuttletracker.Point, route *shuttletracker.Route) flo
 	return math.Asin(math.Sin(angDist) * math.Sin(b1 - b2)) * earthRadius
 }
 
-func (u *Updater) findTracks(locDists []locationDistance, route *shuttletracker.Route) ([][]locationDistance, error) {
+func (em *ETAManager) findTracks(locDists []locationDistance, route *shuttletracker.Route) ([][]locationDistance, error) {
 	tracks := [][]locationDistance{}
 
 	for i := 0; i < len(locDists); i++ {
@@ -436,7 +460,7 @@ func (u *Updater) findTracks(locDists []locationDistance, route *shuttletracker.
 		}
 
 		// stops visited in correct order?
-		inOrder, err := u.stopsVisitedInOrder(route, track)
+		inOrder, err := em.stopsVisitedInOrder(route, track)
 		if err != nil {
 			return nil, err
 		}
@@ -450,8 +474,8 @@ func (u *Updater) findTracks(locDists []locationDistance, route *shuttletracker.
 	return tracks, nil
 }
 
-func (u *Updater) findRouteLoops(route *shuttletracker.Route) ([][]*shuttletracker.Location, error) {
-	vehicles, err := u.ms.Vehicles()
+func (em *ETAManager) findRouteLoops(route *shuttletracker.Route) ([][]*shuttletracker.Location, error) {
+	vehicles, err := em.ms.Vehicles()
 	if err != nil {
 		return nil, err
 	}
@@ -462,7 +486,7 @@ func (u *Updater) findRouteLoops(route *shuttletracker.Route) ([][]*shuttletrack
 		return nil, nil
 	}
 	stopID := route.StopIDs[0]
-	stop, err := u.ms.Stop(stopID)
+	stop, err := em.ms.Stop(stopID)
 	if err != nil {
 		return nil, err
 	}
@@ -483,7 +507,7 @@ func (u *Updater) findRouteLoops(route *shuttletracker.Route) ([][]*shuttletrack
 
 	tracks := [][]locationDistance{}
 	for _, vehicle := range vehicles {
-		locations, err := u.ms.LocationsSince(vehicle.ID, time.Now().Add(-time.Hour*24*30))
+		locations, err := em.ms.LocationsSince(vehicle.ID, time.Now().Add(-time.Hour*24*30))
 		if err != nil {
 			return nil, err
 		}
@@ -501,7 +525,7 @@ func (u *Updater) findRouteLoops(route *shuttletracker.Route) ([][]*shuttletrack
 			locDistances = append(locDistances, locationDistance{loc: loc1, dist: d, index: i})
 		}
 
-		vehicleTracks, err := u.findTracks(locDistances, route)
+		vehicleTracks, err := em.findTracks(locDistances, route)
 		if err != nil {
 			return nil, err
 		}
@@ -535,8 +559,8 @@ func (u *Updater) findRouteLoops(route *shuttletracker.Route) ([][]*shuttletrack
 	return nil, nil
 }
 
-func (u *Updater) calculateInitialETAs() {
-	routes, err := u.ms.Routes()
+func (em *ETAManager) calculateInitialETAs() {
+	routes, err := em.ms.Routes()
 	if err != nil {
 		log.WithError(err).Error("unable to get routes")
 		return
@@ -544,13 +568,13 @@ func (u *Updater) calculateInitialETAs() {
 	for _, route := range routes {
 		routeDistance := calculateRouteDistance(route)
 		log.Debugf("%s %f", route.Name, routeDistance)
-		u.findRouteLoops(route)
+		em.findRouteLoops(route)
 	}
 }
 
-func (u *Updater) calculateETAs(vehicle *shuttletracker.Vehicle) {
+func (em *ETAManager) calculateETAs(vehicle *shuttletracker.Vehicle) {
 	log.Infof("calculating ETA for vehicle %+v", vehicle)
-	location, err := u.ms.LatestLocation(vehicle.ID)
+	location, err := em.ms.LatestLocation(vehicle.ID)
 	if err != nil {
 		log.WithError(err).Error("unable to get latest location")
 		return
@@ -561,7 +585,7 @@ func (u *Updater) calculateETAs(vehicle *shuttletracker.Vehicle) {
 
 	c := &http.Client{Timeout: 5 * time.Second}
 
-	stops, err := u.ms.Stops()
+	stops, err := em.ms.Stops()
 	for _, stop := range stops {
 		stopLonStr := strconv.FormatFloat(stop.Longitude, 'f', -1, 64)
 		stopLatStr := strconv.FormatFloat(stop.Latitude, 'f', -1, 64)

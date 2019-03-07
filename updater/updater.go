@@ -31,6 +31,8 @@ type Updater struct {
 	ms                   shuttletracker.ModelService
 	mutex                *sync.Mutex
 	lastDataFeedResponse *DataFeedResponse
+	sm *sync.Mutex
+	subscribers	[]func(*shuttletracker.Location)
 }
 
 type Config struct {
@@ -44,6 +46,8 @@ func New(cfg Config, ms shuttletracker.ModelService) (*Updater, error) {
 		cfg:   cfg,
 		ms:    ms,
 		mutex: &sync.Mutex{},
+		sm: &sync.Mutex{},
+		subscribers: []func(*shuttletracker.Location){},
 	}
 
 	interval, err := time.ParseDuration(cfg.UpdateInterval)
@@ -75,8 +79,6 @@ func (u *Updater) Run() {
 	log.Debug("Updater started.")
 	ticker := time.Tick(u.updateInterval)
 
-	go u.calculateInitialETAs()
-
 	// Do one initial update.
 	u.update()
 
@@ -84,6 +86,21 @@ func (u *Updater) Run() {
 	for range ticker {
 		u.update()
 	}
+}
+
+// Provide a function that is called after Updater parses a new Location.
+func (u *Updater) Subscribe(f func(*shuttletracker.Location)) {
+	u.sm.Lock()
+	u.subscribers = append(u.subscribers, f)
+	u.sm.Unlock()
+}
+
+func (u *Updater) notifySubscribers(loc *shuttletracker.Location) {
+	u.sm.Lock()
+	for _, sub := range u.subscribers {
+		go sub(loc)
+	}
+	u.sm.Unlock()
 }
 
 // Send a request to iTrak API, get updated shuttle info,
@@ -234,9 +251,10 @@ func (u *Updater) handleVehicleData(vehicleData string) {
 
 	if err := u.ms.CreateLocation(update); err != nil {
 		log.WithError(err).Errorf("could not create location")
+		return
 	}
 
-	u.calculateETAs(vehicle)
+	u.notifySubscribers(update)
 }
 
 // Convert kmh to mph
