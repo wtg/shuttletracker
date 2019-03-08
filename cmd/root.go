@@ -59,7 +59,7 @@ var rootCmd = &cobra.Command{
 			log.WithError(err).Error("unable to create ETA manager")
 			return
 		}
-		_ = etaManager
+		runner.Add(etaManager)
 
 		// Make API server
 		api, err := api.New(*cfg.API, ms, msg, us, updater)

@@ -24,8 +24,11 @@ const earthRadius = 6371000.0 // meters
 
 type ETAManager struct {
 	ms shuttletracker.ModelService
+	locChan chan *shuttletracker.Location
+
 	sm *sync.Mutex
 	subscribers []func(VehicleETA)
+
 	em *sync.Mutex
 	etas []VehicleETA
 }
@@ -52,10 +55,11 @@ type Config struct {
 	UpdateInterval string
 }
 
-// NewManager creates an ETAManager.
+// NewManager creates an ETAManager subscribed to Location updates from Updater.
 func NewManager(cfg Config, ms shuttletracker.ModelService, updater *updater.Updater) (*ETAManager, error) {
 	em := &ETAManager{
 		ms: ms,
+		locChan: make(chan *shuttletracker.Location),
 		sm: &sync.Mutex{},
 		subscribers: []func(VehicleETA){},
 		em: &sync.Mutex{},
@@ -79,14 +83,20 @@ func NewConfig(v *viper.Viper) *Config {
 }
 
 func (em *ETAManager) locationSubscriber(loc *shuttletracker.Location) {
-	log.Infof("ETAManager got location: %+v", loc)
+	em.locChan <- loc
 }
 
-func (em *ETAManager) start() {
-	log.Debug("starting ETAManager...")
+func (em *ETAManager) Run() {
 	for {
-		
+		select {
+		case loc := <-em.locChan:
+			em.handleNewLocation(loc)
+		}
 	}
+}
+
+func (em *ETAManager) handleNewLocation(loc *shuttletracker.Location) {
+	log.Infof("ETAManager got location: %+v", loc)
 }
 
 func (em *ETAManager) Subscribe(sub func(VehicleETA)) {
