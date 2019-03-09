@@ -126,6 +126,7 @@ export default Vue.extend({
 
     this.fusion.start();
     this.fusion.registerMessageReceivedCallback(this.saucyspawn);
+    this.fusion.subscribe('testsub');
   },
   computed: {
     message(): AdminMessageUpdate {

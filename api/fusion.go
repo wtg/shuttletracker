@@ -2,13 +2,13 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/gofrs/uuid"
 	"github.com/gorilla/websocket"
 
 	"github.com/wtg/shuttletracker/log"
@@ -28,6 +28,10 @@ type fusionMessageEnvelope struct {
 }
 
 type fusionMessageSubscribe struct {
+	Topic string `json:"topic"`
+}
+
+type fusionMessageUnsubscribe struct {
 	Topic string `json:"topic"`
 }
 
@@ -57,9 +61,15 @@ type fusionBusButton struct {
 }
 
 type fusionClient struct {
+	id              string
 	conn            *websocket.Conn
 	lastMessageTime time.Time
 	userAgent       string
+}
+
+type clientMessage struct {
+	clientID string
+	msg      interface{}
 }
 
 type fusionManagerDebug struct {
@@ -70,10 +80,10 @@ type fusionManagerDebug struct {
 }
 
 type fusionManager struct {
-	addClientChan    chan *fusionClient
-	removeClientChan chan *fusionClient
+	addClient    chan *fusionClient
+	removeClient chan string
 
-	clientMsg chan interface{}
+	clientMsg chan clientMessage
 
 	// This is a little gnarly... basically we can ask fusionManager to send some
 	// information about itself to a channel so that we don't have to put its internal
@@ -83,41 +93,27 @@ type fusionManager struct {
 	// Everything after this is considered internal state. Only fm.run will read
 	// or modify these fields, and it is considered the owner of this state.
 
-	// clients can subscribe to topics that they're interested in
-	subs map[string][]*fusionClient
+	// Clients can subscribe to topics that they're interested in. We only track
+	// their IDs here.
+	subscriptions map[string][]string
 
-	clients        []*fusionClient
+	clients        map[string]*fusionClient
 	tracks         map[string][]fusionPosition
 	busButtonCount uint64
 }
 
 func newFusionManager() *fusionManager {
 	fm := &fusionManager{
-		addClientChan:    make(chan *fusionClient),
-		removeClientChan: make(chan *fusionClient),
-		clientMsg:        make(chan interface{}),
-		debug:            make(chan chan *fusionManagerDebug),
-		tracks:           map[string][]fusionPosition{},
-		subs:             map[string][]*fusionClient{},
+		addClient:     make(chan *fusionClient),
+		removeClient:  make(chan string),
+		clientMsg:     make(chan clientMessage),
+		debug:         make(chan chan *fusionManagerDebug),
+		clients:       map[string]*fusionClient{},
+		tracks:        map[string][]fusionPosition{},
+		subscriptions: map[string][]string{},
 	}
 	go fm.run()
 	return fm
-}
-
-func (fm *fusionManager) addClient(client *fusionClient) error {
-	fm.clients = append(fm.clients, client)
-	go fm.handleClient(client)
-	return nil
-}
-
-func (fm *fusionManager) removeClient(client *fusionClient) error {
-	for i, c := range fm.clients {
-		if client == c {
-			fm.clients = append(fm.clients[:i], fm.clients[i+1:]...)
-			return nil
-		}
-	}
-	return errors.New("client not found")
 }
 
 // Select handle client connections, disconnections, and messages.
@@ -126,18 +122,12 @@ func (fm *fusionManager) removeClient(client *fusionClient) error {
 func (fm *fusionManager) run() {
 	for {
 		select {
-		case c := <-fm.addClientChan:
-			err := fm.addClient(c)
-			if err != nil {
-				log.WithError(err).Error("unable to add client")
-			}
-		case client := <-fm.removeClientChan:
-			err := fm.removeClient(client)
-			if err != nil {
-				log.WithError(err).Error("umable to remove client")
-			}
-		case msg := <-fm.clientMsg:
-			fm.processMessage(msg)
+		case c := <-fm.addClient:
+			fm.processAddClient(c)
+		case clientID := <-fm.removeClient:
+			fm.processRemoveClient(clientID)
+		case cm := <-fm.clientMsg:
+			fm.processMessage(cm)
 		case debugChan := <-fm.debug:
 			fm.processDebug(debugChan)
 		}
@@ -155,6 +145,124 @@ func decodeFusionMessage(r io.Reader) (string, json.RawMessage, error) {
 		return "", message, err
 	}
 	return fm.Type, message, nil
+}
+
+// Generate a UUID (v1, based on timestamp, since we don't care if it can be predicted;
+// it just needs to be unique) and associate this client with it.
+func (fm *fusionManager) processAddClient(client *fusionClient) {
+	fm.clients[client.id] = client
+	go fm.handleClient(client)
+}
+
+func (fm *fusionManager) processRemoveClient(clientID string) {
+	// find all of this client's subscriptions and remove them
+	for topic, subs := range fm.subscriptions {
+		for i, subbedClient := range subs {
+			if subbedClient == clientID {
+				subs = append(subs[:i], subs[i+1:]...)
+				fm.subscriptions[topic] = subs
+
+				// we're done since handleMsgSubscribe doesn't let a client
+				// subscribe more than once to the same topic
+				break
+			}
+		}
+	}
+
+	// remove from clients
+	delete(fm.clients, clientID)
+}
+
+// processMessage handles messages from clients after they are parsed. it does not
+// need any locks or mutexes since it is only called from the goroutine that "owns"
+// the state inside of fusionManager.
+func (fm *fusionManager) processMessage(cm clientMessage) {
+	switch t := cm.msg.(type) {
+	case fusionMessageSubscribe:
+		fms := cm.msg.(fusionMessageSubscribe)
+		fm.handleMsgSubscribe(cm.clientID, fms)
+	case fusionMessageUnsubscribe:
+		fmu := cm.msg.(fusionMessageUnsubscribe)
+		fm.handleMsgUnsubscribe(cm.clientID, fmu)
+	case fusionPosition:
+		fp := cm.msg.(fusionPosition)
+		fm.handleMsgPosition(fp)
+	case fusionBusButton:
+		fbb := cm.msg.(fusionBusButton)
+		fm.handleMsgBusButton(fbb)
+	default:
+		// This is an error since it means that an unhandled message type was sent to
+		// the channel, probably by handleClient. This shouldn't happen, so please fix
+		// it if it does (make sure all possible message types are being handled).
+		log.Errorf("unknown message type \"%s\"", t)
+	}
+}
+
+func (fm *fusionManager) handleMsgSubscribe(clientID string, fms fusionMessageSubscribe) {
+	log.Debugf("new subscribe: %+v", fms)
+
+	// grab the list of existing subscriptions
+	subs := fm.subscriptions[fms.Topic]
+	if subs == nil {
+		// this is the first subscriber, so the list doesn't exist
+		subs = []string{}
+	}
+
+	// if client is already subscribed, do nothing
+	for _, subbedClient := range subs {
+		if subbedClient == clientID {
+			return
+		}
+	}
+
+	subs = append(subs, clientID)
+	fm.subscriptions[fms.Topic] = subs
+}
+
+func (fm *fusionManager) handleMsgUnsubscribe(clientID string, fmu fusionMessageUnsubscribe) {
+	log.Debugf("new unsubscribe: %+v", fmu)
+
+	subs := fm.subscriptions[fmu.Topic]
+	for i, subbedClient := range subs {
+		if subbedClient == clientID {
+			subs = append(subs[:i], subs[i+1:]...)
+			fm.subscriptions[fmu.Topic] = subs
+
+			// we're done since handleMsgSubscribe doesn't let a client
+			// subscribe more than once to the same topic
+			return
+		}
+	}
+	log.Warnf("client requested unsubscribe from topic it's not subscribed to")
+}
+
+func (fm *fusionManager) handleMsgPosition(fp fusionPosition) {
+	fp.Time = time.Now()
+	log.Debugf("new position: %+v", fp)
+	fm.tracks[fp.Track] = append(fm.tracks[fp.Track], fp)
+}
+
+func (fm *fusionManager) handleMsgBusButton(fbb fusionBusButton) {
+	log.Debugf("new bus button: %+v", fbb)
+	fm.busButtonCount++
+	fme := fusionMessageEnvelope{
+		Type:    "bus_button",
+		Message: fbb,
+	}
+	b, err := json.Marshal(fme)
+	if err != nil {
+		log.WithError(err).Error("unable to marshal")
+		return
+	}
+
+	// find clients subscribed to topic
+	for _, clientID := range fm.subscriptions["bus_button"] {
+		client := fm.clients[clientID]
+		err = client.conn.WriteMessage(websocket.TextMessage, b)
+		if err != nil {
+			log.WithError(err).Error("unable to write")
+		}
+	}
 }
 
 // handleClient is expected to be called inside of a goroutine associated with a client.
@@ -186,7 +294,15 @@ func (fm *fusionManager) handleClient(client *fusionClient) {
 				log.WithError(err).Error("unable to decode fusionMessageSubscribe")
 				break
 			}
-			fm.clientMsg <- fms
+			fm.clientMsg <- clientMessage{client.id, fms}
+		case "unsubscribe":
+			fmu := fusionMessageUnsubscribe{}
+			err = json.Unmarshal(message, &fmu)
+			if err != nil {
+				log.WithError(err).Error("unable to decode fusionMessageUnsubscribe")
+				break
+			}
+			fm.clientMsg <- clientMessage{client.id, fmu}
 		case "position":
 			fp := fusionPosition{}
 			err = json.Unmarshal(message, &fp)
@@ -195,7 +311,7 @@ func (fm *fusionManager) handleClient(client *fusionClient) {
 				break
 			}
 			fp.Time = time.Now()
-			fm.clientMsg <- fp
+			fm.clientMsg <- clientMessage{client.id, fp}
 		case "bus_button":
 			fbb := fusionBusButton{}
 			err = json.Unmarshal(message, &fbb)
@@ -203,7 +319,7 @@ func (fm *fusionManager) handleClient(client *fusionClient) {
 				log.WithError(err).Error("unable to decode fusionBusButton")
 				break
 			}
-			fm.clientMsg <- fbb
+			fm.clientMsg <- clientMessage{client.id, fbb}
 		default:
 			// This is just a warning and not an error since messageType comes straight
 			// from the client. We can't trust it.
@@ -212,75 +328,25 @@ func (fm *fusionManager) handleClient(client *fusionClient) {
 	}
 
 	// remove client since the connection is dead
-	fm.removeClientChan <- client
-}
-
-// processMessage handles messages from clients after they are parsed. it does not
-// need any locks or mutexes since it is only called from the goroutine that "owns"
-// the state inside of fusionManager.
-func (fm *fusionManager) processMessage(msg interface{}) {
-	switch t := msg.(type) {
-	case fusionMessageSubscribe:
-		fms := msg.(fusionMessageSubscribe)
-		fm.handleMsgSubscribe(fms)
-	case fusionPosition:
-		fp := msg.(fusionPosition)
-		fm.handleMsgPosition(fp)
-	case fusionBusButton:
-		fbb := msg.(fusionBusButton)
-		fm.handleMsgBusButton(fbb)
-	default:
-		// This is an error since it means that an unhandled message type was sent to
-		// the channel, probably by handleClient. This shouldn't happen, so please fix
-		// it if it does (make sure all possible message types are being handled).
-		log.Errorf("unknown message type \"%s\"", t)
-	}
-}
-
-func (fm *fusionManager) handleMsgSubscribe(fms fusionMessageSubscribe) {
-	log.Debugf("new subscribe: %+v", fms)
-}
-
-func (fm *fusionManager) handleMsgPosition(fp fusionPosition) {
-	fp.Time = time.Now()
-	log.Debugf("new position: %+v", fp)
-	fm.tracks[fp.Track] = append(fm.tracks[fp.Track], fp)
-}
-
-func (fm *fusionManager) handleMsgBusButton(fbb fusionBusButton) {
-	log.Debugf("new bus button: %+v", fbb)
-	fm.busButtonCount++
-	fme := fusionMessageEnvelope{
-		Type:    "bus_button",
-		Message: fbb,
-	}
-	b, err := json.Marshal(fme)
-	if err != nil {
-		log.WithError(err).Error("unable to marshal")
-		return
-	}
-	for _, client := range fm.clients {
-		err = client.conn.WriteMessage(websocket.TextMessage, b)
-		if err != nil {
-			log.WithError(err).Error("unable to write")
-		}
-	}
+	fm.removeClient <- client.id
 }
 
 func (fm *fusionManager) processDebug(ch chan *fusionManagerDebug) {
 	// assemble the data...
 	debug := &fusionManagerDebug{
-		clients:        make([]fusionClient, len(fm.clients)),
+		clients:        make([]fusionClient, 0, len(fm.clients)),
 		tracks:         make([][]fusionPosition, 0, len(fm.tracks)),
 		busButtonCount: fm.busButtonCount,
 	}
 
-	for i, c := range fm.clients {
-		debug.clients[i] = fusionClient{
+	for _, v := range fm.clients {
+		newClient := fusionClient{
 			// don't copy the websocket conn
-			lastMessageTime: c.lastMessageTime,
-			userAgent:       c.userAgent,
+			id:              v.id,
+			lastMessageTime: v.lastMessageTime,
+			userAgent:       v.userAgent,
 		}
+		debug.clients = append(debug.clients, newClient)
 	}
 
 	for _, v := range fm.tracks {
@@ -369,12 +435,20 @@ func (fm *fusionManager) webSocketHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	u1, err := uuid.NewV1()
+	if err != nil {
+		log.WithError(err).Error("unable to generate UUID")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	c := &fusionClient{
+		id:              u1.String(),
 		conn:            conn,
 		lastMessageTime: time.Now(),
 		userAgent:       r.UserAgent(),
 	}
-	fm.addClientChan <- c
+	fm.addClient <- c
 }
 func (fm *fusionManager) router(auth func(http.Handler) http.Handler) http.Handler {
 	r := chi.NewRouter()

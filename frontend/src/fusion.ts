@@ -6,14 +6,20 @@ import store from '@/store';
 class SocketManager {
     private ws: WebSocket | null = null;
     private url: string;
-    private callbacks = new Array<(data: any) => any>();
+    private callbacks = new Array<(data: any) => void>();
+    private queue = new Array<string>();
+    private reconnectCallbacks = new Array<() => void>();
 
     constructor(url: string) {
         this.url = url;
     }
 
-    public registerMessageReceivedCallback(callback: (data: any) => any) {
+    public registerMessageReceivedCallback(callback: (data: any) => void) {
         this.callbacks.push(callback);
+    }
+
+    public registerReconnectCallback(callback: () => void) {
+        this.reconnectCallbacks.push(callback);
     }
 
     public open() {
@@ -22,9 +28,33 @@ class SocketManager {
         });
     }
 
+    // Queue a message to send to the WebSocket server, then try to flush the queue.
     public send(msg: string) {
-        if (this.ws) {
-            this.ws.send(msg);
+        this.queue.push(msg);
+        this.flushQueue();
+    }
+
+    // Try to send any messages in the queue to the WebSocket server and delete those
+    // which we are able to send.
+    private flushQueue() {
+        if (!this.ws) {
+            return;
+        }
+
+        // Keep track of what messages we send so we can remove them from the queue later.
+        const sent = new Array<number>();
+        for (let i = 0; i < this.queue.length; i++) {
+            if (this.ws.readyState !== 1) {
+                break;
+            }
+            this.ws.send(this.queue[i]);
+            sent.push(i);
+        }
+
+        // Remove sent messages from the queue.
+        // Do this in reverse to avoid worrying about messing up indices.
+        for (let i = sent.length - 1; i >= 0; i--) {
+            this.queue.splice(sent[i], 1);
         }
     }
 
@@ -45,7 +75,16 @@ class SocketManager {
             };
             ws.onclose = (event) => {
                 // console.log("socket closed", event);
-                this.open();
+                this.createSocket().then((newWS) => {
+                    this.ws = newWS;
+
+                    // try to send anything that was queued while the socket was closed
+                    this.flushQueue();
+
+                    for (const callback of this.reconnectCallbacks) {
+                        callback();
+                    }
+                });
             };
         });
     }
@@ -55,6 +94,7 @@ export default class Fusion {
     public ws: SocketManager;
     public track = this.generateUUID();
     private callbacks = Array<(message: {}) => any>();
+    private subscriptionTopics = new Set<string>();
 
     constructor() {
         const wsURL = this.relativeWSURL('fusion/');
@@ -65,10 +105,16 @@ export default class Fusion {
                 callback(message);
             }
         });
+        this.ws.registerReconnectCallback(() => {
+            for (const topic of this.subscriptionTopics) {
+                this.requestSubscription(topic);
+            }
+        });
     }
 
     public start() {
         this.ws.open();
+
         // register location callback
         UserLocationService.getInstance().registerCallback((position) => {
             if (!store.state.settings.fusionPositionEnabled) {
@@ -86,6 +132,18 @@ export default class Fusion {
             };
             this.ws.send(JSON.stringify(data));
         });
+
+        // get notified of bus button setting changes so we can subscribe to the topic
+        store.watch((state) => state.settings.busButtonEnabled, (newValue, oldValue) => {
+            if (newValue === true) {
+                this.subscribe('bus_button');
+            } else {
+                this.unsubscribe('bus_button');
+            }
+        });
+        if (store.state.settings.busButtonEnabled === true) {
+            this.subscribe('bus_button');
+        }
     }
 
     public registerMessageReceivedCallback(callback: (message: {}) => any) {
@@ -105,6 +163,32 @@ export default class Fusion {
                 latitude: pos.coords.latitude,
                 longitude: pos.coords.longitude,
             },
+        };
+        this.ws.send(JSON.stringify(data));
+    }
+
+    public subscribe(topic: string) {
+        this.subscriptionTopics.add(topic);
+        this.requestSubscription(topic);
+    }
+
+    public unsubscribe(topic: string) {
+        this.subscriptionTopics.delete(topic);
+        this.requestUnsubscription(topic);
+    }
+
+    private requestSubscription(topic: string) {
+        const data = {
+            type: 'subscribe',
+            message: { topic },
+        };
+        this.ws.send(JSON.stringify(data));
+    }
+
+    private requestUnsubscription(topic: string) {
+        const data = {
+            type: 'unsubscribe',
+            message: { topic },
         };
         this.ws.send(JSON.stringify(data));
     }
