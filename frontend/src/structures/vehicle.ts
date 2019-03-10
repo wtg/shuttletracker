@@ -131,7 +131,7 @@ export default class Vehicle {
         map.removeLayer(this.marker);
     }
 
-    public asJSON(): {id: number; tracker_id: string; name: string; enabled: boolean } {
+    public asJSON(): { id: number; tracker_id: string; name: string; enabled: boolean } {
         return {
             id: this.id,
             enabled: this.enabled,

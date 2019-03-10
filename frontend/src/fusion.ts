@@ -1,11 +1,19 @@
+import UserLocationService from '@/structures/userlocation.service';
+import store from '@/store';
+
 // SocketManager wraps a WebSocket in order to provide guarantees about
 // reliability, reconnections, retries, etc.
 class SocketManager {
-    public ws: WebSocket | null = null;
-    public url: string;
+    private ws: WebSocket | null = null;
+    private url: string;
+    private callbacks = new Array<(data: any) => any>();
 
     constructor(url: string) {
         this.url = url;
+    }
+
+    public registerMessageReceivedCallback(callback: (data: any) => any) {
+        this.callbacks.push(callback);
     }
 
     public open() {
@@ -28,7 +36,9 @@ class SocketManager {
                 resolve(ws);
             };
             ws.onmessage = (event) => {
-                // console.log(event);
+                for (const callback of this.callbacks) {
+                    callback(event.data);
+                }
             };
             ws.onerror = (event) => {
                 // console.log("socket error", event);
@@ -44,39 +54,59 @@ class SocketManager {
 export default class Fusion {
     public ws: SocketManager;
     public track = this.generateUUID();
+    private callbacks = Array<(message: {}) => any>();
 
     constructor() {
-        console.log('Fusion created.');
         const wsURL = this.relativeWSURL('fusion/');
         this.ws = new SocketManager(wsURL);
+        this.ws.registerMessageReceivedCallback((data) => {
+            const message = JSON.parse(data);
+            for (const callback of this.callbacks) {
+                callback(message);
+            }
+        });
     }
 
     public start() {
         this.ws.open();
-        this.startGeolocation();
-    }
-
-    private startGeolocation() {
-        if (!('geolocation' in navigator)) {
-            console.log('Client does not support geolocation.');
-            return;
-        }
-        const options = { enableHighAccuracy: true, maximumAge: 0 };
-        navigator.geolocation.watchPosition(
-            (position) => {
-                const data = {
+        // register location callback
+        UserLocationService.getInstance().registerCallback((position) => {
+            if (!store.state.settings.fusionPositionEnabled) {
+                return;
+            }
+            const data = {
+                type: 'position',
+                message: {
                     latitude: position.coords.latitude,
                     longitude: position.coords.longitude,
                     heading: position.coords.heading,
                     speed: position.coords.speed,
                     track: this.track,
-                };
-                this.ws.send(JSON.stringify(data));
+                },
+            };
+            this.ws.send(JSON.stringify(data));
+        });
+    }
+
+    public registerMessageReceivedCallback(callback: (message: {}) => any) {
+        this.callbacks.push(callback);
+    }
+
+    public sendBusButton() {
+        const ls = UserLocationService.getInstance();
+        const pos = ls.getCurrentLocation();
+        if (!pos) {
+            // client geolocation isn't enabled or known
+            return;
+        }
+        const data = {
+            type: 'bus_button',
+            message: {
+                latitude: pos.coords.latitude,
+                longitude: pos.coords.longitude,
             },
-            (error) => {
-                // console.log("could not get position", error);
-            }, options,
-        );
+        };
+        this.ws.send(JSON.stringify(data));
     }
 
     private generateUUID() {

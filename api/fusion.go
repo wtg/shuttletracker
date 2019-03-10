@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -18,6 +19,11 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
+type fusionMessageEnvelope struct {
+	Type    string      `json:"type"`
+	Message interface{} `json:"message"`
+}
+
 type fusionPosition struct {
 	Latitude  float64   `json:"latitude"`
 	Longitude float64   `json:"longitude"`
@@ -27,35 +33,41 @@ type fusionPosition struct {
 	Time      time.Time `json:"time"`
 }
 
+type fusionBusButton struct {
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+}
+
 type fusionClient struct {
-	conn *websocket.Conn
+	conn            *websocket.Conn
+	lastMessageTime time.Time
+	userAgent       string
 }
 
 type fusionManager struct {
 	clients          []*fusionClient
 	tracks           map[string][]fusionPosition
-	newConnChan      chan *websocket.Conn
-	newPositionChan  chan fusionPosition
+	addClientChan    chan *fusionClient
 	removeClientChan chan *fusionClient
+	positionChan     chan fusionPosition
+	busButtonChan    chan fusionBusButton
+	busButtonCount   uint64
 }
 
 func newFusionManager() *fusionManager {
 	fm := &fusionManager{
-		newConnChan:      make(chan *websocket.Conn),
-		newPositionChan:  make(chan fusionPosition),
+		addClientChan:    make(chan *fusionClient),
 		removeClientChan: make(chan *fusionClient),
+		positionChan:     make(chan fusionPosition),
+		busButtonChan:    make(chan fusionBusButton),
 		tracks:           map[string][]fusionPosition{},
 	}
 	go fm.clientsLoop()
-	go fm.handleNewPositions()
+	go fm.messagesLoop()
 	return fm
 }
 
-func (fm *fusionManager) addClient(conn *websocket.Conn) error {
-	client := &fusionClient{
-		conn: conn,
-	}
-
+func (fm *fusionManager) addClient(client *fusionClient) error {
 	fm.clients = append(fm.clients, client)
 	go fm.handleClient(client)
 	return nil
@@ -76,8 +88,8 @@ func (fm *fusionManager) removeClient(client *fusionClient) error {
 func (fm *fusionManager) clientsLoop() {
 	for {
 		select {
-		case conn := <-fm.newConnChan:
-			err := fm.addClient(conn)
+		case c := <-fm.addClientChan:
+			err := fm.addClient(c)
 			if err != nil {
 				log.WithError(err).Error("unable to add client")
 			}
@@ -90,33 +102,87 @@ func (fm *fusionManager) clientsLoop() {
 	}
 }
 
+func decodeFusionMessage(r io.Reader) (string, json.RawMessage, error) {
+	var message json.RawMessage
+	fm := fusionMessageEnvelope{
+		Message: &message,
+	}
+	dec := json.NewDecoder(r)
+	err := dec.Decode(&fm)
+	if err != nil {
+		return "", message, err
+	}
+	return fm.Type, message, nil
+}
+
 func (fm *fusionManager) handleClient(client *fusionClient) {
 	for {
 		_, r, err := client.conn.NextReader()
 		if err != nil {
-			log.WithError(err).Error("unable to get reader")
+			// did the client e.g. close the tab? then we expect a normal error
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
+				log.WithError(err).Error("unable to get reader")
+			}
 			break
 		}
-		dec := json.NewDecoder(r)
-		fp := fusionPosition{}
-		err = dec.Decode(&fp)
+		client.lastMessageTime = time.Now()
+		messageType, message, err := decodeFusionMessage(r)
 		if err != nil {
 			log.WithError(err).Error("unable to decode message")
+			break
 		}
-		fp.Time = time.Now()
-		// log.Infof("received message %+v", fp)
-		fm.newPositionChan <- fp
-		// client.positions = append(client.positions, fp)
+		switch messageType {
+		case "position":
+			fp := fusionPosition{}
+			err = json.Unmarshal(message, &fp)
+			if err != nil {
+				log.WithError(err).Error("unable to decode fusionPosition")
+				break
+			}
+			fp.Time = time.Now()
+			fm.positionChan <- fp
+		case "bus_button":
+			fbb := fusionBusButton{}
+			err = json.Unmarshal(message, &fbb)
+			if err != nil {
+				log.WithError(err).Error("unable to decode fusionBusButton")
+				break
+			}
+			fm.busButtonChan <- fbb
+		default:
+			log.WithError(err).Errorf("unknown message type \"%s\"", messageType)
+		}
 	}
 
 	// remove client since the connection is dead
 	fm.removeClientChan <- client
 }
 
-func (fm *fusionManager) handleNewPositions() {
-	for pos := range fm.newPositionChan {
-		log.Debugf("new position: %+v", pos)
-		fm.tracks[pos.Track] = append(fm.tracks[pos.Track], pos)
+func (fm *fusionManager) messagesLoop() {
+	for {
+		select {
+		case pos := <-fm.positionChan:
+			log.Debugf("new position: %+v", pos)
+			fm.tracks[pos.Track] = append(fm.tracks[pos.Track], pos)
+		case bb := <-fm.busButtonChan:
+			log.Debugf("new bus button: %+v", bb)
+			fm.busButtonCount++
+			fme := fusionMessageEnvelope{
+				Type:    "bus_button",
+				Message: bb,
+			}
+			b, err := json.Marshal(fme)
+			if err != nil {
+				log.WithError(err).Error("unable to marshal")
+				continue
+			}
+			for _, client := range fm.clients {
+				err = client.conn.WriteMessage(websocket.TextMessage, b)
+				if err != nil {
+					log.WithError(err).Error("unable to write")
+				}
+			}
+		}
 	}
 }
 
@@ -137,7 +203,13 @@ func (fm *fusionManager) debugHandler(w http.ResponseWriter, r *http.Request) {
 	for _, track := range fm.tracks {
 		numPositions += len(track)
 	}
-	_, err = fmt.Fprintf(w, "%d positions\n\n", numPositions)
+	_, err = fmt.Fprintf(w, "%d positions\n", numPositions)
+	if err != nil {
+		log.WithError(err).Error("unable to write response")
+		return
+	}
+
+	_, err = fmt.Fprintf(w, "%d bus buttons\n\n", fm.busButtonCount)
 	if err != nil {
 		log.WithError(err).Error("unable to write response")
 		return
@@ -149,7 +221,7 @@ func (fm *fusionManager) debugHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for _, client := range fm.clients {
-		_, err = fmt.Fprintf(w, "%+v\n", client)
+		_, err = fmt.Fprintf(w, "%s\t%s\n", client.lastMessageTime.Format(time.RFC3339), client.userAgent)
 		if err != nil {
 			log.WithError(err).Error("unable to write response")
 			return
@@ -176,7 +248,12 @@ func (fm *fusionManager) webSocketHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	fm.newConnChan <- conn
+	c := &fusionClient{
+		conn:            conn,
+		lastMessageTime: time.Now(),
+		userAgent:       r.UserAgent(),
+	}
+	fm.addClientChan <- c
 }
 func (fm *fusionManager) router(auth func(http.Handler) http.Handler) http.Handler {
 	r := chi.NewRouter()

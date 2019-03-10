@@ -1,6 +1,6 @@
 <template>
 <span>
-    <div v-if="(this.message !== undefined && this.message.enabled === true) && !hide" id ="messagebox">
+    <div v-if="(this.message !== undefined && this.message.enabled === true) && !hide" id="messagebox">
         <div style="width: 100%;float:left;" v-html="this.message.message"></div>
         <div @click="hide = !hide" style="cursor: pointer;position:absolute;right:10px;top:6px;color:#333;font-size:20px;">&times;</div>
     </div>
@@ -24,12 +24,12 @@ export default Vue.extend({
     },
 });
 </script>
-<style lang="scss">
 
+<style lang="scss" scoped>
 #messagebox {
   max-height: 150px;
   overflow-y: auto;
-  position: fixed;
+  position: relative;
   z-index: 0;
   bottom: 0px;
   left: 0;
@@ -40,5 +40,4 @@ export default Vue.extend({
   text-align: center;
   font-size: 15px;
 }
-
 </style>
