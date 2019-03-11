@@ -14,10 +14,10 @@
                 </tr>
                 <tr v-for="stop in stops" :key="stop.id">
                     <th>{{stop.name}}</th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
+                    <th>{{stop.id}}</th>
+                    <th>{{stop.description}}</th>
+                    <th>{{stop.latitude}}</th>
+                    <th>{{stop.longitude}}</th>
                     <th></th>
                     <th></th>
                     <th></th>
