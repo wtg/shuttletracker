@@ -24,6 +24,15 @@
                 </tr>
             </thead>
             <tbody>
+
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th><button @click="$router.push('/admin/stops/-1/new')" class="button is-success">New</button></th>
+                </tr>
                 
             </tbody>
         </table>
