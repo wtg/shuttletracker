@@ -10,7 +10,8 @@
                 <p>Route saved successfully</p>
             </div>
 
-            <map-view></map-view>
+            <map-view v-if="false && !creation"></map-view>
+            <place-stop v-if="creation"/>
             <!-- <draw-route/> -->
         </div>
         <div class="form-horizontal column" >
@@ -85,7 +86,8 @@ import mapView from '@/components/admin/map.vue'; // for clicking on a point and
 import Stop from '../../structures/stop';
 import scheduleEditor from '@/components/admin/scheduleEditor.vue';
 import AdminServiceProvider from '../../structures/serviceproviders/admin.service';
-import drawRoute from '@/components/admin/drawRoute.vue';
+import placeStop from '@/components/admin/placeStop.vue';
+// import drawRoute from '@/components/admin/drawRoute.vue';
 import * as L from 'leaflet';
 
 
@@ -109,7 +111,8 @@ export default Vue.extend({
     components: {
         mapView,
         // scheduleEditor,
-        // drawRoute,
+        // placeStop,
+        placeStop,
     },
     // mounted() {
     //     if (this.creation) {
