@@ -110,8 +110,6 @@ export default Vue.extend({
     // },
     components: {
         mapView,
-        // scheduleEditor,
-        // placeStop,
         placeStop,
     },
     // mounted() {
