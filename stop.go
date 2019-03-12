@@ -8,8 +8,8 @@ import (
 // Stop is a place where vehicles frequently stop.
 type Stop struct {
 	ID        int64     `json:"id"`
-	Latitude  float64   `json:"latitude"`
-	Longitude float64   `json:"longitude"`
+	Latitude  float64   `json:"latitude,string"`
+	Longitude float64   `json:"longitude,string"`
 	Created   time.Time `json:"created"`
 	Updated   time.Time `json:"updated"`
 

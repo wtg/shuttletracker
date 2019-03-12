@@ -150,11 +150,12 @@ export default Vue.extend({
 
                 // i have no idea how this statement works
                 if (Number(testStop.id) === Number(id)) {
+                    console.log(testStop);
                     this.stop.id = testStop.id;
                     this.stop.name = testStop.name;
                     this.stop.description = testStop.description;
-                    this.stop.latitude = testStop.latitude;
-                    this.stop.longitude = testStop.longitude;
+                    this.stop.latitude = Number(testStop.latitude);
+                    this.stop.longitude = Number(testStop.longitude);
                 }
             }
         },

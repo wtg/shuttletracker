@@ -20,10 +20,14 @@ export default class Stop {
         this.created = created;
         this.updated = updated;
     }
-    public asJSON(): { id: number; name: string;  } {
+    public asJSON(): {
+        name: string; description: string; latitude: number; longitude: number } {
         return {
-            id: this.id,
+            // id: this.id,
             name: this.name,
+            description: this.description,
+            latitude: this.latitude,
+            longitude: this.longitude,
         };
     }
 }
