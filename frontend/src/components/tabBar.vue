@@ -1,16 +1,22 @@
 <template>
   <ul>
     <router-link tag="li" to="/">
-      <span class="fas fa-location-arrow"></span>
-      Map
+      <span>
+        <span class="fas fa-location-arrow"></span>
+        Map
+      </span>
     </router-link>
     <router-link tag="li" to="/schedules">
-      <span class="fas fa-list-ul"></span>
-      Schedules
+      <span>
+        <span class="fas fa-list-ul"></span>
+        Schedules
+      </span>
     </router-link>
     <router-link tag="li" to="/settings">
-      <span class="fas fa-cog"></span>
-      Settings
+      <span>
+        <span class="fas fa-cog"></span>
+        Settings
+      </span>
     </router-link>
   </ul>
 </template>
@@ -23,6 +29,7 @@ export default Vue.extend({});
 </script>
 
 <style lang="scss" scoped>
+@import "@/assets/vars.scss";
 ul {
   display: flex;
   height: 40px;
@@ -31,7 +38,7 @@ ul {
   display: flex;
   padding: 0;
   margin: 0;
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
   width: 100%;
   border-top: 0.5px solid #eee;
@@ -42,8 +49,18 @@ ul {
 }
 li {
   cursor: pointer;
+  width: auto;
+  height: 100%;
+  padding: 5px 15px;
+  margin: 0 5px;
+  border-top: 1px solid rgba(0, 0, 0, 0);
+  position: relative;
+  top: -0.5px;
+  display: flex;
+  align-items: center;
 }
 .router-link-exact-active {
-  font-weight: 600;
+  border-top: 1px solid $primary;
+  color: $primary;
 }
 </style>
