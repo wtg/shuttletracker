@@ -1,6 +1,5 @@
 <template>
   <div class="parent content">
-    <router-link to="/">Back</router-link>
     <h2>About Shuttle Tracker</h2>
     <p>
       Shuttle Tracker is
