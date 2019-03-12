@@ -12,7 +12,6 @@
 
             <map-view v-if="false && !creation"></map-view>
             <place-stop v-if="creation"/>
-            <!-- <draw-route/> -->
         </div>
         <div class="form-horizontal column" >
             
@@ -23,8 +22,6 @@
                 <input v-model="stop.name" id="Name" name="Name" type="text" placeholder="Name" class="input" :disabled="!creation">
             </div>
             </div>
-
-            <!-- name, id, description, latitude, longitude, enabled-->
 
             <!-- Text input-->
             <div class="field">
@@ -50,26 +47,7 @@
             </div>
             </div>
 
-
-
-            <!-- Multiple Radios -->
-            <!-- <div class="field">
-            <label class="label" for="enabled">Show on map</label>
-            <div class="control">
-                <label class="radio" for="enabled-0">
-                <input @click="setEnabled(true);" :checked="route.enabled" type="radio" name="enabled" id="enabled-0" value="enabled">
-                yes
-                </label>
-                <label class="radio" for="enabled-1">
-                <input @click="setEnabled(false);" :checked="!route.enabled" type="radio" name="enabled" id="enabled-1" value="disabled">
-                no
-                </label>
-            </div>
-            </div>
-            <div class="field">
-                <label class="label">Schedule Editor</label>
-                <schedule-editor v-model="route.schedule" />
-            </div> -->
+            <!-- Submit -->
             <div class="field">
             <div class="control">
                 <button @click="send" v-if="formValid" :class="{'is-loading': this.sending}" class="button is-info">Save</button>
@@ -87,7 +65,6 @@ import Stop from '../../structures/stop';
 import scheduleEditor from '@/components/admin/scheduleEditor.vue';
 import AdminServiceProvider from '../../structures/serviceproviders/admin.service';
 import placeStop from '@/components/admin/placeStop.vue';
-// import drawRoute from '@/components/admin/drawRoute.vue';
 import * as L from 'leaflet';
 
 
@@ -107,35 +84,34 @@ export default Vue.extend({
             failure: boolean;
         };
     },
-    // },
     components: {
         mapView,
         placeStop,
     },
-    // mounted() {
-    //     if (this.creation) {
-    //         return;
-    //     }
-    //     // if the routes are not in the state store yet, wait until they are
-    //     const el = this;
-    //     if (this.$store.getters.getRoutes.length === 0) {
-    //         this.$store.subscribe((mutation) => {
-    //             if (mutation.type === 'setRoutes') {
-    //                 el.grabMyRoute();
-    //             }
-    //         });
-    //     } else {
-    //         this.grabMyRoute();
-    //     }
-    // },
-    // watch: {
-    //     $route() {
-    //         if (this.creation) {
-    //             return;
-    //         }
-    //         this.grabMyRoute();
-    //     },
-    // },
+    mounted() {
+        if (this.creation) {
+            return;
+        }
+        // if the routes are not in the state store yet, wait until they are
+        const el = this;
+        if (this.$store.getters.getStops.length === 0) {
+            this.$store.subscribe((mutation) => {
+                if (mutation.type === 'setStops') {
+                    el.grabMyStop();
+                }
+            });
+        } else {
+            this.grabMyStop();
+        }
+    },
+    watch: {
+        $stop() {
+            if (this.creation) {
+                return;
+            }
+            this.grabMyStop();
+        },
+    },
     computed: {
         formValid(): boolean {
             return this.stop.name !== '';
@@ -144,10 +120,17 @@ export default Vue.extend({
     methods: {
         send() {
             this.sending = true;
+
+            // get most recent data
+            // may not be needed
+            this.grabMyStop();
+
+            // TODO:
+            // Error checking for edit or create
             AdminServiceProvider.NewStop(this.stop).then(() => {
                     this.sending = false;
                     this.success = true;
-                    this.$store.dispatch('grabRoutes');
+                    this.$store.dispatch('grabStops');
                     setTimeout(() => {
                         this.success = false;
                     }, 2000);
@@ -159,14 +142,22 @@ export default Vue.extend({
                     }, 2000);
                 });
         },
-
         // fetch all the fields of the stop
-        grabMyStop(){
+        grabMyStop() {
             for (let i = 0; i < this.$store.getters.getStops.length; i ++) {
-                console.log(i);
-            }
+                const testStop = this.$store.getters.getStops[i];
+                const id = this.stop.id;
 
-        }
+                // i have no idea how this statement works
+                if (Number(testStop.id) === Number(id)) {
+                    this.stop.id = testStop.id;
+                    this.stop.name = testStop.name;
+                    this.stop.description = testStop.description;
+                    this.stop.latitude = testStop.latitude;
+                    this.stop.longitude = testStop.longitude;
+                }
+            }
+        },
     },
     props: {
         creation: {

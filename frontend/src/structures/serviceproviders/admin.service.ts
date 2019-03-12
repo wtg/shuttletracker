@@ -48,7 +48,7 @@ export default class AdminServiceProvider {
         return fetch('/stops/create', {
             method: 'POST',
             body: JSON.stringify(stop.asJSON()),
-        }); 
+        });
     }
 
     public static SetMessage(message: AdminMessageUpdate): Promise<Response> {
