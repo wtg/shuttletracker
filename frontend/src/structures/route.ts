@@ -12,6 +12,7 @@ export interface RouteInterface {
         latitude: number,
         longitude: number,
     }>;
+    stop_ids: number[];
 }
 
 /**
@@ -30,12 +31,13 @@ export default class Route implements RouteInterface {
         latitude: number,
         longitude: number,
     }>;
+    public stop_ids: number[];
 
     constructor(id: number, name: string, description: string, enabled: boolean,
                 color: string, width: number, points: Array<{
             latitude: number,
             longitude: number,
-        }>,     schedule: routeScheduleInterval[], active: boolean) {
+        }>,     schedule: routeScheduleInterval[], active: boolean, stop_ids: number[]) {
 
         this.active = active;
         this.id = id;
@@ -46,10 +48,20 @@ export default class Route implements RouteInterface {
         this.width = Number(width);
         this.points = points;
         this.schedule = schedule;
+        this.stop_ids = stop_ids;
     }
 
     public shouldShow(): boolean {
         return this.enabled && this.active;
+    }
+
+    public containsStop(stop_id: number): boolean {
+        for (const id of this.stop_ids) {
+            if (id === stop_id) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
