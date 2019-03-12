@@ -47,15 +47,6 @@ const store: StoreOptions<StoreState> = {
           }
         });
       });
-
-      // set any routes on existing stops
-      state.Stops.forEach((stop: Stop) => {
-        state.Routes.forEach((route: Route) => {
-          if (route.containsStop(stop.id) && route.active) {
-            stop.addRoute(route);
-          }
-        });
-      });
     },
     setStops(state, Stops: Stop[]) {
       state.Stops = Stops;
@@ -111,6 +102,16 @@ const store: StoreOptions<StoreState> = {
     },
     setGeolocationDenied(state, value: boolean) {
       state.geolocationDenied = value;
+    },
+    setRoutesOnStops(state) {
+      // set any routes on existing stops
+      state.Stops.forEach((stop: Stop) => {
+        state.Routes.forEach((route: Route) => {
+          if (route.containsStop(stop.id) && route.active) {
+            stop.addRoute(route);
+          }
+        });
+      });
     },
   },
   getters: {

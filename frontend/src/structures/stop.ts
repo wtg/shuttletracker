@@ -42,10 +42,13 @@ export class Stop {
     }
 
     public getMessage(): string {
-        const msg = this.name +
-                  ` is${this.routesOn.length > 0 ? ' on' : 'n\'t on a'} route${this.routesOn.length > 1 ? 's' : ''} `
-                  + this.routesOn.map((route: Route) => `<i>${route.name}</i>`).join(', ');
-        return msg;
+        if (this.routesOn.length > 0) {
+            return  this.name +
+                    ` is on route${this.routesOn.length > 1 ? 's' : ''} `
+                    + this.routesOn.map((route: Route) => `<i>${route.name}</i>`).join(', ');
+        } else {
+            return this.name;
+        }
     }
 
     public addRoute(route: Route): void {

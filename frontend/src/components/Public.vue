@@ -64,7 +64,7 @@ export default Vue.extend({
     const ls = UserLocationService.getInstance();
 
     const a = new InfoService();
-    this.$store.dispatch('grabStops').then(() => this.$store.dispatch('grabRoutes'));
+    Promise.all([this.$store.dispatch('grabStops'), this.$store.dispatch('grabRoutes')]);
     this.$store.dispatch('grabVehicles');
     this.$store.dispatch('grabUpdates');
     this.$store.dispatch('grabAdminMesssage');
@@ -104,6 +104,7 @@ export default Vue.extend({
     this.$store.subscribe((mutation: any, state: any) => {
       if (mutation.type === 'setRoutes') {
         this.renderRoutes();
+        this.updateStops();
         this.renderStops();
         this.updateLegend();
       }
@@ -270,6 +271,9 @@ export default Vue.extend({
     },
     busClicked() {
       this.fusion.sendBusButton();
+    },
+    updateStops() {
+      this.$store.commit('setRoutesOnStops');
     },
   },
   components: {
