@@ -20,4 +20,10 @@ export default class Stop {
         this.created = created;
         this.updated = updated;
     }
+    public asJSON(): { id: number; name: string;  } {
+        return {
+            id: this.id,
+            name: this.name,
+        };
+    }
 }

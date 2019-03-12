@@ -144,7 +144,29 @@ export default Vue.extend({
     methods: {
         send() {
             this.sending = true;
+            AdminServiceProvider.NewStop(this.stop).then(() => {
+                    this.sending = false;
+                    this.success = true;
+                    this.$store.dispatch('grabRoutes');
+                    setTimeout(() => {
+                        this.success = false;
+                    }, 2000);
+                }).catch(() => {
+                    this.failure = true;
+                    this.sending = false;
+                    setTimeout(() => {
+                        this.failure = false;
+                    }, 2000);
+                });
         },
+
+        // fetch all the fields of the stop
+        grabMyStop(){
+            for (let i = 0; i < this.$store.getters.getStops.length; i ++) {
+                console.log(i);
+            }
+
+        }
     },
     props: {
         creation: {
