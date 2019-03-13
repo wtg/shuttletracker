@@ -5,6 +5,7 @@ import Route from '@/structures/route';
 import InfoServiceProvider from '@/structures/serviceproviders/info.service';
 import Stop from '@/structures/stop';
 import Vehicle from '@/structures/vehicle';
+import ETA from '@/structures/eta';
 import * as L from 'leaflet';
 import Update from '@/structures/update';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
@@ -23,10 +24,12 @@ const store: StoreOptions<StoreState> = {
     Routes: [],
     Stops: [],
     Vehicles: [],
+    etas: [],
     adminMessage: undefined,
     online: true,
     settings: {
       busButtonEnabled: false,
+      etasEnabled: false,
       fusionPositionEnabled: true,
     },
     geolocationDenied: false,
@@ -85,6 +88,18 @@ const store: StoreOptions<StoreState> = {
     addAdminMessage(state, message: AdminMessageUpdate) {
       state.adminMessage = message;
     },
+    updateETAs(state, { vehicleID, etas }) {
+      // remove all older etas for this vehicle
+      for (let i = state.etas.length - 1; i >= 0; i--) {
+        if (vehicleID === state.etas[i].vehicleID) {
+          state.etas.splice(i, 1);
+        }
+      }
+
+      for (const eta of etas) {
+        state.etas.push(eta);
+      }
+    },
     initializeSettings(state) {
       const savedSettings = localStorage.getItem('st_settings');
       if (!savedSettings) {
@@ -94,6 +109,10 @@ const store: StoreOptions<StoreState> = {
     },
     setSettingsBusButtonEnabled(state, value: boolean) {
       state.settings.busButtonEnabled = value;
+      localStorage.setItem('st_settings', JSON.stringify(state.settings));
+    },
+    setSettingsETAsEnabled(state, value: boolean) {
+      state.settings.etasEnabled = value;
       localStorage.setItem('st_settings', JSON.stringify(state.settings));
     },
     setSettingsFusionPositionEnabled(state, value: boolean) {

@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/websocket"
 
 	"github.com/wtg/shuttletracker/log"
+	"github.com/wtg/shuttletracker/eta"
 )
 
 var upgrader = websocket.Upgrader{
@@ -34,6 +35,8 @@ type fusionMessageSubscribe struct {
 type fusionMessageUnsubscribe struct {
 	Topic string `json:"topic"`
 }
+
+type fusionMessageETAs []eta.VehicleETA
 
 type fusionPosition struct {
 	Latitude  float64 `json:"latitude"`
@@ -72,6 +75,11 @@ type clientMessage struct {
 	msg      interface{}
 }
 
+type serverMessage struct {
+	topic string
+	msg interface{}
+}
+
 type fusionManagerDebug struct {
 	// subscriptions    []sub
 	clients        []fusionClient
@@ -84,6 +92,7 @@ type fusionManager struct {
 	removeClient chan string
 
 	clientMsg chan clientMessage
+	serverMsg chan serverMessage
 
 	// This is a little gnarly... basically we can ask fusionManager to send some
 	// information about itself to a channel so that we don't have to put its internal
@@ -102,16 +111,18 @@ type fusionManager struct {
 	busButtonCount uint64
 }
 
-func newFusionManager() *fusionManager {
+func newFusionManager(etaManager *eta.ETAManager) *fusionManager {
 	fm := &fusionManager{
 		addClient:     make(chan *fusionClient),
 		removeClient:  make(chan string),
 		clientMsg:     make(chan clientMessage),
+		serverMsg:     make(chan serverMessage),
 		debug:         make(chan chan *fusionManagerDebug),
 		clients:       map[string]*fusionClient{},
 		tracks:        map[string][]fusionPosition{},
 		subscriptions: map[string][]string{},
 	}
+	etaManager.Subscribe(fm.handleETA)
 	go fm.run()
 	return fm
 }
@@ -128,10 +139,29 @@ func (fm *fusionManager) run() {
 			fm.processRemoveClient(clientID)
 		case cm := <-fm.clientMsg:
 			fm.processMessage(cm)
+		case sm := <-fm.serverMsg:
+			fm.processServerMessage(sm)
 		case debugChan := <-fm.debug:
 			fm.processDebug(debugChan)
 		}
 	}
+}
+
+func (fm *fusionManager) sendToTopic(topic string, msg fusionMessageEnvelope) {
+	sm := serverMessage{
+		topic: topic,
+		msg: msg,
+	}
+	fm.serverMsg <- sm
+}
+
+// this is a callback for ETAManager to inform Fusion to push out a new ETA
+func (fm *fusionManager) handleETA(eta eta.VehicleETA) {
+	fme := fusionMessageEnvelope{
+		Type: "eta",
+		Message: eta,
+	}
+	fm.sendToTopic("eta", fme)
 }
 
 func decodeFusionMessage(r io.Reader) (string, json.RawMessage, error) {
@@ -195,6 +225,23 @@ func (fm *fusionManager) processMessage(cm clientMessage) {
 		// the channel, probably by handleClient. This shouldn't happen, so please fix
 		// it if it does (make sure all possible message types are being handled).
 		log.Errorf("unknown message type \"%s\"", t)
+	}
+}
+
+func (fm *fusionManager) processServerMessage(sm serverMessage) {
+	b, err := json.Marshal(sm.msg)
+	if err != nil {
+		log.WithError(err).Error("unable to marshal")
+		return
+	}
+
+	// find clients subscribed to topic
+	for _, clientID := range fm.subscriptions[sm.topic] {
+		client := fm.clients[clientID]
+		err = client.conn.WriteMessage(websocket.TextMessage, b)
+		if err != nil {
+			log.WithError(err).Error("unable to write")
+		}
 	}
 }
 

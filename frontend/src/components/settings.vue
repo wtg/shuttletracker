@@ -11,6 +11,10 @@
       <p class="help">Place a bus on other users' maps and let others place buses on your map.</p>
     </div>
 
+    <b-field message="Warning: this feature is experimental. You’re not allowed to get mad at us if you miss your shuttle.">
+      <b-switch v-model="etasEnabled">Estimated times of arrival</b-switch>
+    </b-field>
+
     <router-link to="/about">About and privacy policy</router-link>
   </div>
 </template>
@@ -39,6 +43,14 @@ export default Vue.extend({
     geolocationDenied: {
       get(): boolean {
         return this.$store.state.geolocationDenied;
+      },
+    },
+    etasEnabled: {
+      get(): boolean {
+        return this.$store.state.settings.etasEnabled;
+      },
+      set(value: boolean) {
+        this.$store.commit('setSettingsETAsEnabled', value);
       },
     },
   },

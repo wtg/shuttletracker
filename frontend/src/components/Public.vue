@@ -19,6 +19,7 @@ import InfoService from '../structures/serviceproviders/info.service';
 import Vehicle from '../structures/vehicle';
 import Route from '../structures/route';
 import Stop from '../structures/stop';
+import ETA from '@/structures/eta';
 import messagebox from './adminmessage.vue';
 import * as L from 'leaflet';
 import { setTimeout, setInterval } from 'timers';
@@ -55,6 +56,7 @@ export default Vue.extend({
       legend: new L.Control({ position: 'bottomleft' }),
       locationMarker: undefined,
       fusion: new Fusion(),
+      etaMessage: undefined,
     } as {
         vehicles: Vehicle[];
         routes: Route[];
@@ -67,6 +69,7 @@ export default Vue.extend({
         locationMarker: L.Marker | undefined;
         userShuttleidCount: number;
         fusion: Fusion;
+        etaMessage: string | undefined;
       };
   },
   mounted() {
@@ -122,11 +125,16 @@ export default Vue.extend({
       if (mutation.type === 'setVehicles') {
         this.addVehicles();
       }
+      if (mutation.type === 'updateETA') {
+        this.updateETA();
+      }
     });
-
     this.fusion.start();
     this.fusion.registerMessageReceivedCallback(this.saucyspawn);
-    this.fusion.subscribe('testsub');
+
+    ls.registerCallback((position) => {
+      this.updateETA();
+    });
   },
   computed: {
     message(): AdminMessageUpdate {
@@ -134,6 +142,9 @@ export default Vue.extend({
     },
     busButtonActive(): boolean {
       return this.$store.getters.getBusButtonVisible;
+    },
+    shouldShowETAMessage(): boolean {
+      return true
     },
   },
   methods: {
@@ -287,12 +298,87 @@ export default Vue.extend({
     busClicked() {
       this.fusion.sendBusButton();
     },
+    updateETA() {
+      // find nearest stop
+      const pos = UserLocationService.getInstance().getCurrentLocation();
+      if (pos === undefined) {
+        return;
+      }
+      const c = pos.coords as Coordinates;
+
+      let minDistance = Infinity;
+      let closestStop: Stop | null = null;
+      for (const stop of this.$store.state.Stops) {
+        const d = Math.hypot(c.longitude-stop.longitude, c.latitude-stop.latitude);
+        if (d < minDistance) {
+          minDistance = d;
+          closestStop = stop;
+        }
+      }
+      if (closestStop === null) {
+        return;
+      }
+      
+
+      // do we have an ETA for this stop?
+      let eta: ETA | null = null;
+      for (const e of this.$store.state.etas) {
+        if (e.stopID === closestStop.id) {
+          eta = e;
+          break;
+        }
+      }
+      // console.log(closestStop);
+      if (eta === null) {
+        return;
+      }
+
+      // get associated route
+      let route: Route | null = null;
+      for (const r of this.$store.state.Routes) {
+        if (r.id === eta.routeID) {
+          route = r;
+          break;
+        } 
+      }
+      if (route === null) {
+        return;
+      }
+
+      const now = new Date();
+      let newMessage = `${route.name} shuttle arriving at ${closestStop.name} in ${relativeTime(now, eta.eta)}`;
+
+      // show notification if message has changed
+      if (newMessage !== this.etaMessage) {
+        this.$snackbar.open({
+          message: newMessage,
+          position: 'is-top',
+          container: '#mymap',
+          type: 'is-primary',
+          duration: 10000,
+          indefinite: false,
+        });
+        this.etaMessage = newMessage;
+      }
+    },
   },
   components: {
     messagebox,
     BusButton,
   },
 });
+
+function relativeTime(now: Date, future: Date): string {
+  const minuteMs = 60 * 1000;
+  const elapsed = future.getTime() - now.getTime();
+  
+  // cap display at thirty
+  if (elapsed < minuteMs * 30) {
+    return `${Math.round(elapsed/minuteMs)} minutes`;
+  }
+
+  return 'a while';
+}
 </script>
 
 <style lang="scss">
@@ -375,10 +461,19 @@ export default Vue.extend({
   height: 20px !important;
 
 }
+
 #busbutton{
   position: absolute; 
   right: 25px; 
   bottom: 35px; 
   z-index: 2000;
+}
+
+// this is for the snackbar—we want it over the map and not under title bar or tab bar
+.notices {
+  position: absolute !important;
+}
+.snackbar {
+  font-size: initial;
 }
 </style>

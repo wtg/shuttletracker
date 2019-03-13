@@ -62,7 +62,7 @@ var rootCmd = &cobra.Command{
 		runner.Add(etaManager)
 
 		// Make API server
-		api, err := api.New(*cfg.API, ms, msg, us, updater)
+		api, err := api.New(*cfg.API, ms, msg, us, updater, etaManager)
 		if err != nil {
 			log.WithError(err).Error("Could not create API server.")
 			return

@@ -4,6 +4,7 @@ import Public from './components/Public.vue';
 import about from './components/about.vue';
 import schedules from '@/components/schedules.vue';
 import settings from '@/components/settings.vue';
+import etas from '@/components/etas.vue';
 
 Vue.use(Router);
 
@@ -19,6 +20,11 @@ export default new Router({
       path: '/about',
       name: 'about',
       component: about,
+    },
+    {
+      path: '/etas',
+      name: 'etas',
+      component: etas,
     },
     {
       path: '/schedules',

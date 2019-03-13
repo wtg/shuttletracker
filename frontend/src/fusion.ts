@@ -1,5 +1,6 @@
 import UserLocationService from '@/structures/userlocation.service';
 import store from '@/store';
+import ETA from '@/structures/eta';
 
 // SocketManager wraps a WebSocket in order to provide guarantees about
 // reliability, reconnections, retries, etc.
@@ -25,6 +26,7 @@ class SocketManager {
     public open() {
         this.createSocket().then((ws) => {
             this.ws = ws;
+            this.flushQueue();
         });
     }
 
@@ -144,6 +146,19 @@ export default class Fusion {
         if (store.state.settings.busButtonEnabled === true) {
             this.subscribe('bus_button');
         }
+
+        // subscribe to estimated times of arrival
+        store.watch((state) => state.settings.etasEnabled, (newValue, oldValue) => {
+            if (newValue === true) {
+                this.subscribe('eta');
+            } else {
+                this.unsubscribe('eta');
+            }
+        });
+        if (store.state.settings.etasEnabled === true) {
+            this.subscribe('eta');
+        }
+        this.registerMessageReceivedCallback(this.handleETAs);
     }
 
     public registerMessageReceivedCallback(callback: (message: {}) => any) {
@@ -191,6 +206,19 @@ export default class Fusion {
             message: { topic },
         };
         this.ws.send(JSON.stringify(data));
+    }
+
+    private handleETAs(message: any) {
+        if (message.type !== 'eta') {
+            return;
+        }
+
+        const etas = new Array<ETA>();
+        for (const stopETA of message.message.stop_etas) {
+            const eta = new ETA(stopETA.stop_id, message.message.vehicle_id, new Date(stopETA.eta), message.message.route_id);
+            etas.push(eta);
+        }
+        store.commit('updateETAs', { vehicleID: message.message.vehicle_id, etas });
     }
 
     private generateUUID() {
