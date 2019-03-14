@@ -1,6 +1,6 @@
 import Route, { RouteInterface } from '../route';
 import Vehicle from '../vehicle';
-import Stop from '../stop';
+import { Stop } from '../stop';
 import AdminMessageUpdate from '../adminMessageUpdate';
 
 export default class AdminServiceProvider {

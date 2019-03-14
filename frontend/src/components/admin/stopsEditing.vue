@@ -61,7 +61,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import mapView from '@/components/admin/map.vue'; // for clicking on a point and inserting a stop
-import Stop from '../../structures/stop';
+import { Stop } from '../../structures/stop';
 import scheduleEditor from '@/components/admin/scheduleEditor.vue';
 import AdminServiceProvider from '../../structures/serviceproviders/admin.service';
 import placeStop from '@/components/admin/placeStop.vue';
