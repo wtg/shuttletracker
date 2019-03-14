@@ -246,8 +246,6 @@ func (fm *fusionManager) processServerMessage(sm serverMessage) {
 }
 
 func (fm *fusionManager) handleMsgSubscribe(clientID string, fms fusionMessageSubscribe) {
-	log.Debugf("new subscribe: %+v", fms)
-
 	// grab the list of existing subscriptions
 	subs := fm.subscriptions[fms.Topic]
 	if subs == nil {
@@ -267,8 +265,6 @@ func (fm *fusionManager) handleMsgSubscribe(clientID string, fms fusionMessageSu
 }
 
 func (fm *fusionManager) handleMsgUnsubscribe(clientID string, fmu fusionMessageUnsubscribe) {
-	log.Debugf("new unsubscribe: %+v", fmu)
-
 	subs := fm.subscriptions[fmu.Topic]
 	for i, subbedClient := range subs {
 		if subbedClient == clientID {
@@ -285,12 +281,10 @@ func (fm *fusionManager) handleMsgUnsubscribe(clientID string, fmu fusionMessage
 
 func (fm *fusionManager) handleMsgPosition(fp fusionPosition) {
 	fp.Time = time.Now()
-	log.Debugf("new position: %+v", fp)
 	fm.tracks[fp.Track] = append(fm.tracks[fp.Track], fp)
 }
 
 func (fm *fusionManager) handleMsgBusButton(fbb fusionBusButton) {
-	log.Debugf("new bus button: %+v", fbb)
 	fm.busButtonCount++
 	fme := fusionMessageEnvelope{
 		Type:    "bus_button",

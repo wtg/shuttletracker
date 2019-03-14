@@ -89,13 +89,16 @@ const store: StoreOptions<StoreState> = {
       state.adminMessage = message;
     },
     updateETAs(state, { vehicleID, etas }) {
-      // remove all older etas for this vehicle
+      // remove all older etas for this vehicle or any ETA that has expired
+      const now = new Date();
       for (let i = state.etas.length - 1; i >= 0; i--) {
-        if (vehicleID === state.etas[i].vehicleID) {
+        const eta = state.etas[i];
+        if (vehicleID === eta.vehicleID || eta.eta < now) {
           state.etas.splice(i, 1);
         }
       }
 
+      // store new ETAs
       for (const eta of etas) {
         state.etas.push(eta);
       }

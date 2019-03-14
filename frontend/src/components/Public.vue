@@ -144,7 +144,7 @@ export default Vue.extend({
       return this.$store.getters.getBusButtonVisible;
     },
     shouldShowETAMessage(): boolean {
-      return true
+      return this.$store.state.settings.etasEnabled;
     },
   },
   methods: {
@@ -309,7 +309,7 @@ export default Vue.extend({
       let minDistance = Infinity;
       let closestStop: Stop | null = null;
       for (const stop of this.$store.state.Stops) {
-        const d = Math.hypot(c.longitude-stop.longitude, c.latitude-stop.latitude);
+        const d = Math.hypot(c.longitude - stop.longitude, c.latitude - stop.latitude);
         if (d < minDistance) {
           minDistance = d;
           closestStop = stop;
@@ -318,17 +318,17 @@ export default Vue.extend({
       if (closestStop === null) {
         return;
       }
-      
 
-      // do we have an ETA for this stop?
+      // do we have an ETA for this stop? find the next soonest
       let eta: ETA | null = null;
       for (const e of this.$store.state.etas) {
         if (e.stopID === closestStop.id) {
-          eta = e;
-          break;
+          // is this the soonest?
+          if (eta === null || e.eta < eta.eta) {
+            eta = e;
+          }
         }
       }
-      // console.log(closestStop);
       if (eta === null) {
         return;
       }
@@ -339,14 +339,19 @@ export default Vue.extend({
         if (r.id === eta.routeID) {
           route = r;
           break;
-        } 
+        }
       }
       if (route === null) {
         return;
       }
 
       const now = new Date();
-      let newMessage = `${route.name} shuttle arriving at ${closestStop.name} in ${relativeTime(now, eta.eta)}`;
+
+      let newMessage = `${route.name} shuttle arriving at ${closestStop.name}`;
+      // more than 1 min 30 sec?
+      if (eta.eta.getTime() - now.getTime() > 1.5 * 60 * 1000) {
+        newMessage += ` in ${relativeTime(now, eta.eta)}`;
+      }
 
       // show notification if message has changed
       if (newMessage !== this.etaMessage) {
@@ -368,13 +373,13 @@ export default Vue.extend({
   },
 });
 
-function relativeTime(now: Date, future: Date): string {
+function relativeTime(from: Date, to: Date): string {
   const minuteMs = 60 * 1000;
-  const elapsed = future.getTime() - now.getTime();
-  
-  // cap display at thirty
+  const elapsed = to.getTime() - from.getTime();
+
+  // cap display at thirty min
   if (elapsed < minuteMs * 30) {
-    return `${Math.round(elapsed/minuteMs)} minutes`;
+    return `${Math.round(elapsed / minuteMs)} minutes`;
   }
 
   return 'a while';
