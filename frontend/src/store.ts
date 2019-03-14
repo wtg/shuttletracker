@@ -3,7 +3,7 @@ import Vuex, { StoreOptions } from 'vuex';
 import { StoreState } from '@/StoreState';
 import Route from '@/structures/route';
 import InfoServiceProvider from '@/structures/serviceproviders/info.service';
-import Stop from '@/structures/stop';
+import { Stop } from '@/structures/stop';
 import Vehicle from '@/structures/vehicle';
 import * as L from 'leaflet';
 import Update from '@/structures/update';
@@ -102,6 +102,16 @@ const store: StoreOptions<StoreState> = {
     },
     setGeolocationDenied(state, value: boolean) {
       state.geolocationDenied = value;
+    },
+    setRoutesOnStops(state) {
+      // set any routes on existing stops
+      state.Stops.forEach((stop: Stop) => {
+        state.Routes.forEach((route: Route) => {
+          if (route.containsStop(stop.id) && route.active) {
+            stop.addRoute(route);
+          }
+        });
+      });
     },
   },
   getters: {

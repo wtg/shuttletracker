@@ -40,7 +40,7 @@
 </template>
 <script lang="ts">
 import Vue from 'vue';
-import Stop from '@/structures/stop';
+import { Stop } from '@/structures/stop';
 export default Vue.extend({
     name: 'stops',
 
