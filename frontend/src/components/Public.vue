@@ -207,9 +207,10 @@ export default Vue.extend({
           icon: StopIcon,
         });
         if (this.Map !== undefined) {
-          var stop_link = stop.name.link('/register');
-
-          marker.bindPopup(stop_link);
+          let stop_link = ('/register').concat('?stop_id=');
+          stop_link = stop_link.concat(stop.id);
+          console.log(stop_link);
+          marker.bindPopup(stop.name.link(stop_link));
           marker.addTo(this.Map);
         }
       });
