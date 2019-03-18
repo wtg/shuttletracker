@@ -352,6 +352,7 @@ export default Vue.extend({
       if (eta.eta.getTime() - now.getTime() > 1.5 * 60 * 1000) {
         newMessage += ` in ${relativeTime(now, eta.eta)}`;
       }
+      newMessage += '.';
 
       // show notification if message has changed
       if (newMessage !== this.etaMessage) {

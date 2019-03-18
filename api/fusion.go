@@ -77,6 +77,7 @@ type clientMessage struct {
 
 type serverMessage struct {
 	topic string
+	clientID string
 	msg interface{}
 }
 
@@ -105,10 +106,13 @@ type fusionManager struct {
 	// Clients can subscribe to topics that they're interested in. We only track
 	// their IDs here.
 	subscriptions map[string][]string
+	subscribeCallbacks map[string][]func(string)
 
 	clients        map[string]*fusionClient
 	tracks         map[string][]fusionPosition
 	busButtonCount uint64
+
+	em *eta.ETAManager
 }
 
 func newFusionManager(etaManager *eta.ETAManager) *fusionManager {
@@ -116,13 +120,22 @@ func newFusionManager(etaManager *eta.ETAManager) *fusionManager {
 		addClient:     make(chan *fusionClient),
 		removeClient:  make(chan string),
 		clientMsg:     make(chan clientMessage),
-		serverMsg:     make(chan serverMessage),
+		serverMsg:     make(chan serverMessage, 50),
 		debug:         make(chan chan *fusionManagerDebug),
 		clients:       map[string]*fusionClient{},
 		tracks:        map[string][]fusionPosition{},
 		subscriptions: map[string][]string{},
+		subscribeCallbacks: map[string][]func(string){},
+		em: etaManager,
 	}
+
+	// get notified of new ETAs to push out to the ETA topic
 	etaManager.Subscribe(fm.handleETA)
+
+	// add some subscription callbacks (this could be moved into a method on
+	// ETAManager in the future).
+	fm.subscribeCallbacks["eta"] = []func(string){fm.handleETASubscribe}
+
 	go fm.run()
 	return fm
 }
@@ -155,6 +168,14 @@ func (fm *fusionManager) sendToTopic(topic string, msg fusionMessageEnvelope) {
 	fm.serverMsg <- sm
 }
 
+func (fm *fusionManager) sendToClient(clientID string, msg fusionMessageEnvelope) {
+	sm := serverMessage{
+		clientID: clientID,
+		msg: msg,
+	}
+	fm.serverMsg <- sm
+}
+
 // this is a callback for ETAManager to inform Fusion to push out a new ETA
 func (fm *fusionManager) handleETA(eta eta.VehicleETA) {
 	fme := fusionMessageEnvelope{
@@ -162,6 +183,19 @@ func (fm *fusionManager) handleETA(eta eta.VehicleETA) {
 		Message: eta,
 	}
 	fm.sendToTopic("eta", fme)
+}
+
+// this is a callback for Fusion to immediately push out ETAs to newly-subscribed clients
+func (fm *fusionManager) handleETASubscribe(clientID string) {
+	log.Info("handleETASubscribe")
+	for _, eta := range fm.em.CurrentETAs() {
+		log.Infof("%+v", eta)
+		fme := fusionMessageEnvelope{
+			Type: "eta",
+			Message: eta,
+		}
+		fm.sendToClient(clientID, fme)
+	}
 }
 
 func decodeFusionMessage(r io.Reader) (string, json.RawMessage, error) {
@@ -228,6 +262,8 @@ func (fm *fusionManager) processMessage(cm clientMessage) {
 	}
 }
 
+// Send a message from the server to either all clients subscribed to a topic or
+// only a specific client by its ID.
 func (fm *fusionManager) processServerMessage(sm serverMessage) {
 	b, err := json.Marshal(sm.msg)
 	if err != nil {
@@ -235,13 +271,33 @@ func (fm *fusionManager) processServerMessage(sm serverMessage) {
 		return
 	}
 
-	// find clients subscribed to topic
-	for _, clientID := range fm.subscriptions[sm.topic] {
-		client := fm.clients[clientID]
+	if len(sm.topic) > 0 {
+		// find clients subscribed to topic
+		for _, clientID := range fm.subscriptions[sm.topic] {
+			client, ok := fm.clients[clientID]
+			if !ok {
+				log.Error("client not found")
+				continue
+			}
+			err = client.conn.WriteMessage(websocket.TextMessage, b)
+			if err != nil {
+				log.WithError(err).Error("unable to write")
+				continue
+			}
+		}
+	} else if len(sm.clientID) > 0 {
+		client, ok := fm.clients[sm.clientID]
+		if !ok {
+			log.Error("client not found")
+			return
+		}
 		err = client.conn.WriteMessage(websocket.TextMessage, b)
 		if err != nil {
 			log.WithError(err).Error("unable to write")
+			return
 		}
+	} else {
+		log.Error("neither topic nor client ID found on serverMessage")
 	}
 }
 
@@ -262,6 +318,14 @@ func (fm *fusionManager) handleMsgSubscribe(clientID string, fms fusionMessageSu
 
 	subs = append(subs, clientID)
 	fm.subscriptions[fms.Topic] = subs
+
+	// If this topic has a subscription callback, hit it.
+	// Future optimization: this should probably hit all callbacks concurrently.
+	if cbs, ok := fm.subscribeCallbacks[fms.Topic]; ok {
+		for _, cb := range cbs {
+			cb(clientID)
+		}
+	}
 }
 
 func (fm *fusionManager) handleMsgUnsubscribe(clientID string, fmu fusionMessageUnsubscribe) {

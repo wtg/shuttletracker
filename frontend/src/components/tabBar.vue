@@ -8,9 +8,9 @@
       <span class="fas fa-list-ul"></span>
       Schedules
     </router-link>
-    <router-link v-if="etasEnabled" tag="li" to="/etas">
+    <!-- <router-link v-if="etasEnabled" tag="li" to="/etas">
       ETAs
-    </router-link>
+    </router-link> -->
     <router-link tag="li" to="/settings">
       <span class="fas fa-cog"></span>
       Settings
