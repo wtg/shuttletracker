@@ -19,7 +19,7 @@ import Vue from 'vue';
 import InfoService from '../structures/serviceproviders/info.service';
 import Vehicle from '../structures/vehicle';
 import Route from '../structures/route';
-import Stop from '../structures/stop';
+import { Stop, StopSVG } from '../structures/stop';
 import ETA from '@/structures/eta';
 import messagebox from './adminmessage.vue';
 import * as L from 'leaflet';
@@ -32,16 +32,7 @@ import BusButton from '@/components/busbutton.vue';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 import ETAMessage from '@/components/etaMessage.vue';
 
-const StopSVG = require('@/assets/circle.svg') as string;
 const UserSVG = require('@/assets/user.svg') as string;
-
-const StopIcon = L.icon({
-  iconUrl: StopSVG,
-  iconSize: [12, 12], // size of the icon
-  iconAnchor: [6, 6], // point of the icon which will correspond to marker's location
-  shadowAnchor: [6, 6], // the same for the shadow
-  popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
-});
 
 export default Vue.extend({
   name: 'Public',
@@ -78,8 +69,7 @@ export default Vue.extend({
     const ls = UserLocationService.getInstance();
 
     const a = new InfoService();
-    this.$store.dispatch('grabRoutes');
-    this.$store.dispatch('grabStops');
+    Promise.all([this.$store.dispatch('grabStops'), this.$store.dispatch('grabRoutes')]);
     this.$store.dispatch('grabVehicles');
     this.$store.dispatch('grabUpdates');
     this.$store.dispatch('grabAdminMesssage');
@@ -119,10 +109,9 @@ export default Vue.extend({
     this.$store.subscribe((mutation: any, state: any) => {
       if (mutation.type === 'setRoutes') {
         this.renderRoutes();
-        this.updateLegend();
-      }
-      if (mutation.type === 'setStops') {
+        this.updateStops();
         this.renderStops();
+        this.updateLegend();
       }
       if (mutation.type === 'setVehicles') {
         this.addVehicles();
@@ -214,12 +203,9 @@ export default Vue.extend({
     },
     renderStops() {
       this.$store.state.Stops.forEach((stop: Stop) => {
-        const marker = L.marker([stop.latitude, stop.longitude], {
-          icon: StopIcon,
-        });
         if (this.Map !== undefined) {
-          marker.bindPopup(stop.name);
-          marker.addTo(this.Map);
+          stop.marker.bindPopup(stop.getMessage());
+          stop.marker.addTo(this.Map);
         }
       });
     },
@@ -345,6 +331,9 @@ export default Vue.extend({
       }
 
       this.currentETAInfo = {eta, route, stop: closestStop};
+    },
+    updateStops() {
+      this.$store.commit('setRoutesOnStops');
     },
   },
   components: {

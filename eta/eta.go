@@ -100,7 +100,7 @@ func (em *ETAManager) handleNewLocation(loc *shuttletracker.Location) {
 	vehicleID := *loc.VehicleID
 	eta, err := em.calculateVehicleETAs(vehicleID)
 	if err != nil {
-		log.WithError(err).Errorf("unable to calculate ETAss for vehicle ID %d", vehicleID)
+		log.WithError(err).Errorf("unable to calculate ETAs for vehicle ID %d", vehicleID)
 		return
 	}
 
