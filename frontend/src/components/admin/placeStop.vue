@@ -40,6 +40,8 @@ export default Vue.extend({
                     const el = this;
                     this.Map.on('click', (e: any) => {
                             this.coordinates = (e as any).latlng;
+                            // sends the coordinates to the form
+                            this.$emit('coordinates', this.coordinates);
                     });
                     this.Map.invalidateSize();
 

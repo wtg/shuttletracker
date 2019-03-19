@@ -11,7 +11,7 @@
             </div>
 
             <map-view v-if="false && !creation"></map-view>
-            <place-stop v-if="creation"/>
+            <place-stop v-if="creation" @coordinates="setCoordinates"/>
         </div>
         <div class="form-horizontal column" >
             
@@ -141,6 +141,13 @@ export default Vue.extend({
                         this.failure = false;
                     }, 2000);
                 });
+        },
+
+        // method responsible for setting the reactive forms
+        setCoordinates(coordinates: L.LatLng) {
+            this.stop.latitude = coordinates.lat;
+            this.stop.longitude = coordinates.lng;
+
         },
         // fetch all the fields of the stop
         grabMyStop() {
