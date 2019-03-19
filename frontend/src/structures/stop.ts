@@ -60,8 +60,8 @@ export class Stop {
             // id: this.id,
             name: this.name,
             description: this.description,
-            latitude: this.latitude,
-            longitude: this.longitude,
+            latitude: Number(this.latitude),
+            longitude: Number(this.longitude),
         };
     }
 }
