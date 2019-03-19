@@ -24,10 +24,6 @@ type Config struct {
 	Authenticate         bool
 	ListenURL            string
 	MapboxAPIKey         string
-
-	// OSRMUpstreamURL is where Shuttle Tracker can find an OSRM instance for ETAs.
-	// It proxies requests to /api/osrm to this URL.
-	OSRMUpstreamURL string
 }
 
 // API is responsible for configuring handlers for HTTP endpoints.
@@ -39,7 +35,6 @@ type API struct {
 	updater *updater.Updater
 	fm      *fusionManager
 	etaManager *eta.ETAManager
-	osrmUpstreamURL *url.URL
 }
 
 // New initializes the application given a config and connects to backends.
@@ -54,12 +49,6 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	// Set up fusion manager
 	fm := newFusionManager(etaManager)
 
-	// Parse OSRM URL
-	osrmURL, err := url.Parse(cfg.OSRMUpstreamURL)
-	if err != nil {
-		return nil, err
-	}
-
 	// Create API instance to store database session and collections
 	api := API{
 		cfg:     cfg,
@@ -68,7 +57,6 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		updater: updater,
 		fm:      fm,
 		etaManager: etaManager,
-		osrmUpstreamURL: osrmURL,
 	}
 
 	r := chi.NewRouter()
@@ -157,10 +145,6 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	// iTRAK data feed endpoint
 	r.Get("/datafeed", api.DataFeedHandler)
 
-	// OSRM reverse proxy
-	const osrmProxyURL = "/api/osrm"
-	r.Mount(osrmProxyURL, api.createOSRMProxy(osrmProxyURL))
-
 	api.handler = r
 
 	return &api, nil
@@ -170,12 +154,10 @@ func NewConfig(v *viper.Viper) *Config {
 	cfg := &Config{
 		ListenURL:    "0.0.0.0:8080",
 		Authenticate: true,
-		OSRMUpstreamURL: "https://shuttles.rpi.edu/api/osrm",
 	}
 	v.SetDefault("api.listenurl", cfg.ListenURL)
 	v.SetDefault("api.casurl", cfg.CasURL)
 	v.SetDefault("api.authenticate", cfg.Authenticate)
-	v.SetDefault("api.osrmupstreamurl", cfg.OSRMUpstreamURL)
 	return cfg
 }
 
