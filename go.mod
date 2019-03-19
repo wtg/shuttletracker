@@ -3,12 +3,10 @@ module github.com/wtg/shuttletracker
 require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/Sirupsen/logrus v0.0.0-20151204141443-446d1c146faa
-	github.com/blend/go-sdk v1.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v0.0.0-20170329110642-4da3e2cfbabc // indirect
 	github.com/go-chi/chi v0.0.0-20180202194135-e223a795a06a
 	github.com/gofrs/uuid v3.2.0+incompatible
-	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/gorilla/websocket v1.4.0
 	github.com/hashicorp/hcl v0.0.0-20170509225359-392dba7d905e // indirect
@@ -28,10 +26,9 @@ require (
 	github.com/spf13/viper v1.0.0
 	github.com/stretchr/objx v0.0.0-20180129172003-8a3f7159479f // indirect
 	github.com/stretchr/testify v0.0.0-20180319223459-c679ae2cc0cb
-	github.com/wcharczuk/go-chart v2.0.1+incompatible
-	golang.org/x/image v0.0.0-20190227222117-0694c2d4d067 // indirect
 	golang.org/x/net v0.0.0-20190206173232-65e2d4e15006 // indirect
 	golang.org/x/sys v0.0.0-20170630171205-4ed4d404df45 // indirect
+	golang.org/x/text v0.3.0 // indirect
 	gopkg.in/cas.v2 v2.1.0
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/yaml.v2 v2.0.0-20170407172122-cd8b52f8269e // indirect
