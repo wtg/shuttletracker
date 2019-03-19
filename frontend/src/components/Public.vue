@@ -8,6 +8,7 @@
       <messagebox ref="msgbox"/>
     </span>
     <bus-button id="busbutton" v-on:bus-click="busClicked()" v-if="busButtonActive" />
+    <eta-message v-bind:eta-info="currentETAInfo"></eta-message>
   </div>
 </template>
 
@@ -29,6 +30,7 @@ import Fusion from '@/fusion';
 import UserLocationService from '@/structures/userlocation.service';
 import BusButton from '@/components/busbutton.vue';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
+import ETAMessage from '@/components/etaMessage.vue';
 
 const StopSVG = require('@/assets/circle.svg') as string;
 const UserSVG = require('@/assets/user.svg') as string;
@@ -56,7 +58,7 @@ export default Vue.extend({
       legend: new L.Control({ position: 'bottomleft' }),
       locationMarker: undefined,
       fusion: new Fusion(),
-      etaMessage: undefined,
+      currentETAInfo: undefined,
     } as {
         vehicles: Vehicle[];
         routes: Route[];
@@ -69,7 +71,7 @@ export default Vue.extend({
         locationMarker: L.Marker | undefined;
         userShuttleidCount: number;
         fusion: Fusion;
-        etaMessage: string | undefined;
+        currentETAInfo: {} | undefined;
       };
   },
   mounted() {
@@ -124,9 +126,6 @@ export default Vue.extend({
       }
       if (mutation.type === 'setVehicles') {
         this.addVehicles();
-      }
-      if (mutation.type === 'updateETA') {
-        this.updateETA();
       }
     });
     this.fusion.start();
@@ -345,46 +344,15 @@ export default Vue.extend({
         return;
       }
 
-      const now = new Date();
-
-      let newMessage = `${route.name} shuttle arriving at ${closestStop.name}`;
-      // more than 1 min 30 sec?
-      if (eta.eta.getTime() - now.getTime() > 1.5 * 60 * 1000 && !eta.arriving) {
-        newMessage += ` in ${relativeTime(now, eta.eta)}`;
-      }
-      newMessage += '.';
-
-      // show notification if message has changed
-      if (newMessage !== this.etaMessage) {
-        this.$snackbar.open({
-          message: newMessage,
-          position: 'is-top',
-          container: '#mymap',
-          type: 'is-primary',
-          duration: 10000,
-          indefinite: false,
-        });
-        this.etaMessage = newMessage;
-      }
+      this.currentETAInfo = {eta, route, stop: closestStop};
     },
   },
   components: {
     messagebox,
     BusButton,
+    etaMessage: ETAMessage,
   },
 });
-
-function relativeTime(from: Date, to: Date): string {
-  const minuteMs = 60 * 1000;
-  const elapsed = to.getTime() - from.getTime();
-
-  // cap display at thirty min
-  if (elapsed < minuteMs * 30) {
-    return `${Math.round(elapsed / minuteMs)} minutes`;
-  }
-
-  return 'a while';
-}
 </script>
 
 <style lang="scss">
