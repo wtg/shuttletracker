@@ -99,10 +99,6 @@ func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	stop := &shuttletracker.Stop{}
 
 	err := json.NewDecoder(r.Body).Decode(stop)
-	fmt.Println("the stop info is")
-	fmt.Println(*stop)
-	fmt.Println(reflect.TypeOf(*stop))
-	// log.WithError(err).Error(stop)
 	if err != nil {
 		log.WithError(err).Error("unable to decode stop")
 		http.Error(w, err.Error(), http.StatusInternalServerError)

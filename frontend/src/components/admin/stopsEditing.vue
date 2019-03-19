@@ -4,10 +4,10 @@
 
         <div class="column is-8">
             <div v-if="failure" class="notification is-danger">
-                <p>There was an error saving the route.</p>
+                <p>There was an error saving the stop.</p>
             </div>
             <div v-if="success" class="notification is-success">
-                <p>Route saved successfully</p>
+                <p>Stop saved successfully</p>
             </div>
 
             <map-view v-if="false && !creation"></map-view>

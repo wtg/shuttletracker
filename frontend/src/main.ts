@@ -21,7 +21,6 @@ import router from '@/index';
 Vue.use(Buefy);
 Vue.config.productionTip = false;
 
-Vue.use(Buefy);
 Vue.use(VueAnalytics, {
   id: 'UA-28203673-6',
   autoTracking: {

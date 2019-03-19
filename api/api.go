@@ -135,7 +135,6 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 
 	r.Get("/", api.IndexHandler)
 	r.Get("/about", api.IndexHandler)
-	r.Get("/test", api.IndexHandler)
 	r.Get("/schedules", api.IndexHandler)
 	r.Get("/settings", api.IndexHandler)
 
