@@ -24,8 +24,8 @@ type Updater struct {
 	ms                   shuttletracker.ModelService
 	mutex                *sync.Mutex
 	lastDataFeedResponse *shuttletracker.DataFeedResponse
-	sm *sync.Mutex
-	subscribers	[]func(*shuttletracker.Location)
+	sm                   *sync.Mutex
+	subscribers          []func(*shuttletracker.Location)
 }
 
 type Config struct {

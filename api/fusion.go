@@ -36,8 +36,6 @@ type fusionMessageUnsubscribe struct {
 	Topic string `json:"topic"`
 }
 
-type fusionMessageETAs []shuttletracker.VehicleETA
-
 type fusionPosition struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`

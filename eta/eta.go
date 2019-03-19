@@ -25,11 +25,6 @@ type ETAManager struct {
 	subscribers []func(shuttletracker.VehicleETA)
 }
 
-// type point struct {
-// 	lat float64
-// 	lng float64
-// }
-
 // NewManager creates an ETAManager subscribed to Location updates from Updater.
 func NewManager(ms shuttletracker.ModelService, updater *updater.Updater) (*ETAManager, error) {
 	em := &ETAManager{
@@ -159,51 +154,6 @@ func distanceBetween(p1, p2 shuttletracker.Point) float64 {
 				haversine(lon2Rad-lon1Rad)))
 }
 
-func closestPointIndexOnRoute(stop *shuttletracker.Stop, route []shuttletracker.Point) (int, error) {
-	minDistance := math.Inf(0)
-	var minIndex int
-	for i, p1 := range route {
-		var p2 shuttletracker.Point
-		if i < len(route)-1 {
-			p2 = route[i+1]
-		} else {
-			p2 = route[0]
-		}
-
-		// find distance from stop to line defined by two points
-		d := math.Abs((p2.Latitude-p1.Latitude)*stop.Longitude-
-			(p2.Longitude-p1.Longitude)*stop.Latitude+
-			(p2.Longitude*p1.Latitude)-(p2.Latitude*p1.Longitude)) /
-			math.Sqrt(math.Pow(p2.Latitude-p1.Latitude, 2)+math.Pow(p2.Longitude-p1.Longitude, 2))
-
-		// d := distanceBetween(p, stopPoint)
-		if d < minDistance {
-			minDistance = d
-			minIndex = i
-		}
-	}
-
-	return minIndex, nil
-}
-
-// Loop over all points in all segments and return the index of the segment containing the closest point.
-func snapPointToSegmentIndex(point shuttletracker.Point, segments [][]shuttletracker.Point) int {
-	minDistance := math.Inf(0)
-	var minIndex int
-
-	for i, segment := range segments {
-		// log.Info(segment)
-		for _, p := range segment {
-			d := distanceBetween(point, p)
-			if d < minDistance {
-				minIndex = i
-			}
-		}
-	}
-
-	return minIndex
-}
-
 func calculateRouteDistance(route *shuttletracker.Route) float64 {
 	totalDistance := 0.0
 	for i, p1 := range route.Points {
@@ -216,31 +166,10 @@ func calculateRouteDistance(route *shuttletracker.Route) float64 {
 	return totalDistance
 }
 
-func calculatePointsDistance(points []shuttletracker.Point) float64 {
-	totalDistance := 0.0
-	for i, p1 := range points {
-		if i == len(points)-1 {
-			break
-		}
-		p2 := points[i+1]
-		totalDistance += distanceBetween(p1, p2)
-	}
-	return totalDistance
-}
-
 type locationDistance struct {
 	loc   *shuttletracker.Location
 	dist  float64
 	index int
-}
-
-func findNextMinimum(locDists []locationDistance) *locationDistance {
-	for _, ld := range locDists {
-		if ld.dist < 0.03 {
-			return &ld
-		}
-	}
-	return nil
 }
 
 func calculateDistance(lds []locationDistance) float64 {
@@ -288,46 +217,6 @@ func (em *ETAManager) determineNearestStopIndicesAlongRoute(track []*shuttletrac
 	return stopZones, nil
 }
 
-func calculateDistanceAlongRoute(locs []*shuttletracker.Location, route *shuttletracker.Route) float64 {
-	total := 0.0
-	if len(locs) < 2 {
-		return total
-	}
-
-	// for every subsequent vehicle location, find the distance between the closest route points
-	lastRoutePointIdx := 0
-	for i := range locs {
-		// for every location, find the route points on either side of it
-		locPoint := shuttletracker.Point{Latitude: locs[i].Latitude, Longitude: locs[i].Longitude}
-
-		// this is the sum of distances from location point to two consecutive points on route.
-		// we want to minimize it.
-		totalDistance := math.Inf(1)
-		var idx1, idx2 int
-
-		for j := lastRoutePointIdx; j < len(route.Points)-1; j++ {
-			p1 := route.Points[j]
-			p2 := route.Points[j+1]
-
-			d1 := distanceBetween(locPoint, p1)
-			d2 := distanceBetween(locPoint, p2)
-			d := d1 + d2
-
-			if d < totalDistance {
-				totalDistance = d
-				idx1 = j
-				idx2 = j + 1
-			}
-		}
-		lastRoutePointIdx = idx2
-		segmentDistance := calculatePointsDistance(route.Points[idx1 : idx2+1])
-		total += segmentDistance
-		log.Debugf("\n\ntotal: %f\nremaining points: %d\n", total, len(route.Points)-lastRoutePointIdx)
-	}
-
-	return total
-}
-
 // Loop over all points in route and return the route's points that are closest
 // to the provided point. We can't just find the distances to all points and then
 // take the two points with smallest distances, since they might not be next to
@@ -355,28 +244,6 @@ func findClosestLine(point shuttletracker.Point, route *shuttletracker.Route) (p
 	}
 
 	return
-}
-
-// Loop over all points in route and return the index of the route's point that is closest
-// to the provided point. Similar to findClosestLine but only returns one point.
-func findClosestPointIndex(point shuttletracker.Point, route *shuttletracker.Route) int {
-	minIndex := 0
-	if len(route.Points) < 1 {
-		return minIndex
-	}
-
-	minDistance := math.Inf(1)
-
-	for i := range route.Points {
-		p := route.Points[i]
-		d := distanceBetween(point, p)
-		if d < minDistance {
-			minIndex = i
-			minDistance = d
-		}
-	}
-
-	return minIndex
 }
 
 // for each location, return the index of the stop zone that it is closest to on the route.
@@ -697,19 +564,6 @@ func (em *ETAManager) findRouteLoops(route *shuttletracker.Route) ([][]*shuttlet
 	}
 
 	return locs, nil
-}
-
-func (em *ETAManager) calculateInitialETAs() {
-	routes, err := em.ms.Routes()
-	if err != nil {
-		log.WithError(err).Error("unable to get routes")
-		return
-	}
-	for _, route := range routes {
-		routeDistance := calculateRouteDistance(route)
-		log.Debugf("%s %f", route.Name, routeDistance)
-		em.findRouteLoops(route)
-	}
 }
 
 // WARNING: this assumes that the initial stop only occurs on a route _once_!

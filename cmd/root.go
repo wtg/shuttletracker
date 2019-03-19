@@ -10,10 +10,10 @@ import (
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/api"
 	"github.com/wtg/shuttletracker/config"
+	"github.com/wtg/shuttletracker/eta"
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/postgres"
 	"github.com/wtg/shuttletracker/updater"
-	"github.com/wtg/shuttletracker/eta"
 )
 
 var rootCmd = &cobra.Command{
