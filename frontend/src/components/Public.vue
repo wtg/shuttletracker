@@ -321,11 +321,13 @@ export default Vue.extend({
 
       // do we have an ETA for this stop? find the next soonest
       let eta: ETA | null = null;
-      for (const e of this.$store.state.etas) {
-        if (e.stopID === closestStop.id) {
-          // is this the soonest?
-          if (eta === null || e.eta < eta.eta) {
-            eta = e;
+      for (const [vehicleID, etas] of this.$store.state.etas) {
+        for (const e of etas) {
+          if (e.stopID === closestStop.id) {
+            // is this the soonest?
+            if (eta === null || e.eta < eta.eta || e.arriving) {
+              eta = e;
+            }
           }
         }
       }
@@ -349,7 +351,7 @@ export default Vue.extend({
 
       let newMessage = `${route.name} shuttle arriving at ${closestStop.name}`;
       // more than 1 min 30 sec?
-      if (eta.eta.getTime() - now.getTime() > 1.5 * 60 * 1000) {
+      if (eta.eta.getTime() - now.getTime() > 1.5 * 60 * 1000 && !eta.arriving) {
         newMessage += ` in ${relativeTime(now, eta.eta)}`;
       }
       newMessage += '.';

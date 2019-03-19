@@ -8,11 +8,13 @@ export default class ETA {
     public vehicleID: number;
     public routeID: number;
     public eta: Date;
+    public arriving: boolean;
 
-    constructor(stop: number, vehicle: number, eta: Date, routeID: number) {
-        this.stopID = stop;
-        this.vehicleID = vehicle;
-        this.eta = eta;
+    constructor(stopID: number, vehicleID: number, routeID: number, eta: Date, arriving: boolean) {
+        this.stopID = stopID;
+        this.vehicleID = vehicleID;
         this.routeID = routeID;
+        this.eta = eta;
+        this.arriving = arriving;
     }
 }

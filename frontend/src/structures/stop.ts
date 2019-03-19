@@ -11,7 +11,6 @@ export default class Stop {
     public longitude: number;
     public created: string;
     public updated: string;
-    // public etas: ETA[];
 
     constructor(id: number, name: string, description: string,
                 lat: number, lng: number, created: string, updated: string) {
@@ -22,6 +21,5 @@ export default class Stop {
         this.longitude = lng;
         this.created = created;
         this.updated = updated;
-        // this.etas = [];
     }
 }

@@ -215,7 +215,13 @@ export default class Fusion {
 
         const etas = new Array<ETA>();
         for (const stopETA of message.message.stop_etas) {
-            const eta = new ETA(stopETA.stop_id, message.message.vehicle_id, new Date(stopETA.eta), message.message.route_id);
+            const eta = new ETA(
+                stopETA.stop_id,
+                message.message.vehicle_id,
+                message.message.route_id,
+                new Date(stopETA.eta),
+                stopETA.arriving,
+            );
             etas.push(eta);
         }
         store.commit('updateETAs', { vehicleID: message.message.vehicle_id, etas });

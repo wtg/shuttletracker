@@ -9,6 +9,7 @@ import ETA from '@/structures/eta';
 import * as L from 'leaflet';
 import Update from '@/structures/update';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
+import { stat } from 'fs';
 
 Vue.use(Vuex);
 const InfoService = new InfoServiceProvider();
@@ -24,7 +25,7 @@ const store: StoreOptions<StoreState> = {
     Routes: [],
     Stops: [],
     Vehicles: [],
-    etas: [],
+    etas: new Map(),
     adminMessage: undefined,
     online: true,
     settings: {
@@ -56,6 +57,16 @@ const store: StoreOptions<StoreState> = {
     },
     setVehicles(state, vehicles: Vehicle[]) {
       state.Vehicles = vehicles;
+
+      // also ensure that vehicles consider being on any known routes
+      state.Vehicles.forEach((vehicle: Vehicle) => {
+        state.Routes.forEach((route: Route) => {
+          if (vehicle.RouteID === route.id) {
+            vehicle.setRoute(route);
+            return;
+          }
+        });
+      });
     },
     addUpdates(state, updates: Update[]) {
       const toHide = new Array<Vehicle>();
@@ -89,19 +100,20 @@ const store: StoreOptions<StoreState> = {
       state.adminMessage = message;
     },
     updateETAs(state, { vehicleID, etas }) {
-      // remove all older etas for this vehicle or any ETA that has expired
+      // remove any ETA that has expired
       const now = new Date();
-      for (let i = state.etas.length - 1; i >= 0; i--) {
-        const eta = state.etas[i];
-        if (vehicleID === eta.vehicleID || eta.eta < now) {
-          state.etas.splice(i, 1);
+      for (const [, vehicleETAs] of state.etas) {
+        for (let i = vehicleETAs.length - 1; i >= 0; i--) {
+          const eta = vehicleETAs[i];
+          if (eta.eta < now) {
+            vehicleETAs.splice(i, 1);
+          }
         }
       }
 
-      // store new ETAs
-      for (const eta of etas) {
-        state.etas.push(eta);
-      }
+      // remove this vehicle's old ETAs and store new ETAs
+      state.etas.delete(vehicleID);
+      state.etas.set(vehicleID, etas);
     },
     initializeSettings(state) {
       const savedSettings = localStorage.getItem('st_settings');

@@ -27,7 +27,7 @@ type ETAManager struct {
 	ms shuttletracker.ModelService
 	etaChan chan *VehicleETA
 	etas map[int64]*VehicleETA
-	etasReqChan chan chan map[int64]*VehicleETA
+	etasReqChan chan chan map[int64]VehicleETA
 
 	sm *sync.Mutex
 	subscribers []func(VehicleETA)
@@ -68,7 +68,7 @@ func NewManager(cfg Config, ms shuttletracker.ModelService, updater *updater.Upd
 		ms: ms,
 		etaChan: make(chan *VehicleETA),
 		etas: map[int64]*VehicleETA{},
-		etasReqChan: make(chan chan map[int64]*VehicleETA),
+		etasReqChan: make(chan chan map[int64]VehicleETA),
 		sm: &sync.Mutex{},
 		subscribers: []func(VehicleETA){},
 	}
@@ -131,10 +131,10 @@ func (em *ETAManager) handleNewETA(eta *VehicleETA) {
 }
 
 // spit out all current ETAs over the provided channel
-func (em *ETAManager) processETAsRequest(c chan map[int64]*VehicleETA) {
-	etas := map[int64]*VehicleETA{}
+func (em *ETAManager) processETAsRequest(c chan map[int64]VehicleETA) {
+	etas := map[int64]VehicleETA{}
 	for k, v := range em.etas {
-		etas[k] = v
+		etas[k] = *v
 	}
 
 	c <- etas
@@ -166,9 +166,10 @@ func (em *ETAManager) Subscribe(sub func(VehicleETA)) {
 	em.sm.Unlock()
 }
 
-// this can be called by anyone to get ETAManager's current view of vehcile ETAs
-func (em *ETAManager) CurrentETAs() map[int64]*VehicleETA {
-	etasChan := make(chan map[int64]*VehicleETA)
+// This can be called by anyone to get ETAManager's current view of vehicle ETAs.
+// It returns structs as values in order to prevent data races.
+func (em *ETAManager) CurrentETAs() map[int64]VehicleETA {
+	etasChan := make(chan map[int64]VehicleETA)
 	em.etasReqChan <- etasChan
 	return <-etasChan
 }

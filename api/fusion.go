@@ -187,9 +187,7 @@ func (fm *fusionManager) handleETA(eta eta.VehicleETA) {
 
 // this is a callback for Fusion to immediately push out ETAs to newly-subscribed clients
 func (fm *fusionManager) handleETASubscribe(clientID string) {
-	log.Info("handleETASubscribe")
 	for _, eta := range fm.em.CurrentETAs() {
-		log.Infof("%+v", eta)
 		fme := fusionMessageEnvelope{
 			Type: "eta",
 			Message: eta,
