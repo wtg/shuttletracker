@@ -11,8 +11,8 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/gorilla/websocket"
 
-	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/eta"
+	"github.com/wtg/shuttletracker/log"
 )
 
 var upgrader = websocket.Upgrader{
@@ -76,9 +76,9 @@ type clientMessage struct {
 }
 
 type serverMessage struct {
-	topic string
+	topic    string
 	clientID string
-	msg interface{}
+	msg      interface{}
 }
 
 type fusionManagerDebug struct {
@@ -105,7 +105,7 @@ type fusionManager struct {
 
 	// Clients can subscribe to topics that they're interested in. We only track
 	// their IDs here.
-	subscriptions map[string][]string
+	subscriptions      map[string][]string
 	subscribeCallbacks map[string][]func(string)
 
 	clients        map[string]*fusionClient
@@ -117,16 +117,16 @@ type fusionManager struct {
 
 func newFusionManager(etaManager *eta.ETAManager) *fusionManager {
 	fm := &fusionManager{
-		addClient:     make(chan *fusionClient),
-		removeClient:  make(chan string),
-		clientMsg:     make(chan clientMessage),
-		serverMsg:     make(chan serverMessage, 50),
-		debug:         make(chan chan *fusionManagerDebug),
-		clients:       map[string]*fusionClient{},
-		tracks:        map[string][]fusionPosition{},
-		subscriptions: map[string][]string{},
+		addClient:          make(chan *fusionClient),
+		removeClient:       make(chan string),
+		clientMsg:          make(chan clientMessage),
+		serverMsg:          make(chan serverMessage, 50),
+		debug:              make(chan chan *fusionManagerDebug),
+		clients:            map[string]*fusionClient{},
+		tracks:             map[string][]fusionPosition{},
+		subscriptions:      map[string][]string{},
 		subscribeCallbacks: map[string][]func(string){},
-		em: etaManager,
+		em:                 etaManager,
 	}
 
 	// get notified of new ETAs to push out to the ETA topic
@@ -163,7 +163,7 @@ func (fm *fusionManager) run() {
 func (fm *fusionManager) sendToTopic(topic string, msg fusionMessageEnvelope) {
 	sm := serverMessage{
 		topic: topic,
-		msg: msg,
+		msg:   msg,
 	}
 	fm.serverMsg <- sm
 }
@@ -171,7 +171,7 @@ func (fm *fusionManager) sendToTopic(topic string, msg fusionMessageEnvelope) {
 func (fm *fusionManager) sendToClient(clientID string, msg fusionMessageEnvelope) {
 	sm := serverMessage{
 		clientID: clientID,
-		msg: msg,
+		msg:      msg,
 	}
 	fm.serverMsg <- sm
 }
@@ -179,7 +179,7 @@ func (fm *fusionManager) sendToClient(clientID string, msg fusionMessageEnvelope
 // this is a callback for ETAManager to inform Fusion to push out a new ETA
 func (fm *fusionManager) handleETA(eta eta.VehicleETA) {
 	fme := fusionMessageEnvelope{
-		Type: "eta",
+		Type:    "eta",
 		Message: eta,
 	}
 	fm.sendToTopic("eta", fme)
@@ -189,7 +189,7 @@ func (fm *fusionManager) handleETA(eta eta.VehicleETA) {
 func (fm *fusionManager) handleETASubscribe(clientID string) {
 	for _, eta := range fm.em.CurrentETAs() {
 		fme := fusionMessageEnvelope{
-			Type: "eta",
+			Type:    "eta",
 			Message: eta,
 		}
 		fm.sendToClient(clientID, fme)
