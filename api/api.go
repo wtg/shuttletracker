@@ -12,8 +12,6 @@ import (
 
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
-	"github.com/wtg/shuttletracker/updater"
-	"github.com/wtg/shuttletracker/eta"
 )
 
 // Config holds API settings.
@@ -32,14 +30,14 @@ type API struct {
 	handler http.Handler
 	ms      shuttletracker.ModelService
 	msg     shuttletracker.MessageService
-	updater *updater.Updater
+	updater shuttletracker.UpdaterService
 	fm      *fusionManager
-	etaManager *eta.ETAManager
+	etaManager shuttletracker.ETAService
 }
 
 // New initializes the application given a config and connects to backends.
 // It also seeds any needed information to the database.
-func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageService, us shuttletracker.UserService, updater *updater.Updater, etaManager *eta.ETAManager) (*API, error) {
+func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageService, us shuttletracker.UserService, updater shuttletracker.UpdaterService, etaManager shuttletracker.ETAService) (*API, error) {
 	// Set up CAS authentication
 	url, err := url.Parse(cfg.CasURL)
 	if err != nil {

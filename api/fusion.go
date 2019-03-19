@@ -11,7 +11,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/gorilla/websocket"
 
-	"github.com/wtg/shuttletracker/eta"
+	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
 )
 
@@ -36,7 +36,7 @@ type fusionMessageUnsubscribe struct {
 	Topic string `json:"topic"`
 }
 
-type fusionMessageETAs []eta.VehicleETA
+type fusionMessageETAs []shuttletracker.VehicleETA
 
 type fusionPosition struct {
 	Latitude  float64 `json:"latitude"`
@@ -112,10 +112,10 @@ type fusionManager struct {
 	tracks         map[string][]fusionPosition
 	busButtonCount uint64
 
-	em *eta.ETAManager
+	em shuttletracker.ETAService
 }
 
-func newFusionManager(etaManager *eta.ETAManager) *fusionManager {
+func newFusionManager(etaManager shuttletracker.ETAService) *fusionManager {
 	fm := &fusionManager{
 		addClient:          make(chan *fusionClient),
 		removeClient:       make(chan string),
@@ -177,7 +177,7 @@ func (fm *fusionManager) sendToClient(clientID string, msg fusionMessageEnvelope
 }
 
 // this is a callback for ETAManager to inform Fusion to push out a new ETA
-func (fm *fusionManager) handleETA(eta eta.VehicleETA) {
+func (fm *fusionManager) handleETA(eta shuttletracker.VehicleETA) {
 	fme := fusionMessageEnvelope{
 		Type:    "eta",
 		Message: eta,

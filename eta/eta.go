@@ -1,12 +1,8 @@
 package eta
 
 import (
-	"encoding/json"
 	"errors"
 	"math"
-	"net/http"
-	"strconv"
-	"strings"
 	"sync"
 	"time"
 
@@ -17,52 +13,32 @@ import (
 	"github.com/wtg/shuttletracker/updater"
 )
 
-const osrmBaseURL = "http://127.0.0.1:8080/api/osrm"
 const earthRadius = 6371000.0 // meters
 
 type ETAManager struct {
 	ms          shuttletracker.ModelService
-	etaChan     chan *VehicleETA
-	etas        map[int64]*VehicleETA
-	etasReqChan chan chan map[int64]VehicleETA
+	etaChan     chan *shuttletracker.VehicleETA
+	etas        map[int64]*shuttletracker.VehicleETA
+	etasReqChan chan chan map[int64]shuttletracker.VehicleETA
 
 	sm          *sync.Mutex
-	subscribers []func(VehicleETA)
+	subscribers []func(shuttletracker.VehicleETA)
 }
 
-type VehicleETA struct {
-	VehicleID int64     `json:"vehicle_id"`
-	RouteID   int64     `json:"route_id"`
-	StopETAs  []StopETA `json:"stop_etas"`
-	Updated   time.Time `json:"updated"`
-}
-
-type StopETA struct {
-	StopID   int64     `json:"stop_id"`
-	ETA      time.Time `json:"eta"`
-	Arriving bool      `json:"arriving"`
-}
-
-type osrmRouteResp struct {
-	Routes []struct {
-		Duration float64
-	}
-}
-
-type point struct {
-	lat float64
-	lng float64
-}
+// type point struct {
+// 	lat float64
+// 	lng float64
+// }
 
 // NewManager creates an ETAManager subscribed to Location updates from Updater.
 func NewManager(ms shuttletracker.ModelService, updater *updater.Updater) (*ETAManager, error) {
 	em := &ETAManager{
 		ms:          ms,
-		etaChan:     make(chan *VehicleETA),
-		etas:        map[int64]*VehicleETA{},
-		etasReqChan: make(chan chan map[int64]VehicleETA),
+		etaChan:     make(chan *shuttletracker.VehicleETA),
+		etas:        map[int64]*shuttletracker.VehicleETA{},
+		etasReqChan: make(chan chan map[int64]shuttletracker.VehicleETA),
 		sm:          &sync.Mutex{},
-		subscribers: []func(VehicleETA){},
+		subscribers: []func(shuttletracker.VehicleETA){},
 	}
 
 	// subscribe to new Locations with Updater
@@ -108,7 +84,7 @@ func (em *ETAManager) handleNewLocation(loc *shuttletracker.Location) {
 	em.etaChan <- eta
 }
 
-func (em *ETAManager) handleNewETA(eta *VehicleETA) {
+func (em *ETAManager) handleNewETA(eta *shuttletracker.VehicleETA) {
 	em.etas[eta.VehicleID] = eta
 
 	// notify subscribers
@@ -120,8 +96,8 @@ func (em *ETAManager) handleNewETA(eta *VehicleETA) {
 }
 
 // spit out all current ETAs over the provided channel
-func (em *ETAManager) processETAsRequest(c chan map[int64]VehicleETA) {
-	etas := map[int64]VehicleETA{}
+func (em *ETAManager) processETAsRequest(c chan map[int64]shuttletracker.VehicleETA) {
+	etas := map[int64]shuttletracker.VehicleETA{}
 	for k, v := range em.etas {
 		etas[k] = *v
 	}
@@ -149,7 +125,7 @@ func (em *ETAManager) cleanup() {
 	}
 }
 
-func (em *ETAManager) Subscribe(sub func(VehicleETA)) {
+func (em *ETAManager) Subscribe(sub func(shuttletracker.VehicleETA)) {
 	em.sm.Lock()
 	em.subscribers = append(em.subscribers, sub)
 	em.sm.Unlock()
@@ -157,8 +133,8 @@ func (em *ETAManager) Subscribe(sub func(VehicleETA)) {
 
 // This can be called by anyone to get ETAManager's current view of vehicle ETAs.
 // It returns structs as values in order to prevent data races.
-func (em *ETAManager) CurrentETAs() map[int64]VehicleETA {
-	etasChan := make(chan map[int64]VehicleETA)
+func (em *ETAManager) CurrentETAs() map[int64]shuttletracker.VehicleETA {
+	etasChan := make(chan map[int64]shuttletracker.VehicleETA)
 	em.etasReqChan <- etasChan
 	return <-etasChan
 }
@@ -226,33 +202,6 @@ func snapPointToSegmentIndex(point shuttletracker.Point, segments [][]shuttletra
 	}
 
 	return minIndex
-}
-
-func (em *ETAManager) snapLocationsToRoads(locations []*shuttletracker.Location) ([]point, error) {
-	coords := strings.Builder{}
-	for i, loc := range locations {
-		coords.WriteString(strconv.FormatFloat(loc.Longitude, 'f', -1, 64))
-		coords.WriteByte(',')
-		coords.WriteString(strconv.FormatFloat(loc.Latitude, 'f', -1, 64))
-		if i != len(locations)-1 {
-			coords.WriteByte(';')
-		}
-	}
-
-	c := &http.Client{Timeout: 5 * time.Second}
-	resp, err := c.Get(osrmBaseURL + "/match/v1/car/" + coords.String())
-	if err != nil {
-		return nil, err
-	}
-
-	osrmMatch := osrmRouteResp{}
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&osrmMatch)
-	if err != nil {
-		return nil, err
-	}
-	log.Infof("%+v", osrmMatch)
-	return nil, nil
 }
 
 func calculateRouteDistance(route *shuttletracker.Route) float64 {
@@ -863,7 +812,7 @@ func (em *ETAManager) determineAverageTravelTimes(route *shuttletracker.Route) (
 	return durations, nil
 }
 
-func (em *ETAManager) calculateVehicleETAs(vehicleID int64) (*VehicleETA, error) {
+func (em *ETAManager) calculateVehicleETAs(vehicleID int64) (*shuttletracker.VehicleETA, error) {
 	// get vehicle info
 	vehicle, err := em.ms.Vehicle(vehicleID)
 	if err != nil {
@@ -889,10 +838,10 @@ func (em *ETAManager) calculateVehicleETAs(vehicleID int64) (*VehicleETA, error)
 		return nil, err
 	}
 
-	eta := &VehicleETA{
+	eta := &shuttletracker.VehicleETA{
 		VehicleID: vehicleID,
 		RouteID:   routeID,
-		StopETAs:  []StopETA{},
+		StopETAs:  []shuttletracker.StopETA{},
 		Updated:   time.Now(),
 	}
 
@@ -980,7 +929,7 @@ func (em *ETAManager) calculateVehicleETAs(vehicleID int64) (*VehicleETA, error)
 			continue
 		}
 
-		stopETA := StopETA{
+		stopETA := shuttletracker.StopETA{
 			StopID:   stopID,
 			ETA:      etaTime,
 			Arriving: arriving,
@@ -989,41 +938,4 @@ func (em *ETAManager) calculateVehicleETAs(vehicleID int64) (*VehicleETA, error)
 	}
 
 	return eta, nil
-}
-
-func (em *ETAManager) calculateETAs(vehicle *shuttletracker.Vehicle) {
-	log.Infof("calculating ETA for vehicle %+v", vehicle)
-	location, err := em.ms.LatestLocation(vehicle.ID)
-	if err != nil {
-		log.WithError(err).Error("unable to get latest location")
-		return
-	}
-
-	lonStr := strconv.FormatFloat(location.Longitude, 'f', -1, 64)
-	latStr := strconv.FormatFloat(location.Latitude, 'f', -1, 64)
-
-	c := &http.Client{Timeout: 5 * time.Second}
-
-	stops, err := em.ms.Stops()
-	for _, stop := range stops {
-		stopLonStr := strconv.FormatFloat(stop.Longitude, 'f', -1, 64)
-		stopLatStr := strconv.FormatFloat(stop.Latitude, 'f', -1, 64)
-
-		coords := lonStr + "," + latStr + ";" + stopLonStr + "," + stopLatStr
-
-		resp, err := c.Get(osrmBaseURL + "/route/v1/car/" + coords)
-		if err != nil {
-			log.WithError(err).Error("unable to get OSRM route")
-			continue
-		}
-
-		osrmRoute := osrmRouteResp{}
-		dec := json.NewDecoder(resp.Body)
-		err = dec.Decode(&osrmRoute)
-		if err != nil {
-			log.WithError(err).Error("unable to decode")
-			continue
-		}
-		log.Infof("%+v", osrmRoute)
-	}
 }
