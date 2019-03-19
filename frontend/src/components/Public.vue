@@ -321,13 +321,11 @@ export default Vue.extend({
 
       // do we have an ETA for this stop? find the next soonest
       let eta: ETA | null = null;
-      for (const [vehicleID, etas] of this.$store.state.etas) {
-        for (const e of etas) {
-          if (e.stopID === closestStop.id) {
-            // is this the soonest?
-            if (eta === null || e.eta < eta.eta || e.arriving) {
-              eta = e;
-            }
+      for (const e of this.$store.state.etas) {
+        if (e.stopID === closestStop.id) {
+          // is this the soonest?
+          if (eta === null || e.eta < eta.eta || e.arriving) {
+            eta = e;
           }
         }
       }

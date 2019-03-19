@@ -9,7 +9,7 @@ export interface StoreState {
     Routes: Route[];
     Vehicles: Vehicle[];
     Stops: Stop[];
-    etas: Map<number, ETA[]>;
+    etas: ETA[];
     adminMessage: AdminMessageUpdate | undefined;
     online: boolean;
     settings: {

@@ -4,9 +4,6 @@ import 'typeface-open-sans';
 import Buefy from 'buefy';
 import 'buefy/dist/buefy.css';
 
-// @ts-ignore
-import VueMoment from 'vue-moment';
-
 // only include the specific fontawesome icons that we use
 import '@fortawesome/fontawesome-free/css/fontawesome.css';
 import '@fortawesome/fontawesome-free/css/solid.css';
@@ -17,7 +14,6 @@ import router from '@/index';
 import '@/assets/styles.scss';
 
 Vue.use(Buefy);
-Vue.use(VueMoment);
 Vue.config.productionTip = false;
 
 /**

@@ -10,13 +10,15 @@
             <th>Vehicle</th>
             <th>Stop</th>
             <th>ETA</th>
+            <th>Arriving</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(eta, i) in etas" v-bind:key="i">
             <td>{{ eta.vehicle.name }}</td>
             <td>{{ eta.stop.name }}</td>
-            <td>{{ eta.eta | moment("from", "now", true) }}</td>
+            <td>{{ eta.eta }}</td>
+            <td>{{ eta.arriving }}</td>
           </tr>
         </tbody>
       </table>
@@ -34,7 +36,7 @@ export default Vue.extend({
     etas(): any[] {
       const ret = [];
       for (const eta of this.$store.state.etas) {
-        const e = Object.create({eta: eta.eta});
+        const e = Object.create({eta: eta.eta, arriving: eta.arriving});
 
         for (const vehicle of this.$store.state.Vehicles) {
           if (eta.vehicleID === vehicle.id) {

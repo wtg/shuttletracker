@@ -25,7 +25,7 @@ const store: StoreOptions<StoreState> = {
     Routes: [],
     Stops: [],
     Vehicles: [],
-    etas: new Map(),
+    etas: [],
     adminMessage: undefined,
     online: true,
     settings: {
@@ -100,20 +100,19 @@ const store: StoreOptions<StoreState> = {
       state.adminMessage = message;
     },
     updateETAs(state, { vehicleID, etas }) {
-      // remove any ETA that has expired
+      // remove this vehicle's ETAs and any ETA that has expired
       const now = new Date();
-      for (const [, vehicleETAs] of state.etas) {
-        for (let i = vehicleETAs.length - 1; i >= 0; i--) {
-          const eta = vehicleETAs[i];
-          if (eta.eta < now) {
-            vehicleETAs.splice(i, 1);
-          }
+      for (let i = state.etas.length - 1; i >= 0; i--) {
+        const eta = state.etas[i];
+        if (eta.vehicleID === vehicleID || eta.eta < now) {
+          state.etas.splice(i, 1);
         }
       }
 
-      // remove this vehicle's old ETAs and store new ETAs
-      state.etas.delete(vehicleID);
-      state.etas.set(vehicleID, etas);
+      // store new ETAs
+      for (const eta of etas) {
+        state.etas.push(eta);
+      }
     },
     initializeSettings(state) {
       const savedSettings = localStorage.getItem('st_settings');
