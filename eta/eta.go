@@ -7,13 +7,10 @@ import (
 	"encoding/json"
 	"strings"
 	"math"
-	// "os"
-	// "fmt"
 	"sync"
 	"errors"
 
 	// "github.com/wcharczuk/go-chart"
-	"github.com/spf13/viper"
 
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
@@ -57,13 +54,8 @@ type point struct {
 	lng float64
 }
 
-type Config struct {
-	DataFeed       string
-	UpdateInterval string
-}
-
 // NewManager creates an ETAManager subscribed to Location updates from Updater.
-func NewManager(cfg Config, ms shuttletracker.ModelService, updater *updater.Updater) (*ETAManager, error) {
+func NewManager(ms shuttletracker.ModelService, updater *updater.Updater) (*ETAManager, error) {
 	em := &ETAManager{
 		ms: ms,
 		etaChan: make(chan *VehicleETA),
@@ -77,16 +69,6 @@ func NewManager(cfg Config, ms shuttletracker.ModelService, updater *updater.Upd
 	updater.Subscribe(em.locationSubscriber)
 
 	return em, nil
-}
-
-func NewConfig(v *viper.Viper) *Config {
-	cfg := &Config{
-		// UpdateInterval: "10s",
-		// DataFeed:       "https://shuttles.rpi.edu/datafeed",
-	}
-	// v.SetDefault("updater.updateinterval", cfg.UpdateInterval)
-	// v.SetDefault("updater.datafeed", cfg.DataFeed)
-	return cfg
 }
 
 // This gets new Locations from Updater. As soon as this happens, we'll

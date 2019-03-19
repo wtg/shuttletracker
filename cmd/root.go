@@ -54,7 +54,7 @@ var rootCmd = &cobra.Command{
 		}
 		runner.Add(updater)
 
-		etaManager, err := eta.NewManager(*cfg.ETA, ms, updater)
+		etaManager, err := eta.NewManager(ms, updater)
 		if err != nil {
 			log.WithError(err).Error("unable to create ETA manager")
 			return

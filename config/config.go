@@ -9,7 +9,6 @@ import (
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/postgres"
 	"github.com/wtg/shuttletracker/updater"
-	"github.com/wtg/shuttletracker/eta"
 )
 
 // Config is the global configuration struct.
@@ -18,7 +17,6 @@ type Config struct {
 	API      *api.Config
 	Log      *log.Config
 	Postgres *postgres.Config
-	ETA *eta.Config
 }
 
 // New creates a new, global Config. Reads in configuration from config files.
@@ -34,7 +32,6 @@ func New() (*Config, error) {
 	cfg.API = api.NewConfig(v)
 	cfg.Updater = updater.NewConfig(v)
 	cfg.Log = log.NewConfig(v)
-	cfg.ETA = eta.NewConfig(v)
 
 	pgCfg, err := postgres.NewConfig(v)
 	if err != nil {
@@ -59,7 +56,6 @@ func New() (*Config, error) {
 	log.Debugf("Updater configuration: %+v", cfg.Updater)
 	log.Debugf("Log configuration: %+v", cfg.Log)
 	log.Debugf("Postgres configuration: %+v", cfg.Postgres)
-	log.Debugf("ETA configuration: %+v", cfg.ETA)
 
 	return cfg, nil
 }
