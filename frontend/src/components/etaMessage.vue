@@ -1,6 +1,6 @@
 <template>
     <transition name="pop">
-        <div class="eta-message" v-if="message && shouldShow">
+        <div class="eta-message" v-if="message && show">
             {{ message }}
         </div>
     </transition>
@@ -10,11 +10,8 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  props: ['etaInfo'],
+  props: ['etaInfo', 'show'],
   computed: {
-    shouldShow(): boolean {
-      return this.$store.state.settings.etasEnabled;
-    },
     message(): string | null {
       if (this.etaInfo === undefined) {
           return null;

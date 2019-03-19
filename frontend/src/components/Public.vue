@@ -8,7 +8,7 @@
       <messagebox ref="msgbox"/>
     </span>
     <bus-button id="busbutton" v-on:bus-click="busClicked()" v-if="busButtonActive" />
-    <eta-message v-bind:eta-info="currentETAInfo"></eta-message>
+    <eta-message v-bind:eta-info="currentETAInfo" v-bind:show="shouldShowETAMessage"></eta-message>
   </div>
 </template>
 
