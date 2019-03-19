@@ -431,12 +431,4 @@ export default Vue.extend({
   bottom: 35px; 
   z-index: 2000;
 }
-
-// this is for the snackbar—we want it over the map and not under title bar or tab bar
-.notices {
-  position: absolute !important;
-}
-.snackbar {
-  font-size: initial;
-}
 </style>
