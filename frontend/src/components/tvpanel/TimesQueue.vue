@@ -1,15 +1,17 @@
 <template>
-<div id ="queue">
-    <h3> The Current Time is {{displayCurTime()}} </h3>
+<div id ="main">
+
+    <!-- Display Current Time and Day -->
+    <h3> The Current Time is {{updateCurTime()}} </h3>
     <h3> The Day is {{curr_time.getDay()}} </h3>
 
     <!-- East Queue -->
     <div id="east" v-if="checkEast()">
         <ul>  
             <li id="type"> EAST  </li>
-            <li id="time"> 1 </li>
-            <li id="time"> 2 </li>
-            <li id="time"> 3 </li>
+            <li id="east1" class="time"></li>
+            <li id="east2" class="time"></li>
+            <li id="east3" class="time"></li>
         </ul>
     </div>
 
@@ -17,9 +19,9 @@
     <div id="west" v-if="checkWest()">
         <ul>
             <li id="type"> WEST </li>
-            <li id="time"> 1 </li>
-            <li id="time"> 2 </li>
-            <li id="time"> 3 </li>
+            <li id="west1" class="time"></li>
+            <li id="west2" class="time"></li>
+            <li id="west3" class="time"></li>
         </ul>
     </div>
 
@@ -27,23 +29,23 @@
     <div id="weekendlate" v-if="checkLate()">
         <ul>
             <li id="type" > LATE NIGHT </li>
-            <li id="time"> 1 </li>
-            <li id="time"> 2 </li>
-            <li id="time"> 3 </li>
+            <li id="late1" class="time"></li>
+            <li id="late2" class="time"></li>
+            <li id="late3" class="time"></li>
         </ul>
     </div>
 </div>
 </template>
 
 <script lang="ts">
-// This component handles the Shuttle Time Queue on the TV Panel
+// This component handles the Shuttle Times Queue on the TV Panel
 import Vue from 'vue';
 
 // Importing East Campus shuttle times (JSON)
 import weekdayE from '@/assets/shuttle_times/weekdayE.json';
 import weekendE from '@/assets/shuttle_times/weekendE.json';
 
-// Importing Weekend/Late Night shuttle times (JSON)
+// Importing Weekend/Late shuttle times (JSON)
 import weekendlate from '@/assets/shuttle_times/weekendlate.json';
 
 // Importing West Campus shuttle times (JSON)
@@ -55,52 +57,31 @@ export default Vue.extend({
     name: 'TimesQueue',
     data(){
         return {
-            curr_time: new Date(),
-            curr_west: undefined,
-            curr_east: undefined, 
-            curr_weekend_late: undefined,
+            curr_time: new Date(),        // Current Time (Date Object)
+            curr_west: undefined,         // Current West Time Queue (Array)
+            curr_east: undefined,         // Current East Time Queue (Array)
+            curr_weekend_late: undefined, // Current Late/Weekend Time Queue (Array)
         }
     },
     methods: {
-
-        // Display/update the current time 
-        displayCurTime(){
+        // --------------------------------------------------------------------------
+        // Display/Update the current time 
+        updateCurTime(){
             this.curr_time = new Date();
             return this.curr_time.getHours() + ': ' + this.curr_time.getMinutes();
         },
-
         // --------------------------------------------------------------------------
-        // Check if EAST shuttles are running
-        checkEast(){
-            if (this.curr_east){
-                return true;
+        // Function to handle checking/updating the queues every hour 
+        updateHour(){
+            if (this.curr_time.getMinutes() === 0){
+                this.updateQueues();
+                this.checkEast();
+                this.checkWest();
+                this.checkLate();
+                console.log("Hourly Check/Update Done");
             }
-            return false;
         },
-        // Check if WEST shuttles are running 
-        checkWest(){
-            if (this.curr_west){
-                return true;
-            }
-            return false;
-        },
-        // Check if LATENIGHT/WEEKEND shuttles are running 
-        checkLate(){
-            if (this.curr_weekend_late){
-                // If east and west shuttles are also running, format 
-                if (this.curr_east && this.curr_west){
-                    document.getElementById("weekendlate").style.marginTop = "300px";
-                }   
-                else {
-                    document.getElementById("weekendlate").style.margin = "0 auto";
-                }
-                return true; 
-            }
-            return false; 
-        },
-        // --------------------------------------------------------------------------
-
-        // Update queues
+        // Function to update the component's queue values
         updateQueues(){
             // Monday - Thursday 
             if (this.curr_time.getDay() >= 1 && this.curr_time.getDay() <= 4){
@@ -148,32 +129,85 @@ export default Vue.extend({
                 }
             }
         },
+        // Toggle East Shuttles Queue
+        checkEast(){
+            if (this.curr_east){
+                return true;
+            }
+            return false;
+        },
+        // Toggle West Shuttles Queue
+        checkWest(){
+            if (this.curr_west){
+                return true;
+            }
+            return false;
+        },
+        // Toggle Late/Weekend Shuttles Queue
+        checkLate(){
+            if (this.curr_weekend_late){
+                // If East and West shuttles are also running, format the queue
+                if (this.curr_east && this.curr_west){
+                    document.getElementById("weekendlate").style.marginTop = "300px";
+                }
+                // If only the Late Night shuttles are running, center the queue    
+                else {
+                    document.getElementById("weekendlate").style.margin = "0 auto";
+                }
+                return true; 
+            }
+            return false; 
+        },
+        // --------------------------------------------------------------------------
+        // Function to handle updating shuttle times 
+        updateShuttleTimes(){
+            if (this.curr_east){
+                this.updateQueueEast();
+            }
+            if (this.curr_west){
+                this.updateQueueWest();
+            }
+            if (this.curr_weekend_late){
+                this.updateQueueLate();
+            }
+        },
+        // Function to update shuttle times for the East Queue
+        updateQueueEast(){  
 
+
+        },
+        // Function to update shuttles times for the West Queue
+        updateQueueWest(){
+
+
+        },
+        // Function to update shuttle times for the Late/Weekend Queue
+        updateQueueLate(){
+
+
+        },
+        // --------------------------------------------------------------------------
 
     },
 
     mounted() {
-        // Interval to update current time, check to display EAST,WEST,LATE queues
+        
+        // Interval every minute
         setInterval(() => {
-            this.displayCurTime();
+            this.updateCurTime();
+            this.updateHour();
         }, 60000);
 
-
-        // Interval to update queues every hour 
+        // Interval every five minutes
         setInterval(() => {
-            this.updateQueues();
-            this.checkEast();
-            this.checkWest();
-            this.checkLate();
-        }, 100);
+            this.updateShuttleTimes();
+        }, 300000);
 
     },
 });
 </script>
-
-// CSS Styling for the Shuttle Time Queue
 <style scoped>
-    #queue{
+    #main{
         margin-left:25px;
         float:left;
         height:700px;
@@ -183,7 +217,7 @@ export default Vue.extend({
         text-align:center;
         color:black;
     }
-    #time{
+    .time{
         font-size:20px;
     }
     ul {
