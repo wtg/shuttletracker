@@ -8,6 +8,7 @@
       <messagebox ref="msgbox"/>
     </span>
     <bus-button id="busbutton" v-on:bus-click="busClicked()" v-if="busButtonActive" />
+    <eta-message v-bind:eta-info="currentETAInfo" v-bind:show="shouldShowETAMessage"></eta-message>
   </div>
 </template>
 
@@ -19,6 +20,7 @@ import InfoService from '../structures/serviceproviders/info.service';
 import Vehicle from '../structures/vehicle';
 import Route from '../structures/route';
 import { Stop, StopSVG } from '../structures/stop';
+import ETA from '@/structures/eta';
 import messagebox from './adminmessage.vue';
 import * as L from 'leaflet';
 import { setTimeout, setInterval } from 'timers';
@@ -28,6 +30,7 @@ import Fusion from '@/fusion';
 import UserLocationService from '@/structures/userlocation.service';
 import BusButton from '@/components/busbutton.vue';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
+import ETAMessage from '@/components/etaMessage.vue';
 
 const UserSVG = require('@/assets/user.svg') as string;
 
@@ -46,6 +49,7 @@ export default Vue.extend({
       legend: new L.Control({ position: 'bottomleft' }),
       locationMarker: undefined,
       fusion: new Fusion(),
+      currentETAInfo: null,
     } as {
         vehicles: Vehicle[];
         routes: Route[];
@@ -58,6 +62,7 @@ export default Vue.extend({
         locationMarker: L.Marker | undefined;
         userShuttleidCount: number;
         fusion: Fusion;
+        currentETAInfo: {} | null;
       };
   },
   mounted() {
@@ -112,9 +117,12 @@ export default Vue.extend({
         this.addVehicles();
       }
     });
-
     this.fusion.start();
     this.fusion.registerMessageReceivedCallback(this.saucyspawn);
+
+    ls.registerCallback((position) => {
+      this.updateETA();
+    });
   },
   computed: {
     message(): AdminMessageUpdate {
@@ -122,6 +130,9 @@ export default Vue.extend({
     },
     busButtonActive(): boolean {
       return this.$store.getters.getBusButtonVisible;
+    },
+    shouldShowETAMessage(): boolean {
+      return this.$store.state.settings.etasEnabled;
     },
   },
   methods: {
@@ -272,6 +283,59 @@ export default Vue.extend({
     busClicked() {
       this.fusion.sendBusButton();
     },
+    updateETA() {
+      // find nearest stop
+      const pos = UserLocationService.getInstance().getCurrentLocation();
+      if (pos === undefined) {
+        this.currentETAInfo = null;
+        return;
+      }
+      const c = pos.coords as Coordinates;
+
+      let minDistance = Infinity;
+      let closestStop: Stop | null = null;
+      for (const stop of this.$store.state.Stops) {
+        const d = Math.hypot(c.longitude - stop.longitude, c.latitude - stop.latitude);
+        if (d < minDistance) {
+          minDistance = d;
+          closestStop = stop;
+        }
+      }
+      if (closestStop === null) {
+        this.currentETAInfo = null;
+        return;
+      }
+
+      // do we have an ETA for this stop? find the next soonest
+      let eta: ETA | null = null;
+      for (const e of this.$store.state.etas) {
+        if (e.stopID === closestStop.id) {
+          // is this the soonest?
+          if (eta === null || e.eta < eta.eta || e.arriving) {
+            eta = e;
+          }
+        }
+      }
+      if (eta === null) {
+        this.currentETAInfo = null;
+        return;
+      }
+
+      // get associated route
+      let route: Route | null = null;
+      for (const r of this.$store.state.Routes) {
+        if (r.id === eta.routeID) {
+          route = r;
+          break;
+        }
+      }
+      if (route === null) {
+        this.currentETAInfo = null;
+        return;
+      }
+
+      this.currentETAInfo = {eta, route, stop: closestStop};
+    },
     updateStops() {
       this.$store.commit('setRoutesOnStops');
     },
@@ -279,6 +343,7 @@ export default Vue.extend({
   components: {
     messagebox,
     BusButton,
+    etaMessage: ETAMessage,
   },
 });
 </script>
@@ -363,6 +428,7 @@ export default Vue.extend({
   height: 20px !important;
 
 }
+
 #busbutton{
   position: absolute; 
   right: 25px; 

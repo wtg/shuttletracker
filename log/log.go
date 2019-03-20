@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -22,10 +23,13 @@ func init() {
 	logger = logrus.New()
 }
 
-func NewConfig() *Config {
-	return &Config{
+// NewConfig creates a new Config.
+func NewConfig(v *viper.Viper) *Config {
+	cfg := &Config{
 		Level: "info",
 	}
+	v.SetDefault("log.level", cfg.Level)
+	return cfg
 }
 
 func SetLevel(level string) {

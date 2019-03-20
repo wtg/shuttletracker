@@ -1,0 +1,10 @@
+run:
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    - prealloc
+    - goimports
+    - misspell
+    - unconvert
+    - goconst

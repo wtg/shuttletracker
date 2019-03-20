@@ -19,8 +19,7 @@ addons:
   postgresql: "9.6"
 
 before_install:
-  - curl -L https://git.io/vp6lP | sh
-  - GO111MODULE=off go get -u github.com/bradleyfalzon/revgrep/...
+  - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s v1.15.0
   - cd frontend && npm install && npm run build && cd ..
 
 install:
@@ -30,8 +29,8 @@ before_script:
   - psql -c 'create database shuttletracker_test;' -U postgres
 
 script:
-  - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then go mod vendor && GO111MODULE=off PATH="$(pwd)/bin:$PATH" ./bin/gometalinter --vendor ./... 2>&1 | revgrep origin/master; fi
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then go mod vendor && GO111MODULE=off PATH="$(pwd)/bin:$PATH" ./bin/gometalinter --vendor ./... || true; fi
+  - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then ./bin/golangci-lint run --new-from-rev=HEAD~ ./...; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./bin/golangci-lint run ./... || true; fi
   - ./test.sh
   - docker build .
   - bash <(curl -s https://codecov.io/bash)

@@ -35,6 +35,23 @@ func (ss *StopService) CreateStop(stop *shuttletracker.Stop) error {
 	return row.Scan(&stop.ID, &stop.Created, &stop.Updated)
 }
 
+// Stop returns a Stop by its ID.
+func (ss *StopService) Stop(id int64) (*shuttletracker.Stop, error) {
+	s := &shuttletracker.Stop{
+		ID: id,
+	}
+
+	statement := "SELECT s.name, s.created, s.updated, s.description, s.latitude, s.longitude" +
+		" FROM stops s WHERE id = $1;"
+	row := ss.db.QueryRow(statement, id)
+	err := row.Scan(&s.Name, &s.Created, &s.Updated, &s.Description, &s.Latitude, &s.Longitude)
+	if err == sql.ErrNoRows {
+		return nil, shuttletracker.ErrStopNotFound
+	}
+
+	return s, err
+}
+
 // Stops returns all Stops.
 func (ss *StopService) Stops() ([]*shuttletracker.Stop, error) {
 	stops := []*shuttletracker.Stop{}

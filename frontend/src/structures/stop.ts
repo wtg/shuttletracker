@@ -37,15 +37,15 @@ export class Stop {
                 iconAnchor: [6, 6], // point of the icon which will correspond to marker's location
                 shadowAnchor: [6, 6], // the same for the shadow
                 popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
-              }),
+            }),
         });
     }
 
     public getMessage(): string {
         if (this.routesOn.length > 0) {
-            return  this.name +
-                    ` is on route${this.routesOn.length > 1 ? 's' : ''} `
-                    + this.routesOn.map((route: Route) => `<i>${route.name}</i>`).join(', ');
+            return this.name +
+                ` is on route${this.routesOn.length > 1 ? 's' : ''} `
+                + this.routesOn.map((route: Route) => `<i>${route.name}</i>`).join(', ');
         } else {
             return this.name;
         }

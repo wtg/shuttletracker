@@ -22,7 +22,7 @@
     "leaflet-routing-machine": "^3.2.12",
     "typeface-open-sans": "0.0.54",
     "vue": "^2.5.17",
-    "vue-analytics": "^5.16.2",
+    "vue-analytics": "^5.16.4",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1"
   },
