@@ -1,9 +1,4 @@
-// import Stop from '@/structures/stop';
-// import Vehicle from '@/structures/vehicle';
-
 export default class ETA {
-    // public stop: Stop;
-    // public vehicle: Vehicle;
     public stopID: number;
     public vehicleID: number;
     public routeID: number;
