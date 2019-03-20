@@ -1,0 +1,17 @@
+{
+  "Updater": {
+    "UpdateInterval": "3s"
+  },
+  "API": {
+    "CasURL": "https://cas-auth.rpi.edu/cas/",
+    "Authenticate": true,
+    "ListenURL": "127.0.0.1:8080",
+    "MapboxAPIKey": ""
+  },
+  "Postgres": {
+    "URL": "postgres://localhost/shuttletracker?sslmode=disable"
+  },
+  "Log": {
+    "Level": "debug"
+  }
+}
