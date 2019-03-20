@@ -192,6 +192,9 @@ const store: StoreOptions<StoreState> = {
     getRoutes(state: StoreState): Route[] {
       return state.Routes;
     },
+    getStops(state: StoreState): Stop[] {
+      return state.Stops;
+    },
     getVehicles(state: StoreState): Vehicle[] {
       return state.Vehicles;
     },
