@@ -30,7 +30,7 @@ type ETAManager struct {
 func NewManager(ms shuttletracker.ModelService, updater *updater.Updater) (*ETAManager, error) {
 	em := &ETAManager{
 		ms:          ms,
-		etaChan:     make(chan *shuttletracker.VehicleETA),
+		etaChan:     make(chan *shuttletracker.VehicleETA, 50),
 		etas:        map[int64]*shuttletracker.VehicleETA{},
 		etasReqChan: make(chan chan map[int64]shuttletracker.VehicleETA),
 		sm:          &sync.Mutex{},
@@ -51,6 +51,11 @@ func (em *ETAManager) locationSubscriber(loc *shuttletracker.Location) {
 
 // Run is in charge of managing all of the state inside of ETAManager.
 func (em *ETAManager) Run() {
+	err := em.createInitialETAs()
+	if err != nil {
+		log.WithError(err).Error("unable to create initial ETAs")
+	}
+
 	ticker := time.Tick(time.Minute)
 	for {
 		select {
@@ -64,6 +69,23 @@ func (em *ETAManager) Run() {
 	}
 }
 
+func (em *ETAManager) createInitialETAs() error {
+	vehicles, err := em.ms.Vehicles()
+	if err != nil {
+		return err
+	}
+	for _, vehicle := range vehicles {
+		eta, err := em.calculateVehicleETAs(vehicle.ID)
+		if err != nil {
+			log.WithError(err).Errorf("unable to calculate ETAs for vehicle ID %d", vehicle.ID)
+			continue
+		}
+		log.Debugf("calculated ETAs for vehicle ID %d", vehicle.ID)
+		em.etaChan <- eta
+	}
+	return nil
+}
+
 func (em *ETAManager) handleNewLocation(loc *shuttletracker.Location) {
 	if loc.VehicleID == nil {
 		// can't do anything...
@@ -72,7 +94,7 @@ func (em *ETAManager) handleNewLocation(loc *shuttletracker.Location) {
 	vehicleID := *loc.VehicleID
 	eta, err := em.calculateVehicleETAs(vehicleID)
 	if err != nil {
-		log.WithError(err).Warnf("unable to calculate ETAs for vehicle ID %d", vehicleID)
+		log.WithError(err).Errorf("unable to calculate ETAs for vehicle ID %d", vehicleID)
 		return
 	}
 
@@ -101,22 +123,24 @@ func (em *ETAManager) processETAsRequest(c chan map[int64]shuttletracker.Vehicle
 	c <- etas
 }
 
-// iterate over all ETAs and remove those that have expired.
+// Iterate over all ETAs and remove those that have expired.
+// We also send empty ETAs after we clean them up.
 func (em *ETAManager) cleanup() {
 	log.Debug("ETAManager cleanup")
 	now := time.Now()
-	for vehicleID, vehicleETA := range em.etas {
+	for _, vehicleETA := range em.etas {
 		stopETAs := vehicleETA.StopETAs
+		shouldPush := false
 		for i := len(stopETAs) - 1; i >= 0; i-- {
 			stopETA := stopETAs[i]
 			if now.After(stopETA.ETA) {
+				shouldPush = true
 				stopETAs = append(stopETAs[:i], stopETAs[i+1:]...)
 			}
 		}
-		if len(stopETAs) == 0 {
-			delete(em.etas, vehicleID)
-		} else {
-			vehicleETA.StopETAs = stopETAs
+		vehicleETA.StopETAs = stopETAs
+		if shouldPush {
+			em.etaChan <- vehicleETA
 		}
 	}
 }
@@ -191,7 +215,7 @@ func calculateDistance(lds []locationDistance) float64 {
 
 func (em *ETAManager) determineNearestStopIndicesAlongRoute(track []*shuttletracker.Location, route *shuttletracker.Route) ([]int, error) {
 	if len(track) < 2 {
-		return nil, errors.New("not enough locations in track")
+		return []int{}, nil
 	}
 
 	// get stops
@@ -588,7 +612,7 @@ func (em *ETAManager) getLastDepartureTrack(vehicle *shuttletracker.Vehicle, rou
 	stopPoint := shuttletracker.Point{Latitude: stop.Latitude, Longitude: stop.Longitude}
 
 	if len(locs) < 2 {
-		return nil, errors.New("not enough locations")
+		return []*shuttletracker.Location{}, nil
 	}
 
 	i := 0
@@ -682,23 +706,23 @@ func (em *ETAManager) calculateVehicleETAs(vehicleID int64) (*shuttletracker.Veh
 
 	locPoint := shuttletracker.Point{Latitude: loc.Latitude, Longitude: loc.Longitude}
 
+	eta := &shuttletracker.VehicleETA{
+		VehicleID: vehicleID,
+		StopETAs:  []shuttletracker.StopETA{},
+		Updated:   time.Now(),
+	}
+
 	// get route info for vehicle's current route
 	if loc.RouteID == nil {
 		// vehicle isn't on route
-		return nil, errors.New("vehicle not on route")
+		return eta, nil
 	}
 
 	routeID := *loc.RouteID
+	eta.RouteID = routeID
 	route, err := em.ms.Route(routeID)
 	if err != nil {
 		return nil, err
-	}
-
-	eta := &shuttletracker.VehicleETA{
-		VehicleID: vehicleID,
-		RouteID:   routeID,
-		StopETAs:  []shuttletracker.StopETA{},
-		Updated:   time.Now(),
 	}
 
 	lastDepartureTrack, err := em.getLastDepartureTrack(vehicle, route)
@@ -727,15 +751,13 @@ func (em *ETAManager) calculateVehicleETAs(vehicleID int64) (*shuttletracker.Veh
 
 	durs, err := em.determineAverageTravelTimes(route)
 	if err != nil {
-		// log.WithError(err).Error("unable to determine average travel times")
-		return eta, nil
+		return nil, err
 	}
 
 	// find index of stop zone on the route the vehicle is nearest to
 	locIndices, err := em.determineNearestStopIndicesAlongRoute(lastDepartureTrack, route)
 	if err != nil {
-		// log.WithError(err).Warn("unable to determine where vehicle is along route")
-		return eta, nil
+		return nil, err
 	}
 	locIndex := locIndices[len(locIndices)-1]
 

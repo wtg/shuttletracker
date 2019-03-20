@@ -13,7 +13,7 @@ export default Vue.extend({
   props: ['etaInfo', 'show'],
   computed: {
     message(): string | null {
-      if (this.etaInfo === undefined) {
+      if (this.etaInfo === null) {
           return null;
       }
       const now = new Date();

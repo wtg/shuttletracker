@@ -49,7 +49,7 @@ export default Vue.extend({
       legend: new L.Control({ position: 'bottomleft' }),
       locationMarker: undefined,
       fusion: new Fusion(),
-      currentETAInfo: undefined,
+      currentETAInfo: null,
     } as {
         vehicles: Vehicle[];
         routes: Route[];
@@ -62,7 +62,7 @@ export default Vue.extend({
         locationMarker: L.Marker | undefined;
         userShuttleidCount: number;
         fusion: Fusion;
-        currentETAInfo: {} | undefined;
+        currentETAInfo: {} | null;
       };
   },
   mounted() {
@@ -287,6 +287,7 @@ export default Vue.extend({
       // find nearest stop
       const pos = UserLocationService.getInstance().getCurrentLocation();
       if (pos === undefined) {
+        this.currentETAInfo = null;
         return;
       }
       const c = pos.coords as Coordinates;
@@ -301,6 +302,7 @@ export default Vue.extend({
         }
       }
       if (closestStop === null) {
+        this.currentETAInfo = null;
         return;
       }
 
@@ -315,6 +317,7 @@ export default Vue.extend({
         }
       }
       if (eta === null) {
+        this.currentETAInfo = null;
         return;
       }
 
@@ -327,6 +330,7 @@ export default Vue.extend({
         }
       }
       if (route === null) {
+        this.currentETAInfo = null;
         return;
       }
 
