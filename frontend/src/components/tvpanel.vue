@@ -4,7 +4,8 @@
       <TimesQueue />
       <Map />
     <div class="titleBar bot">
-      <img src="~../assets/icon.svg">
+      <img src="~../assets/icon.svg" id="shuttlepic"> 
+      <h1 id='WTG'>Web Technologies Group</h1>
     </div>
   </div>
 </template>
@@ -37,9 +38,15 @@ html, body {
     font-size:75px;
     color:black;
 }
+#WTG {
+  position:absolute;
+  right:20px;
+}
+
 .bot {
   position:absolute;
   bottom:0px;
   height:60px;
+
 }
 </style>
