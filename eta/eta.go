@@ -214,7 +214,7 @@ func calculateDistance(lds []locationDistance) float64 {
 }
 
 func (em *ETAManager) determineNearestStopIndicesAlongRoute(track []*shuttletracker.Location, route *shuttletracker.Route) ([]int, error) {
-	if len(track) < 2 {
+	if len(track) < 1 {
 		return []int{}, nil
 	}
 
@@ -759,9 +759,13 @@ func (em *ETAManager) calculateVehicleETAs(vehicleID int64) (*shuttletracker.Veh
 	if err != nil {
 		return nil, err
 	}
+
+	// The last locIndex is where the vehicle is now. If the track is short, we can't determine this.
+	if len(locIndices) == 0 {
+		return eta, nil
+	}
 	locIndex := locIndices[len(locIndices)-1]
 
-	// stopPoints := make([]shuttletracker.Point, len(route.StopIDs))
 	for i, stopID := range route.StopIDs {
 		// find which zoneIndex this stop has
 		zoneIdx := i
