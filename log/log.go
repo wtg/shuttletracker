@@ -23,6 +23,7 @@ func init() {
 	logger = logrus.New()
 }
 
+// NewConfig creates a new Config.
 func NewConfig(v *viper.Viper) *Config {
 	cfg := &Config{
 		Level: "info",

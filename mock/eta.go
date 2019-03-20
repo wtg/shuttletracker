@@ -17,6 +17,7 @@ func (es *ETAService) CurrentETAs() map[int64]shuttletracker.VehicleETA {
 	return args.Get(0).(map[int64]shuttletracker.VehicleETA)
 }
 
+// Subscribe allows callers to provide a callback to receive VehicleETAs.
 func (es *ETAService) Subscribe(f func(shuttletracker.VehicleETA)) {
 	es.Called(f)
 }

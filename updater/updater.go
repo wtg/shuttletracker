@@ -81,7 +81,7 @@ func (u *Updater) Run() {
 	}
 }
 
-// Provide a function that is called after Updater parses a new Location.
+// Subscribe allows callers to provide a function that is called after Updater parses a new Location.
 func (u *Updater) Subscribe(f func(*shuttletracker.Location)) {
 	u.sm.Lock()
 	u.subscribers = append(u.subscribers, f)

@@ -15,6 +15,7 @@ import (
 
 const earthRadius = 6371000.0 // meters
 
+// ETAManager implements ETAService and provides ETAs for Vehicles to Stops.
 type ETAManager struct {
 	ms          shuttletracker.ModelService
 	etaChan     chan *shuttletracker.VehicleETA
@@ -120,13 +121,14 @@ func (em *ETAManager) cleanup() {
 	}
 }
 
+// Subscribe allows callers to provide a callback to receive new VehicleETAs.
 func (em *ETAManager) Subscribe(sub func(shuttletracker.VehicleETA)) {
 	em.sm.Lock()
 	em.subscribers = append(em.subscribers, sub)
 	em.sm.Unlock()
 }
 
-// This can be called by anyone to get ETAManager's current view of vehicle ETAs.
+// CurrentETAs can be called by anyone to get ETAManager's current view of vehicle ETAs.
 // It returns structs as values in order to prevent data races.
 func (em *ETAManager) CurrentETAs() map[int64]shuttletracker.VehicleETA {
 	etasChan := make(chan map[int64]shuttletracker.VehicleETA)
