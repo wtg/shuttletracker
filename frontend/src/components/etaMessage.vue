@@ -45,7 +45,7 @@ function relativeTime(from: Date, to: Date): string {
 
 <style lang="scss" scoped>
 .eta-message {
-    width: 300px;
+    width: 320px;
     position: fixed;
     top: 0;
     left: 0;
@@ -63,6 +63,8 @@ function relativeTime(from: Date, to: Date): string {
     .eta-message {
         width: auto;
         margin: 50px 10px 0 10px;
+        padding: 16px 22px;
+        font-size: 16px;
     }
 }
 .pop-enter-active {
