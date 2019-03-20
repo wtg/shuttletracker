@@ -8,7 +8,7 @@ RUN npm install
 RUN npm run build
 
 
-FROM golang:1.11
+FROM golang:1.12
 
 RUN mkdir /app
 WORKDIR /app
