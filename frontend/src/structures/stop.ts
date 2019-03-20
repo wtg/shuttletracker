@@ -54,4 +54,14 @@ export class Stop {
     public addRoute(route: Route): void {
         this.routesOn.push(route);
     }
+    public asJSON(): {
+        name: string; description: string; latitude: number; longitude: number } {
+        return {
+            // id: this.id,
+            name: this.name,
+            description: this.description,
+            latitude: Number(this.latitude),
+            longitude: Number(this.longitude),
+        };
+    }
 }

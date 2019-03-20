@@ -5,6 +5,7 @@ import stopsAdmin from '@/components/admin/stopsAdmin.vue';
 import vehiclesAdmin from '@/components/admin/vehiclesAdmin.vue';
 import routeOverview from '@/components/admin/routeOverview.vue';
 import routeEditing from '@/components/admin/routeEditing.vue';
+import stopsEditing from '@/components/admin/stopsEditing.vue';
 import vehicleEditing from '@/components/admin/vehicleEditing.vue';
 import vehicleOverview from '@/components/admin/vehicleOverview.vue';
 import messagesAdmin from '@/components/admin/MessagesAdmin.vue';
@@ -39,6 +40,13 @@ export default new Router({
         component: routeEditing,
         props: {creation: true},
       },
+      {
+        path: '/admin/stops/:id/new',
+        name: 'new stop',
+        component: stopsEditing,
+        props: { creation: true },
+      },
+
       {
         path: '/admin/stops',
         name: 'stops',

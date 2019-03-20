@@ -1,9 +1,9 @@
-@import "~bulma/sass/utilities/_all";
+@import "~bulma/sass/utilities/all";
 
-$primary: #ED1C24;
-$link: red;
+$primary: #ed1c24;
+$link: #ff0000;
 $primary-invert: findColorInvert($primary);
-$twitter: #4099FF;
+$twitter: #4099ff;
 $twitter-invert: findColorInvert($twitter);
 
 $colors: (
