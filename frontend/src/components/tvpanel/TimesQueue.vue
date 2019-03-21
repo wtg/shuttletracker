@@ -72,7 +72,7 @@ export default Vue.extend({
         },
         // --------------------------------------------------------------------------
         // Function to handle checking/updating the queues every hour 
-        updateHour(){
+        checkHour(){
             if (this.curr_time.getMinutes() === 0){
                 this.updateQueues();
                 this.checkEast();
@@ -173,36 +173,70 @@ export default Vue.extend({
         },
         // Function to update shuttle times for the East Queue
         updateQueueEast(){  
-
-
+            let now = this.curr_time;
+            let first_shuttle_time = this.curr_east.scheduleTime[0].split(":");
+            if (now.getHours() > parseInt(first_shuttle_time[0])){
+                this.curr_east.scheduleTime.shift();
+            }            
+            else if (now.getHours() === parseInt(first_shuttle_time[0])){
+                if (now.getMinutes() > parseInt(first_shuttle_time[1])){
+                    this.curr_east.scheduleTime.shift();
+                }
+            }
+            // Display the first three shuttle times of the queue
+            document.getElementById('east1').innerHTML = (this.curr_east.scheduleTime[0]) ? this.curr_east.scheduleTime[0] : ""; 
+            document.getElementById('east2').innerHTML = (this.curr_east.scheduleTime[1]) ? this.curr_east.scheduleTime[1] : "";
+            document.getElementById('east3').innerHTML = (this.curr_east.scheduleTime[2]) ? this.curr_east.scheduleTime[2] : "";
         },
         // Function to update shuttles times for the West Queue
         updateQueueWest(){
-
-
+            let now = this.curr_time;
+            let first_shuttle_time = this.curr_west.scheduleTime[0].split(":");
+            if (now.getHours() > parseInt(first_shuttle_time[0])){
+                this.curr_west.scheduleTime.shift();
+            }            
+            else if (now.getHours() === parseInt(first_shuttle_time[0])){
+                if (now.getMinutes() > parseInt(first_shuttle_time[1])){
+                    this.curr_west.scheduleTime.shift();
+                }
+            }
+            // Display the first three shuttle times of the queue
+            document.getElementById('west1').innerHTML = (this.curr_west.scheduleTime[0]) ? this.curr_west.scheduleTime[0] : ""; 
+            document.getElementById('west2').innerHTML = (this.curr_west.scheduleTime[1]) ? this.curr_west.scheduleTime[1] : "";
+            document.getElementById('west3').innerHTML = (this.curr_west.scheduleTime[2]) ? this.curr_west.scheduleTime[2] : "";
         },
         // Function to update shuttle times for the Late/Weekend Queue
         updateQueueLate(){
-
-
+            let now = this.curr_time;
+            let first_shuttle_time = this.curr_weekend_late[0].split(":");
+            if (now.getHours() > parseInt(first_shuttle_time[0])){
+                this.curr_weekend_late.scheduleTime.shift();
+            }            
+            else if (now.getHours() === parseInt(first_shuttle_time[0])){
+                if (now.getMinutes() > parseInt(first_shuttle_time[1])){
+                    this.curr_weekend_late.scheduleTime.shift();
+                }
+            }
+            // Display the first three shuttle times of the queue
+            document.getElementById('late1').innerHTML = (this.curr_weekend_late.scheduleTime[0]) ? this.curr_weekend_late.scheduleTime[0] : ""; 
+            document.getElementById('late2').innerHTML = (this.curr_weekend_late.scheduleTime[1]) ? this.curr_weekend_late.scheduleTime[1] : "";
+            document.getElementById('late3').innerHTML = (this.curr_weekend_late.scheduleTime[2]) ? this.curr_weekend_late.scheduleTime[2] : "";
         },
         // --------------------------------------------------------------------------
 
     },
 
     mounted() {
-        
         // Interval every minute
         setInterval(() => {
             this.updateCurTime();
-            this.updateHour();
+            this.checkHour();
         }, 60000);
-
+        
         // Interval every five minutes
         setInterval(() => {
             this.updateShuttleTimes();
         }, 300000);
-
     },
 });
 </script>
