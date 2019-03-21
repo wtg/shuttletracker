@@ -58,7 +58,7 @@ export default Vue.extend({
     data(){
         return {
             curr_time: new Date(),        // Current Time (Date Object)
-            curr_west: weekdayW.scheduleTime,         // Current West Time Queue (Array)
+            curr_west: undefined,         // Current West Time Queue (Array)
             curr_east: undefined,         // Current East Time Queue (Array)
             curr_weekend_late: undefined, // Current Late/Weekend Time Queue (Array)
         }
@@ -78,7 +78,7 @@ export default Vue.extend({
                 this.checkEast();
                 this.checkWest();
                 this.checkLate();
-                console.log("Hourly Check/Update Done");
+                console.log("Hourly check/update done");
             }
         },
         // Function to update/set the component's queue values
@@ -87,7 +87,7 @@ export default Vue.extend({
             if (this.curr_time.getDay() >= 1 && this.curr_time.getDay() <= 4){
                 // Morning (Update at 6AM)
                 if (this.curr_time.getHours() === 6){
-                    delete this.curr_weekend_late;
+                    this.curr_weekend_late = null;
                     this.curr_west = weekdayW.scheduleTime;
                     this.curr_east = weekdayE.scheduleTime;
                 } 
@@ -110,12 +110,12 @@ export default Vue.extend({
                 if (this.curr_time.getHours() === 9 ){
                     this.curr_east = weekendE.scheduleTime;
                     this.curr_west = satW.scheduleTime;
-                    delete this.curr_weekend_late;
+                    this.curr_weekend_late = null;
                 }
                 // Late night (Update at 7PM)
                 else if (this.curr_time.getHours() === 19 ){
-                    delete this.curr_east;
-                    delete this.curr_west;
+                    this.curr_east = null;
+                    this.curr_west = null;
                     this.curr_weekend_late = weekendlate.scheduleTime;
                 }
             }
@@ -125,27 +125,27 @@ export default Vue.extend({
                 if (this.curr_time.getHours() === 9){
                     this.curr_east = weekendE.scheduleTime;
                     this.curr_west = sunW.scheduleTime;
-                    delete this.curr_weekend_late;
+                    this.curr_weekend_late = null;
                 }
             }
         },
         // Toggle East Shuttles Queue
         checkEast(){
-            if (this.curr_east){
+            if (this.curr_east != null){
                 return true;
             }
             return false;
         },
         // Toggle West Shuttles Queue
         checkWest(){
-            if (this.curr_west){
+            if (this.curr_west != null){
                 return true;
             }
             return false;
         },
         // Toggle Late/Weekend Shuttles Queue
         checkLate(){
-            if (this.curr_weekend_late){
+            if (this.curr_weekend_late != null){
                 // If East and West shuttles are also running, format the queue
                 if (this.curr_east && this.curr_west){
                     document.getElementById("weekendlate").style.marginTop = "300px";
@@ -161,13 +161,13 @@ export default Vue.extend({
         // --------------------------------------------------------------------------
         // Function to handle updating shuttle times 
         updateShuttleTimes(){
-            if (this.curr_east !== undefined){
+            if (this.curr_east != null){
                 this.updateQueueEast();
             }
-            if (this.curr_west !== undefined){
+            if (this.curr_west != null){
                 this.updateQueueWest();
             }
-            if (this.curr_weekend_late !== undefined){
+            if (this.curr_weekend_late != null){
                 this.updateQueueLate();
             }
             console.log("Shuttle times updated");
@@ -180,14 +180,14 @@ export default Vue.extend({
                 this.curr_east.shift();
             }            
             else if (now.getHours() === parseInt(first_shuttle_time[0])){
-                if (now.getMinutes() > parseInt(first_shuttle_time[1])){
+                if (now.getMinutes() > parseInt(first_shuttle_time[1]) + 2){
                     this.curr_east.shift();
                 }
             }
             // Display the first three shuttle times of the queue
-            document.getElementById('east1').innerHTML = (this.curr_east[0]) ? this.curr_east[0] : ""; 
-            document.getElementById('east2').innerHTML = (this.curr_east[1]) ? this.curr_east[1] : "";
-            document.getElementById('east3').innerHTML = (this.curr_east[2]) ? this.curr_east[2] : "";
+            document.getElementById('east1').innerHTML = (this.curr_east[0]) ? this.display(this.curr_east[0]) : ""; 
+            document.getElementById('east2').innerHTML = (this.curr_east[1]) ? this.display(this.curr_east[1]) : "";
+            document.getElementById('east3').innerHTML = (this.curr_east[2]) ? this.display(this.curr_east[2]) : "";
         },
         // Function to update shuttles times for the West Queue
         updateQueueWest(){
@@ -197,14 +197,14 @@ export default Vue.extend({
                 this.curr_west.shift();
             }            
             else if (now.getHours() === parseInt(first_shuttle_time[0])){
-                if (now.getMinutes() > parseInt(first_shuttle_time[1])){
+                if (now.getMinutes() > parseInt(first_shuttle_time[1]) + 2){
                     this.curr_west.shift();
                 }
             }
             // Display the first three shuttle times of the queue
-            document.getElementById('west1').innerHTML = (this.curr_west[0]) ? this.curr_west[0] : ""; 
-            document.getElementById('west2').innerHTML = (this.curr_west[1]) ? this.curr_west[1] : "";
-            document.getElementById('west3').innerHTML = (this.curr_west[2]) ? this.curr_west[2] : "";
+            document.getElementById('west1').innerHTML = (this.curr_west[0]) ? this.display(this.curr_west[0]) : ""; 
+            document.getElementById('west2').innerHTML = (this.curr_west[1]) ? this.display(this.curr_west[1]) : "";
+            document.getElementById('west3').innerHTML = (this.curr_west[2]) ? this.display(this.curr_west[2]) : "";
         },
         // Function to update shuttle times for the Late/Weekend Queue
         updateQueueLate(){
@@ -214,15 +214,36 @@ export default Vue.extend({
                 this.curr_weekend_late.shift();
             }            
             else if (now.getHours() === parseInt(first_shuttle_time[0])){
-                if (now.getMinutes() > parseInt(first_shuttle_time[1])){
+                if (now.getMinutes() > parseInt(first_shuttle_time[1]) + 2){
                     this.curr_weekend_late.shift();
                 }
             }
             // Display the first three shuttle times of the queue
-            document.getElementById('late1').innerHTML = (this.curr_weekend_late[0]) ? this.curr_weekend_late[0] : ""; 
-            document.getElementById('late2').innerHTML = (this.curr_weekend_late[1]) ? this.curr_weekend_late[1] : "";
-            document.getElementById('late3').innerHTML = (this.curr_weekend_late[2]) ? this.curr_weekend_late[2] : "";
+            document.getElementById('late1').innerHTML = (this.curr_weekend_late[0]) ? this.display(this.curr_weekend_late[0]) : ""; 
+            document.getElementById('late2').innerHTML = (this.curr_weekend_late[1]) ? this.display(this.curr_weekend_late[1]) : "";
+            document.getElementById('late3').innerHTML = (this.curr_weekend_late[2]) ? this.display(this.curr_weekend_late[2]) : "";
         },
+        // --------------------------------------------------------------------------
+        // Function to convert 24 to 12 hour format and display AM or PM
+        display(time){
+            let temp = time.split(":");
+            let hour = temp[0];
+            let minutes = temp[1];
+            if (hour < 12){
+                if (time == 0){
+                    hour = 12;
+                }
+                return hour + ':' + minutes + ' AM';
+            }
+            else {
+                if (time == 24){
+                    hour = hour - 12;
+                    return hour + ':' + minutes + ' AM';
+                }
+                hour = hour - 12;
+                return hour + ':' + minutes + ' PM';
+            }
+        }
         // --------------------------------------------------------------------------
     },
 
@@ -247,7 +268,7 @@ export default Vue.extend({
         height:700px;
         width:49%;
         top:159px;
-        position:relative;
+        position:relative; 
         text-align:center;
         color:black;
     }
