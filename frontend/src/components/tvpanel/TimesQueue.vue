@@ -58,7 +58,7 @@ export default Vue.extend({
     data(){
         return {
             curr_time: new Date(),        // Current Time (Date Object)
-            curr_west: undefined,         // Current West Time Queue (Array)
+            curr_west: weekdayW.scheduleTime,         // Current West Time Queue (Array)
             curr_east: undefined,         // Current East Time Queue (Array)
             curr_weekend_late: undefined, // Current Late/Weekend Time Queue (Array)
         }
@@ -81,7 +81,7 @@ export default Vue.extend({
                 console.log("Hourly Check/Update Done");
             }
         },
-        // Function to update the component's queue values
+        // Function to update/set the component's queue values
         updateQueues(){
             // Monday - Thursday 
             if (this.curr_time.getDay() >= 1 && this.curr_time.getDay() <= 4){
@@ -161,69 +161,69 @@ export default Vue.extend({
         // --------------------------------------------------------------------------
         // Function to handle updating shuttle times 
         updateShuttleTimes(){
-            if (this.curr_east){
+            if (this.curr_east !== undefined){
                 this.updateQueueEast();
             }
-            if (this.curr_west){
+            if (this.curr_west !== undefined){
                 this.updateQueueWest();
             }
-            if (this.curr_weekend_late){
+            if (this.curr_weekend_late !== undefined){
                 this.updateQueueLate();
             }
+            console.log("Shuttle times updated");
         },
         // Function to update shuttle times for the East Queue
         updateQueueEast(){  
             let now = this.curr_time;
-            let first_shuttle_time = this.curr_east.scheduleTime[0].split(":");
+            let first_shuttle_time = this.curr_east[0].split(":");
             if (now.getHours() > parseInt(first_shuttle_time[0])){
-                this.curr_east.scheduleTime.shift();
+                this.curr_east.shift();
             }            
             else if (now.getHours() === parseInt(first_shuttle_time[0])){
                 if (now.getMinutes() > parseInt(first_shuttle_time[1])){
-                    this.curr_east.scheduleTime.shift();
+                    this.curr_east.shift();
                 }
             }
             // Display the first three shuttle times of the queue
-            document.getElementById('east1').innerHTML = (this.curr_east.scheduleTime[0]) ? this.curr_east.scheduleTime[0] : ""; 
-            document.getElementById('east2').innerHTML = (this.curr_east.scheduleTime[1]) ? this.curr_east.scheduleTime[1] : "";
-            document.getElementById('east3').innerHTML = (this.curr_east.scheduleTime[2]) ? this.curr_east.scheduleTime[2] : "";
+            document.getElementById('east1').innerHTML = (this.curr_east[0]) ? this.curr_east[0] : ""; 
+            document.getElementById('east2').innerHTML = (this.curr_east[1]) ? this.curr_east[1] : "";
+            document.getElementById('east3').innerHTML = (this.curr_east[2]) ? this.curr_east[2] : "";
         },
         // Function to update shuttles times for the West Queue
         updateQueueWest(){
             let now = this.curr_time;
-            let first_shuttle_time = this.curr_west.scheduleTime[0].split(":");
+            let first_shuttle_time = this.curr_west[0].split(":");
             if (now.getHours() > parseInt(first_shuttle_time[0])){
-                this.curr_west.scheduleTime.shift();
+                this.curr_west.shift();
             }            
             else if (now.getHours() === parseInt(first_shuttle_time[0])){
                 if (now.getMinutes() > parseInt(first_shuttle_time[1])){
-                    this.curr_west.scheduleTime.shift();
+                    this.curr_west.shift();
                 }
             }
             // Display the first three shuttle times of the queue
-            document.getElementById('west1').innerHTML = (this.curr_west.scheduleTime[0]) ? this.curr_west.scheduleTime[0] : ""; 
-            document.getElementById('west2').innerHTML = (this.curr_west.scheduleTime[1]) ? this.curr_west.scheduleTime[1] : "";
-            document.getElementById('west3').innerHTML = (this.curr_west.scheduleTime[2]) ? this.curr_west.scheduleTime[2] : "";
+            document.getElementById('west1').innerHTML = (this.curr_west[0]) ? this.curr_west[0] : ""; 
+            document.getElementById('west2').innerHTML = (this.curr_west[1]) ? this.curr_west[1] : "";
+            document.getElementById('west3').innerHTML = (this.curr_west[2]) ? this.curr_west[2] : "";
         },
         // Function to update shuttle times for the Late/Weekend Queue
         updateQueueLate(){
             let now = this.curr_time;
             let first_shuttle_time = this.curr_weekend_late[0].split(":");
             if (now.getHours() > parseInt(first_shuttle_time[0])){
-                this.curr_weekend_late.scheduleTime.shift();
+                this.curr_weekend_late.shift();
             }            
             else if (now.getHours() === parseInt(first_shuttle_time[0])){
                 if (now.getMinutes() > parseInt(first_shuttle_time[1])){
-                    this.curr_weekend_late.scheduleTime.shift();
+                    this.curr_weekend_late.shift();
                 }
             }
             // Display the first three shuttle times of the queue
-            document.getElementById('late1').innerHTML = (this.curr_weekend_late.scheduleTime[0]) ? this.curr_weekend_late.scheduleTime[0] : ""; 
-            document.getElementById('late2').innerHTML = (this.curr_weekend_late.scheduleTime[1]) ? this.curr_weekend_late.scheduleTime[1] : "";
-            document.getElementById('late3').innerHTML = (this.curr_weekend_late.scheduleTime[2]) ? this.curr_weekend_late.scheduleTime[2] : "";
+            document.getElementById('late1').innerHTML = (this.curr_weekend_late[0]) ? this.curr_weekend_late[0] : ""; 
+            document.getElementById('late2').innerHTML = (this.curr_weekend_late[1]) ? this.curr_weekend_late[1] : "";
+            document.getElementById('late3').innerHTML = (this.curr_weekend_late[2]) ? this.curr_weekend_late[2] : "";
         },
         // --------------------------------------------------------------------------
-
     },
 
     mounted() {
@@ -232,7 +232,7 @@ export default Vue.extend({
             this.updateCurTime();
             this.checkHour();
         }, 60000);
-        
+
         // Interval every five minutes
         setInterval(() => {
             this.updateShuttleTimes();
