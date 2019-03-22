@@ -2,8 +2,9 @@
     <div class="container">
         <router-link to="/">Back</router-link>
         <h1>Notification Register</h1>
-        <h4>User Phone Number:</h4>
-        <input v-model="phone_number" placeholder="ex. 1234567890">
+        <h4>Shuttle Stop : <span v-html="stop_id"></span></h4>
+        <h4>User Phone Number :</h4>
+        <input v-model.trim="phone_number" placeholder="ex. 1234567890">
         <!-- phone_number holds string -->
         <h4>Carrier Type</h4>
         <select v-model="carrier">
@@ -14,21 +15,16 @@
             <option value="ooredoo">Ooredoo</option>
         </select>
         <!-- carrier holds value -->
-        <h4>Shuttle Stop</h4>
-        <select v-model="stop">
-            <option disabled selected>Select a Stop</option>
-            <option value="union">Student Union</option>
-            <option value="b">B</option>
-        </select>
-        <h4>Shuttle Route</h4>
-        <input type="checkbox" id="east" value="east" v-model="route">
-        <label for="east">East</label>
+        <h4>Shuttle Route :</h4>
+        <input type="radio" v-model="route" value="east">
+        <label for="east"> East</label>
         <br>
-        <input type="checkbox" id="west" value="west" v-model="route">
-        <label for="west">West</label>
+        <input type="radio" v-model="route" value="west">
+        <label for="west"> West</label>
         <br>
-        <input type="checkbox" id="wln" value="wln" v-model="route">
-        <label for="wln">Weekend Late Night</label>
+        <input type="radio" v-model="route" value="wln">
+        <label for="wln"> Weekend Late Night</label>
+        <br>
         <!-- route holds value -->
         <br><br>
         <Tabulator/>
@@ -36,10 +32,10 @@
         <Selected/>
         <br>
         <!-- TODO make time reactive -->
-        <span>Times are : {{ time }}</span>
+        <!-- <span>Times are : {{ time }}</span> -->
         <br>
         <!-- TODO disable button until flag -->
-        <button v-on:click="" v-bind:disabled="route == ''">Submit</button>
+        <button v-on:click="submit()" v-bind:disabled="(route == '')||(carrier == '')">Submit</button>
         <br><br><br>
     </div>
 </template>
@@ -55,15 +51,50 @@ export default Vue.extend({
         Tabulator,
         Selected,
     },
-    data: {
-        phone_number: '',
-        carrier: '',
-        route: '',
-        stop: '',
+    data() {
+        return {
+            phone_number: '',
+            carrier: '',
+            carriers: ['verizon', 'at&t'],
+            route: '',
+            stop_url:  decodeURI(window.location.href),
+        }
+    },
+    computed: {
+        stop_id: function() {
+            return ((this.stop_url.split('?')[1]).split('=')[1]);
+        },
     },
     methods: {
         submit() {
-            // TODO store info into db
+            //test phone_num
+            if ( this.phone_number.length !== 10 || Number.isNaN(this.phone_number as any) ) {
+                //error phone
+                console.log("Error : Phone Number Invalid")
+                return
+            }
+            //test carrier
+            if (  this.carriers.indexOf(this.carrier) <= -1 ) {
+                //error carrier
+                console.log("Error : Carrier Invalid")
+                return
+            }
+            //test route
+            if ( this.route == '' ) {
+                //error route
+                console.log("Error : Route Not Selected")
+                return
+            }
+            //test time
+            if ( !time ) {
+                //error time
+                console.log("Error : Time Not Selected")
+                return
+            } 
+            
+            //TODO submit 
+
+
         },
     },
 });

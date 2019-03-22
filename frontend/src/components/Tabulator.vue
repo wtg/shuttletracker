@@ -11,7 +11,7 @@ export default {
     return {
       tabulator: null,
       tableColumn: [
-      {title: 'Sunday', field: 'su', align: 'center', cellClick: function(e, cell){time=time+cell.getValue()+' '+cell.getColumn().getField()+' ';console.log(time)},}, 
+      {title: 'Sunday', field: 'su', align: 'center', cellClick: function(e, cell){time=time+cell.getValue()+' '+cell.getColumn().getField()+' ';console.log(time);},}, 
       {title: 'Monday', field: 'm', align: 'center', cellClick: function(e, cell){console.log(cell.getValue()); console.log(cell.getColumn().getField())},}, 
       {title: 'Tuesday', field: 't', align: 'center', cellClick: function(e, cell){console.log(cell.getValue()); console.log(cell.getColumn().getField())},}, 
       {title: 'Wednesday', field: 'w', align: 'center', cellClick: function(e, cell){console.log(cell.getValue()); console.log(cell.getColumn().getField())},}, 
