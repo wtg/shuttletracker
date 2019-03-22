@@ -1,27 +1,22 @@
 <template>
 <div id ="main">
 
-    <!-- Display Current Time and Day -->
-    <h3> The Current Time is {{updateCurTime()}} </h3>
-    <h3> The Day is {{curr_time.getDay()}} </h3>
-
     <!-- East Queue -->
     <div id="east" v-if="checkEast()">
         <ul>  
             <li id="type"> EAST  </li>
-            <li id="east1" class="time"></li>
-            <li id="east2" class="time"></li>
-            <li id="east3" class="time"></li>
+            <li id="east1" class="time" v-show="this.curr_east">1</li>
+            <li id="east2" class="time" v-show="this.curr_east">2</li>
+            <li id="east3" class="time" v-show="this.curr_east">3</li>
         </ul>
     </div>
-
     <!-- West Queue -->
     <div id="west" v-if="checkWest()">
         <ul>
             <li id="type"> WEST </li>
-            <li id="west1" class="time"></li>
-            <li id="west2" class="time"></li>
-            <li id="west3" class="time"></li>
+            <li id="west1" class="time" v-show="this.curr_west">1</li>
+            <li id="west2" class="time" v-show="this.curr_west">2</li>
+            <li id="west3" class="time" v-show="this.curr_west">3</li>
         </ul>
     </div>
 
@@ -29,9 +24,9 @@
     <div id="weekendlate" v-if="checkLate()">
         <ul>
             <li id="type" > LATE NIGHT </li>
-            <li id="late1" class="time"></li>
-            <li id="late2" class="time"></li>
-            <li id="late3" class="time"></li>
+            <li id="late1" class="time" v-show="this.curr_weekend_late">1</li>
+            <li id="late2" class="time" v-show="this.curr_weekend_late">2</li>
+            <li id="late3" class="time" v-show="this.curr_weekend_late">3</li>
         </ul>
     </div>
 </div>
@@ -68,7 +63,6 @@ export default Vue.extend({
         // Display/Update the current time 
         updateCurTime(){
             this.curr_time = new Date();
-            return this.curr_time.getHours() + ': ' + this.curr_time.getMinutes();
         },
         // --------------------------------------------------------------------------
         // Function to handle checking/updating the queues every hour 
@@ -87,7 +81,7 @@ export default Vue.extend({
             if (this.curr_time.getDay() >= 1 && this.curr_time.getDay() <= 4){
                 // Morning (Update at 6AM)
                 if (this.curr_time.getHours() === 6){
-                    this.curr_weekend_late = null;
+                    this.curr_weekend_late = null || undefined;
                     this.curr_west = weekdayW.scheduleTime;
                     this.curr_east = weekdayE.scheduleTime;
                 } 
@@ -110,12 +104,12 @@ export default Vue.extend({
                 if (this.curr_time.getHours() === 9 ){
                     this.curr_east = weekendE.scheduleTime;
                     this.curr_west = satW.scheduleTime;
-                    this.curr_weekend_late = null;
+                    this.curr_weekend_late = null || undefined;
                 }
                 // Late night (Update at 7PM)
                 else if (this.curr_time.getHours() === 19 ){
-                    this.curr_east = null;
-                    this.curr_west = null;
+                    this.curr_east = null || undefined;
+                    this.curr_west = null || undefined;
                     this.curr_weekend_late = weekendlate.scheduleTime;
                 }
             }
@@ -125,9 +119,11 @@ export default Vue.extend({
                 if (this.curr_time.getHours() === 9){
                     this.curr_east = weekendE.scheduleTime;
                     this.curr_west = sunW.scheduleTime;
-                    this.curr_weekend_late = null;
+                    this.curr_weekend_late = null || undefined;
                 }
             }
+            // Format weekendlate queue
+            this.formatWeekendLate();
         },
         // Toggle East Shuttles Queue
         checkEast(){
@@ -146,17 +142,21 @@ export default Vue.extend({
         // Toggle Late/Weekend Shuttles Queue
         checkLate(){
             if (this.curr_weekend_late != null){
-                // If East and West shuttles are also running, format the queue
-                if (this.curr_east && this.curr_west){
-                    document.getElementById("weekendlate").style.marginTop = "300px";
-                }
-                // If only the Late Night shuttles are running, center the queue    
-                else {
-                    document.getElementById("weekendlate").style.margin = "0 auto";
-                }
-                return true; 
+                return true;
             }
-            return false; 
+            return false;    
+        },
+
+        // Function to manipulate weekendlate formatting
+        formatWeekendLate(){
+            //If East and West shuttles are also running, format the queue
+            if (this.curr_east && this.curr_west && this.curr_weekend_late){
+                document.getElementById("weekendlate").style.marginTop = "250px";
+            }
+            // If only the Late Night shuttles are running, center the queue    
+            else if (this.curr_weekend_late){
+                document.getElementById("weekendlate").style.margin = "0 auto";
+            }
         },
         // --------------------------------------------------------------------------
         // Function to handle updating shuttle times 
@@ -229,14 +229,17 @@ export default Vue.extend({
             let temp = time.split(":");
             let hour = temp[0];
             let minutes = temp[1];
-            if (hour < 12){
-                if (time == 0){
+            if (parseInt(hour) < 12){
+                if (parseInt(hour) == 0){
                     hour = 12;
                 }
                 return hour + ':' + minutes + ' AM';
             }
+            else if (parseInt(hour) == 12){
+                return hour + ':' + minutes + ' PM';
+            }
             else {
-                if (time == 24){
+                if (parseInt(hour) == 24){
                     hour = hour - 12;
                     return hour + ':' + minutes + ' AM';
                 }
@@ -254,10 +257,10 @@ export default Vue.extend({
             this.checkHour();
         }, 60000);
 
-        // Interval every five minutes
+        // Interval every three minutes 180,000 milliseconds
         setInterval(() => {
             this.updateShuttleTimes();
-        }, 300000);
+        }, 180000);
     },
 });
 </script>
@@ -273,7 +276,7 @@ export default Vue.extend({
         color:black;
     }
     .time{
-        font-size:20px;
+        font-size:35px;
     }
     ul {
         padding-left:0;
@@ -293,6 +296,15 @@ export default Vue.extend({
         padding-top:30px;
     }
     #type{
-        font-size:60px;
+        font-size:80px;
     }
+    
+    .fade-enter-active, .fade-leave-active {
+        transition: opacity 0.25s ease-out;
+    }
+
+    .fade-enter, .fade-leave-to {
+        opacity: 0;
+    }
+
 </style>
