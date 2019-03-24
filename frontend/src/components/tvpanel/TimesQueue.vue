@@ -51,8 +51,8 @@ export default Vue.extend({
     data(){
         return {
             curr_time: new Date(),        // Current Time (Date Object)
-            curr_west: undefined,         // Current West Time Queue (Array)
-            curr_east: undefined,         // Current East Time Queue (Array)
+            curr_west: sunW.scheduleTime,         // Current West Time Queue (Array)
+            curr_east: weekendE.scheduleTime,         // Current East Time Queue (Array)
             curr_weekend_late: undefined, // Current Late/Weekend Time Queue (Array)
         }
     },
@@ -70,7 +70,7 @@ export default Vue.extend({
                 this.checkEast();
                 this.checkWest();
                 this.checkLate();
-                console.log("Hourly check/update done");
+                console.log("Hourly Queue check/update done");
             }
         },
         // Function to update/set the component's queue values
@@ -257,7 +257,7 @@ export default Vue.extend({
         // Interval every three minutes; 180,000 milliseconds
         setInterval(() => {
             this.updateShuttleTimes();
-        }, 180000);
+        }, 100);
     },
 });
 </script>

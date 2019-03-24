@@ -12,12 +12,17 @@ import Vue from "vue";
 
 export default Vue.extend({
   name: "TimeDisplay",
+  data() {
+    return {
+      today: new Date(),
+    }
+  },
   methods: {
     // Function to display the Current Time
     displayTime() {
-      let today = new Date();
-      let hour = today.getHours();
-      let minutes = today.getMinutes();
+      this.today = new Date();
+      let hour = this.today.getHours();
+      let minutes = this.today.getMinutes();
       let am_pm;
       // Format Hours
       if (hour < 12) {
@@ -32,7 +37,7 @@ export default Vue.extend({
         hour = hour - 12;
         am_pm = "PM";
       }
-      // Format Minutes and return
+      // Format minutes and return
       if (minutes <= 9) {
         return hour.toString() + ":0" + minutes.toString() + " " + am_pm;
       }
@@ -42,7 +47,6 @@ export default Vue.extend({
     displayDay() {
       let today = new Date();
       let day = today.getDay();
-
       switch (day) {
         case 0:
           return "Sunday";
@@ -62,9 +66,11 @@ export default Vue.extend({
     }
   },
   mounted() {
-    // Update time every minute
+    // Update Time and Day every minute
     setInterval(() => {
-      this.updateCurTime();
+      this.displayTime();
+      this.displayDay();
+      console.log("Updated Current Time/Date");
     }, 60000);
   }
 });

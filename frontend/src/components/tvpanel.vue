@@ -28,12 +28,6 @@ export default Vue.extend({
     Map,
     TimeDisplay,
   },
-  mounted() {
-    // Update time every minute
-    setInterval(() => {
-      this.updateCurTime();
-    }, 60000);
-  }
 });
 </script>
 
