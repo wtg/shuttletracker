@@ -1,6 +1,5 @@
 <template>
 <div id ="main">
-
     <!-- East Queue -->
     <div id="east" v-if="checkEast()">
         <ul>  
@@ -19,7 +18,6 @@
             <li id="west3" class="time" v-show="this.curr_west">3</li>
         </ul>
     </div>
-
     <!-- Late Night/Weekend Queue -->
     <div id="weekendlate" v-if="checkLate()">
         <ul>
@@ -146,7 +144,6 @@ export default Vue.extend({
             }
             return false;    
         },
-
         // Function to manipulate weekendlate formatting
         formatWeekendLate(){
             //If East and West shuttles are also running, format the queue
@@ -251,19 +248,20 @@ export default Vue.extend({
     },
 
     mounted() {
-        // Interval every minute
+        // Interval every minute; 60,000 milliseconds
         setInterval(() => {
             this.updateCurTime();
             this.checkHour();
         }, 60000);
 
-        // Interval every three minutes 180,000 milliseconds
+        // Interval every three minutes; 180,000 milliseconds
         setInterval(() => {
             this.updateShuttleTimes();
         }, 180000);
     },
 });
 </script>
+
 <style scoped>
     #main{
         margin-left:25px;
@@ -306,5 +304,4 @@ export default Vue.extend({
     .fade-enter, .fade-leave-to {
         opacity: 0;
     }
-
 </style>
