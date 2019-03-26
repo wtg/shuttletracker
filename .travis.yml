@@ -31,6 +31,7 @@ before_script:
 script:
   - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then ./bin/golangci-lint run --new-from-rev=HEAD~ ./...; fi
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./bin/golangci-lint run ./... || true; fi
+  - cd frontend && npx tslint --project . && cd ..
   - ./test.sh
   - docker build .
   - bash <(curl -s https://codecov.io/bash)

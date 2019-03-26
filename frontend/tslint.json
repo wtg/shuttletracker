@@ -1,5 +1,5 @@
 {
-  "defaultSeverity": "warning",
+  "defaultSeverity": "error",
   "extends": [
     "tslint:recommended"
   ],
@@ -27,7 +27,7 @@
     "prefer-for-of": false,
     "variable-name": false,
     "no-empty": false,
-    "max-classes-per-file": null,
+    "max-classes-per-file": false,
     "no-bitwise": false,
     "no-console": false
   }
