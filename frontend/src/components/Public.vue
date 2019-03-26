@@ -8,6 +8,7 @@
       <messagebox ref="msgbox"/>
     </span>
     <bus-button id="busbutton" v-on:bus-click="busClicked()" v-if="busButtonActive" />
+    <eta-message v-bind:eta-info="currentETAInfo" v-bind:show="shouldShowETAMessage"></eta-message>
   </div>
 </template>
 
@@ -18,7 +19,8 @@ import Vue from 'vue';
 import InfoService from '../structures/serviceproviders/info.service';
 import Vehicle from '../structures/vehicle';
 import Route from '../structures/route';
-import Stop from '../structures/stop';
+import { Stop, StopSVG } from '../structures/stop';
+import ETA from '@/structures/eta';
 import messagebox from './adminmessage.vue';
 import * as L from 'leaflet';
 import { setTimeout, setInterval } from 'timers';
@@ -28,17 +30,9 @@ import Fusion from '@/fusion';
 import UserLocationService from '@/structures/userlocation.service';
 import BusButton from '@/components/busbutton.vue';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
+import ETAMessage from '@/components/etaMessage.vue';
 
-const StopSVG = require('@/assets/circle.svg') as string;
 const UserSVG = require('@/assets/user.svg') as string;
-
-const StopIcon = L.icon({
-  iconUrl: StopSVG,
-  iconSize: [12, 12], // size of the icon
-  iconAnchor: [6, 6], // point of the icon which will correspond to marker's location
-  shadowAnchor: [6, 6], // the same for the shadow
-  popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
-});
 
 export default Vue.extend({
   name: 'Public',
@@ -55,6 +49,7 @@ export default Vue.extend({
       legend: new L.Control({ position: 'bottomleft' }),
       locationMarker: undefined,
       fusion: new Fusion(),
+      currentETAInfo: null,
     } as {
         vehicles: Vehicle[];
         routes: Route[];
@@ -67,14 +62,14 @@ export default Vue.extend({
         locationMarker: L.Marker | undefined;
         userShuttleidCount: number;
         fusion: Fusion;
+        currentETAInfo: {} | null;
       };
   },
   mounted() {
     const ls = UserLocationService.getInstance();
 
     const a = new InfoService();
-    this.$store.dispatch('grabRoutes');
-    this.$store.dispatch('grabStops');
+    Promise.all([this.$store.dispatch('grabStops'), this.$store.dispatch('grabRoutes')]);
     this.$store.dispatch('grabVehicles');
     this.$store.dispatch('grabUpdates');
     this.$store.dispatch('grabAdminMesssage');
@@ -114,18 +109,20 @@ export default Vue.extend({
     this.$store.subscribe((mutation: any, state: any) => {
       if (mutation.type === 'setRoutes') {
         this.renderRoutes();
-        this.updateLegend();
-      }
-      if (mutation.type === 'setStops') {
+        this.updateStops();
         this.renderStops();
+        this.updateLegend();
       }
       if (mutation.type === 'setVehicles') {
         this.addVehicles();
       }
     });
-
     this.fusion.start();
     this.fusion.registerMessageReceivedCallback(this.saucyspawn);
+
+    ls.registerCallback((position) => {
+      this.updateETA();
+    });
   },
   computed: {
     message(): AdminMessageUpdate {
@@ -133,6 +130,9 @@ export default Vue.extend({
     },
     busButtonActive(): boolean {
       return this.$store.getters.getBusButtonVisible;
+    },
+    shouldShowETAMessage(): boolean {
+      return this.$store.state.settings.etasEnabled;
     },
   },
   methods: {
@@ -203,12 +203,9 @@ export default Vue.extend({
     },
     renderStops() {
       this.$store.state.Stops.forEach((stop: Stop) => {
-        const marker = L.marker([stop.latitude, stop.longitude], {
-          icon: StopIcon,
-        });
         if (this.Map !== undefined) {
-          marker.bindPopup(stop.name);
-          marker.addTo(this.Map);
+          stop.marker.bindPopup(stop.getMessage());
+          stop.marker.addTo(this.Map);
         }
       });
     },
@@ -286,10 +283,67 @@ export default Vue.extend({
     busClicked() {
       this.fusion.sendBusButton();
     },
+    updateETA() {
+      // find nearest stop
+      const pos = UserLocationService.getInstance().getCurrentLocation();
+      if (pos === undefined) {
+        this.currentETAInfo = null;
+        return;
+      }
+      const c = pos.coords as Coordinates;
+
+      let minDistance = Infinity;
+      let closestStop: Stop | null = null;
+      for (const stop of this.$store.state.Stops) {
+        const d = Math.hypot(c.longitude - stop.longitude, c.latitude - stop.latitude);
+        if (d < minDistance) {
+          minDistance = d;
+          closestStop = stop;
+        }
+      }
+      if (closestStop === null) {
+        this.currentETAInfo = null;
+        return;
+      }
+
+      // do we have an ETA for this stop? find the next soonest
+      let eta: ETA | null = null;
+      for (const e of this.$store.state.etas) {
+        if (e.stopID === closestStop.id) {
+          // is this the soonest?
+          if (eta === null || e.eta < eta.eta || e.arriving) {
+            eta = e;
+          }
+        }
+      }
+      if (eta === null) {
+        this.currentETAInfo = null;
+        return;
+      }
+
+      // get associated route
+      let route: Route | null = null;
+      for (const r of this.$store.state.Routes) {
+        if (r.id === eta.routeID) {
+          route = r;
+          break;
+        }
+      }
+      if (route === null) {
+        this.currentETAInfo = null;
+        return;
+      }
+
+      this.currentETAInfo = {eta, route, stop: closestStop};
+    },
+    updateStops() {
+      this.$store.commit('setRoutesOnStops');
+    },
   },
   components: {
     messagebox,
     BusButton,
+    etaMessage: ETAMessage,
   },
 });
 </script>
@@ -374,6 +428,7 @@ export default Vue.extend({
   height: 20px !important;
 
 }
+
 #busbutton{
   position: absolute; 
   right: 25px; 

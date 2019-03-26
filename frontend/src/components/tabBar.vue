@@ -12,6 +12,9 @@
         Schedules
       </span>
     </router-link>
+    <!-- <router-link v-if="etasEnabled" tag="li" to="/etas">
+      ETAs
+    </router-link> -->
     <router-link tag="li" to="/settings">
       <span>
         <span class="fas fa-cog"></span>
@@ -25,7 +28,13 @@
 <script lang="ts">
 import Vue from 'vue';
 
-export default Vue.extend({});
+export default Vue.extend({
+  computed: {
+    etasEnabled(): boolean {
+      return this.$store.state.settings.etasEnabled;
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

@@ -27,3 +27,9 @@ func (ss *StopService) Stops() ([]*shuttletracker.Stop, error) {
 	args := ss.Called()
 	return args.Get(0).([]*shuttletracker.Stop), args.Error(1)
 }
+
+// Stop gets a Stop.
+func (ss *StopService) Stop(stopID int64) (*shuttletracker.Stop, error) {
+	args := ss.Called(stopID)
+	return args.Get(0).(*shuttletracker.Stop), args.Error(1)
+}

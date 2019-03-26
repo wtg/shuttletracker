@@ -3,11 +3,13 @@ import Vuex, { StoreOptions } from 'vuex';
 import { StoreState } from '@/StoreState';
 import Route from '@/structures/route';
 import InfoServiceProvider from '@/structures/serviceproviders/info.service';
-import Stop from '@/structures/stop';
+import { Stop } from '@/structures/stop';
 import Vehicle from '@/structures/vehicle';
+import ETA from '@/structures/eta';
 import * as L from 'leaflet';
 import Update from '@/structures/update';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
+import { stat } from 'fs';
 
 Vue.use(Vuex);
 const InfoService = new InfoServiceProvider();
@@ -23,10 +25,12 @@ const store: StoreOptions<StoreState> = {
     Routes: [],
     Stops: [],
     Vehicles: [],
+    etas: [],
     adminMessage: undefined,
     online: true,
     settings: {
       busButtonEnabled: false,
+      etasEnabled: false,
       fusionPositionEnabled: true,
     },
     geolocationDenied: false,
@@ -53,6 +57,16 @@ const store: StoreOptions<StoreState> = {
     },
     setVehicles(state, vehicles: Vehicle[]) {
       state.Vehicles = vehicles;
+
+      // also ensure that vehicles consider being on any known routes
+      state.Vehicles.forEach((vehicle: Vehicle) => {
+        state.Routes.forEach((route: Route) => {
+          if (vehicle.RouteID === route.id) {
+            vehicle.setRoute(route);
+            return;
+          }
+        });
+      });
     },
     addUpdates(state, updates: Update[]) {
       const toHide = new Array<Vehicle>();
@@ -85,6 +99,21 @@ const store: StoreOptions<StoreState> = {
     addAdminMessage(state, message: AdminMessageUpdate) {
       state.adminMessage = message;
     },
+    updateETAs(state, { vehicleID, etas }) {
+      // remove this vehicle's ETAs and any ETA that has expired
+      const now = new Date();
+      for (let i = state.etas.length - 1; i >= 0; i--) {
+        const eta = state.etas[i];
+        if (eta.vehicleID === vehicleID || eta.eta < now) {
+          state.etas.splice(i, 1);
+        }
+      }
+
+      // store new ETAs
+      for (const eta of etas) {
+        state.etas.push(eta);
+      }
+    },
     initializeSettings(state) {
       const savedSettings = localStorage.getItem('st_settings');
       if (!savedSettings) {
@@ -96,12 +125,26 @@ const store: StoreOptions<StoreState> = {
       state.settings.busButtonEnabled = value;
       localStorage.setItem('st_settings', JSON.stringify(state.settings));
     },
+    setSettingsETAsEnabled(state, value: boolean) {
+      state.settings.etasEnabled = value;
+      localStorage.setItem('st_settings', JSON.stringify(state.settings));
+    },
     setSettingsFusionPositionEnabled(state, value: boolean) {
       state.settings.fusionPositionEnabled = value;
       localStorage.setItem('st_settings', JSON.stringify(state.settings));
     },
     setGeolocationDenied(state, value: boolean) {
       state.geolocationDenied = value;
+    },
+    setRoutesOnStops(state) {
+      // set any routes on existing stops
+      state.Stops.forEach((stop: Stop) => {
+        state.Routes.forEach((route: Route) => {
+          if (route.containsStop(stop.id) && route.active) {
+            stop.addRoute(route);
+          }
+        });
+      });
     },
   },
   getters: {
@@ -181,6 +224,9 @@ const store: StoreOptions<StoreState> = {
     },
     getRoutes(state: StoreState): Route[] {
       return state.Routes;
+    },
+    getStops(state: StoreState): Stop[] {
+      return state.Stops;
     },
     getVehicles(state: StoreState): Vehicle[] {
       return state.Vehicles;

@@ -5,6 +5,7 @@
 !config
 !go.mod
 !go.sum
+!eta
 !log
 !mock
 !postgres

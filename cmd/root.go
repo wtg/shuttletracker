@@ -10,6 +10,7 @@ import (
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/api"
 	"github.com/wtg/shuttletracker/config"
+	"github.com/wtg/shuttletracker/eta"
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/postgres"
 	"github.com/wtg/shuttletracker/updater"
@@ -29,9 +30,6 @@ var rootCmd = &cobra.Command{
 		}
 
 		runner := runner.New()
-
-		// Log
-		log.SetLevel(cfg.Log.Level)
 
 		pg, err := postgres.New(*cfg.Postgres)
 		if err != nil {
@@ -56,8 +54,15 @@ var rootCmd = &cobra.Command{
 		}
 		runner.Add(updater)
 
+		etaManager, err := eta.NewManager(ms, updater)
+		if err != nil {
+			log.WithError(err).Error("unable to create ETA manager")
+			return
+		}
+		runner.Add(etaManager)
+
 		// Make API server
-		api, err := api.New(*cfg.API, ms, msg, us, updater)
+		api, err := api.New(*cfg.API, ms, msg, us, updater, etaManager)
 		if err != nil {
 			log.WithError(err).Error("Could not create API server.")
 			return

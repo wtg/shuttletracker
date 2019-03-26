@@ -7,6 +7,8 @@ import (
 	"os"
 	"testing"
 
+	tmock "github.com/stretchr/testify/mock"
+
 	"github.com/wtg/shuttletracker/mock"
 )
 
@@ -37,8 +39,11 @@ func TestStatic(t *testing.T) {
 	ms := &mock.ModelService{}
 	msg := &mock.MessageService{}
 	us := &mock.UserService{}
+	ups := &mock.UpdaterService{}
+	em := &mock.ETAService{}
+	em.On("Subscribe", tmock.AnythingOfType("func(shuttletracker.VehicleETA)")).Return()
 
-	api, err := New(cfg, ms, msg, us, nil)
+	api, err := New(cfg, ms, msg, us, ups, em)
 	if err != nil {
 		t.Errorf("unexpected error: %s", err)
 		return

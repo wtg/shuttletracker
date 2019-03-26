@@ -90,7 +90,7 @@ import * as L from 'leaflet';
 export default Vue.extend({
     data() {
         return {
-            route: new Route(-1, '', '', true, '#ff00ff', 4, [], [], true),
+            route: new Route(-1, '', '', true, '#ff00ff', 4, [], [], true, []),
             routePolyLine: undefined,
             sending: false,
             success: false,

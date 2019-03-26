@@ -20,6 +20,7 @@ type Stop struct {
 
 // StopService is an interface for interacting with Stops.
 type StopService interface {
+	Stop(id int64) (*Stop, error)
 	Stops() ([]*Stop, error)
 	CreateStop(stop *Stop) error
 	DeleteStop(id int64) error

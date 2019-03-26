@@ -1,5 +1,6 @@
 import Route, { RouteInterface } from '../route';
 import Vehicle from '../vehicle';
+import { Stop } from '../stop';
 import AdminMessageUpdate from '../adminMessageUpdate';
 
 export default class AdminServiceProvider {
@@ -40,6 +41,13 @@ export default class AdminServiceProvider {
         return fetch('/vehicles/create', {
             method: 'POST',
             body: JSON.stringify(vehicle.asJSON()),
+        });
+    }
+
+    public static NewStop(stop: Stop): Promise<Response> {
+        return fetch('/stops/create', {
+            method: 'POST',
+            body: JSON.stringify(stop.asJSON()),
         });
     }
 
