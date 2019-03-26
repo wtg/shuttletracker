@@ -69,6 +69,7 @@ server {
   keepalive_timeout   70;
 
   location    / {
+    add_header Strict-Transport-Security "max-age=0";
     return 301 http://$host$request_uri;
   }
   include {{ $.DOKKU_ROOT }}/{{ $.APP }}/nginx.conf.d/*.conf;
