@@ -113,7 +113,7 @@ type fusionManager struct {
 	em shuttletracker.ETAService
 }
 
-func newFusionManager(etaManager shuttletracker.ETAService) *fusionManager {
+func newFusionManager(etaManager shuttletracker.ETAService, updater shuttletracker.UpdaterService) *fusionManager {
 	fm := &fusionManager{
 		addClient:          make(chan *fusionClient),
 		removeClient:       make(chan string),
@@ -129,6 +129,9 @@ func newFusionManager(etaManager shuttletracker.ETAService) *fusionManager {
 
 	// get notified of new ETAs to push out to the ETA topic
 	etaManager.Subscribe(fm.handleETA)
+
+	// get notified of new vehicle locations to push out
+	updater.Subscribe(fm.handleVehicleLocation)
 
 	// add some subscription callbacks (this could be moved into a method on
 	// ETAManager in the future).
@@ -181,6 +184,14 @@ func (fm *fusionManager) handleETA(eta shuttletracker.VehicleETA) {
 		Message: eta,
 	}
 	fm.sendToTopic("eta", fme)
+}
+
+func (fm *fusionManager) handleVehicleLocation(location *shuttletracker.Location) {
+	fme := fusionMessageEnvelope{
+		Type:    "vehicle_location",
+		Message: location,
+	}
+	fm.sendToTopic("vehicle_location", fme)
 }
 
 // this is a callback for Fusion to immediately push out ETAs to newly-subscribed clients

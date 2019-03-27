@@ -71,11 +71,11 @@ export default Vue.extend({
     const a = new InfoService();
     Promise.all([this.$store.dispatch('grabStops'), this.$store.dispatch('grabRoutes')]);
     this.$store.dispatch('grabVehicles');
-    this.$store.dispatch('grabUpdates');
     this.$store.dispatch('grabAdminMesssage');
-    setInterval(() => {
-      this.$store.dispatch('grabUpdates');
-    }, 5000);
+    // this.$store.dispatch('grabUpdates');
+    // setInterval(() => {
+    //   this.$store.dispatch('grabUpdates');
+    // }, 5000);
 
     this.$nextTick(() => {
       this.ready = true;
@@ -115,6 +115,9 @@ export default Vue.extend({
       }
       if (mutation.type === 'setVehicles') {
         this.addVehicles();
+      }
+      if (mutation.type === 'updateVehicleLocation') {
+        console.log('lol');
       }
     });
     this.fusion.start();

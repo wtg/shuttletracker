@@ -1,5 +1,6 @@
 import * as L from 'leaflet';
 import Route from '@/structures/route';
+import Location from '@/structures/location';
 import getMarkerString from '@/structures/leaflet/rotatedMarker';
 import getCardinalDirection from '@/structures/cardinalDirection';
 import 'leaflet-rotatedmarker';
@@ -28,6 +29,7 @@ export default class Vehicle {
     public Route: Route | undefined;
     public lastUpdate: Date;
     public tracker_id: number;
+    public location: Location | null;
 
     constructor(id: number, name: string, created: Date, updated: Date, enabled: boolean, trackerID: number) {
         this.id = id;
@@ -55,16 +57,20 @@ export default class Vehicle {
         this.Route = undefined;
         this.lastUpdate = new Date();
         this.tracker_id = trackerID;
+        this.location = null;
     }
 
     public getMessage(): string {
-        const speed = Math.round(this.speed * 100) / 100;
-        const direction = getCardinalDirection(this.heading + 45);
+        if (this.location === null) {
+            return '';
+        }
+        const speed = Math.round(this.location.speed * 100) / 100;
+        const direction = getCardinalDirection(this.location.heading + 45);
         const routeOnMsg = this.Route === undefined ? '' : `on route <i>${this.Route.name}</i>`;
         let message = `<b>${this.name}</b> ${routeOnMsg}<br>`
             + `Traveling ${direction} at ${speed} mph`;
-        if (this.lastUpdate !== undefined) {
-            message += '<br>as of ' + this.lastUpdate.toLocaleTimeString();
+        if (this.location !== undefined) {
+            message += '<br>as of ' + this.location.time.toLocaleTimeString();
         }
         return message;
     }
@@ -138,5 +144,15 @@ export default class Vehicle {
             tracker_id: String(this.tracker_id),
             name: this.name,
         };
+    }
+
+    public setLocation(location: Location) {
+        this.location = location;
+
+        // update marker
+        this.setLatLng(this.location.latitude, this.location.longitude);
+        this.setHeading(this.location.heading);
+        this.speed = this.location.speed;
+        this.showOnMap(true);
     }
 }

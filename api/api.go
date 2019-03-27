@@ -26,12 +26,12 @@ type Config struct {
 
 // API is responsible for configuring handlers for HTTP endpoints.
 type API struct {
-	cfg     Config
-	handler http.Handler
-	ms      shuttletracker.ModelService
-	msg     shuttletracker.MessageService
-	updater shuttletracker.UpdaterService
-	fm      *fusionManager
+	cfg        Config
+	handler    http.Handler
+	ms         shuttletracker.ModelService
+	msg        shuttletracker.MessageService
+	updater    shuttletracker.UpdaterService
+	fm         *fusionManager
 	etaManager shuttletracker.ETAService
 }
 
@@ -45,15 +45,15 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	}
 
 	// Set up fusion manager
-	fm := newFusionManager(etaManager)
+	fm := newFusionManager(etaManager, updater)
 
 	// Create API instance to store database session and collections
 	api := API{
-		cfg:     cfg,
-		ms:      ms,
-		msg:     msg,
-		updater: updater,
-		fm:      fm,
+		cfg:        cfg,
+		ms:         ms,
+		msg:        msg,
+		updater:    updater,
+		fm:         fm,
 		etaManager: etaManager,
 	}
 

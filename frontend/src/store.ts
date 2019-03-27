@@ -5,6 +5,7 @@ import Route from '@/structures/route';
 import InfoServiceProvider from '@/structures/serviceproviders/info.service';
 import { Stop } from '@/structures/stop';
 import Vehicle from '@/structures/vehicle';
+import Location from '@/structures/location';
 import ETA from '@/structures/eta';
 import * as L from 'leaflet';
 import Update from '@/structures/update';
@@ -67,6 +68,15 @@ const store: StoreOptions<StoreState> = {
           }
         });
       });
+    },
+    updateVehicleLocation(state, location: Location) {
+      // find vehicle
+      for (const vehicle of state.Vehicles) {
+        if (vehicle.id === location.vehicleID) {
+          vehicle.setLocation(location);
+          break;
+        }
+      }
     },
     addUpdates(state, updates: Update[]) {
       const toHide = new Array<Vehicle>();

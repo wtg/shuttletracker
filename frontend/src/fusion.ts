@@ -1,6 +1,7 @@
 import UserLocationService from '@/structures/userlocation.service';
 import store from '@/store';
 import ETA from '@/structures/eta';
+import Location from '@/structures/location';
 
 // SocketManager wraps a WebSocket in order to provide guarantees about
 // reliability, reconnections, retries, etc.
@@ -135,6 +136,10 @@ export default class Fusion {
             this.ws.send(JSON.stringify(data));
         });
 
+        // subscribe to vehicle location updates
+        this.subscribe('vehicle_location');
+        this.registerMessageReceivedCallback(this.handleVehicleLocations);
+
         // get notified of bus button setting changes so we can subscribe to the topic
         store.watch((state) => state.settings.busButtonEnabled, (newValue, oldValue) => {
             if (newValue === true) {
@@ -225,6 +230,26 @@ export default class Fusion {
             etas.push(eta);
         }
         store.commit('updateETAs', { vehicleID: message.message.vehicle_id, etas });
+    }
+
+    private handleVehicleLocations(message: any) {
+        if (message.type !== 'vehicle_location') {
+            return;
+        }
+
+        const m = message.message;
+        const location = new Location(
+            m.id,
+            m.vehicle_id,
+            new Date(m.created),
+            new Date(m.time),
+            m.latitude,
+            m.longitude,
+            m.heading,
+            m.speed,
+            m.route_id,
+        );
+        store.commit('updateVehicleLocation', location);
     }
 
     private generateUUID() {
