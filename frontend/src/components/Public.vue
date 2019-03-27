@@ -116,6 +116,9 @@ export default Vue.extend({
       if (mutation.type === 'setVehicles') {
         this.addVehicles();
       }
+      if (mutation.type === 'updateETAs' || mutation.type === 'setRoutes' || mutation.type === 'setStops') {
+        this.updateETA();
+      }
     });
     this.fusion.start();
     this.fusion.registerMessageReceivedCallback(this.saucyspawn);
