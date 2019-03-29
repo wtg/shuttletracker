@@ -5,21 +5,21 @@
 <script>
 // npm install tabulator-tables --save
 const Tabulator = require('tabulator-tables');
-export var time = '';
 export default {
   data() {
     return {
       tabulator: null,
       tableColumn: [
-      {title: 'Sunday', field: 'su', align: 'center', cellClick: function(e, cell){time=time+cell.getValue()+' '+cell.getColumn().getField()+' ';console.log(time);},}, 
-      {title: 'Monday', field: 'm', align: 'center', cellClick: function(e, cell){console.log(cell.getValue()); console.log(cell.getColumn().getField())},}, 
-      {title: 'Tuesday', field: 't', align: 'center', cellClick: function(e, cell){console.log(cell.getValue()); console.log(cell.getColumn().getField())},}, 
-      {title: 'Wednesday', field: 'w', align: 'center', cellClick: function(e, cell){console.log(cell.getValue()); console.log(cell.getColumn().getField())},}, 
-      {title: 'Thursday', field: 'th', align: 'center', cellClick: function(e, cell){console.log(cell.getValue()); console.log(cell.getColumn().getField())},}, 
-      {title: 'Friday', field: 'f', align: 'center', cellClick: function(e, cell){console.log(cell.getValue()); console.log(cell.getColumn().getField())},}, 
-      {title: 'Saturday', field: 'sa', align: 'center', cellClick: function(e, cell){console.log(cell.getValue()); console.log(cell.getColumn().getField())},} ],
+      {title: 'Sunday', field: 'su', align: 'center', headerSort:false, cellClick: function(e, cell){this.addTime(cell.getValue(),cell.getColumn().getField());console.log(time)},}, 
+      {title: 'Monday', field: 'm', align: 'center', headerSort:false, cellClick: function(e, cell){addTime(cell.getValue(),cell.getColumn().getField())},}, 
+      {title: 'Tuesday', field: 't', align: 'center', headerSort:false, cellClick: function(e, cell){addTime(cell.getValue(),cell.getColumn().getField())},}, 
+      {title: 'Wednesday', field: 'w', align: 'center', headerSort:false, cellClick: function(e, cell){addTime(cell.getValue(),cell.getColumn().getField())},}, 
+      {title: 'Thursday', field: 'th', align: 'center', headerSort:false, cellClick: function(e, cell){addTime(cell.getValue(),cell.getColumn().getField())},}, 
+      {title: 'Friday', field: 'f', align: 'center', headerSort:false, cellClick: function(e, cell){addTime(cell.getValue(),cell.getColumn().getField())},}, 
+      {title: 'Saturday', field: 'sa', align: 'center', headerSort:false, cellClick: function(e, cell){addTime(cell.getValue(),cell.getColumn().getField())},} ],
     
     tableData: [ 
+    {id: 0, su: '7:00', m: '7:00', t: '7:00', w: '7:00', th: '7:00', f: '7:00', sa: '7:00'}, 
     {id: 1, su: '8:00', m: '8:00', t: '8:00', w: '8:00', th: '8:00', f: '8:00', sa: '8:00'}, 
     {id: 2, su: '9:00', m: '9:00', t: '9:00', w: '9:00', th: '9:00', f: '9:00', sa: '9:00'}, 
     {id: 3, su: '10:00', m: '10:00', t: '10:00', w: '10:00', th: '10:00', f: '10:00', sa: '10:00'}, 
@@ -39,11 +39,6 @@ export default {
 	  data: this.tableData,
 	  columns: this.tableColumn,
 	  layout: 'fitColumns',
-    movableRows: true,
-    movableRowsConnectedTables: '#select',
-    movableRowsReceiver: 'add',
-    movableRowsSender: 'delete',
-    placeholder: 'All Times Selected',
 	  });
 	},
   methods: {
@@ -68,5 +63,29 @@ export default {
 </script>
 
 <style>
-@import '~tabulator-tables/dist/css/tabulator.min.css'
+#table {
+  background-color:#666;
+  border: 1px solid #333;
+  border-radius: 10px;
+}
+
+#table .tabulator-header {
+  background-color:#666;
+  color:#fff;
+}
+
+#table .tabulator-header .tabulator-col,
+#table .tabulator-header .tabulator-col-row-handle {
+  white-space: normal;
+  background-color:#333;
+}
+
+#table .tabulator-tableHolder .tabulator-table .tabulator-row {
+  background-color:#666;
+  color:#fff;
+}
+
+#table .tabulator-tableHolder .tabulator-table .tabulator-row:nth-child(even) {
+  background-color:#444;
+}
 </style>
