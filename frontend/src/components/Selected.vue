@@ -1,5 +1,7 @@
 <template>
-	<div id='select'></div>
+	<div id='select'>
+   <button v-on:click="reset()">Reset</button> 
+  </div>
 </template>
 
 <script>
@@ -27,7 +29,12 @@ export default Vue.extend({
     receiveData (payload) {
       this.counter += 1;
       this.tabulator.addData([{id:this.counter, day:payload.day.charAt(0).toUpperCase()+payload.day.slice(1), time:payload.time}], true);
-    }
+    },
+    reset () {
+      for (let row in this.tabulator.getRows()) {
+        row.delete();
+      }
+    },
   },
 
   mounted() {

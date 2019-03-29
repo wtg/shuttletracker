@@ -18,12 +18,8 @@
         <!-- carrier holds value -->
         <p class="subtitle">Shuttle Route :
             <br>
-            <input type="radio" v-model="stop_route" value="2">
-            <label for="2"> East</label>
-            <br>
-            <input type="radio" v-model="stop_route" value="1">
-            <label for="1"> West</label>
-            <br>
+            <input type="radio" :value="stop_route" name="2"> East<br>
+            <input type="radio" :value="stop_route" name="1"> West<br>
         </p>
         <!-- route holds value -->
         <p class="subtitle">Select Times
@@ -70,6 +66,7 @@ export default Vue.extend({
         }
     },
     methods: {
+
         submit() {
             //test phone_num
             if ( this.phone_number.length !== 10 || Number.isNaN(this.phone_number as any) ) {
@@ -109,5 +106,14 @@ export default Vue.extend({
 }
 .container{
     margin: 20px;
+}
+.button {
+    background-color: blue;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    display: inline-block;
+    font-size: 16px; 
 }
 </style>
