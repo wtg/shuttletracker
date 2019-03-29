@@ -16,14 +16,12 @@
 - Figure 3, example for data in Routes json
 - <img width="116" alt="22" src="https://user-images.githubusercontent.com/42976354/55191261-14e52e00-5178-11e9-8f34-a82b03a62eec.PNG">
 - The algorithm to calculate is showed in the below Figure 4. The dark green point "Raw Shuttle Coordinate" is the real time position for a single shuttle. Then, in https://shuttles.rpi.edu/routes, find the nearest point to the dark green point. The nearest point is shown as the light green point "Projected Point on Route". 
-- Then
-距离算法如下图，深绿色的Raw Shuttle Coordinate就是校车的实时位置。 然后在https://shuttles.rpi.edu/routes 里找出与校车实时位置最近的点。会比较耗时，在loop里算很多次。需要把实时位置（提供经纬度）的和页面上的每个点算距离，然后选出最短的。和实时位置最近的点，就是我们用来算距离的点，如下图的浅绿色点。然后我们就要算浅绿色点和最近的行驶方向的stop（停靠站）的距离。 东线，西线，深夜线，都是环线，都是有固定行驶方向的，不会逆向行驶。行驶的方向如上面的点的顺序在https://shuttles.rpi.edu/routes。把浅绿色点和最近行驶方向的停靠站之间线段的长度加起来，就是这条曲线的大致距离（我们所求的x）, 有11个。还没讲怎么找停靠站的位置，下面会讲stop（停靠站）的位置。
-- Figure 4, algorithm for this
+- Then find the nearest stop "yellow point" to the light green point "Projected Point on Route" in the driving direction, by calculating the distance between the light green point with all the stops in the "Stops json" https://shuttles.rpi.edu/stops and find the nearest stop in the driving direction. The reason why I did a lot of  matching/sorting is because the points in the routes are not matched in "Routes json" and "History json" and "Update json". Then calculate the length between the light green point and the nearest stop in the driving direction, by add up the line segments between them.
+- Figure 4, algorithm for this calculation.
 - <img width="382" alt="33" src="https://user-images.githubusercontent.com/42976354/55192265-6f7f8980-517a-11e9-9c40-ab5ad54dde51.PNG">
-
-
-
-
-> Step 3
-
-> Step 4
+> Step 3: Calculate V
+- <img width="232" alt="V" src="https://user-images.githubusercontent.com/42976354/55211167-47674900-51c1-11e9-8306-59ac9fc58d18.PNG">
+- n represent number of line segments, V-curr is from https://shuttles.rpi.edu/updates 
+> Step 4: finally calculate ETA
+- <img width="91" alt="t" src="https://user-images.githubusercontent.com/42976354/55211267-9a410080-51c1-11e9-846a-0cea06a83393.PNG">
+- Use go module to import the "t"
