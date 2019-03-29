@@ -65,7 +65,7 @@ export default class Vehicle {
             return '';
         }
         const speed = Math.round(this.location.speed * 100) / 100;
-        const direction = getCardinalDirection(this.location.heading + 45);
+        const direction = getCardinalDirection(this.location.heading);
         const routeOnMsg = this.Route === undefined ? '' : `on route <i>${this.Route.name}</i>`;
         let message = `<b>${this.name}</b> ${routeOnMsg}<br>`
             + `Traveling ${direction} at ${speed} mph`;
@@ -99,12 +99,13 @@ export default class Vehicle {
     }
 
     public setHeading(heading: number) {
-        this.heading = heading - 45;
-        this.marker.setRotationAngle(this.heading);
+        this.heading = heading;
+        this.marker.setRotationAngle(this.heading - 45);
         this.marker.bindPopup(this.getMessage());
     }
 
     public setRoute(r: Route | undefined) {
+        console.log('set route');
         if (r === undefined) {
             this.marker.setIcon(L.icon({
                 iconUrl: getMarkerString('#FFF'),
@@ -153,6 +154,13 @@ export default class Vehicle {
         this.setLatLng(this.location.latitude, this.location.longitude);
         this.setHeading(this.location.heading);
         this.speed = this.location.speed;
-        this.showOnMap(true);
+
+        const now = new Date().getTime();
+        const fiveMinMilliseconds = 5 * 60 * 1000;
+        if (now - this.location.time.getTime() > fiveMinMilliseconds) {
+            this.showOnMap(false);
+        } else {
+            this.showOnMap(true);
+        }
     }
 }

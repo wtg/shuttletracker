@@ -46,7 +46,7 @@ const store: StoreOptions<StoreState> = {
       // also ensure that vehicles consider being on any newly-returned routes
       state.Vehicles.forEach((vehicle: Vehicle) => {
         state.Routes.forEach((route: Route) => {
-          if (vehicle.RouteID === route.id) {
+          if (vehicle.location !== null && vehicle.location.routeID === route.id) {
             vehicle.setRoute(route);
             return;
           }
@@ -73,6 +73,14 @@ const store: StoreOptions<StoreState> = {
       // find vehicle
       for (const vehicle of state.Vehicles) {
         if (vehicle.id === location.vehicleID) {
+          if (location.routeID) {
+            for (const route of state.Routes) {
+              if (route.id === location.routeID) {
+                vehicle.setRoute(route);
+                break;
+              }
+            }
+          }
           vehicle.setLocation(location);
           break;
         }
