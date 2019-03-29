@@ -3,16 +3,31 @@
 </template>
 
 <script>
+import Vue from 'vue';
+import EventBus from '../event_bus.ts';
 const Tabulator = require('tabulator-tables');
-export default {
+export default Vue.extend({
   data() {
     return {
       tabulator: null,
       tableColumn: [
-        {title: 'Day', field: 'day', align: 'center', headerSort:false, cellClick: function(e, cell){console.log(cell.getValue()); console.log(cell.getColumn().getField())},}, 
-        {title: 'Time', field: 'time', align: 'center', headerSort:false, cellClick: function(e, cell){console.log(cell.getValue()); console.log(cell.getColumn().getField())},}, 
+        {title: 'Day', field: 'day', align: 'center', headerSort:false,cellClick: function(e, cell){
+            cell.getRow().delete();
+        }}, 
+        {title: 'Time', field: 'time', align: 'center', headerSort:false,cellClick: function(e, cell){
+           cell.getRow().delete();
+        }}, 
       ],
+      counter: 0,
+      days: ['Sunday','Monday','Tuesday','Wednesday','Thurday','Friday','Saturday'],
     };
+  },
+
+  methods: {
+    receiveData (payload) {
+      this.counter += 1;
+      this.tabulator.addData([{id:this.counter, day:payload.day.charAt(0).toUpperCase()+payload.day.slice(1), time:payload.time}], true);
+    }
   },
 
   mounted() {
@@ -22,6 +37,10 @@ export default {
       height: 250,
       layout: 'fitColumns',
       placeholder: 'Select Times',
+    });
+
+    EventBus.$on('TIME_SENT', (payload) => {
+      this.receiveData(payload)
     });
   },
 
@@ -33,33 +52,9 @@ export default {
       deep: true,
     },
   },
-};
+});
 </script>
 
 <style>
-#select {
-  background-color:#666;
-  border: 1px solid #333;
-  border-radius: 10px;
-}
-
-#select .tabulator-header {
-  background-color:#666;
-  color:#fff;
-}
-
-#select .tabulator-header .tabulator-col,
-#select .tabulator-header .tabulator-col-row-handle {
-  white-space: normal;
-  background-color:#333;
-}
-
-#select .tabulator-tableHolder .tabulator-table .tabulator-row {
-  background-color:#666;
-  color:#fff;
-}
-
-#select .tabulator-tableHolder .tabulator-table .tabulator-row:nth-child(even) {
-  background-color:#444;
-}
+@import '~tabulator-tables/dist/css/tabulator_midnight.min.css'
 </style>

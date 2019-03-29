@@ -26,8 +26,9 @@
             <br>
         </p>
         <!-- route holds value -->
-        <p class="subtitle">Select Times</p>
-        <Tabulator/>
+        <p class="subtitle">Select Times
+            <Tabulator/>
+        </p>
         <Selected/>
         <br>
         <!-- TODO make time reactive -->

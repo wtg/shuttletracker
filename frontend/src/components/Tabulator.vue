@@ -4,34 +4,36 @@
 
 <script>
 // npm install tabulator-tables --save
+import Vue from 'vue';
+import EventBus from '../event_bus.ts';
 const Tabulator = require('tabulator-tables');
-export default {
+export default Vue.extend({
   data() {
     return {
       tabulator: null,
       tableColumn: [
-      {title: 'Sunday', field: 'su', align: 'center', headerSort:false, cellClick: function(e, cell){this.addTime(cell.getValue(),cell.getColumn().getField());console.log(time)},}, 
-      {title: 'Monday', field: 'm', align: 'center', headerSort:false, cellClick: function(e, cell){addTime(cell.getValue(),cell.getColumn().getField())},}, 
-      {title: 'Tuesday', field: 't', align: 'center', headerSort:false, cellClick: function(e, cell){addTime(cell.getValue(),cell.getColumn().getField())},}, 
-      {title: 'Wednesday', field: 'w', align: 'center', headerSort:false, cellClick: function(e, cell){addTime(cell.getValue(),cell.getColumn().getField())},}, 
-      {title: 'Thursday', field: 'th', align: 'center', headerSort:false, cellClick: function(e, cell){addTime(cell.getValue(),cell.getColumn().getField())},}, 
-      {title: 'Friday', field: 'f', align: 'center', headerSort:false, cellClick: function(e, cell){addTime(cell.getValue(),cell.getColumn().getField())},}, 
-      {title: 'Saturday', field: 'sa', align: 'center', headerSort:false, cellClick: function(e, cell){addTime(cell.getValue(),cell.getColumn().getField())},} ],
+      {title: 'Sunday', field: 'sunday', align: 'center', headerSort:false, cellClick: this.sendData}, 
+      {title: 'Monday', field: 'monday', align: 'center', headerSort:false, cellClick: this.sendData}, 
+      {title: 'Tuesday', field: 'tuesday', align: 'center', headerSort:false, cellClick: this.sendData}, 
+      {title: 'Wednesday', field: 'wednesday', align: 'center', headerSort:false, cellClick: this.sendData}, 
+      {title: 'Thursday', field: 'thursday', align: 'center', headerSort:false, cellClick: this.sendData}, 
+      {title: 'Friday', field: 'friday', align: 'center', headerSort:false, cellClick: this.sendData}, 
+      {title: 'Saturday', field: 'saturday', align: 'center', headerSort:false, cellClick: this.sendData} ],
     
     tableData: [ 
-    {id: 0, su: '7:00', m: '7:00', t: '7:00', w: '7:00', th: '7:00', f: '7:00', sa: '7:00'}, 
-    {id: 1, su: '8:00', m: '8:00', t: '8:00', w: '8:00', th: '8:00', f: '8:00', sa: '8:00'}, 
-    {id: 2, su: '9:00', m: '9:00', t: '9:00', w: '9:00', th: '9:00', f: '9:00', sa: '9:00'}, 
-    {id: 3, su: '10:00', m: '10:00', t: '10:00', w: '10:00', th: '10:00', f: '10:00', sa: '10:00'}, 
-    {id: 4, su: '11:00', m: '11:00', t: '11:00', w: '11:00', th: '11:00', f: '11:00', sa: '11:00'}, 
-    {id: 5, su: '12:00', m: '12:00', t: '12:00', w: '12:00', th: '12:00', f: '12:00', sa: '12:00'}, 
-    {id: 6, su: '13:00', m: '13:00', t: '13:00', w: '13:00', th: '13:00', f: '13:00', sa: '13:00'}, 
-    {id: 7, su: '14:00', m: '14:00', t: '14:00', w: '14:00', th: '14:00', f: '14:00', sa: '14:00'}, 
-    {id: 8, su: '15:00', m: '15:00', t: '15:00', w: '15:00', th: '15:00', f: '15:00', sa: '15:00'}, 
-    {id: 9, su: '16:00', m: '16:00', t: '16:00', w: '16:00', th: '16:00', f: '16:00', sa: '16:00'}, 
-    {id: 10, su: '17:00', m: '17:00', t: '17:00', w: '17:00', th: '17:00', f: '17:00', sa: '17:00'}, 
-    {id: 11, su: '18:00', m: '18:00', t: '18:00', w: '18:00', th: '18:00', f: '18:00', sa: '18:00'}, ],
-	  addData: {id: null, su: null, m: null, t: null, w: null, th: null, f: null, sa: null},
+    {id: 12, sunday: '7:00', monday: '7:00', tuesday: '7:00', wednesday: '7:00', thursday: '7:00', friday: '7:00', saturday: '7:00'}, 
+    {id: 1, sunday: '8:00', monday: '8:00', tuesday: '8:00', wednesday: '8:00', thursday: '8:00', friday: '8:00', saturday: '8:00'}, 
+    {id: 2, sunday: '9:00', monday: '9:00', tuesday: '9:00', wednesday: '9:00', thursday: '9:00', friday: '9:00', saturday: '9:00'}, 
+    {id: 3, sunday: '10:00', monday: '10:00', tuesday: '10:00', wednesday: '10:00', thursday: '10:00', friday: '10:00', saturday: '10:00'}, 
+    {id: 4, sunday: '11:00', monday: '11:00', tuesday: '11:00', wednesday: '11:00', thursday: '11:00', friday: '11:00', saturday: '11:00'}, 
+    {id: 5, sunday: '12:00', monday: '12:00', tuesday: '12:00', wednesday: '12:00', thursday: '12:00', friday: '12:00', saturday: '12:00'}, 
+    {id: 6, sunday: '13:00', monday: '13:00', tuesday: '13:00', wednesday: '13:00', thursday: '13:00', friday: '13:00', saturday: '13:00'}, 
+    {id: 7, sunday: '14:00', monday: '14:00', tuesday: '14:00', wednesday: '14:00', thursday: '14:00', friday: '14:00', saturday: '14:00'}, 
+    {id: 8, sunday: '15:00', monday: '15:00', tuesday: '15:00', wednesday: '15:00', thursday: '15:00', friday: '15:00', saturday: '15:00'}, 
+    {id: 9, sunday: '16:00', monday: '16:00', tuesday: '16:00', wednesday: '16:00', thursday: '16:00', friday: '16:00', saturday: '16:00'}, 
+    {id: 10, sunday: '17:00', monday: '17:00', tuesday: '17:00', wednesday: '17:00', thursday: '17:00', friday: '17:00', saturday: '17:00'}, 
+    {id: 11, sunday: '18:00', monday: '18:00', tuesday: '18:00', wednesday: '18:00', thursday: '18:00', friday: '18:00', saturday: '18:00'}, ],
+	  addData: {id: null, sunday: null, monday: null, tuesday: null, wednesday: null, thursday: null, friday: null, saturday: null},
 	  };
 	},
   mounted() {
@@ -50,6 +52,14 @@ export default {
 	    this.addData[key] = null;
       }));
     },
+
+    sendData : function(e, cell) {
+      const payload = {
+        time: cell.getValue(),
+        day: cell.getColumn().getField()
+      }
+      EventBus.$emit('TIME_SENT', payload);
+    },
   },
   watch: {
     tableData: {
@@ -59,7 +69,7 @@ export default {
       deep: true,
     },
   },
-};
+});
 </script>
 
 <style>
