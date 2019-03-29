@@ -10,16 +10,17 @@
         <p class="subtitle">Carrier Type :
         <select v-model="carrier">
             <option selected disabled>Select a Carrier</option>
-            <option value="verizon">Verizon</option>
-            <option value="at&t">AT&T</option>
-            <option value="t-mobile">T-mobile</option>
-            <option value="ooredoo">Ooredoo</option>
+            <option v-for="c in carriers" :value="c">{{c}}</option>
         </select></p>
         <!-- carrier holds value -->
         <p class="subtitle">Shuttle Route :
             <br>
-            <input type="radio" :value="stop_route" name="2"> East<br>
-            <input type="radio" :value="stop_route" name="1"> West<br>
+            <input type="radio" v-model="route" name="route" value="2">
+            <label for="2"> East</label>
+            <br>
+            <input type="radio" v-model="route" name="route" value="1">
+            <label for="1"> West</label>
+            <br>
         </p>
         <!-- route holds value -->
         <p class="subtitle">Select Times
@@ -30,7 +31,7 @@
         <!-- TODO make time reactive -->
         <!-- <span>Times are : {{ time }}</span> -->
         <!-- TODO disable button until flag -->
-        <button v-on:click="submit()" v-bind:disabled="(route == '')||(carrier == '')">Submit</button>
+        <button v-on:click="submit()">Submit</button>
         <br><br><br>
     </div>
 </template>
@@ -49,9 +50,10 @@ export default Vue.extend({
         return {
             phone_number: '',
             carrier: '',
-            carriers: ['verizon', 'at&t'],
+            carriers: ['AT&T','T-Mobile','Verizon','Sprint','XFinity Mobile','Virgin Mobile','Tracfone','Metro PCS','Boost Mobile','Cricket','Republic Wireless','Google Fi','U.S. Cellular','Ting','Consumer Cellular','C-Spire','Page Plus'],
             route: '',
             stop_url:  decodeURI(window.location.href),
+            times: [],
         }
     },
     computed: {
@@ -62,7 +64,8 @@ export default Vue.extend({
             return this.stop_url.split('?')[1].split('&')[1].split('=')[1];
         },
         stop_route: function() {
-            return this.stop_url.split('?')[1].split('&')[2].split('=')[1];
+            this.route = this.stop_url.split('?')[1].split('&')[2].split('=')[1];
+            return this.route;
         }
     },
     methods: {
@@ -71,27 +74,32 @@ export default Vue.extend({
             //test phone_num
             if ( this.phone_number.length !== 10 || Number.isNaN(this.phone_number as any) ) {
                 //error phone
-                console.log("Error : Phone Number Invalid")
+                console.log("Error : Phone Number Invalid");
                 return
             }
             //test carrier
-            if (  this.carriers.indexOf(this.carrier) <= -1 ) {
+            if ( this.carriers.indexOf(this.carrier) <= -1 ) {
                 //error carrier
-                console.log("Error : Carrier Invalid")
+                console.log("Error : Carrier Invalid");
+                return
+            }
+            //test stop
+            if ( Number.isNaN(this.stop_id as any) ) {
+                console.log("Error : Invalid Stop Id");
                 return
             }
             //test route
-            if ( this.route == '' ) {
+            if ( this.route.length != 1 ) {
                 //error route
-                console.log("Error : Route Not Selected")
+                console.log("Error : Route Not Selected");
                 return
             }
             //test time
-            /*if ( !time ) {
+            if ( this.times.length < 1 ) {
                 //error time
-                console.log("Error : Time Not Selected")
+                console.log("Error : Time Not Selected");
                 return
-            } */
+            } 
             
             //TODO submit 
 
