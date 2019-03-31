@@ -2,6 +2,9 @@
   <div class="parent">
     <div class="titleBar">
       <img src="~../assets/icon.svg">
+      <div class="reconnecting">
+        <span class="fas fa-circle-notch fa-spin"></span> Reconnecting...
+       </div>
     </div>
     <div id="mymap"></div>
     <span>
@@ -372,8 +375,9 @@ export default Vue.extend({
 .titleBar {
   height: 40px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  position: relative;
   width: 100%;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -384,10 +388,24 @@ export default Vue.extend({
   user-select: none;
   background: white;
   z-index: 1;
+  padding: 0 6px;
 
   img {
-    flex: 1;
+    flex: 0 1 auto;
     height: 70%;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  div.reconnecting {
+    flex: 0 1 auto;
+    margin-left: auto;
+    background: linear-gradient(0deg, rgb(250, 250, 250), rgb(240, 240, 240));
+    border: 0.5px solid #eee;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-size: 13px;
   }
 }
 
