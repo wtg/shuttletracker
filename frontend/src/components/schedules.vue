@@ -22,6 +22,12 @@
         </div>
       </div>
     </div>
+    <div class="columns">
+      <div class="column browsers">
+        <img src="@/assets/ns_logo.gif">
+        <img src="@/assets/ie_logo.gif">
+      </div>
+    </div>
   </div>
 </template>
 
@@ -61,5 +67,8 @@ export default Vue.extend({
 }
 .caption {
   margin-bottom: 1em;
+}
+.browsers img {
+  margin-right: 10px;
 }
 </style>

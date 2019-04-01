@@ -43,8 +43,8 @@ export default class Vehicle {
         this.marker = new L.Marker([this.lat, this.lng], {
             icon: L.icon({
                 iconUrl: getMarkerString('#FFF'),
-                iconSize: [32, 32], // size of the icon
-                iconAnchor: [16, 16], // point of the icon which will correspond to marker's location
+                iconSize: [19, 40], // size of the icon
+                iconAnchor: [9, 20], // point of the icon which will correspond to marker's location
                 popupAnchor: [0, 0],   // point from which the popup should open relative to the iconAnchor
             }),
             zIndexOffset: 1000,
@@ -94,7 +94,7 @@ export default class Vehicle {
 
     public setHeading(heading: number) {
         this.heading = heading - 45;
-        this.marker.setRotationAngle(this.heading);
+        this.marker.setRotationAngle(this.heading + 45);
         this.marker.bindPopup(this.getMessage());
     }
 
@@ -102,8 +102,8 @@ export default class Vehicle {
         if (r === undefined) {
             this.marker.setIcon(L.icon({
                 iconUrl: getMarkerString('#FFF'),
-                iconSize: [32, 32], // size of the icon
-                iconAnchor: [16, 16], // point of the icon which will correspond to marker's location
+                iconSize: [19, 40], // size of the icon
+                iconAnchor: [9, 20], // point of the icon which will correspond to marker's location
                 popupAnchor: [0, 0],   // point from which the popup should open relative to the iconAnchor
             }));
 
@@ -113,8 +113,8 @@ export default class Vehicle {
         this.RouteID = r.id;
         this.marker.setIcon(L.icon({
             iconUrl: getMarkerString(r.color),
-            iconSize: [32, 32], // size of the icon
-            iconAnchor: [16, 16], // point of the icon which will correspond to marker's location
+            iconSize: [19, 40], // size of the icon
+            iconAnchor: [9, 20], // point of the icon which will correspond to marker's location
             popupAnchor: [0, 0],   // point from which the popup should open relative to the iconAnchor
         }));
         this.marker.bindPopup(this.getMessage());
