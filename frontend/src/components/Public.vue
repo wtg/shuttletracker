@@ -207,7 +207,14 @@ export default Vue.extend({
           icon: StopIcon,
         });
         if (this.Map !== undefined) {
-          marker.bindPopup(stop.name);
+          let stop_link = ('/register').concat('?stop_id=').concat(stop.id.toString()).concat('&stop_name=').concat(stop.name);
+          if ( stop.routesOn.length == 1 ) {
+            stop_link = stop_link.concat('&route=').concat(stop.routesOn[0].id.toString());
+          } else {
+            stop_link = stop_link.concat('&route=null');
+          }
+          encodeURI(stop_link);
+          marker.bindPopup(stop.name.link(stop_link));
           marker.addTo(this.Map);
         }
       });
