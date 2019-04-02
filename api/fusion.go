@@ -118,7 +118,7 @@ func newFusionManager(etaManager shuttletracker.ETAService) *fusionManager {
 		addClient:          make(chan *fusionClient),
 		removeClient:       make(chan string),
 		clientMsg:          make(chan clientMessage),
-		serverMsg:          make(chan serverMessage, 50),
+		serverMsg:          make(chan serverMessage, 1000),
 		debug:              make(chan chan *fusionManagerDebug),
 		clients:            map[string]*fusionClient{},
 		tracks:             map[string][]fusionPosition{},
