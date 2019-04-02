@@ -15,10 +15,10 @@
         <!-- carrier holds value -->
         <p class="subtitle">Shuttle Route :
             <br>
-            <input type="radio" v-model="route" value="2" :checked="true">
+            <input type="radio" v-model="route" value="2">
             <label for="2"> East</label>
             <br>
-            <input type="radio" v-model="route" value="1" :checked="false">
+            <input type="radio" v-model="route" value="1">
             <label for="1"> West</label>
             <br>
         </p>
@@ -48,12 +48,11 @@ export default Vue.extend({
     },
 
     data() {
-        let url = decodeURI(window.location.href);
+        const url = decodeURI(window.location.href);
         return {
             phone_number: '',
             carrier: '',
             carriers: ['AT&T','T-Mobile','Verizon','Sprint','XFinity Mobile','Virgin Mobile','Tracfone','Metro PCS','Boost Mobile','Cricket','Republic Wireless','Google Fi','U.S. Cellular','Ting','Consumer Cellular','C-Spire','Page Plus'],
-            err: 0,
             route: url.split('?')[1].split('&')[2].split('=')[1],
             stop_url: url,
             times: [],
@@ -75,54 +74,38 @@ export default Vue.extend({
             if ( this.phone_number.length !== 10 || Number.isNaN(this.phone_number as any) ) {
                 //error phone
                 console.log("Error : Phone Number Invalid");
-                this.error(1);
+                alert("Error : Phone Number Invalid.");
                 return
             }
             //test carrier
             if ( this.carriers.indexOf(this.carrier) <= -1 ) {
                 //error carrier
                 console.log("Error : Carrier Invalid");
-                this.error(2);
+                alert("Error : Carrier Invalid.")
                 return
             }
             //test stop
             if ( Number.isNaN(this.stop_id as any) ) {
                 console.log("Error : Invalid Stop Id");
-                this.error(3);
+                alert("Error : Invalid Stop Id.");
                 return
             }
             //test route
             if ( this.route.length != 1 ) {
                 //error route
                 console.log("Error : Route Not Selected");
-                this.error(4);
+                alert("Error : Route Not Selected.");
                 return
             }
             //test time
             if ( this.times.length < 1 ) {
                 //error time
                 console.log("Error : Time Not Selected");
-                this.error(5);
+                alert("Error : Time Not Selected.");
                 return
             } 
             
             //TODO submit
-        },
-
-        error( err: any ) {
-            if ( err == 1 ) {
-                alert("Error : Phone Number Invalid.")
-            } else if ( err == 2 ) {
-                alert("Error : Carrier Invalid.")
-            } else if ( err == 3 ) {
-                alert("Error : Invalid Stop Id.")
-            } else if ( err == 4 ) {
-                alert("Error : Route Not Selected.")
-            } else if ( err == 5 ) {
-                alert("Error : Time Not Selected.")
-            } else {
-                alert("Error : Something isn't Working!")
-            }
         },
     },
 });
