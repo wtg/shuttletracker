@@ -4,7 +4,7 @@ import Route from '@/structures/route';
 /**
  * SVG used for representing a stop on the map and in the legend
  */
-export const StopSVG = require('@/assets/blue_pin.png') as string;
+export const StopSVG = require('@/assets/circle.svg') as string;
 
 /**
  * Stop represents a single stop on a route
@@ -33,9 +33,9 @@ export class Stop {
         this.marker = L.marker([this.latitude, this.longitude], {
             icon: L.icon({
                 iconUrl: StopSVG,
-                iconSize: [12, 20], // size of the icon
-                iconAnchor: [6, 10], // point of the icon which will correspond to marker's location
-                shadowAnchor: [6, 10], // the same for the shadow
+                iconSize: [12, 12], // size of the icon
+                iconAnchor: [6, 6], // point of the icon which will correspond to marker's location
+                shadowAnchor: [6, 6], // the same for the shadow
                 popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
             }),
         });
@@ -55,8 +55,7 @@ export class Stop {
         this.routesOn.push(route);
     }
     public asJSON(): {
-        name: string; description: string; latitude: number; longitude: number
-    } {
+        name: string; description: string; latitude: number; longitude: number } {
         return {
             // id: this.id,
             name: this.name,

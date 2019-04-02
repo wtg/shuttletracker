@@ -1,22 +1,14 @@
 <template>
-  <div class="parent april">
-    <div class="logo">
-      <img src="~../assets/shuttle_track.png">
+  <div class="parent">
+    <div class="titleBar">
+      <img src="~../assets/icon.svg">
     </div>
-    <div id="mymap">
-      <div class="corner-ribbon top-left sticky red shadow">
-        Real-time vehicle tracking! <img src="@/assets/new.gif">
-      </div>
-    </div>
-    <div id="left"></div>
-    <div id="top"></div>
-    <div id="right"></div>
-    <div id="bottom"></div>
+    <div id="mymap"></div>
     <span>
       <messagebox ref="msgbox"/>
     </span>
     <bus-button id="busbutton" v-on:bus-click="busClicked()" v-if="busButtonActive" />
-    <!-- <eta-message v-bind:eta-info="currentETAInfo" v-bind:show="shouldShowETAMessage"></eta-message> -->
+    <eta-message v-bind:eta-info="currentETAInfo" v-bind:show="shouldShowETAMessage"></eta-message>
   </div>
 </template>
 
@@ -163,8 +155,8 @@ export default Vue.extend({
         this.$store.state.Routes.forEach((route: Route) => {
           if (route.shouldShow()) {
             legendstring +=
-              `<li><img class="legend-icon " src=` +
-              getMarkerString(route.color, true) +
+              `<li><img class="legend-icon" src=` +
+              getMarkerString(route.color) +
               `
 			      width="12" height="12"> ` +
               route.name;
@@ -369,88 +361,31 @@ export default Vue.extend({
   flex-direction: column;
 }
 
-.april {
-  background-image:url(~../assets/bg_tile.png);
-  background-color: #999999;
-}
-
 #mymap {
-  position:absolute;
-  right:30px;
-  left:30px;
-  top:30px;
-  bottom:30px;
-  border:1px solid black;
+  flex: 1;
+  z-index: 0
 }
 
-#right
-{
-  background-image:-moz-linear-gradient(left,rgba(0,0,0,0),rgba(0,0,0,1));
-  background-image:-webkit-gradient(linear,left bottom,right bottom,color-stop(0%, rgba(0,0,0,0)),color-stop(100%, rgba(0,0,0,1)));
-  width:30px;
-  right:0px;
-  position:absolute;
-  height:100%;
-}
-#left
-{
-  background-image:-moz-linear-gradient(right,rgba(0,0,0,0),rgba(0,0,0,1));
-  background-image:-webkit-gradient(linear,left bottom,right bottom,color-stop(0%, rgba(0,0,0,1)),color-stop(100%, rgba(0,0,0,0)));
-  width:30px;
-  position:absolute;
-  height:100%;
-}
-#top
-{
-  background-image:-moz-linear-gradient(bottom,rgba(0,0,0,0),rgba(0,0,0,1));
-  background-image:-webkit-gradient(linear,left top,left bottom,color-stop(0%, rgba(0,0,0,1)),color-stop(100%, rgba(0,0,0,0)));
-  width:100%;
-  position:absolute;
-  height:30px;
-}
-#bottom
-{
-  background-image:-moz-linear-gradient(top,rgba(0,0,0,0),rgba(0,0,0,1));
-  background-image:-webkit-gradient(linear,left top,left bottom,color-stop(0%, rgba(0,0,0,0)),color-stop(100%, rgba(0,0,0,1)));
-  width:100%;
-  bottom:0px;
-  position:absolute;
-  height:30px;
-}
-@media screen and (max-width: 500px) {
-  #mymap {
-    right: 15px;
-    left: 15px;
-    top: 15px;
-    bottom: 15px;
-  }
-  #right {
-    width: 15px;
-  }
-  #left {
-    width: 15px;
-  }
-  #top {
-    height: 15px;
-  }
-  #bottom {
-    height: 15px;
-  }
-}
+.titleBar {
+  height: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  border-bottom: 0.5px solid #eee;
+  box-shadow: 0 -3px 8px 0 #ddd;
+  user-select: none;
+  background: white;
+  z-index: 1;
 
-.logo {
-  position:absolute;
-  top:30px;
-  width:403px;
-  max-width: 80%;
-  height:100px;
-  // left:50%;
-  // margin-left:-201px;
-  z-index:1000;
-  pointer-events: none;
-  margin: 0 auto;
-  left: 0;
-  right: 0;
+  img {
+    flex: 1;
+    height: 70%;
+  }
 }
 
 .info.legend {
@@ -499,91 +434,8 @@ export default Vue.extend({
 
 #busbutton{
   position: absolute; 
-  right: 37px; 
-  bottom: 50px; 
+  right: 25px; 
+  bottom: 35px; 
   z-index: 2000;
 }
-
-@media screen and (max-width: 500px) {
-  .corner-ribbon {
-    display: none;
-  }
-}
-.corner-ribbon{
-  width: 400px;
-  background: #e43;
-  position: absolute;
-  top: 25px;
-  left: -50px;
-  text-align: center;
-  line-height: 50px;
-  color: #f0f0f0;
-  transform: rotate(-45deg);
-  -webkit-transform: rotate(-45deg);
-  z-index: 3000;
-  font-size: 15px;
-  padding: 0 30px;
-
-  img {
-    top: 10px;
-    position: relative;
-  }
-}
-
-/* Custom styles */
-
-.corner-ribbon.sticky{
-  position: fixed;
-}
-
-.corner-ribbon.shadow{
-  box-shadow: 0 0 3px rgba(0,0,0,.3);
-}
-
-/* Different positions */
-
-.corner-ribbon.top-left{
-  top: 70px;
-  left: -90px;
-  transform: rotate(-45deg);
-  -webkit-transform: rotate(-45deg);
-}
-
-.corner-ribbon.top-right{
-  top: 25px;
-  right: -50px;
-  left: auto;
-  transform: rotate(45deg);
-  -webkit-transform: rotate(45deg);
-}
-
-.corner-ribbon.bottom-left{
-  top: auto;
-  bottom: 25px;
-  left: -50px;
-  transform: rotate(45deg);
-  -webkit-transform: rotate(45deg);
-}
-
-.corner-ribbon.bottom-right{
-  top: auto;
-  right: -50px;
-  bottom: 25px;
-  left: auto;
-  transform: rotate(-45deg);
-  -webkit-transform: rotate(-45deg);
-}
-
-/* Colors */
-
-.corner-ribbon.white{background: #f0f0f0; color: #555;}
-.corner-ribbon.black{background: #333;}
-.corner-ribbon.grey{background: #999;}
-.corner-ribbon.blue{background: #39d;}
-.corner-ribbon.green{background: #2c7;}
-.corner-ribbon.turquoise{background: #1b9;}
-.corner-ribbon.purple{background: #95b;}
-.corner-ribbon.red{background: #e43;}
-.corner-ribbon.orange{background: #e82;}
-.corner-ribbon.yellow{background: #ec0;}
 </style>
