@@ -15,10 +15,10 @@
         <!-- carrier holds value -->
         <p class="subtitle">Shuttle Route :
             <br>
-            <input type="radio" v-model="route" name="route" value="2">
+            <input type="radio" v-model="route" value="2" :checked="true">
             <label for="2"> East</label>
             <br>
-            <input type="radio" v-model="route" name="route" value="1">
+            <input type="radio" v-model="route" value="1" :checked="false">
             <label for="1"> West</label>
             <br>
         </p>
@@ -46,17 +46,20 @@ export default Vue.extend({
         Selected,
         Tabulator,
     },
+
     data() {
+        let url = decodeURI(window.location.href);
         return {
             phone_number: '',
             carrier: '',
             carriers: ['AT&T','T-Mobile','Verizon','Sprint','XFinity Mobile','Virgin Mobile','Tracfone','Metro PCS','Boost Mobile','Cricket','Republic Wireless','Google Fi','U.S. Cellular','Ting','Consumer Cellular','C-Spire','Page Plus'],
             err: 0,
-            route: '',
-            stop_url:  decodeURI(window.location.href),
+            route: url.split('?')[1].split('&')[2].split('=')[1],
+            stop_url: url,
             times: [],
         }
     },
+
     computed: {
         stop_id: function() {
             return this.stop_url.split('?')[1].split('&')[0].split('=')[1];
@@ -64,13 +67,9 @@ export default Vue.extend({
         stop_name: function() {
             return this.stop_url.split('?')[1].split('&')[1].split('=')[1];
         },
-        stop_route: function() {
-            this.route = this.stop_url.split('?')[1].split('&')[2].split('=')[1];
-            return this.route;
-        }
     },
-    methods: {
 
+    methods: {
         submit() {
             //test phone_num
             if ( this.phone_number.length !== 10 || Number.isNaN(this.phone_number as any) ) {
@@ -107,9 +106,7 @@ export default Vue.extend({
                 return
             } 
             
-            //TODO submit 
-
-
+            //TODO submit
         },
 
         error( err: any ) {
@@ -129,6 +126,7 @@ export default Vue.extend({
         },
     },
 });
+
 </script>
 <style lang="scss">
 .parent {
