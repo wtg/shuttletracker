@@ -118,7 +118,7 @@ func newFusionManager(etaManager shuttletracker.ETAService) *fusionManager {
 		addClient:          make(chan *fusionClient),
 		removeClient:       make(chan string),
 		clientMsg:          make(chan clientMessage),
-		serverMsg:          make(chan serverMessage, 1000),
+		serverMsg:          make(chan serverMessage, 15),
 		debug:              make(chan chan *fusionManagerDebug),
 		clients:            map[string]*fusionClient{},
 		tracks:             map[string][]fusionPosition{},
@@ -143,6 +143,15 @@ func newFusionManager(etaManager shuttletracker.ETAService) *fusionManager {
 // Anything run calls should obtain the lock on fusionManager state.
 func (fm *fusionManager) run() {
 	for {
+		// first see if we have any messages to push out
+		select {
+		case sm := <-fm.serverMsg:
+			fm.processServerMessage(sm)
+			continue
+		default:
+		}
+
+		// then handle everything else
 		select {
 		case c := <-fm.addClient:
 			fm.processAddClient(c)
