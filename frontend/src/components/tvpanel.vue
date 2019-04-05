@@ -1,16 +1,18 @@
 <template>
-  <div>
-    <p id="title-RPI">Shuttle Tracker 🚐💨</p>
+  <div class="tvPanel">
     
     <!-- <TimesQueue/> -->
-    <Map/>
-    <!-- <TimeDisplay/>  -->
-    <eta></eta>
+    <Map class="map"/>
 
+    <!-- <eta></eta> -->
+ 
     <!-- Bottom Banner --> 
-    <div class="titleBar bot">
-      <img src="~../assets/icon.svg" id="shuttlepic">
+    <div class="sidebar has-text-centered">
+      <!-- <img src="~../assets/icon.svg" id="shuttlepic"> -->
+      <TimeDisplay /> 
+      <eta></eta>
     </div>
+
 
   </div>
 </template>
@@ -35,7 +37,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 html,body {
-  height: 100%;
+  height: calc( 100% + 44px );
   width: 100%;
   overflow: hidden;
 }
@@ -55,16 +57,37 @@ html,body {
   right: 10px;
 }
 
+.map{
+  width: calc( 100% - 400px );
+  height: 100% !important;
+}
+
 .bot {
   position: absolute;
   bottom: 0px;
   height: 60px;
 }
 
+.tvPanel{
+  width: 100%;
+  height: calc( 100% + 44px ) !important;
+  display: flex;
+  flex-flow: row;
+  justify-content: space-between;
+}
+
+.sidebar {
+  width: 400px;
+  border-bottom: 0.5px solid #eee;
+  box-shadow: -3px 0px 8px 0 #ddd;
+  height: calc( 100% + 44px );
+  z-index: 3;
+  padding-top:20px;
+}
+
 .titleBar {
   height: 40px;
-  display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   width: 100%;
   -webkit-touch-callout: none;
@@ -72,10 +95,9 @@ html,body {
   -moz-user-select: none;
   -ms-user-select: none;
   border-bottom: 0.5px solid #eee;
-  box-shadow: 0 3px 8px 0 #ddd;
+  box-shadow: -3px 0 8px 0 #ddd;
   user-select: none;
   background: white;
   z-index: 1;
-
 }
 </style>

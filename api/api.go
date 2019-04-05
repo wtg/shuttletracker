@@ -80,11 +80,9 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		r.Get("/", api.UpdatesHandler)
 	})
 
-<<<<<<< HEAD
-	//History
-=======
+
 	// History
->>>>>>> upstream/master
+
 	r.Route("/history", func(r chi.Router) {
 		r.Get("/", api.HistoryHandler)
 	})

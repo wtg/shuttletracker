@@ -1,8 +1,7 @@
 <template>
   <!-- Display Current Time and Day -->
-  <div id="timeDisplay">
-    <h1>Current Time: {{displayTime()}}</h1>
-    <h1>Today is {{displayDay()}}</h1>
+  <div class="title is-1" id="timeDisplay">
+    <h1>{{displayTime()}}</h1>
   </div>
 </template>
 
@@ -82,7 +81,5 @@ export default Vue.extend({
 <style scoped>
 #timeDisplay {
   position: relative;
-  right: 200px;
-  top: 70px;
 }
 </style>

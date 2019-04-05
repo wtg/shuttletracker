@@ -1,7 +1,15 @@
 <template>
-    <div class="eta-message" v-if="message">
-        {{ message }}
+  <div>
+    <div class="eta-message">
+      East Campus shuttle arriving in 7 minutes.
     </div>
+    <div class="eta-message">
+      West Campus shuttle arriving in 3 minutes.
+    </div>
+    <div class="eta-message" v-if="message">
+      {{ message }}
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -14,8 +22,50 @@ export default Vue.extend({
   },
   computed: {
     message(): string | null {
-    //   const etas = this.$store.state.etas;
-      return "${etas.length} etas";
+      return null;
+      // find nearest stop
+      let unionStop: Stop | null;
+      for (const stop of this.$store.state.Stops) {
+        if (stop.name === "Student Union") {
+          unionStop = stop;
+          break;
+        }
+      }
+      if (unionStop === null) {
+        return "No ETA";
+      }
+
+      // do we have an ETA for this stop? find the next soonest
+      let eta: ETA | null = null;
+      for (const e of this.$store.state.etas) {
+        if (e.stopID === unionStop.id) {
+          // is this the soonest?
+          if (eta === null || e.eta < eta.eta || e.arriving) {
+            eta = e;
+          }
+        }
+      }
+      if (eta === null) {
+        this.currentETAInfo = null;
+        return "No ETA";
+      }
+
+      // get associated route
+      let route: Route | null = null;
+      for (const r of this.$store.state.Routes) {
+        if (r.id === eta.routeID) {
+          route = r;
+          break;
+        }
+      }
+      if (route === null) {
+        this.currentETAInfo = null;
+        return;
+      }
+
+      // this.currentETAInfo = {eta, route, stop: closestStop};
+      const etas = this.$store.state.etas;
+      return `${etas.length} etas`;
     //   if (this.etaInfo === null) {
     //       return null;
     //   }
@@ -43,19 +93,19 @@ function relativeTime(from: Date, to: Date): string {
 
 <style lang="scss" scoped>
 .eta-message {
-    width: 320px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    margin: 60px 20px auto auto;
-    z-index: 1000;
+    // width: 320px;
+    // position: fixed;
+    // top: 0;
+    // left: 0;
+    // right: 0;
+    margin: 20px 20px;
+    // z-index: 1000;
     background: white;
     padding: 20px 28px;
     border: 0.5px solid #eee;
     border-radius: 4px;
     box-shadow: 0 1px 16px -4px #bbb;
-    font-size: 17px;
+    font-size: 18px;
 }
 @media screen and (max-width: 500px) {
     .eta-message {

@@ -64,7 +64,10 @@ export default Vue.extend({
     this.$store.dispatch('grabStops');
     this.$store.dispatch('grabVehicles');
     this.$store.dispatch('grabUpdates');
+    
+    // Interval to update current Routes 
     setInterval(() => {
+      this.$store.dispatch('grabRoutes');
       this.$store.dispatch('grabUpdates');
     }, 5000);
 
@@ -92,7 +95,6 @@ export default Vue.extend({
           minZoom: 14,
         },
       ).addTo(this.Map);
-
       this.Map.invalidateSize();
     });
     this.renderRoutes();
@@ -147,6 +149,7 @@ export default Vue.extend({
     routePolyLines(): L.Polyline[] {
       return this.$store.getters.getRoutePolyLines;
     },
+
     renderRoutes() {
       if (this.routePolyLines().length > 0 && !this.initialized) {
         if (
@@ -157,6 +160,7 @@ export default Vue.extend({
           this.Map.fitBounds(this.$store.getters.getBoundsPolyLine.getBounds());
         }
       }
+    
       this.existingRouteLayers.forEach((line) => {
         if (this.Map !== undefined) {
           this.Map.removeLayer(line);
@@ -164,6 +168,7 @@ export default Vue.extend({
       });
       this.existingRouteLayers = new Array<L.Polyline>();
       this.routePolyLines().forEach((line: L.Polyline) => {
+
         if (this.Map !== undefined) {
           this.Map.addLayer(line);
           this.existingRouteLayers.push(line);
@@ -228,12 +233,6 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.map {
-    position:relative;  
-    height:600px;
-    width:800px;
-    top:150px;
-}
 
 #mymap {
   flex: 1;
@@ -283,6 +282,5 @@ export default Vue.extend({
   border: none !important;
   width: 20px !important;
   height: 20px !important;
-
 }
 </style>
