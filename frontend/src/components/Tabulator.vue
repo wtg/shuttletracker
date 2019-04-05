@@ -3,39 +3,51 @@
 </template>
 
 <script>
-// npm install tabulator-tables --save
+// TO BUILD TABULATOR NEED ===>
+// ===>  "npm install tabulator-tables --save" <====
 import Vue from 'vue';
 import EventBus from '../event_bus.ts';
 const Tabulator = require('tabulator-tables');
 export default Vue.extend({
   data() {
     return {
+      days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+      times: [],
       tabulator: null,
-      tableColumn: [
-      {title: 'Sunday', field: 'sunday', align: 'center', headerSort:false, cellClick: this.sendData}, 
-      {title: 'Monday', field: 'monday', align: 'center', headerSort:false, cellClick: this.sendData}, 
-      {title: 'Tuesday', field: 'tuesday', align: 'center', headerSort:false, cellClick: this.sendData}, 
-      {title: 'Wednesday', field: 'wednesday', align: 'center', headerSort:false, cellClick: this.sendData}, 
-      {title: 'Thursday', field: 'thursday', align: 'center', headerSort:false, cellClick: this.sendData}, 
-      {title: 'Friday', field: 'friday', align: 'center', headerSort:false, cellClick: this.sendData}, 
-      {title: 'Saturday', field: 'saturday', align: 'center', headerSort:false, cellClick: this.sendData} ],
-    
-    tableData: [ 
-    {id: 12, sunday: '7:00', monday: '7:00', tuesday: '7:00', wednesday: '7:00', thursday: '7:00', friday: '7:00', saturday: '7:00'}, 
-    {id: 1, sunday: '8:00', monday: '8:00', tuesday: '8:00', wednesday: '8:00', thursday: '8:00', friday: '8:00', saturday: '8:00'}, 
-    {id: 2, sunday: '9:00', monday: '9:00', tuesday: '9:00', wednesday: '9:00', thursday: '9:00', friday: '9:00', saturday: '9:00'}, 
-    {id: 3, sunday: '10:00', monday: '10:00', tuesday: '10:00', wednesday: '10:00', thursday: '10:00', friday: '10:00', saturday: '10:00'}, 
-    {id: 4, sunday: '11:00', monday: '11:00', tuesday: '11:00', wednesday: '11:00', thursday: '11:00', friday: '11:00', saturday: '11:00'}, 
-    {id: 5, sunday: '12:00', monday: '12:00', tuesday: '12:00', wednesday: '12:00', thursday: '12:00', friday: '12:00', saturday: '12:00'}, 
-    {id: 6, sunday: '13:00', monday: '13:00', tuesday: '13:00', wednesday: '13:00', thursday: '13:00', friday: '13:00', saturday: '13:00'}, 
-    {id: 7, sunday: '14:00', monday: '14:00', tuesday: '14:00', wednesday: '14:00', thursday: '14:00', friday: '14:00', saturday: '14:00'}, 
-    {id: 8, sunday: '15:00', monday: '15:00', tuesday: '15:00', wednesday: '15:00', thursday: '15:00', friday: '15:00', saturday: '15:00'}, 
-    {id: 9, sunday: '16:00', monday: '16:00', tuesday: '16:00', wednesday: '16:00', thursday: '16:00', friday: '16:00', saturday: '16:00'}, 
-    {id: 10, sunday: '17:00', monday: '17:00', tuesday: '17:00', wednesday: '17:00', thursday: '17:00', friday: '17:00', saturday: '17:00'}, 
-    {id: 11, sunday: '18:00', monday: '18:00', tuesday: '18:00', wednesday: '18:00', thursday: '18:00', friday: '18:00', saturday: '18:00'}, ],
-	  addData: {id: null, sunday: null, monday: null, tuesday: null, wednesday: null, thursday: null, friday: null, saturday: null},
+      tableColumn: [],
+      tableData: [],
+      addData: {id: null, Sunday: null, Monday: null, Tuesday: null, Wednesday: null, Thursday: null, Friday: null, Saturday: null},
 	  };
 	},
+  created() {
+    //tableColumn
+    var tc = [];
+    for ( var i = 0; i < this.days.length; i++ ) {
+      let obj = {title: this.days[i], field: this.days[i], align: 'center', headerSort:false, cellClick: this.sendData};
+      tc.push(obj);
+    }
+    this.tableColumn = tc;
+
+    //times
+    tc = [];
+    var start_hour = 7; //first hour
+    var end_hour = 19; //last hour
+    var minutes = ['00']; //minutes
+    for ( var i = start_hour; i <= end_hour; i++ ) {
+      for ( var j = 0; j < minutes.length; j++ ) {
+        tc.push(i.toString() + ":" + minutes[j]);
+      }
+    }
+    this.times = tc;
+
+    //tableData
+    tc = [];
+    for ( var i = 0; i < this.times.length; i++ ) {
+      let obj = {id: i, Sunday: this.times[i], Monday: this.times[i], Tuesday: this.times[i], Wednesday: this.times[i], Thursday: this.times[i], Friday: this.times[i], Saturday: this.times[i]};
+      tc.push(obj);
+    }
+    this.tableData = tc;
+  },
   mounted() {
     this.tabulator = new Tabulator('#table', {
 	  data: this.tableData,

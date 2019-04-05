@@ -1,7 +1,5 @@
 <template>
-	<div id='select'>
-   <button v-on:click="reset()">Reset</button> 
-  </div>
+	<div id='select'></div>
 </template>
 
 <script>
@@ -13,22 +11,37 @@ export default Vue.extend({
     return {
       tabulator: null,
       tableColumn: [
-        {title: 'Day', field: 'day', align: 'center', headerSort:false,cellClick: function(e, cell){
-            cell.getRow().delete();
-        }}, 
-        {title: 'Time', field: 'time', align: 'center', headerSort:false,cellClick: function(e, cell){
-           cell.getRow().delete();
-        }}, 
+        {title: 'Day', field: 'day', align: 'center', headerSort:false,cellClick: this.delete}, 
+        {title: 'Time', field: 'time', align: 'center', headerSort:false,cellClick: this.delete}, 
       ],
       counter: 0,
       days: ['Sunday','Monday','Tuesday','Wednesday','Thurday','Friday','Saturday'],
+      selected_times: [],
     };
   },
 
   methods: {
     receiveData (payload) {
-      this.counter += 1;
-      this.tabulator.addData([{id:this.counter, day:payload.day.charAt(0).toUpperCase()+payload.day.slice(1), time:payload.time}], true);
+      let selected_time = payload.day + ' ' + payload.time;
+      if ( this.selected_times.indexOf( selected_time ) == -1 ) {
+        this.counter += 1;
+        this.tabulator.addData([{id:this.counter, day:payload.day.charAt(0).toUpperCase()+payload.day.slice(1), time:payload.time}], true);
+        this.selected_times.push(selected_time);
+        EventBus.$emit('TIME_ADDED', payload);
+      }
+    },
+    delete : function(e, cell) {
+      let selected_time = cell.getRow().getCells();
+      const payload = {
+        time: selected_time[1].getValue(),
+        day: selected_time[0].getValue().charAt(0).toLowerCase() + selected_time[0].getValue().slice(1)
+      }
+      EventBus.$emit('TIME_REMOVED', payload);
+      selected_time = payload.day + ' ' + payload.time;
+      let index = this.selected_times.indexOf( selected_time );
+      this.selected_times[index] = this.selected_times[0];
+      this.selected_times.shift();
+      cell.getRow().delete();
     },
     reset () {
       for (let row in this.tabulator.getRows()) {
