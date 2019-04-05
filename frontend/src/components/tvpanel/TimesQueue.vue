@@ -51,9 +51,9 @@ export default Vue.extend({
     data(){
         return {
             curr_time: new Date(),        // Current Time (Date Object)
-            curr_west: sunW.scheduleTime,         // Current West Time Queue (Array)
-            curr_east: weekendE.scheduleTime,         // Current East Time Queue (Array)
-            curr_weekend_late: undefined, // Current Late/Weekend Time Queue (Array)
+            curr_west: null,         // Current West Time Queue (Array)
+            curr_east: null,         // Current East Time Queue (Array)
+            curr_weekend_late: null, // Current Late/Weekend Time Queue (Array)
         }
     },
     methods: {
@@ -93,7 +93,7 @@ export default Vue.extend({
                 }
                 // Late night (Update at 7PM)
                 else if (this.curr_time.getHours() === 19){
-                    this.weekendlate = weekendlate.scheduleTime;
+                    this.curr_weekend_late = weekendlate.scheduleTime;
                 }
             }
             // Saturday
@@ -257,7 +257,7 @@ export default Vue.extend({
         // Interval every three minutes; 180,000 milliseconds
         setInterval(() => {
             this.updateShuttleTimes();
-        }, 100);
+        }, 180000);
     },
 });
 </script>

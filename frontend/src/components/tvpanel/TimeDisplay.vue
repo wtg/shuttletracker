@@ -17,6 +17,9 @@ export default Vue.extend({
       today: new Date(),
     }
   },
+  // hey nerds
+  // how's it going 🖕
+  // 🚐💨
   methods: {
     // Function to display the Current Time
     displayTime() {
@@ -78,7 +81,7 @@ export default Vue.extend({
 
 <style scoped>
 #timeDisplay {
-  position: absolute;
+  position: relative;
   right: 200px;
   top: 70px;
 }
