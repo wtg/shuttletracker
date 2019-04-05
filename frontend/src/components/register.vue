@@ -40,7 +40,7 @@
 import Selected from './Selected.vue'
 import Tabulator from './Tabulator.vue'
 import Vue from 'vue';
-// console.log('why is this'+time);
+import EventBus from '../event_bus'
 export default Vue.extend({
     components: {
         Selected,
@@ -55,7 +55,7 @@ export default Vue.extend({
             carriers: ['AT&T','T-Mobile','Verizon','Sprint','XFinity Mobile','Virgin Mobile','Tracfone','Metro PCS','Boost Mobile','Cricket','Republic Wireless','Google Fi','U.S. Cellular','Ting','Consumer Cellular','C-Spire','Page Plus'],
             route: url.split('?')[1].split('&')[2].split('=')[1],
             stop_url: url,
-            times: [],
+            times: [] as string[],
         }
     },
 
@@ -69,6 +69,16 @@ export default Vue.extend({
     },
 
     methods: {
+        addData (payload:any) {
+            let time = payload.day + ' ' + payload.time;
+            this.times.push(time);
+        },
+        removeData (payload:any) {
+            let time = payload.day + ' ' + payload.time;
+            let index = this.times.indexOf(time);
+            this.times[index] = this.times[0];
+            this.times.shift();
+        },
         submit() {
             //test phone_num
             if ( this.phone_number.length !== 10 || Number.isNaN(this.phone_number as any) ) {
@@ -107,6 +117,15 @@ export default Vue.extend({
             
             //TODO submit
         },
+    },
+
+    mounted() {
+        EventBus.$on('TIME_ADDED', (payload:any) => {
+            this.addData(payload)
+        });
+        EventBus.$on('TIME_REMOVED', (payload:any) => {
+            this.removeData(payload)
+        });
     },
 });
 
