@@ -1,7 +1,5 @@
 <template>
-	<div id='select'>
-   <button v-on:click="reset()">Reset</button> 
-  </div>
+	<div id='select'></div>
 </template>
 
 <script>
