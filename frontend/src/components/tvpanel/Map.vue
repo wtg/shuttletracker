@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-// This component handles everything on the shuttle tracker that is publicly facing.
+// This component the Map Component on the TV Display Panel 
 
 import Vue from 'vue';
 import TabBar from '../tabBar.vue';
@@ -233,7 +233,6 @@ export default Vue.extend({
     height:600px;
     width:800px;
     top:150px;
-    background-color:red;
 }
 
 #mymap {

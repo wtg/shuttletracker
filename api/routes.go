@@ -1,6 +1,7 @@
 package api
 
 import (
+
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -94,6 +95,7 @@ func (api *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
 // StopsCreateHandler adds a new route stop to the database
 func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	stop := &shuttletracker.Stop{}
+
 	err := json.NewDecoder(r.Body).Decode(stop)
 	if err != nil {
 		log.WithError(err).Error("unable to decode stop")
@@ -124,3 +126,5 @@ func (api *API) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
+// func (api *API) UnmarshalJSON(data []byte) error

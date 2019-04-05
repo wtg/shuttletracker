@@ -14,16 +14,25 @@
                 </tr>
                 <tr v-for="stop in stops" :key="stop.id">
                     <th>{{stop.name}}</th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
+                    <th>{{stop.id}}</th>
+                    <th>{{stop.description}}</th>
+                    <th>{{stop.latitude}}</th>
+                    <th>{{stop.longitude}}</th>
                     <th></th>
                     <th></th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
+
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th><button @click="$router.push('/admin/stops/-1/new')" class="button is-success">New</button></th>
+                </tr>
                 
             </tbody>
         </table>
@@ -31,7 +40,7 @@
 </template>
 <script lang="ts">
 import Vue from 'vue';
-import Stop from '@/structures/stop';
+import { Stop } from '@/structures/stop';
 export default Vue.extend({
     name: 'stops',
 

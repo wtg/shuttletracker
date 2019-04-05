@@ -16,13 +16,6 @@ import (
 	"github.com/wtg/shuttletracker/log"
 )
 
-// DataFeedResponse contains information from the iTRAK data feed.
-type DataFeedResponse struct {
-	Body       []byte
-	StatusCode int
-	Headers    http.Header
-}
-
 // Updater handles periodically grabbing the latest vehicle location data from iTrak.
 type Updater struct {
 	cfg                  Config
@@ -30,7 +23,9 @@ type Updater struct {
 	dataRegexp           *regexp.Regexp
 	ms                   shuttletracker.ModelService
 	mutex                *sync.Mutex
-	lastDataFeedResponse *DataFeedResponse
+	lastDataFeedResponse *shuttletracker.DataFeedResponse
+	sm                   *sync.Mutex
+	subscribers          []func(*shuttletracker.Location)
 }
 
 type Config struct {
@@ -44,6 +39,8 @@ func New(cfg Config, ms shuttletracker.ModelService) (*Updater, error) {
 		cfg:   cfg,
 		ms:    ms,
 		mutex: &sync.Mutex{},
+		sm: &sync.Mutex{},
+		subscribers: []func(*shuttletracker.Location){},
 	}
 
 	interval, err := time.ParseDuration(cfg.UpdateInterval)
@@ -84,6 +81,21 @@ func (u *Updater) Run() {
 	}
 }
 
+// Subscribe allows callers to provide a function that is called after Updater parses a new Location.
+func (u *Updater) Subscribe(f func(*shuttletracker.Location)) {
+	u.sm.Lock()
+	u.subscribers = append(u.subscribers, f)
+	u.sm.Unlock()
+}
+
+func (u *Updater) notifySubscribers(loc *shuttletracker.Location) {
+	u.sm.Lock()
+	for _, sub := range u.subscribers {
+		go sub(loc)
+	}
+	u.sm.Unlock()
+}
+
 // Send a request to iTrak API, get updated shuttle info,
 // store updated records in the database, and remove old records.
 func (u *Updater) update() {
@@ -108,7 +120,7 @@ func (u *Updater) update() {
 	}
 	resp.Body.Close()
 
-	dfresp := &DataFeedResponse{
+	dfresp := &shuttletracker.DataFeedResponse{
 		Body:       body,
 		StatusCode: resp.StatusCode,
 		Headers:    resp.Header,
@@ -232,7 +244,10 @@ func (u *Updater) handleVehicleData(vehicleData string) {
 
 	if err := u.ms.CreateLocation(update); err != nil {
 		log.WithError(err).Errorf("could not create location")
+		return
 	}
+
+	u.notifySubscribers(update)
 }
 
 // Convert kmh to mph
@@ -325,14 +340,14 @@ func itrakTimeDate(itrakTime, itrakDate string) (time.Time, error) {
 	return time.Parse("date:01022006 time:150405", combined)
 }
 
-func (u *Updater) setLastResponse(dfresp *DataFeedResponse) {
+func (u *Updater) setLastResponse(dfresp *shuttletracker.DataFeedResponse) {
 	u.mutex.Lock()
 	u.lastDataFeedResponse = dfresp
 	u.mutex.Unlock()
 }
 
 // GetLastResponse returns the most recent response from the iTRAK data feed.
-func (u *Updater) GetLastResponse() *DataFeedResponse {
+func (u *Updater) GetLastResponse() *shuttletracker.DataFeedResponse {
 	u.mutex.Lock()
 	defer u.mutex.Unlock()
 	return u.lastDataFeedResponse
