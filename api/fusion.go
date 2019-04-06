@@ -232,7 +232,7 @@ func (fm *fusionManager) processAddClient(client *fusionClient) {
 	fm.clients[client.id] = client
 
 	fme := fusionMessageEnvelope{
-		Type: "server_id",
+		Type:    "server_id",
 		Message: fm.id,
 	}
 	fm.sendToClient(client.id, fme)
