@@ -11,6 +11,7 @@
       <!-- <img src="~../assets/icon.svg" id="shuttlepic"> -->
       <TimeDisplay /> 
       <eta></eta>
+      <img class="logo" src="~../assets/icon.svg">
     </div>
 
 
@@ -100,4 +101,13 @@ html,body {
   background: white;
   z-index: 1;
 }
+
+.logo {
+  height:60px;
+  width:60px;
+  position:fixed;
+  left: calc( 100% - 230px );
+  bottom:30px;
+}
+
 </style>
