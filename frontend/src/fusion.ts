@@ -133,7 +133,7 @@ export default class Fusion {
                 this.serverID = message.message;
             } else if (this.serverID !== message.message) {
                 // reload page after a random amount of time
-                const wait = Math.random() * 20 + 1;
+                const wait = Math.random() * 20;
                 console.log(`Server ID has changed; reloading after ${wait} seconds`);
 
                 setTimeout(() => {
