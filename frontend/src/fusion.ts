@@ -1,6 +1,7 @@
 import UserLocationService from '@/structures/userlocation.service';
 import store from '@/store';
 import ETA from '@/structures/eta';
+import Resources from '@/resources';
 
 // SocketManager wraps a WebSocket in order to provide guarantees about
 // reliability, reconnections, retries, etc.
@@ -104,7 +105,7 @@ export default class Fusion {
     private serverID = null;
 
     constructor() {
-        const wsURL = this.relativeWSURL('fusion/');
+        const wsURL = Resources.FusionURL;
         this.ws = new SocketManager(wsURL);
         this.ws.registerMessageReceivedCallback((data) => {
             const message = JSON.parse(data);
