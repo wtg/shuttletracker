@@ -153,13 +153,13 @@ def findClosestPoint():
         point_list1 = np.array(point_list1)
         index_list = np.argsort(point_list1)
         index = index_list[0]  # find the shortest
-        print("=====得出车{car_id}该条行驶线路上最近距离点======".format(car_id))
-        # 得出所有行驶车辆以及对应线路上的最近点位置
+        print("=====now finding the light green point======".format(car_id))
+        # get all light green points
         print(route_points[index])
 
-        # 循环此条线路上所有停车点与此最近点的距离
-        point_list2 = [] # 存储预排序的所有距离值(上面程序求出的离车最近的路线点与该条线路的所有停车站点)
-        stop_points = []   # 此条线路上一共几个停车点 列表中存储几个点的坐标
+        # find all the distance between this shuttle and all the stops
+        point_list2 = []   # storage all the light green points and all stops)
+        stop_points = []   # store all the stops
         for stop_id in stop_ids:
             for l_stop in stop:
                 if int(l_stop.get("id")) == int(stop_id):
@@ -170,14 +170,14 @@ def findClosestPoint():
             point_list2.append(di_point)
         point_list2 = np.array(point_list2)
         index_list = np.argsort(point_list2)
-        index = index_list[0]  # 排序值最小的下标
-        print("=====得出车{car_id}该条行驶线路上最近距离点最近的停车站点位{stop_id}======".format(car_id=car_id,stop_id=stop_ids[index]))
+        index = index_list[0]  # find the shortest
+        print("====={car_id} with nearest {stop_id}======".format(car_id=car_id,stop_id=stop_ids[index]))
         print(stop_ids[index])
         all_point_list.append({'car_id': car_id, 'car_route_id': car_route_id, 'route_point': route_points[index],'stop_point':stop_points[index],'distance':point_list2[index],'car_speed':car_speed,'route_len':route_len})
     return all_point_list
 
 
-# 第三步:得到实时速度
+# 第三步:Get V
 def getV(V_avg,all_point_list):
     car_number = len(all_point_list)
     V_list = []
@@ -185,8 +185,8 @@ def getV(V_avg,all_point_list):
     for car in all_point_list:
         car_id = car.get("car_id")
         car_route_id = car.get("car_route_id")
-        route_point = car.get("route_point")  # 线路上最近的点
-        distance = car.get("distance")   # 线路上最近的点与最近的停车点的距离
+        route_point = car.get("route_point")  # light green point
+        distance = car.get("distance")   # distance between light green point and nearest stop
         car_speed = car.get("car_speed")
         n = car.get("route_len")
         V_avg = V_avg
