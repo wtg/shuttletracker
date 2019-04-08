@@ -111,9 +111,12 @@ type fusionManager struct {
 	busButtonCount uint64
 
 	em shuttletracker.ETAService
+
+	// an ID for Fusion clients to tell if they get reconnected to the same server or not
+	id string
 }
 
-func newFusionManager(etaManager shuttletracker.ETAService) *fusionManager {
+func newFusionManager(etaManager shuttletracker.ETAService) (*fusionManager, error) {
 	fm := &fusionManager{
 		addClient:          make(chan *fusionClient),
 		removeClient:       make(chan string),
@@ -134,8 +137,15 @@ func newFusionManager(etaManager shuttletracker.ETAService) *fusionManager {
 	// ETAManager in the future).
 	fm.subscribeCallbacks["eta"] = []func(string){fm.handleETASubscribe}
 
+	// generate a server UUID
+	u, err := uuid.NewV1()
+	if err != nil {
+		return nil, err
+	}
+	fm.id = u.String()
+
 	go fm.run()
-	return fm
+	return fm, nil
 }
 
 // Select handle client connections, disconnections, and messages.
@@ -220,6 +230,13 @@ func decodeFusionMessage(r io.Reader) (string, json.RawMessage, error) {
 // it just needs to be unique) and associate this client with it.
 func (fm *fusionManager) processAddClient(client *fusionClient) {
 	fm.clients[client.id] = client
+
+	fme := fusionMessageEnvelope{
+		Type:    "server_id",
+		Message: fm.id,
+	}
+	fm.sendToClient(client.id, fme)
+
 	go fm.handleClient(client)
 }
 
