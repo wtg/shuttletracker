@@ -164,24 +164,29 @@ export default Vue.extend({
         // --------------------------------------------------------------------------
         // Function to handle updating shuttle times 
         updateShuttleTimes(){
-            if (this.curr_east != null){
+            if (this.curr_east !== null){
                 this.updateQueueEast();
             }
-            if (this.curr_west != null){
+            else{
+                document.getElementById('east3').innerHTML = "No Avaliable Shuttles";
+            }
+            if (this.curr_west !== null){
                 this.updateQueueWest();
             }
-            if (this.curr_weekend_late != null){
+            else{
+                document.getElementById('west3').innerHTML = "No Avaliable Shuttles";
+            }
+            if (this.curr_weekend_late !== null){
                 this.updateQueueLate();
+            }
+            else{
+                document.getElementById('late3').innerHTML = "No Avaliable Shuttles";
             }
             console.log("Shuttle times updated");
         },
         // Function to update shuttle times for the East Queue
         updateQueueEast(){  
             let now = this.curr_time;
-
-            if (!this.curr_east){
-                document.getElementById('east3').innerHTML = "No Avaliable Shuttles";
-            }
 
             let first_shuttle_time = this.curr_east[0].split(":");
             if (now.getHours() > parseInt(first_shuttle_time[0])){
@@ -202,10 +207,6 @@ export default Vue.extend({
         updateQueueWest(){
             let now = this.curr_time;
 
-            if (!this.curr_west){
-                document.getElementById('west3').innerHTML = "No Avaliable Shuttles";
-            }
-
             let first_shuttle_time = this.curr_west[0].split(":");
             if (now.getHours() > parseInt(first_shuttle_time[0])){
                 this.curr_west.shift();
@@ -224,10 +225,6 @@ export default Vue.extend({
         // Function to update shuttle times for the Late/Weekend Queue
         updateQueueLate(){
             let now = this.curr_time;
-
-            if (!this.curr_weekendlate){
-                document.getElementById('late3').innerHTML = "No Avaliable Shuttles";
-            }
 
             let first_shuttle_time = this.curr_weekend_late[0].split(":");
             if (now.getHours() > parseInt(first_shuttle_time[0])){
@@ -281,7 +278,6 @@ export default Vue.extend({
         // Interval every three minutes; 180,000 milliseconds ****
         setInterval(() => {
             this.updateShuttleTimes();  
-
         }, 60);
     },
 });
