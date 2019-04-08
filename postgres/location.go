@@ -61,19 +61,14 @@ func (ls *LocationService) run() {
 	}
 
 	for {
-		log.Debug("top of loop")
 		select {
 		case c := <-ls.addSub:
-			log.Debug("hi")
 			ls.subscribers = append(ls.subscribers, c)
 		case n := <-ls.listener.Notify:
 			if n == nil {
-				log.Debug("yikes")
 				break
 			}
-			log.Debug("hey")
 			if n.Channel != locationsInsertChannel {
-				log.Debug("whoa")
 				continue
 			}
 
@@ -92,15 +87,12 @@ func (ls *LocationService) run() {
 				sub <- loc
 			}
 		}
-		log.Debug("bottom of loop")
 	}
-	log.Debug("verrry bad")
 }
 
 func (ls *LocationService) SubscribeLocations() chan *shuttletracker.Location {
 	c := make(chan *shuttletracker.Location)
 	ls.addSub <- c
-	log.Debug("haha")
 	return c
 }
 

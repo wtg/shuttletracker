@@ -119,9 +119,6 @@ export default Vue.extend({
       if (mutation.type === 'setVehicles') {
         this.addVehicles();
       }
-      if (mutation.type === 'updateVehicleLocation') {
-        console.log('lol');
-      }
       if (mutation.type === 'updateETAs' || mutation.type === 'setRoutes' || mutation.type === 'setStops') {
         this.updateETA();
       }

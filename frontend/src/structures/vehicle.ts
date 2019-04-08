@@ -105,7 +105,6 @@ export default class Vehicle {
     }
 
     public setRoute(r: Route | undefined) {
-        console.log('set route');
         if (r === undefined) {
             this.marker.setIcon(L.icon({
                 iconUrl: getMarkerString('#FFF'),
