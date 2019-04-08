@@ -1,4 +1,4 @@
-FROM node:8 as npmenv
+FROM node:10 as npmenv
 
 ADD /frontend /frontend
 WORKDIR /frontend
