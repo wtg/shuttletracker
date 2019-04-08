@@ -4,13 +4,12 @@ import { Stop } from '../stop';
 import Update from '../update';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 import routeScheduleInterval from '../routeScheduleInterval';
-import Resources from '@/resources';
 /**
  * Info service provider grabs the basic information from the api and returns it to the frontend.
  */
 export default class InfoServiceProvider {
     public GrabVehicles(): Promise<Vehicle[]> {
-        return fetch(Resources.VehiclesURL).then((data) => data.json()).then((data) => {
+        return fetch('/vehicles').then((data) => data.json()).then((data) => {
             const ret = new Array<Vehicle>();
             data.forEach((element: {
                 id: number,
@@ -29,7 +28,7 @@ export default class InfoServiceProvider {
     }
 
     public GrabRoutes(): Promise<Route[]> {
-        return fetch(Resources.RoutesURL).then((data) => data.json()).then((data) => {
+        return fetch('routes').then((data) => data.json()).then((data) => {
             const ret = new Array<Route>();
             data.forEach((element: {
                 id: number,
@@ -68,7 +67,7 @@ export default class InfoServiceProvider {
     }
 
     public GrabStops(): Promise<Stop[]> {
-        return fetch(Resources.StopsURL).then((data) => data.json()).then((data) => {
+        return fetch('stops').then((data) => data.json()).then((data) => {
             const ret = new Array<Stop>();
             data.forEach((element: {
                 id: number,
@@ -87,7 +86,7 @@ export default class InfoServiceProvider {
     }
 
     public GrabAdminMessage(): Promise<AdminMessageUpdate> {
-        return fetch(Resources.AdminMessageURL).then((data) => data.json()).then((ret) => {
+        return fetch('adminMessage').then((data) => data.json()).then((ret) => {
             return new AdminMessageUpdate(ret.message, Boolean(ret.enabled), new Date(ret.created), new Date(ret.updated));
         }).catch(() => {
             return new AdminMessageUpdate('', false, new Date(), new Date());
@@ -96,7 +95,7 @@ export default class InfoServiceProvider {
     }
 
     public GrabUpdates(): Promise<Update[]> {
-        return fetch(Resources.UpdatesURL).then((data) => data.json()).then((data): Update[] => {
+        return fetch('updates').then((data) => data.json()).then((data): Update[] => {
             const ret = new Array<Update>();
             data.forEach((element: Update) => {
                 ret.push(element);
@@ -106,7 +105,7 @@ export default class InfoServiceProvider {
     }
 
     public GrabMapboxKey(): Promise<string> {
-        return fetch('/getKey/').then((data) => data.json()).then((data: string) => {
+        return fetch('getKey/').then((data) => data.json()).then((data: string) => {
             return data;
         });
     }

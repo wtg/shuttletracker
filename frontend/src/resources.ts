@@ -1,5 +1,5 @@
 const BASE_URL = process.env.BASE_URL as string;
-const ROOT_URL = BASE_URL.slice(0, -8);
+const ROOT_URL = BASE_URL.slice(0, -7);
 function constructURL(path: string): string {
     return ROOT_URL + path;
 }
@@ -11,4 +11,5 @@ export default {
     VehiclesURL: constructURL('vehicles'),
     AdminMessageURL: constructURL('adminMessage'),
     FusionURL: constructURL('fusion/'),
+    BasePath: BASE_URL.slice(0, -7), // strip /static/ from Vue's publicPath
 };
