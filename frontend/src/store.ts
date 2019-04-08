@@ -81,6 +81,8 @@ const store: StoreOptions<StoreState> = {
                 break;
               }
             }
+          } else {
+            vehicle.setRoute(undefined);
           }
           vehicle.setLocation(location);
           break;
