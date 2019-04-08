@@ -66,6 +66,7 @@ class SocketManager {
             const ws = new WebSocket(this.url);
             ws.onopen = (event) => {
                 // console.log("socket connected", event);
+                store.commit('setFusionConnected', true);
                 resolve(ws);
             };
             ws.onmessage = (event) => {
@@ -78,6 +79,8 @@ class SocketManager {
             };
             ws.onclose = (event) => {
                 // console.log("socket closed", event);
+
+                store.commit('setFusionConnected', false);
 
                 // try to reconnect after a second
                 setTimeout(() => {

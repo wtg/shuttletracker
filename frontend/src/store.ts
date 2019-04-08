@@ -35,6 +35,7 @@ const store: StoreOptions<StoreState> = {
       fusionPositionEnabled: true,
     },
     geolocationDenied: false,
+    fusionConnected: undefined,
   },
   mutations: {
     setOnline(state, online: boolean) {
@@ -153,6 +154,9 @@ const store: StoreOptions<StoreState> = {
     },
     setGeolocationDenied(state, value: boolean) {
       state.geolocationDenied = value;
+    },
+    setFusionConnected(state, value: boolean) {
+      state.fusionConnected = value;
     },
     setRoutesOnStops(state) {
       // set any routes on existing stops

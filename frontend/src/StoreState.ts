@@ -18,4 +18,5 @@ export interface StoreState {
         fusionPositionEnabled: boolean,
     };
     geolocationDenied: boolean;
+    fusionConnected: boolean | undefined;
 }

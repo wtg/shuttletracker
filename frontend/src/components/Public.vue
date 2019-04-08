@@ -2,9 +2,9 @@
   <div class="parent">
     <div class="titleBar">
       <img src="~../assets/icon.svg">
-      <div class="reconnecting">
+      <div class="reconnecting" v-if="reconnecting">
         <span class="fas fa-circle-notch fa-spin"></span> Reconnecting...
-       </div>
+      </div>
     </div>
     <div id="mymap"></div>
     <span>
@@ -139,6 +139,9 @@ export default Vue.extend({
     },
     shouldShowETAMessage(): boolean {
       return this.$store.state.settings.etasEnabled;
+    },
+    reconnecting(): boolean {
+      return this.$store.state.fusionConnected === false;
     },
   },
   methods: {
