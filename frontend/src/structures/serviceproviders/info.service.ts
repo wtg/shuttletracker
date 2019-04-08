@@ -9,7 +9,7 @@ import routeScheduleInterval from '../routeScheduleInterval';
  */
 export default class InfoServiceProvider {
     public GrabVehicles(): Promise<Vehicle[]> {
-        return fetch('/vehicles').then((data) => data.json()).then((data) => {
+        return fetch('vehicles').then((data) => data.json()).then((data) => {
             const ret = new Array<Vehicle>();
             data.forEach((element: {
                 id: number,

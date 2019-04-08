@@ -9,8 +9,6 @@ import Resources from '@/resources';
 
 Vue.use(Router);
 
-console.log(Resources.BasePath);
-
 export default new Router({
   mode: 'history',
   base: Resources.BasePath,
