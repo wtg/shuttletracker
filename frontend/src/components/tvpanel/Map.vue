@@ -57,7 +57,6 @@ export default Vue.extend({
       };
   },
   mounted() {
-    console.log("here");
     const ls = UserLocationService.getInstance();
     const a = new InfoService();
     this.$store.dispatch('grabRoutes');

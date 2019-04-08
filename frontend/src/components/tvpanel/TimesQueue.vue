@@ -3,28 +3,34 @@
     <!-- East Queue -->
     <div id="east" v-if="checkEast()">
         <ul>  
-            <li id="type"> EAST  </li>
+            <li id="type"> East:  </li>
+            <div class="times" >
             <li id="east1" class="time" v-show="this.curr_east">1</li>
             <li id="east2" class="time" v-show="this.curr_east">2</li>
             <li id="east3" class="time" v-show="this.curr_east">3</li>
+            </div> 
         </ul>
     </div>
     <!-- West Queue -->
     <div id="west" v-if="checkWest()">
         <ul>
-            <li id="type"> WEST </li>
+            <li id="type"> West: </li>
+            <div class="times">
             <li id="west1" class="time" v-show="this.curr_west">1</li>
             <li id="west2" class="time" v-show="this.curr_west">2</li>
             <li id="west3" class="time" v-show="this.curr_west">3</li>
+            </div>
         </ul>
     </div>
     <!-- Late Night/Weekend Queue -->
     <div id="weekendlate" v-if="checkLate()">
         <ul>
-            <li id="type" > LATE NIGHT </li>
+            <li id="type" > Late Night: </li>
+            <div class="times">
             <li id="late1" class="time" v-show="this.curr_weekend_late">1</li>
             <li id="late2" class="time" v-show="this.curr_weekend_late">2</li>
             <li id="late3" class="time" v-show="this.curr_weekend_late">3</li>
+            </div>
         </ul>
     </div>
 </div>
@@ -50,9 +56,9 @@ export default Vue.extend({
     name: 'TimesQueue',
     data(){
         return {
-            curr_time: new Date(),        // Current Time (Date Object)
-            curr_west: null,         // Current West Time Queue (Array)
-            curr_east: null,         // Current East Time Queue (Array)
+            curr_time: new Date(),   // Current Time (Date Object)
+            curr_west: weekdayW.scheduleTime,         // Current West Time Queue (Array)
+            curr_east: weekdayE.scheduleTime,         // Current East Time Queue (Array)
             curr_weekend_late: null, // Current Late/Weekend Time Queue (Array)
         }
     },
@@ -172,6 +178,11 @@ export default Vue.extend({
         // Function to update shuttle times for the East Queue
         updateQueueEast(){  
             let now = this.curr_time;
+
+            if (!this.curr_east){
+                document.getElementById('east3').innerHTML = "No Avaliable Shuttles";
+            }
+
             let first_shuttle_time = this.curr_east[0].split(":");
             if (now.getHours() > parseInt(first_shuttle_time[0])){
                 this.curr_east.shift();
@@ -182,13 +193,19 @@ export default Vue.extend({
                 }
             }
             // Display the first three shuttle times of the queue
-            document.getElementById('east1').innerHTML = (this.curr_east[0]) ? this.display(this.curr_east[0]) : ""; 
-            document.getElementById('east2').innerHTML = (this.curr_east[1]) ? this.display(this.curr_east[1]) : "";
+            document.getElementById('east1').innerHTML = (this.curr_east[0]) ? this.display(this.curr_east[0]) : document.getElementById('east1').remove(); 
+            document.getElementById('east2').innerHTML = (this.curr_east[1]) ? this.display(this.curr_east[1]) : document.getElementById('east2').remove();
             document.getElementById('east3').innerHTML = (this.curr_east[2]) ? this.display(this.curr_east[2]) : "";
+           
         },
         // Function to update shuttles times for the West Queue
         updateQueueWest(){
             let now = this.curr_time;
+
+            if (!this.curr_west){
+                document.getElementById('west3').innerHTML = "No Avaliable Shuttles";
+            }
+
             let first_shuttle_time = this.curr_west[0].split(":");
             if (now.getHours() > parseInt(first_shuttle_time[0])){
                 this.curr_west.shift();
@@ -199,13 +216,19 @@ export default Vue.extend({
                 }
             }
             // Display the first three shuttle times of the queue
-            document.getElementById('west1').innerHTML = (this.curr_west[0]) ? this.display(this.curr_west[0]) : ""; 
-            document.getElementById('west2').innerHTML = (this.curr_west[1]) ? this.display(this.curr_west[1]) : "";
-            document.getElementById('west3').innerHTML = (this.curr_west[2]) ? this.display(this.curr_west[2]) : "";
-        },
+            document.getElementById('west1').innerHTML = (this.curr_west[0]) ? this.display(this.curr_west[0]) : document.getElementById('west1').remove(); 
+            document.getElementById('west2').innerHTML = (this.curr_west[1]) ? this.display(this.curr_west[1]) : document.getElementById('west2').remove();
+             document.getElementById('west3').innerHTML = (this.curr_west[2]) ? this.display(this.curr_west[2]) : "";
+            
+     },
         // Function to update shuttle times for the Late/Weekend Queue
         updateQueueLate(){
             let now = this.curr_time;
+
+            if (!this.curr_weekendlate){
+                document.getElementById('late3').innerHTML = "No Avaliable Shuttles";
+            }
+
             let first_shuttle_time = this.curr_weekend_late[0].split(":");
             if (now.getHours() > parseInt(first_shuttle_time[0])){
                 this.curr_weekend_late.shift();
@@ -216,9 +239,10 @@ export default Vue.extend({
                 }
             }
             // Display the first three shuttle times of the queue
-            document.getElementById('late1').innerHTML = (this.curr_weekend_late[0]) ? this.display(this.curr_weekend_late[0]) : ""; 
-            document.getElementById('late2').innerHTML = (this.curr_weekend_late[1]) ? this.display(this.curr_weekend_late[1]) : "";
+            document.getElementById('late1').innerHTML = (this.curr_weekend_late[0]) ? this.display(this.curr_weekend_late[0]) : document.getElementById('late1').remove(); 
+            document.getElementById('late2').innerHTML = (this.curr_weekend_late[1]) ? this.display(this.curr_weekend_late[1]) : document.getElementById('late2').remove();
             document.getElementById('late3').innerHTML = (this.curr_weekend_late[2]) ? this.display(this.curr_weekend_late[2]) : "";
+
         },
         // --------------------------------------------------------------------------
         // Function to convert 24 to 12 hour format and display AM or PM
@@ -248,60 +272,76 @@ export default Vue.extend({
     },
 
     mounted() {
-        // Interval every minute; 60,000 milliseconds
+        // Interval every 30 seconds; 30,000 milliseconds
         setInterval(() => {
             this.updateCurTime();
             this.checkHour();
-        }, 60000);
+        }, 30000);
 
-        // Interval every three minutes; 180,000 milliseconds
+        // Interval every three minutes; 180,000 milliseconds ****
         setInterval(() => {
-            this.updateShuttleTimes();
-        }, 180000);
+            this.updateShuttleTimes();  
+
+        }, 60);
     },
 });
 </script>
 
 <style scoped>
+
+    .li{
+        margin: 20px 20px;
+        z-index: 1000;
+        background: white;
+        padding: 20px 28px;
+        border: 0.5px solid #eee;
+        border-radius: 4px;
+        box-shadow: 0 1px 16px -4px #bbb;
+        font-size: 18px;
+    }
     #main{
-        margin-left:25px;
-        float:left;
         height:700px;
         width:49%;
-        top:159px;
-        position:relative; 
+        position:absolute; 
         text-align:center;
         color:black;
     }
+    
     .time{
-        font-size:35px;
+        font-size:23px;
+        margin: 20px 20px;
+        width:200px;
+        z-index: 1000;
+        background: white;
+        padding: 15px 28px;
+        border: 0.5px solid #eee;
+        border-radius: 4px;
+        box-shadow: 0 1px 16px -4px #bbb;
+        font-size: 18px;
+        height:60px;
+    }
+    .times {
+        position:relative;
+        left:165px;
+        bottom:65px;
+        z-index:100;
     }
     ul {
         padding-left:0;
     }
     #east{
-        float:left;
-        margin-left:200px;
-        padding-top:30px;
+        text-align:center;
     }
     #west{
-        float:right;
-        margin-right:200px;
-        padding-top:30px;
+        text-align:center;
     }
-    #weekendlate{
-        margin:auto 0;
-        padding-top:30px;
+    #weekendlate{ 
+        text-align:center;
     }
     #type{
-        font-size:80px;
-    }
-    
-    .fade-enter-active, .fade-leave-active {
-        transition: opacity 0.25s ease-out;
-    }
-
-    .fade-enter, .fade-leave-to {
-        opacity: 0;
+        font-size:30px; 
+        position:relative;
+        top:0px;
+        z-index:0;
     }
 </style>

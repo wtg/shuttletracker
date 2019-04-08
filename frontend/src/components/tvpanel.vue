@@ -1,20 +1,20 @@
 <template>
   <div class="tvPanel">
     
-    <!-- <TimesQueue/> -->
+    <!-- Map Component --> 
     <Map class="map"/>
 
-    <!-- <eta></eta> -->
- 
-    <!-- Bottom Banner --> 
-    <div class="sidebar has-text-centered">
-      <!-- <img src="~../assets/icon.svg" id="shuttlepic"> -->
-      <TimeDisplay /> 
-      <eta></eta>
-      <img class="logo" src="~../assets/icon.svg">
+    <!-- Side Bar --> 
+    <div class="sidebar has-text-centered">  
+      <TimeDisplay />
+      <div id="queue">
+        <TimesQueue /> 
+        <img class="logo" src="~../assets/icon.svg">
+        <div id="eta"> 
+        <eta > </eta>
+        </div>
+      </div>
     </div>
-
-
   </div>
 </template>
 
@@ -38,9 +38,9 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 html,body {
-  height: calc( 100% + 44px );
+  height: 100%;
   width: 100%;
-  overflow: hidden;
+  overflow:hidden;
 }
 #title-RPI {
   text-align: center;
@@ -49,45 +49,27 @@ html,body {
   font-size: 75px;
   color: black;
 }
-#WTG {
-  position: absolute;
-  right: 20px;
-}
-
-#wtglogo{
-  right: 10px;
-}
 
 .map{
   width: calc( 100% - 400px );
-  height: 100% !important;
 }
-
-.bot {
-  position: absolute;
-  bottom: 0px;
-  height: 60px;
-}
-
 .tvPanel{
   width: 100%;
-  height: calc( 100% + 44px ) !important;
+  height: 100%;
   display: flex;
   flex-flow: row;
   justify-content: space-between;
 }
-
 .sidebar {
   width: 400px;
   border-bottom: 0.5px solid #eee;
   box-shadow: -3px 0px 8px 0 #ddd;
-  height: calc( 100% + 44px );
+  height:100%;
   z-index: 3;
   padding-top:20px;
 }
-
 .titleBar {
-  height: 40px;
+  height: 100%;
   justify-content: center;
   align-items: center;
   width: 100%;
@@ -101,13 +83,23 @@ html,body {
   background: white;
   z-index: 1;
 }
-
 .logo {
-  height:60px;
-  width:60px;
-  position:fixed;
-  left: calc( 100% - 230px );
-  bottom:30px;
+  height:20px;
+  width:20px;
+  position:relative !important;
+  top:100%;
+  // left: calc( 100% - 230px );
 }
-
+#queue {
+  height:100%;
+  width:100%;
+  position:relative;
+  top:0px;
+}
+#eta {
+  height:200px;
+  width:100%;
+  position:relative;
+  top:55%;
+}
 </style>

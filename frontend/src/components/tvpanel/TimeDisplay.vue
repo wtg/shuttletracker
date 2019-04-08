@@ -3,7 +3,7 @@
   <div class="title is-1" id="timeDisplay">
     <h1>{{displayTime()}}</h1>
   </div>
-</template>
+</template> 
 
 <script>
 // This component handles the Time Display on the TV panel
@@ -81,5 +81,8 @@ export default Vue.extend({
 <style scoped>
 #timeDisplay {
   position: relative;
+  padding-bottom:20px;
+  border-bottom:2px solid 	#D3D3D3; 
+  z-index:100;
 }
 </style>
