@@ -112,14 +112,17 @@ type fusionManager struct {
 
 	em shuttletracker.ETAService
 	ms shuttletracker.ModelService
+
+	// an ID for Fusion clients to tell if they get reconnected to the same server or not
+	id string
 }
 
-func newFusionManager(etaManager shuttletracker.ETAService, ms shuttletracker.ModelService) *fusionManager {
+func newFusionManager(etaManager shuttletracker.ETAService, ms shuttletracker.ModelService) (*fusionManager, error) {
 	fm := &fusionManager{
 		addClient:          make(chan *fusionClient),
 		removeClient:       make(chan string),
 		clientMsg:          make(chan clientMessage),
-		serverMsg:          make(chan serverMessage, 100), // this buffer needs to be at least as large as number of vehicles
+		serverMsg:          make(chan serverMessage, 100), // buffer needs to be at least as large as the number of messages that will be sent in any given loop through fusionManager's run() method
 		debug:              make(chan chan *fusionManagerDebug),
 		clients:            map[string]*fusionClient{},
 		tracks:             map[string][]fusionPosition{},
@@ -141,8 +144,15 @@ func newFusionManager(etaManager shuttletracker.ETAService, ms shuttletracker.Mo
 	fm.subscribeCallbacks["eta"] = []func(string){fm.handleETASubscribe}
 	fm.subscribeCallbacks["vehicle_location"] = []func(string){fm.handleVehicleLocationSubscribe}
 
+	// generate a server UUID
+	u, err := uuid.NewV1()
+	if err != nil {
+		return nil, err
+	}
+	fm.id = u.String()
+
 	go fm.run()
-	return fm
+	return fm, nil
 }
 
 // Select handle client connections, disconnections, and messages.
@@ -150,6 +160,15 @@ func newFusionManager(etaManager shuttletracker.ETAService, ms shuttletracker.Mo
 // Anything run calls should obtain the lock on fusionManager state.
 func (fm *fusionManager) run() {
 	for {
+		// first see if we have any messages to push out
+		select {
+		case sm := <-fm.serverMsg:
+			fm.processServerMessage(sm)
+			continue
+		default:
+		}
+
+		// then handle everything else
 		select {
 		case c := <-fm.addClient:
 			fm.processAddClient(c)
@@ -246,6 +265,13 @@ func decodeFusionMessage(r io.Reader) (string, json.RawMessage, error) {
 // it just needs to be unique) and associate this client with it.
 func (fm *fusionManager) processAddClient(client *fusionClient) {
 	fm.clients[client.id] = client
+
+	fme := fusionMessageEnvelope{
+		Type:    "server_id",
+		Message: fm.id,
+	}
+	fm.sendToClient(client.id, fme)
+
 	go fm.handleClient(client)
 }
 

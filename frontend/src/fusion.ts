@@ -78,16 +78,20 @@ class SocketManager {
             };
             ws.onclose = (event) => {
                 // console.log("socket closed", event);
-                this.createSocket().then((newWS) => {
-                    this.ws = newWS;
 
-                    // try to send anything that was queued while the socket was closed
-                    this.flushQueue();
+                // try to reconnect after a second
+                setTimeout(() => {
+                    this.createSocket().then((newWS) => {
+                        this.ws = newWS;
 
-                    for (const callback of this.reconnectCallbacks) {
-                        callback();
-                    }
-                });
+                        // try to send anything that was queued while the socket was closed
+                        this.flushQueue();
+
+                        for (const callback of this.reconnectCallbacks) {
+                            callback();
+                        }
+                    });
+                }, 1000);
             };
         });
     }
@@ -98,6 +102,7 @@ export default class Fusion {
     public track = this.generateUUID();
     private callbacks = Array<(message: {}) => any>();
     private subscriptionTopics = new Set<string>();
+    private serverID = null;
 
     constructor() {
         const wsURL = this.relativeWSURL('fusion/');
@@ -117,6 +122,26 @@ export default class Fusion {
 
     public start() {
         this.ws.open();
+
+        // register server ID changed refresh callback
+        this.registerMessageReceivedCallback((message: any) => {
+            if (message.type !== 'server_id') {
+                return;
+            }
+
+            // store this server ID or check if it has changed
+            if (this.serverID === null) {
+                this.serverID = message.message;
+            } else if (this.serverID !== message.message) {
+                // reload page after a random amount of time
+                const wait = Math.random() * 20;
+                console.log(`Server ID has changed; reloading after ${wait} seconds`);
+
+                setTimeout(() => {
+                    location.reload(true);
+                }, wait * 1000);
+            }
+        });
 
         // register location callback
         UserLocationService.getInstance().registerCallback((position) => {

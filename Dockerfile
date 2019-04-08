@@ -1,10 +1,12 @@
-FROM node:8 as npmenv
+FROM node:10 as npmenv
 
 ADD /frontend /frontend
 WORKDIR /frontend
 
 # Install npm dependencies and build
 RUN npm install
+# this lets us override where the built assets should expect to be found
+ARG STATIC_PATH
 RUN npm run build
 
 
