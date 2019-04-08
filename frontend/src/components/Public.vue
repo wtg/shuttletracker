@@ -415,7 +415,7 @@ export default Vue.extend({
   animation: pop-in 0.1s;
 }
 .pop-leave-active {
-  animation: pop-out 0.1s;
+  animation: pop-out 0.15s;
 }
 @keyframes pop-in {
   0% {
