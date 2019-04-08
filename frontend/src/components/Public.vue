@@ -2,9 +2,11 @@
   <div class="parent">
     <div class="titleBar">
       <img src="~../assets/icon.svg">
-      <div class="reconnecting" v-if="reconnecting">
-        <span class="fas fa-circle-notch fa-spin"></span> Reconnecting...
-      </div>
+      <transition name="pop">
+        <div class="reconnecting" v-if="reconnecting">
+          <span class="fas fa-circle-notch fa-spin"></span> Reconnecting...
+        </div>
+      </transition>
     </div>
     <div id="mymap"></div>
     <span>
@@ -403,9 +405,39 @@ export default Vue.extend({
     margin-left: auto;
     background: linear-gradient(0deg, rgb(250, 250, 250), rgb(240, 240, 240));
     border: 0.5px solid #eee;
-    padding: 2px 4px;
+    padding: 2px 6px;
     border-radius: 4px;
     font-size: 13px;
+  }
+}
+
+.pop-enter-active {
+  animation: pop-in 0.1s;
+}
+.pop-leave-active {
+  animation: pop-out 0.1s;
+}
+@keyframes pop-in {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.02);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes pop-out {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0;
   }
 }
 
