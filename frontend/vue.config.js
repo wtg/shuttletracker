@@ -1,8 +1,6 @@
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-
 module.exports = {
     outputDir: '../static',
-    baseUrl: '/static/',
+    publicPath: process.env.STATIC_PATH || '/static/',
     pages: {
         index: {
             entry: 'src/main.ts',
@@ -15,11 +13,7 @@ module.exports = {
             filename: 'admin.html',
         }
     },
-    
     configureWebpack: {
-        // plugins: [
-        //     new CopyWebpackPlugin([{from: 'src/admin'}], {}),
-        // ],
         devServer: {
             proxy: {
                 '/vehicles|/routes|/adminMessage|/updates|/stops': {

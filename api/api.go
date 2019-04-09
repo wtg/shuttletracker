@@ -45,7 +45,10 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	}
 
 	// Set up fusion manager
-	fm := newFusionManager(etaManager)
+	fm, err := newFusionManager(etaManager)
+	if err != nil {
+		return nil, err
+	}
 
 	// Create API instance to store database session and collections
 	api := API{
