@@ -89,34 +89,6 @@ const store: StoreOptions<StoreState> = {
         }
       }
     },
-    addUpdates(state, updates: Update[]) {
-      const toHide = new Array<Vehicle>();
-      state.Vehicles.forEach((vehicle: Vehicle) => {
-        let found = false;
-        for (let i = 0; i < updates.length; i++) {
-          if (Number(vehicle.id) === Number(updates[i].vehicle_id)) {
-            vehicle.lastUpdate = new Date(updates[i].time);
-            found = true;
-            vehicle.speed = Number(updates[i].speed);
-            vehicle.setRoute(undefined);
-            for (let j = 0; j < state.Routes.length; j++) {
-              if (state.Routes[j].id === updates[i].route_id) {
-                vehicle.setRoute(state.Routes[j]);
-                break;
-              }
-            }
-            vehicle.setLatLng(Number(updates[i].latitude), Number(updates[i].longitude));
-            vehicle.setHeading(Number(updates[i].heading));
-            vehicle.showOnMap(true);
-
-            break;
-          }
-        }
-        if (!found) {
-          vehicle.showOnMap(false);
-        }
-      });
-    },
     addAdminMessage(state, message: AdminMessageUpdate) {
       state.adminMessage = message;
     },
@@ -269,11 +241,6 @@ const store: StoreOptions<StoreState> = {
     },
     grabVehicles({ commit }) {
       InfoService.GrabVehicles().then((ret: Vehicle[]) => commit('setVehicles', ret)).catch(() => {
-        commit('setOnline', false);
-      });
-    },
-    grabUpdates({ commit }) {
-      InfoService.GrabUpdates().then((ret: Update[]) => commit('addUpdates', ret)).catch(() => {
         commit('setOnline', false);
       });
     },
