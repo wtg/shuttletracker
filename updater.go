@@ -14,5 +14,4 @@ type DataFeedResponse struct {
 // UpdaterService is an interface for interacting with vehicle location updates.
 type UpdaterService interface {
 	GetLastResponse() *DataFeedResponse
-	Subscribe(func(*Location))
 }

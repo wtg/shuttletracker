@@ -36,3 +36,21 @@ func (ls *LocationService) LatestLocation(vehicleID int64) (*shuttletracker.Loca
 	args := ls.Called(vehicleID)
 	return args.Get(0).(*shuttletracker.Location), args.Error(1)
 }
+
+// LatestLocations returns the most recent Location for each Vehicle.
+func (ls *LocationService) LatestLocations() ([]*shuttletracker.Location, error) {
+	args := ls.Called()
+	return args.Get(0).([]*shuttletracker.Location), args.Error(1)
+}
+
+// Location returns a Location by its ID.
+func (ls *LocationService) Location(id int64) (*shuttletracker.Location, error) {
+	args := ls.Called(id)
+	return args.Get(0).(*shuttletracker.Location), args.Error(1)
+}
+
+// SubscribLocations returns a chan that receives each new Location.
+func (ls *LocationService) SubscribeLocations() (chan *shuttletracker.Location) {
+	args := ls.Called()
+	return args.Get(0).(chan *shuttletracker.Location)
+}
