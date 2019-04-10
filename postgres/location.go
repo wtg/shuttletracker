@@ -90,6 +90,8 @@ func (ls *LocationService) run() {
 	}
 }
 
+// SubscribeLocations returns a chan that receives each new Location after it is
+// written to the database.
 func (ls *LocationService) SubscribeLocations() chan *shuttletracker.Location {
 	c := make(chan *shuttletracker.Location)
 	ls.addSub <- c

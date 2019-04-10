@@ -49,8 +49,8 @@ func (ls *LocationService) Location(id int64) (*shuttletracker.Location, error) 
 	return args.Get(0).(*shuttletracker.Location), args.Error(1)
 }
 
-// SubscribLocations returns a chan that receives each new Location.
-func (ls *LocationService) SubscribeLocations() (chan *shuttletracker.Location) {
+// SubscribeLocations returns a chan that receives each new Location.
+func (ls *LocationService) SubscribeLocations() chan *shuttletracker.Location {
 	args := ls.Called()
 	return args.Get(0).(chan *shuttletracker.Location)
 }
