@@ -47,7 +47,7 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS locations_insert on locations;
-CREATE TRIGGER locations_insert AFTER INSERT ON locations FOR EACH ROW EXECUTE FUNCTION locations_insert_notify();
+CREATE TRIGGER locations_insert AFTER INSERT ON locations FOR EACH ROW EXECUTE PROCEDURE locations_insert_notify();
 `
 	_, err := ls.db.Exec(schema)
 	return err
