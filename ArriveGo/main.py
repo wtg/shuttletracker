@@ -22,9 +22,9 @@ def getAveV():
     car_vel = []
     for item in text:
         # only need car ID and speed
-        car_id.append(item['tracker_id'])
-        car_vel.append(item['speed'])
-    for i in len(text):          # again and again
+        car_id.append(['tracker_id'])
+        car_vel.append(['speed'])
+    for i in range(len(text)):          # again and again
         if car_id[i] not in car.keys():
             velo_list.append(car_vel[i])
             car[car_id[i]] = velo_list
@@ -177,7 +177,7 @@ def findClosestPoint():
     return all_point_list
 
 
-# 第三步:Get V
+# Step 3:Get V
 def getV(V_avg,all_point_list):
     car_number = len(all_point_list)
     V_list = []
@@ -195,7 +195,7 @@ def getV(V_avg,all_point_list):
         distance_list.append(distance)
     return V_list, distance_list
 
-# 第四步
+# Step 4: get ETA
 def getPredictTime(V_list, distance_list):
     T_list = []
     for i in range(len(V_list)):
@@ -207,13 +207,13 @@ def getPredictTime(V_list, distance_list):
 
 
 if __name__ == '__main__':
-    # 一
+    # one
     Vave = getAveV()
-    # 二
+    # two
     all_point_list = findClosestPoint()
-    # 三
+    # three
     V_list, distance_list = getV(Vave,all_point_list)
-    # 四
+    # four
     Final_list = getPredictTime(V_list, distance_list)
     print(Final_list)
 
