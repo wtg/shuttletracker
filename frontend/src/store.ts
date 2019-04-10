@@ -6,11 +6,8 @@ import InfoServiceProvider from '@/structures/serviceproviders/info.service';
 import { Stop } from '@/structures/stop';
 import Vehicle from '@/structures/vehicle';
 import Location from '@/structures/location';
-import ETA from '@/structures/eta';
 import * as L from 'leaflet';
-import Update from '@/structures/update';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
-import { stat } from 'fs';
 
 Vue.use(Vuex);
 const InfoService = new InfoServiceProvider();

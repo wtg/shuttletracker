@@ -1,7 +1,6 @@
 import Vehicle from '../vehicle';
 import Route from '../route';
 import { Stop } from '../stop';
-import Update from '../update';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 import routeScheduleInterval from '../routeScheduleInterval';
 /**
@@ -91,16 +90,6 @@ export default class InfoServiceProvider {
         }).catch(() => {
             return new AdminMessageUpdate('', false, new Date(), new Date());
 
-        });
-    }
-
-    public GrabUpdates(): Promise<Update[]> {
-        return fetch('updates').then((data) => data.json()).then((data): Update[] => {
-            const ret = new Array<Update>();
-            data.forEach((element: Update) => {
-                ret.push(element);
-            });
-            return ret;
         });
     }
 
