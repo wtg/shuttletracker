@@ -154,6 +154,15 @@ export default class Vehicle {
         this.setHeading(this.location.heading);
         this.speed = this.location.speed;
 
+        this.updateShowOnMap();
+    }
+
+    public updateShowOnMap() {
+        if (this.location === null) {
+            this.showOnMap(false);
+            return;
+        }
+
         const now = new Date().getTime();
         const fiveMinMilliseconds = 5 * 60 * 1000;
         if (now - this.location.time.getTime() > fiveMinMilliseconds) {

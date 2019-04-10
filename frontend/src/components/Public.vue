@@ -77,10 +77,11 @@ export default Vue.extend({
     Promise.all([this.$store.dispatch('grabStops'), this.$store.dispatch('grabRoutes')]);
     this.$store.dispatch('grabVehicles');
     this.$store.dispatch('grabAdminMesssage');
-    // this.$store.dispatch('grabUpdates');
-    // setInterval(() => {
-    //   this.$store.dispatch('grabUpdates');
-    // }, 5000);
+
+    // periodically hide inactive vehicles
+    setInterval(() => {
+      this.$store.commit('hideInactiveVehicles');
+    }, 30000);
 
     this.$nextTick(() => {
       this.ready = true;
