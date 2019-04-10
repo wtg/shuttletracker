@@ -208,7 +208,14 @@ export default Vue.extend({
     renderStops() {
       this.$store.state.Stops.forEach((stop: Stop) => {
         if (this.Map !== undefined) {
-          stop.marker.bindPopup(stop.getMessage());
+          let stop_link = ('/register').concat('?stop_id=').concat(stop.id.toString()).concat('&stop_name=').concat(stop.name);
+          if ( stop.routesOn.length == 1 ) {
+            stop_link = stop_link.concat('&route=').concat(stop.routesOn[0].id.toString());
+          } else {
+            stop_link = stop_link.concat('&route=null');
+          }
+          encodeURI(stop_link);
+          stop.marker.bindPopup(stop.name.link(stop_link));
           stop.marker.addTo(this.Map);
         }
       });

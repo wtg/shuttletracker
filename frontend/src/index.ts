@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Public from './components/Public.vue';
 import about from './components/about.vue';
+import register from '@/components/register.vue';
 import schedules from '@/components/schedules.vue';
 import settings from '@/components/settings.vue';
 import tvpanel from '@/components/tvpanel.vue';
@@ -28,6 +29,11 @@ export default new Router({
       path: '/etas',
       name: 'etas',
       component: etas,
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: register,
     },
     {
       path: '/schedules',
