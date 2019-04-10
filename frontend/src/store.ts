@@ -86,13 +86,6 @@ const store: StoreOptions<StoreState> = {
         }
       }
     },
-    hideInactiveVehicles(state) {
-      for (const vehicle of state.Vehicles) {
-        if (vehicle.shownOnMap) {
-          vehicle.updateShowOnMap();
-        }
-      }
-    },
     addAdminMessage(state, message: AdminMessageUpdate) {
       state.adminMessage = message;
     },

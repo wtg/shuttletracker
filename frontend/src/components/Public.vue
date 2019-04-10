@@ -78,11 +78,6 @@ export default Vue.extend({
     this.$store.dispatch('grabVehicles');
     this.$store.dispatch('grabAdminMesssage');
 
-    // periodically hide inactive vehicles
-    setInterval(() => {
-      this.$store.commit('hideInactiveVehicles');
-    }, 30000);
-
     this.$nextTick(() => {
       this.ready = true;
       this.Map = L.map('mymap', {
