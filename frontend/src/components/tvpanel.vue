@@ -86,8 +86,8 @@ html,body {
 .logo {
   height:20px;
   width:20px;
-  position:relative !important;
-  top:100%;
+  position:relative;
+  top:780px;
   // left: calc( 100% - 230px );
 }
 #queue {

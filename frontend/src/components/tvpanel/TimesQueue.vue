@@ -1,35 +1,37 @@
 <template>
 <div id ="main">
     <!-- East Queue -->
-    <div id="east" v-if="checkEast()">
+    <div id="east" v-if="curr_east">
         <ul>  
-            <li id="type"> East:  </li>
+            <li id="type"> East  </li>
             <div class="times" >
-            <li id="east1" class="time" v-show="this.curr_east">1</li>
-            <li id="east2" class="time" v-show="this.curr_east">2</li>
-            <li id="east3" class="time" v-show="this.curr_east">3</li>
+            <li id="east1" class="time" v-if="east1_time" key="east1_time">{{display(east1_time)}}</li>
+            <li id="east2" class="time" v-if="east2_time" key="east2_time">{{display(east2_time)}}</li>
+            <li id="east3" class="time" v-if="east3_time" key="east3_time">{{display(east3_time)}}</li>
+            <li id="east3" class="time" v-if="east4_time" key="east4_time">{{display(east4_time)}}</li>
+            <li id="east3" class="time" v-if="east5_time" key="east5_time">{{display(east5_time)}}</li>
             </div> 
         </ul>
     </div>
     <!-- West Queue -->
-    <div id="west" v-if="checkWest()">
+    <div id="west" v-if="curr_west">
         <ul>
-            <li id="type"> West: </li>
+            <li id="type"> West </li>
             <div class="times">
-            <li id="west1" class="time" v-show="this.curr_west">1</li>
-            <li id="west2" class="time" v-show="this.curr_west">2</li>
-            <li id="west3" class="time" v-show="this.curr_west">3</li>
+            <li id="west1" class="time" v-if="west1_time" key="west1_time">{{display(west1_time)}}</li>
+            <li id="west2" class="time" v-if="west2_time" key="west2_time">{{display(west2_time)}}</li>
+            <li id="west3" class="time" v-if="west3_time" key="west3_time">{{display(west3_time)}}</li>
             </div>
         </ul>
     </div>
     <!-- Late Night/Weekend Queue -->
-    <div id="weekendlate" v-if="checkLate()">
+    <div id="weekendlate" v-if="curr_weekend_late">
         <ul>
-            <li id="type" > Late Night: </li>
+            <li id="type" > Late Night </li>
             <div class="times">
-            <li id="late1" class="time" v-show="this.curr_weekend_late">1</li>
-            <li id="late2" class="time" v-show="this.curr_weekend_late">2</li>
-            <li id="late3" class="time" v-show="this.curr_weekend_late">3</li>
+            <li id="late1" class="time" v-show="this.curr_weekend_late">{{display(late1_time)}}</li>
+            <li id="late2" class="time" v-show="this.curr_weekend_late">{{display(late2_time)}}</li>
+            <li id="late3" class="time" v-show="this.curr_weekend_late">{{display(late3_time)}}</li>
             </div>
         </ul>
     </div>
@@ -52,14 +54,35 @@ import weekdayW from '@/assets/shuttle_times/weekdayW.json';
 import satW from '@/assets/shuttle_times/satW.json';
 import sunW from '@/assets/shuttle_times/sunW.json';
 
+
 export default Vue.extend({
     name: 'TimesQueue',
     data(){
         return {
-            curr_time: new Date(),   // Current Time (Date Object)
-            curr_west: weekdayW.scheduleTime,         // Current West Time Queue (Array)
-            curr_east: weekdayE.scheduleTime,         // Current East Time Queue (Array)
-            curr_weekend_late: null, // Current Late/Weekend Time Queue (Array)
+            curr_time: new Date(),    
+
+            curr_west: weekdayW.scheduleTime,          
+            curr_east: weekdayE.scheduleTime,                            
+            curr_weekend_late: null,                   
+
+            east1_time: null,
+            east2_time: null,
+            east3_time: null,
+            east4_time: null,
+            east5_time: null,
+
+            west1_time: null,
+            west2_time: null,
+            west3_time: null,
+            west4_time: null,
+            west5_time: null,
+
+            late1_time: null,
+            late2_time: null,
+            late3_time: null,
+            late4_time: null,
+            late5_time: null,
+            no_shuttles: "No Avaliable Shuttles",
         }
     },
     methods: {
@@ -73,9 +96,6 @@ export default Vue.extend({
         checkHour(){
             if (this.curr_time.getMinutes() === 0){
                 this.updateQueues();
-                this.checkEast();
-                this.checkWest();
-                this.checkLate();
                 console.log("Hourly Queue check/update done");
             }
         },
@@ -127,60 +147,30 @@ export default Vue.extend({
                 }
             }
             // Format weekendlate queue
-            this.formatWeekendLate();
+            // this.formatWeekendLate();
         },
-        // Toggle East Shuttles Queue
-        checkEast(){
-            if (this.curr_east != null){
-                return true;
-            }
-            return false;
-        },
-        // Toggle West Shuttles Queue
-        checkWest(){
-            if (this.curr_west != null){
-                return true;
-            }
-            return false;
-        },
-        // Toggle Late/Weekend Shuttles Queue
-        checkLate(){
-            if (this.curr_weekend_late != null){
-                return true;
-            }
-            return false;    
-        },
-        // Function to manipulate weekendlate formatting
-        formatWeekendLate(){
-            //If East and West shuttles are also running, format the queue
-            if (this.curr_east && this.curr_west && this.curr_weekend_late){
-                document.getElementById("weekendlate").style.marginTop = "250px";
-            }
-            // If only the Late Night shuttles are running, center the queue    
-            else if (this.curr_weekend_late){
-                document.getElementById("weekendlate").style.margin = "0 auto";
-            }
-        },
+        // // Function to manipulate weekendlate formatting
+        // formatWeekendLate(){
+        //     //If East and West shuttles are also running, format the queue
+        //     if (this.curr_east && this.curr_west && this.curr_weekend_late){
+        //         document.getElementById("weekendlate").style.marginTop = "250px";
+        //     }
+        //     // If only the Late Night shuttles are running, center the queue    
+        //     else if (this.curr_weekend_late){
+        //         document.getElementById("weekendlate").style.margin = "0 auto";
+        //     }
+        // },  
         // --------------------------------------------------------------------------
         // Function to handle updating shuttle times 
         updateShuttleTimes(){
             if (this.curr_east !== null){
                 this.updateQueueEast();
             }
-            else{
-                document.getElementById('east3').innerHTML = "No Avaliable Shuttles";
-            }
             if (this.curr_west !== null){
                 this.updateQueueWest();
             }
-            else{
-                document.getElementById('west3').innerHTML = "No Avaliable Shuttles";
-            }
             if (this.curr_weekend_late !== null){
                 this.updateQueueLate();
-            }
-            else{
-                document.getElementById('late3').innerHTML = "No Avaliable Shuttles";
             }
             console.log("Shuttle times updated");
         },
@@ -198,10 +188,12 @@ export default Vue.extend({
                 }
             }
             // Display the first three shuttle times of the queue
-            document.getElementById('east1').innerHTML = (this.curr_east[0]) ? this.display(this.curr_east[0]) : document.getElementById('east1').remove(); 
-            document.getElementById('east2').innerHTML = (this.curr_east[1]) ? this.display(this.curr_east[1]) : document.getElementById('east2').remove();
-            document.getElementById('east3').innerHTML = (this.curr_east[2]) ? this.display(this.curr_east[2]) : "";
-           
+            this.east1_time = this.curr_east[0];
+            this.east2_time = this.curr_east[1];
+            this.east3_time = this.curr_east[2];
+            this.east4_time = this.curr_east[3];
+            this.east5_time = this.curr_east[900];
+            
         },
         // Function to update shuttles times for the West Queue
         updateQueueWest(){
@@ -217,10 +209,9 @@ export default Vue.extend({
                 }
             }
             // Display the first three shuttle times of the queue
-            document.getElementById('west1').innerHTML = (this.curr_west[0]) ? this.display(this.curr_west[0]) : document.getElementById('west1').remove(); 
-            document.getElementById('west2').innerHTML = (this.curr_west[1]) ? this.display(this.curr_west[1]) : document.getElementById('west2').remove();
-             document.getElementById('west3').innerHTML = (this.curr_west[2]) ? this.display(this.curr_west[2]) : "";
-            
+            this.west1_time = this.curr_west[0];
+            this.west2_time = this.curr_west[1];
+            this.west3_time = this.curr_west[2];    
      },
         // Function to update shuttle times for the Late/Weekend Queue
         updateQueueLate(){
@@ -236,10 +227,9 @@ export default Vue.extend({
                 }
             }
             // Display the first three shuttle times of the queue
-            document.getElementById('late1').innerHTML = (this.curr_weekend_late[0]) ? this.display(this.curr_weekend_late[0]) : document.getElementById('late1').remove(); 
-            document.getElementById('late2').innerHTML = (this.curr_weekend_late[1]) ? this.display(this.curr_weekend_late[1]) : document.getElementById('late2').remove();
-            document.getElementById('late3').innerHTML = (this.curr_weekend_late[2]) ? this.display(this.curr_weekend_late[2]) : "";
-
+            this.late1_time = this.curr_weekend_late[0];
+            this.late2_time = this.curr_weekend_late[1];
+            this.late3_time = this.curr_weekend_late[2];  
         },
         // --------------------------------------------------------------------------
         // Function to convert 24 to 12 hour format and display AM or PM
@@ -278,13 +268,12 @@ export default Vue.extend({
         // Interval every three minutes; 180,000 milliseconds ****
         setInterval(() => {
             this.updateShuttleTimes();  
-        }, 60);
+        }, 1800);
     },
 });
 </script>
 
 <style scoped>
-
     .li{
         margin: 20px 20px;
         z-index: 1000;
@@ -301,43 +290,31 @@ export default Vue.extend({
         position:absolute; 
         text-align:center;
         color:black;
-    }
-    
-    .time{
-        font-size:23px;
-        margin: 20px 20px;
-        width:200px;
-        z-index: 1000;
-        background: white;
-        padding: 15px 28px;
-        border: 0.5px solid #eee;
-        border-radius: 4px;
-        box-shadow: 0 1px 16px -4px #bbb;
-        font-size: 18px;
-        height:60px;
-    }
-    .times {
-        position:relative;
-        left:165px;
-        bottom:65px;
-        z-index:100;
+        display:flex;
     }
     ul {
         padding-left:0;
     }
+    .time{
+        font-size:25px;
+        margin-top:10px;
+        margin-bottom:10px;
+    }
     #east{
         text-align:center;
+        flex:50%;
     }
     #west{
         text-align:center;
+        flex:50%;
     }
     #weekendlate{ 
         text-align:center;
+        flex:50%;
     }
     #type{
-        font-size:30px; 
-        position:relative;
-        top:0px;
-        z-index:0;
+        font-size:60px; 
+        margin-left:35px;
+        margin-right:35px;
     }
 </style>

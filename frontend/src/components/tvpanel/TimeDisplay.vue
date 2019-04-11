@@ -8,7 +8,6 @@
 <script>
 // This component handles the Time Display on the TV panel
 import Vue from "vue";
-
 export default Vue.extend({
   name: "TimeDisplay",
   data() {
@@ -16,9 +15,7 @@ export default Vue.extend({
       today: new Date(),
     }
   },
-  // hey nerds
-  // how's it going 🖕
-  // 🚐💨
+
   methods: {
     // Function to display the Current Time
     displayTime() {
