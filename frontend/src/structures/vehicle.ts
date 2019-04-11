@@ -1,11 +1,12 @@
 import * as L from 'leaflet';
 import Route from '@/structures/route';
+import Location from '@/structures/location';
 import getMarkerString from '@/structures/leaflet/rotatedMarker';
 import getCardinalDirection from '@/structures/cardinalDirection';
 import 'leaflet-rotatedmarker';
 
-const ShuttleIcon = require('@/assets/shuttle.svg') as string;
-const maxMissedUpdatesBeforeHide = 5;
+// vehicles are hidden when their most recent location update becomes this old
+const vehicleInactiveDurationMS = 5 * 60 * 1000;  // five minutes in milliseconds
 
 
 /**
@@ -20,14 +21,14 @@ export default class Vehicle {
     public marker: L.Marker;
     public lat: number;
     public lng: number;
-    public heading: number;
-    public speed: number;
     public RouteID: number | null;
     public shownOnMap: boolean;
     public map: L.Map | undefined;
     public Route: Route | undefined;
     public lastUpdate: Date;
     public tracker_id: number;
+    public location: Location | null;
+    private hideTimer: number | null = null;
 
     constructor(id: number, name: string, created: Date, updated: Date, enabled: boolean, trackerID: number) {
         this.id = id;
@@ -37,8 +38,6 @@ export default class Vehicle {
         this.enabled = enabled;
         this.lat = 0;
         this.lng = 0;
-        this.heading = 0;
-        this.speed = 0;
         this.RouteID = null;
         this.marker = new L.Marker([this.lat, this.lng], {
             icon: L.icon({
@@ -55,16 +54,20 @@ export default class Vehicle {
         this.Route = undefined;
         this.lastUpdate = new Date();
         this.tracker_id = trackerID;
+        this.location = null;
     }
 
     public getMessage(): string {
-        const speed = Math.round(this.speed * 100) / 100;
-        const direction = getCardinalDirection(this.heading + 45);
+        if (this.location === null) {
+            return '';
+        }
+        const speed = Math.round(this.location.speed * 100) / 100;
+        const direction = getCardinalDirection(this.location.heading);
         const routeOnMsg = this.Route === undefined ? '' : `on route <i>${this.Route.name}</i>`;
         let message = `<b>${this.name}</b> ${routeOnMsg}<br>`
             + `Traveling ${direction} at ${speed} mph`;
-        if (this.lastUpdate !== undefined) {
-            message += '<br>as of ' + this.lastUpdate.toLocaleTimeString();
+        if (this.location !== undefined) {
+            message += '<br>as of ' + this.location.time.toLocaleTimeString();
         }
         return message;
     }
@@ -93,8 +96,7 @@ export default class Vehicle {
     }
 
     public setHeading(heading: number) {
-        this.heading = heading - 45;
-        this.marker.setRotationAngle(this.heading);
+        this.marker.setRotationAngle(heading - 45);
         this.marker.bindPopup(this.getMessage());
     }
 
@@ -138,5 +140,37 @@ export default class Vehicle {
             tracker_id: String(this.tracker_id),
             name: this.name,
         };
+    }
+
+    public setLocation(location: Location) {
+        this.location = location;
+
+        // update marker
+        this.setLatLng(this.location.latitude, this.location.longitude);
+        this.setHeading(this.location.heading);
+
+        this.updateShowOnMap();
+
+        // vehicle hides itself after five min since most recent update
+        if (this.hideTimer !== null) {
+            window.clearInterval(this.hideTimer);
+        }
+        const now = new Date().getTime();
+        this.hideTimer = window.setTimeout(() => { this.updateShowOnMap(); }, vehicleInactiveDurationMS - (now - location.time.getTime()));
+    }
+
+    // hides vehicle if the time of its most recent update is older than five minutes
+    public updateShowOnMap() {
+        if (this.location === null) {
+            this.showOnMap(false);
+            return;
+        }
+
+        const now = new Date().getTime();
+        if (now - this.location.time.getTime() >= vehicleInactiveDurationMS) {
+            this.showOnMap(false);
+        } else {
+            this.showOnMap(true);
+        }
     }
 }
