@@ -29,15 +29,15 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  mounted(){
+  mounted() {
     console.log(this.$route.path);
   },
   computed: {
     etasEnabled(): boolean {
       return this.$store.state.settings.etasEnabled;
     },
-    visible(): boolean{
-      switch(this.$route.path) {
+    visible(): boolean {
+      switch (this.$route.path) {
         case '/': {
           return true;
           break;
@@ -51,9 +51,9 @@ export default Vue.extend({
           break;
         }
       }
-      return false; 
+      return false;
 
-    }
+    },
 
   },
 });
