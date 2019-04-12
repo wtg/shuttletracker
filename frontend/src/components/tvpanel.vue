@@ -87,7 +87,7 @@ html,body {
   height:20px;
   width:20px;
   position:relative;
-  top:780px;
+  top:600px;
   // left: calc( 100% - 230px );
 }
 #queue {

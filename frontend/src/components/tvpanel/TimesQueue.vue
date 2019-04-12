@@ -6,7 +6,9 @@
             <li id="type"> East  </li>
             <div class="times" >
             <li id="east1" class="time" v-if="east1_time" key="east1_time">{{display(east1_time)}}</li>
+            <transition name="fade">
             <li id="east2" class="time" v-if="east2_time" key="east2_time">{{display(east2_time)}}</li>
+            </transition>
             <li id="east3" class="time" v-if="east3_time" key="east3_time">{{display(east3_time)}}</li>
             <li id="east3" class="time" v-if="east4_time" key="east4_time">{{display(east4_time)}}</li>
             <li id="east3" class="time" v-if="east5_time" key="east5_time">{{display(east5_time)}}</li>
@@ -237,27 +239,26 @@ export default Vue.extend({
             let temp = time.split(":");
             let hour = temp[0];
             let minutes = temp[1];
-            if (parseInt(hour) < 12){
+            if (parseInt(hour) < 12) {
                 if (parseInt(hour) == 0){
                     hour = 12;
                 }
                 return hour + ':' + minutes + ' AM';
             }
-            else if (parseInt(hour) == 12){
+            else if (parseInt(hour) == 12) {
                 return hour + ':' + minutes + ' PM';
             }
             else {
-                if (parseInt(hour) == 24){
+                if (parseInt(hour) == 24) {
                     hour = hour - 12;
                     return hour + ':' + minutes + ' AM';
                 }
                 hour = hour - 12;
                 return hour + ':' + minutes + ' PM';
             }
-        }
+        },
         // --------------------------------------------------------------------------
     },
-
     mounted() {
         // Interval every 30 seconds; 30,000 milliseconds
         setInterval(() => {
@@ -267,54 +268,50 @@ export default Vue.extend({
 
         // Interval every three minutes; 180,000 milliseconds ****
         setInterval(() => {
-            this.updateShuttleTimes();  
+            this.updateShuttleTimes();
         }, 1800);
     },
 });
 </script>
-
 <style scoped>
-    .li{
-        margin: 20px 20px;
-        z-index: 1000;
-        background: white;
-        padding: 20px 28px;
-        border: 0.5px solid #eee;
-        border-radius: 4px;
-        box-shadow: 0 1px 16px -4px #bbb;
-        font-size: 18px;
-    }
     #main{
-        height:700px;
-        width:49%;
-        position:absolute; 
         text-align:center;
-        color:black;
+        position:absolute;
         display:flex;
-    }
-    ul {
-        padding-left:0;
+        width:100%;
+        height:600px;
+        color:black;
     }
     .time{
-        font-size:25px;
+        font-size:16px;
+        padding: 15px 28px;
+        width:150px;
+        height:55px;
+        box-shadow: 0 1px 16px -4px #bbb;
         margin-top:10px;
         margin-bottom:10px;
+        border-radius:5px;
+    }
+    li {
+        flex:50%;
     }
     #east{
-        text-align:center;
         flex:50%;
     }
     #west{
-        text-align:center;
         flex:50%;
     }
     #weekendlate{ 
-        text-align:center;
         flex:50%;
     }
     #type{
         font-size:60px; 
-        margin-left:35px;
-        margin-right:35px;
+        flex:50%;
+    }
+    .fade-enter-active, .fade-leave-active {
+     transition: opacity .5s;
+    }
+    .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+    opacity: 0;
     }
 </style>
