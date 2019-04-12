@@ -52,7 +52,7 @@ export default Vue.extend({
     this.tabulator = new Tabulator('#select', {
       data: [],
       columns: this.tableColumn,
-      height: 250,
+      height: 150,
       layout: 'fitColumns',
       placeholder: 'Select Times',
     });
