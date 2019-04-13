@@ -30,6 +30,7 @@ const store: StoreOptions<StoreState> = {
       busButtonEnabled: false,
       etasEnabled: false,
       fusionPositionEnabled: true,
+      pushEnabled: false,
     },
     geolocationDenied: false,
     fusionConnected: undefined,
@@ -121,6 +122,10 @@ const store: StoreOptions<StoreState> = {
     },
     setSettingsFusionPositionEnabled(state, value: boolean) {
       state.settings.fusionPositionEnabled = value;
+      localStorage.setItem('st_settings', JSON.stringify(state.settings));
+    },
+    setSettingsPushEnabled(state, value: boolean) {
+      state.settings.pushEnabled = value;
       localStorage.setItem('st_settings', JSON.stringify(state.settings));
     },
     setGeolocationDenied(state, value: boolean) {

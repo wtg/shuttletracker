@@ -21,17 +21,47 @@
         Settings
       </span>
     </router-link>
+    <b-field>
+      <b-switch v-model="pushEnabled">Push Notification</b-switch>
+    </b-field>
   </ul>
 </template>
 
 
 <script lang="ts">
 import Vue from 'vue';
+import Push from 'push.js';
 
 export default Vue.extend({
+  data() {
+    return {
+      notify: false,
+    } as {
+      notify: boolean;
+    };
+  },
   computed: {
     etasEnabled(): boolean {
       return this.$store.state.settings.etasEnabled;
+    },
+    pushEnabled: {
+      get(): boolean {
+        return this.$store.state.settings.pushEnabled;
+      },
+      set(value: boolean) {
+        this.$store.commit('setSettingsPushEnabled', value);
+        if ( value === true && !Push.Permission.has() ) {
+          Push.Permission.request(this.onGranted, this.onDenied);
+        }
+      },
+    },
+  },
+  methods: {
+    onGranted() {
+      this.notify = true;
+    },
+    onDenied() {
+      this.pushEnabled = false;
     },
   },
 });
