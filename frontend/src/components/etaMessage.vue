@@ -7,11 +7,15 @@
 </template>
 
 <script lang="ts">
+import Push from 'push.js';
 import Vue from 'vue';
 
 export default Vue.extend({
   props: ['etaInfo', 'show'],
   computed: {
+    pushEnabled(): boolean {
+      return this.$store.state.settings.pushEnabled;
+    },
     message(): string | null {
       if (this.etaInfo === null) {
           return null;
@@ -19,11 +23,21 @@ export default Vue.extend({
       const now = new Date();
 
       let newMessage = `${this.etaInfo.route.name} shuttle arriving at ${this.etaInfo.stop.name}`;
+      const eta_min = this.etaInfo.eta.eta.getTime() - now.getTime();
       // more than 1 min 30 sec?
-      if (this.etaInfo.eta.eta.getTime() - now.getTime() > 1.5 * 60 * 1000 && !this.etaInfo.eta.arriving) {
+      if (eta_min > 1.5 * 60 * 1000 && !this.etaInfo.eta.arriving) {
         newMessage += ` in ${relativeTime(now, this.etaInfo.eta.eta)}`;
       }
       newMessage += '.';
+
+      if (this.pushEnabled === true && eta_min > 3 * 60 * 1000 && eta_min < 5 * 60 * 1000) {
+        Push.create('Shuttle Tracker', {
+          body: newMessage,
+          icon: '~../assets/icon.svg',
+          timeout: 4000,
+          vibrate: true,
+        });
+      }
 
       return newMessage;
     },

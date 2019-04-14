@@ -33,13 +33,6 @@ import Vue from 'vue';
 import Push from 'push.js';
 
 export default Vue.extend({
-  data() {
-    return {
-      notify: false,
-    } as {
-      notify: boolean;
-    };
-  },
   computed: {
     etasEnabled(): boolean {
       return this.$store.state.settings.etasEnabled;
@@ -58,7 +51,7 @@ export default Vue.extend({
   },
   methods: {
     onGranted() {
-      this.notify = true;
+      this.pushEnabled = true;
     },
     onDenied() {
       this.pushEnabled = false;
