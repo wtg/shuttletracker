@@ -32,6 +32,7 @@
 <script lang="ts">
 import Selected from './notification/Selected.vue'
 import Tabulator from './notification/Tabulator.vue'
+import Push from 'push.js';
 import Vue from 'vue';
 import EventBus from '../event_bus'
 export default Vue.extend({
@@ -97,6 +98,12 @@ export default Vue.extend({
             } 
             
             //TODO submit
+            Push.create('Shuttle Tracker', {
+                body: "Testing",
+                icon: '~../assets/icon.svg',
+                timeout: 4000,
+                vibrate: true,
+            });
         },
     },
     mounted () {
