@@ -39,6 +39,10 @@ export default Vue.extend({
         });
       }
 
+      if (this.pushEnabled && this.etaInfo.eta.arriving) {
+        this.$store.commit('setSettingsPushEnabled', false);
+      } 
+
       return newMessage;
     },
   },
