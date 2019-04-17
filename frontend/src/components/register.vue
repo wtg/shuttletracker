@@ -21,7 +21,7 @@
             <br>
         </p>
         <p class="subtitle">Select Times
-            <Tabulator/>
+            <Tabulator :stop_id="stop_id" :route="route"/>
         </p>
         <Selected/>
         <br>
