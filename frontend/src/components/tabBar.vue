@@ -29,8 +29,10 @@
 
 
 <script lang="ts">
+/*$ npm install -g web-push --save
+$ web-push generate-vapid-keys */
+import EventBus from '@/event_bus';
 import Vue from 'vue';
-import Push from 'push.js';
 
 export default Vue.extend({
   computed: {
@@ -42,19 +44,81 @@ export default Vue.extend({
         return this.$store.state.settings.pushEnabled;
       },
       set(value: boolean) {
-        this.$store.commit('setSettingsPushEnabled', value);
-        if ( value === true && !Push.Permission.has() ) {
-          Push.Permission.request(this.onGranted, this.onDenied);
+        if ( value === true ) {
+          this.askPermission();
+          const payload = {
+            register: this.registration,
+          };
+          EventBus.$emit('REGISTER', payload);
+          /*const pushSubscription = this.subscribeUserToPush();
+          const subscriptionObject = JSON.stringify(pushSubscription);*/
         }
+        this.$store.commit('setSettingsPushEnabled', value);
       },
+    },
+    registration() {
+      if (!('serviceWorker' in navigator)) {
+        console.log('ServiceWorker isn\'t supported');
+      }
+      if (!('PushManager' in window)) {
+        console.log('Push isn\'t supported');
+      }
+      return this.registerServiceWorker();
     },
   },
   methods: {
-    onGranted() {
-      this.pushEnabled = true;
+    registerServiceWorker() {
+      navigator.serviceWorker.register('/serviceworker.js')
+      .then((reg) => {
+        console.log('Service Worker Successfully Registered.');
+        return reg;
+      })
+      .catch((err) => {
+        console.error('Unable to Register Service Worker.', err);
+      });
     },
-    onDenied() {
-      this.pushEnabled = false;
+    askPermission() {
+      new Promise((resolve, reject) => {
+        const permissionResult = Notification.requestPermission((result) => {
+          resolve(result);
+        });
+        if ( permissionResult ) {
+          permissionResult.then(resolve, reject);
+        }
+      })
+      .then((permissionResult) => {
+        if ( permissionResult !== 'granted' ) {
+          this.pushEnabled = false;
+          console.log('No permission granted');
+        }
+      });
+    },
+    subscribeUserToPush() {
+      navigator.serviceWorker.register('serviceworker.js')
+      .then((reg) => {
+        const options = {
+          userVisibleOnly: true,
+          applicationServerKey: this.urlBase64ToUint8Array('BFgDYavD_PqQryHBqpHa6w7Fh8dRok9tZ3E5nfY0_P3cFCNPSHN06REG-kgtEjuKkQE_UZp3bjREFKPtQR5wVqk'),
+        };
+        reg.pushManager.subscribe(options);
+      })
+      .then((pushSubscription) => {
+        console.log('Subscribed Push:', JSON.stringify(pushSubscription));
+      });
+    },
+    urlBase64ToUint8Array(base64String: string) {
+      const padding = '='.repeat((4 - base64String.length % 4) % 4);
+      const base64 = (base64String + padding)
+      .replace(/\-/g, '+')
+      .replace(/_/g, '/');
+
+      const rawData = window.atob(base64);
+      const outputArray = new Uint8Array(rawData.length);
+
+      for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+      }
+      return outputArray;
     },
   },
 });

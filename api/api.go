@@ -141,6 +141,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	r.Get("/about", api.IndexHandler)
 	r.Get("/schedules", api.IndexHandler)
 	r.Get("/settings", api.IndexHandler)
+	r.Get("/serviceworker.js", api.ServiceWorkerHandler)
 	r.Get("/etas", api.IndexHandler)
 
 	// iTRAK data feed endpoint
@@ -166,6 +167,10 @@ func (api *API) Run() {
 	if err := http.ListenAndServe(api.cfg.ListenURL, api.handler); err != nil {
 		log.WithError(err).Error("Unable to serve.")
 	}
+}
+
+func (api *API) ServiceWorkerHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "frontend/src/serviceworker.js")
 }
 
 // IndexHandler serves the index page.

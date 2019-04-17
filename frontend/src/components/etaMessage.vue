@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts">
-import Push from 'push.js';
+import EventBus from '@/event_bus';
 import Vue from 'vue';
 
 export default Vue.extend({
@@ -30,20 +30,32 @@ export default Vue.extend({
       }
       newMessage += '.';
 
-      if (this.pushEnabled === true && eta_min > 3 * 60 * 1000 && eta_min < 5 * 60 * 1000) {
-        Push.create('Shuttle Tracker', {
-          body: newMessage,
-          icon: '~../assets/icon.svg',
-          timeout: 4000,
-          vibrate: true,
-        });
+      let register = null;
+      EventBus.$on('REGISTER', (payload: any) => {
+        register = payload.register;
+      });
+      if ( register == null ) {
+        return newMessage;
       }
-
-      if (this.pushEnabled && this.etaInfo.eta.arriving) {
-        this.$store.commit('setSettingsPushEnabled', false);
+      if (register !== null && this.pushEnabled === true && eta_min > 4 * 60 * 1000 && eta_min < 5 * 60 * 1000) {
+        this.sendNotification(register, newMessage);
       }
 
       return newMessage;
+    },
+  },
+  methods: {
+    sendNotification(register: any, newMessage: any) {
+      const now = new Date();
+      const title = 'Shuttle Tracker';
+      const options = {
+        body: newMessage,
+        icon: '~../assets/icon.svg',
+        requireInteraction: true,
+        timestamp: now.getHours() + ':' + now.getMinutes(),
+      };
+      register.showNotification(title, options);
+      this.$store.commit('setSettingsPushEnabled', false);
     },
   },
 });
