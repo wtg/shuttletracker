@@ -39,7 +39,6 @@ export default Vue.extend({
   data() {
     return {
       valid: true,
-      delay: 0,
     };
   },
   computed: {
@@ -52,32 +51,28 @@ export default Vue.extend({
         return this.$store.state.settings.pushEnabled;
       },
       set(value: boolean) {
-        let found = value;
+        this.$store.commit('setSettingsPushEnabled', value);
         if ( value === true ) {
-          found = this.sendnotify(this.subscription);
+          this.sendnotify();
         }
-        this.$store.commit('setSettingsPushEnabled', found);
       },
     },
-
-    subscription() {
-      if (!('serviceWorker' in navigator)) {
-        console.log('ServiceWorker isn\'t supported');
-        this.valid = false;
-      }
-      if ( Notification.permission === 'denied' ) {
-        console.log('User has blocked notifications');
-        this.valid = false;
-      }
-      if (!('PushManager' in window)) {
-        console.log('Push isn\'t supported');
-        this.valid = false;
-      }
-      const reg = this.registerServiceWorker();
-      this.readyServiceWorker();
-
-      return reg;
-    },
+  },
+  created() {
+    if (!('serviceWorker' in navigator)) {
+      console.log('ServiceWorker isn\'t supported');
+      this.valid = false;
+    }
+    if ( Notification.permission === 'denied' ) {
+      console.log('User has blocked notifications');
+      this.valid = false;
+    }
+    if (!('PushManager' in window)) {
+      console.log('Push isn\'t supported');
+      this.valid = false;
+    }
+    this.registerServiceWorker();
+    this.readyServiceWorker();
   },
   methods: {
     readyServiceWorker() {
@@ -114,25 +109,26 @@ export default Vue.extend({
       });
     },
 
-    sendnotify(subscription: any): boolean {
+    sendnotify() {
       let eta;
       let newMessage;
       EventBus.$on('PUSH', (payload: any) => {
-        eta = payload.eta_mil;
+        eta = payload.eta;
         newMessage = payload.newMessage;
       });
       if ( eta == null || eta < 5.5 * 60 * 1000 ) {
         console.log('No Push Available');
+        this.valid = false;
         this.pushEnabled = false;
-        return false;
+        console.log(this.pushEnabled);
+      } else {
+        fetch('./sendNotification', {
+          method: 'POST',
+          body: JSON.stringify({
+            delay: eta - 5 * 60 * 1000,
+          }),
+        });
       }
-      fetch('./sendNotification', {
-        method: 'POST',
-        body: JSON.stringify({
-          delay: eta - 5 * 60 * 1000,
-        }),
-      });
-      return true;
     },
 
     urlBase64ToUint8Array(base64String: string) {

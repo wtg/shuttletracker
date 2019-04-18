@@ -13,9 +13,6 @@ import Vue from 'vue';
 export default Vue.extend({
   props: ['etaInfo', 'show'],
   computed: {
-    pushEnabled(): boolean {
-      return this.$store.state.settings.pushEnabled;
-    },
     message(): string | null {
       if (this.etaInfo === null) {
           return null;
