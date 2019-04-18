@@ -2,6 +2,9 @@ package api
 
 import (
 	"encoding/json"
+	"time"
+
+	webPush "github.com/SherClockHolmes/webpush-go"
 
 	"net/http"
 	"net/url"
@@ -14,6 +17,14 @@ import (
 	"github.com/wtg/shuttletracker/log"
 )
 
+
+const (
+	vapidPublicKey = "BP_qB6Rfxb4PNwV89br7bq5WzXoEU5pJwvS_wji6iNgEOTYo2MiVNhmBq6zDMg2HPjNUr1MamHvEFttADuLni2g" 
+	subscription = ``
+)
+var vapidPrivateKey string
+
+
 // Config holds API settings.
 type Config struct {
 	GoogleMapAPIKey      string
@@ -22,6 +33,7 @@ type Config struct {
 	Authenticate         bool
 	ListenURL            string
 	MapboxAPIKey         string
+	PrivateVapidKey		 string
 }
 
 // API is responsible for configuring handlers for HTTP endpoints.
@@ -144,6 +156,12 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	r.Get("/serviceworker.js", api.ServiceWorkerHandler)
 	r.Get("/etas", api.IndexHandler)
 
+	if vapidPrivateKey == "" {
+		vapidPrivateKey = api.cfg.PrivateVapidKey
+	}
+
+	r.Post("/sendNotification", api.SendNotificationHandler)
+
 	// iTRAK data feed endpoint
 	r.Get("/datafeed", api.DataFeedHandler)
 
@@ -167,6 +185,20 @@ func (api *API) Run() {
 	if err := http.ListenAndServe(api.cfg.ListenURL, api.handler); err != nil {
 		log.WithError(err).Error("Unable to serve.")
 	}
+}
+
+func (api *API) SendNotificationHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	delay := r.FormValue("delay") + "ms"
+	d, _ := time.ParseDuration(delay)
+	s := &webPush.Subscription{}
+	json.Unmarshal([]byte(subscription), s)
+	time.Sleep(d * time.Millisecond)
+	webPush.SendNotification(nil, s, &webPush.Options{
+		VAPIDPublicKey: 	vapidPublicKey,
+		VAPIDPrivateKey: 	vapidPrivateKey,
+		TTL:				30,
+	})
 }
 
 func (api *API) ServiceWorkerHandler(w http.ResponseWriter, r *http.Request) {

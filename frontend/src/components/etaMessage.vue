@@ -23,39 +23,21 @@ export default Vue.extend({
       const now = new Date();
 
       let newMessage = `${this.etaInfo.route.name} shuttle arriving at ${this.etaInfo.stop.name}`;
-      const eta_min = this.etaInfo.eta.eta.getTime() - now.getTime();
+      const eta_mil = this.etaInfo.eta.eta.getTime() - now.getTime();
+      const notifyMessage = newMessage;
       // more than 1 min 30 sec?
-      if (eta_min > 1.5 * 60 * 1000 && !this.etaInfo.eta.arriving) {
+      if (eta_mil > 1.5 * 60 * 1000 && !this.etaInfo.eta.arriving) {
         newMessage += ` in ${relativeTime(now, this.etaInfo.eta.eta)}`;
       }
       newMessage += '.';
 
-      let register = null;
-      EventBus.$on('REGISTER', (payload: any) => {
-        register = payload.register;
-      });
-      if ( register == null ) {
-        return newMessage;
-      }
-      if (register !== null && this.pushEnabled === true && eta_min > 4 * 60 * 1000 && eta_min < 5 * 60 * 1000) {
-        this.sendNotification(register, newMessage);
-      }
+      const payload = {
+        newMessage: notifyMessage,
+        eta: eta_mil,
+      };
+      EventBus.$emit('PUSH', payload);
 
       return newMessage;
-    },
-  },
-  methods: {
-    sendNotification(register: any, newMessage: any) {
-      const now = new Date();
-      const title = 'Shuttle Tracker';
-      const options = {
-        body: newMessage,
-        icon: '~../assets/icon.svg',
-        requireInteraction: true,
-        timestamp: now.getHours() + ':' + now.getMinutes(),
-      };
-      register.showNotification(title, options);
-      this.$store.commit('setSettingsPushEnabled', false);
     },
   },
 });

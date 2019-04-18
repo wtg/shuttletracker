@@ -2,6 +2,7 @@ module github.com/wtg/shuttletracker
 
 require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
+	github.com/SherClockHolmes/webpush-go v1.1.0
 	github.com/Sirupsen/logrus v0.0.0-20151204141443-446d1c146faa
 	github.com/go-chi/chi v0.0.0-20180202194135-e223a795a06a
 	github.com/gofrs/uuid v3.2.0+incompatible

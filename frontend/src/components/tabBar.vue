@@ -22,7 +22,7 @@
       </span>
     </router-link>
     <b-field>
-      <b-switch v-model="pushEnabled">Push Notification</b-switch>
+      <b-switch v-model="pushEnabled" :disabled="valid == false">Push Notification</b-switch>
     </b-field>
   </ul>
 </template>
@@ -31,42 +31,78 @@
 <script lang="ts">
 /*$ npm install -g web-push --save
 $ web-push generate-vapid-keys */
+// Public: BP_qB6Rfxb4PNwV89br7bq5WzXoEU5pJwvS_wji6iNgEOTYo2MiVNhmBq6zDMg2HPjNUr1MamHvEFttADuLni2g
 import EventBus from '@/event_bus';
 import Vue from 'vue';
 
 export default Vue.extend({
+  data() {
+    return {
+      valid: true,
+      delay: 0,
+    };
+  },
   computed: {
     etasEnabled(): boolean {
       return this.$store.state.settings.etasEnabled;
     },
+
     pushEnabled: {
       get(): boolean {
         return this.$store.state.settings.pushEnabled;
       },
       set(value: boolean) {
+        let found = value;
         if ( value === true ) {
-          this.askPermission();
-          const payload = {
-            register: this.registration,
-          };
-          EventBus.$emit('REGISTER', payload);
-          /*const pushSubscription = this.subscribeUserToPush();
-          const subscriptionObject = JSON.stringify(pushSubscription);*/
+          found = this.sendnotify(this.subscription);
         }
-        this.$store.commit('setSettingsPushEnabled', value);
+        this.$store.commit('setSettingsPushEnabled', found);
       },
     },
-    registration() {
+
+    subscription() {
       if (!('serviceWorker' in navigator)) {
         console.log('ServiceWorker isn\'t supported');
+        this.valid = false;
+      }
+      if ( Notification.permission === 'denied' ) {
+        console.log('User has blocked notifications');
+        this.valid = false;
       }
       if (!('PushManager' in window)) {
         console.log('Push isn\'t supported');
+        this.valid = false;
       }
-      return this.registerServiceWorker();
+      const reg = this.registerServiceWorker();
+      this.readyServiceWorker();
+
+      return reg;
     },
   },
   methods: {
+    readyServiceWorker() {
+      navigator.serviceWorker.ready
+      .then((registration) => {
+        return registration.pushManager.getSubscription()
+        .then((subscription) => {
+          if ( subscription ) {
+            return subscription;
+          }
+          // subscribe
+          const vapidPublicKey = 'BP_qB6Rfxb4PNwV89br7bq5WzXoEU5pJwvS_wji6iNgEOTYo2MiVNhmBq6zDMg2HPjNUr1MamHvEFttADuLni2g';
+          const convertedVapidKey = this.urlBase64ToUint8Array(vapidPublicKey);
+          return registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: convertedVapidKey,
+          });
+        });
+      }).then((subscription) => {
+        console.log(JSON.stringify({
+          subscribe: subscription,
+        }));
+      });
+    },
+
     registerServiceWorker() {
       navigator.serviceWorker.register('/serviceworker.js')
       .then((reg) => {
@@ -77,35 +113,28 @@ export default Vue.extend({
         console.error('Unable to Register Service Worker.', err);
       });
     },
-    askPermission() {
-      new Promise((resolve, reject) => {
-        const permissionResult = Notification.requestPermission((result) => {
-          resolve(result);
-        });
-        if ( permissionResult ) {
-          permissionResult.then(resolve, reject);
-        }
-      })
-      .then((permissionResult) => {
-        if ( permissionResult !== 'granted' ) {
-          this.pushEnabled = false;
-          console.log('No permission granted');
-        }
+
+    sendnotify(subscription: any): boolean {
+      let eta;
+      let newMessage;
+      EventBus.$on('PUSH', (payload: any) => {
+        eta = payload.eta_mil;
+        newMessage = payload.newMessage;
       });
-    },
-    subscribeUserToPush() {
-      navigator.serviceWorker.register('serviceworker.js')
-      .then((reg) => {
-        const options = {
-          userVisibleOnly: true,
-          applicationServerKey: this.urlBase64ToUint8Array('BFgDYavD_PqQryHBqpHa6w7Fh8dRok9tZ3E5nfY0_P3cFCNPSHN06REG-kgtEjuKkQE_UZp3bjREFKPtQR5wVqk'),
-        };
-        reg.pushManager.subscribe(options);
-      })
-      .then((pushSubscription) => {
-        console.log('Subscribed Push:', JSON.stringify(pushSubscription));
+      if ( eta == null || eta < 5.5 * 60 * 1000 ) {
+        console.log('No Push Available');
+        this.pushEnabled = false;
+        return false;
+      }
+      fetch('./sendNotification', {
+        method: 'POST',
+        body: JSON.stringify({
+          delay: eta - 5 * 60 * 1000,
+        }),
       });
+      return true;
     },
+
     urlBase64ToUint8Array(base64String: string) {
       const padding = '='.repeat((4 - base64String.length % 4) % 4);
       const base64 = (base64String + padding)
