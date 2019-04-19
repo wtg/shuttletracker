@@ -2,9 +2,11 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
+	"strings"
 
-	webPush "github.com/SherClockHolmes/webpush-go"
+	webpush "github.com/SherClockHolmes/webpush-go"
 
 	"net/http"
 	"net/url"
@@ -19,11 +21,10 @@ import (
 
 
 const (
-	vapidPublicKey = "BP_qB6Rfxb4PNwV89br7bq5WzXoEU5pJwvS_wji6iNgEOTYo2MiVNhmBq6zDMg2HPjNUr1MamHvEFttADuLni2g" 
-	subscription = ``
+	subscription = `{"endpoint":"https://fcm.googleapis.com/fcm/send/fOj5jrgo-Vk:APA91bFWNkbuYJ1H_6Yq31rHs8PuVyGB6FpNWeQllkjDaLhP6_dxg5HriR1TcGGWVpM7cf4oHnzxIFMJeDsuNSm0x_JKaE801u7L6q1GlMaGOI_rmGpfGq-eF6YgHDNEbQN_KpP8r3Eo","keys":{"p256dh":"BHcFvRhUe0gtfEXDqOGEI8BpxYLyYrJmHDY1eslb-f_jHYLj6qwWw2OCU0Dw-5-q5C5EE7wnlB_VBcaVE6l2aBk","auth":"OLhh2ZCwmdruKGZvXe_-Kg"}}`
+	vapidPublicKey = "BHu_01FAmOhIaQ1KXX4qqHiJ7ire9s5dYTK4TF2dFXbeWb0fFvfpjJl3zaQjonIjhx1bl7IlQ_MWFsQBzAYZV9I"
 )
 var vapidPrivateKey string
-
 
 // Config holds API settings.
 type Config struct {
@@ -156,9 +157,11 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	r.Get("/serviceworker.js", api.ServiceWorkerHandler)
 	r.Get("/etas", api.IndexHandler)
 
-	if vapidPrivateKey == "" {
-		vapidPrivateKey = api.cfg.PrivateVapidKey
-	}
+	// vapidpr, vapidpu, _ := vapidkeys.Generate()
+	// fmt.Println(vapidpr)
+	// fmt.Println(vapidpu)
+
+	vapidPrivateKey = api.cfg.PrivateVapidKey
 
 	r.Post("/sendNotification", api.SendNotificationHandler)
 
@@ -188,17 +191,30 @@ func (api *API) Run() {
 }
 
 func (api *API) SendNotificationHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/x-www-form-urlencoded")
 	r.ParseForm()
-	delay := r.FormValue("delay") + "ms"
-	d, _ := time.ParseDuration(delay)
-	s := &webPush.Subscription{}
+	keys := make([]string, 0, len(r.Form))
+	for k := range r.Form {
+		keys = append(keys, k)
+		fmt.Println(k)
+	}
+	temp1 := strings.Split(keys[0], ":")
+	temp2 := strings.Split(temp1[1], "}")
+	d, _ := time.ParseDuration(temp2[0] + "ms")
+	fmt.Println(d)
+	s := &webpush.Subscription{}
 	json.Unmarshal([]byte(subscription), s)
 	time.Sleep(d * time.Millisecond)
-	webPush.SendNotification(nil, s, &webPush.Options{
+	res, err := webpush.SendNotification([]byte("test"), s, &webpush.Options{
+		Subscriber:			"shuttletrackertest@gmail.com",
 		VAPIDPublicKey: 	vapidPublicKey,
 		VAPIDPrivateKey: 	vapidPrivateKey,
-		TTL:				30,
+		TTL:				300,
 	})
+	fmt.Println(res)
+	if (err != nil){
+		fmt.Println(err)
+	}
 }
 
 func (api *API) ServiceWorkerHandler(w http.ResponseWriter, r *http.Request) {

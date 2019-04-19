@@ -22,7 +22,7 @@
       </span>
     </router-link>
     <b-field>
-      <b-switch v-model="pushEnabled" :disabled="valid == false">Push Notification</b-switch>
+      <button v-on:click="sendnotify()" :disabled="valid == false">Notify</button>
     </b-field>
   </ul>
 </template>
@@ -34,66 +34,77 @@ $ web-push generate-vapid-keys */
 // Public: BP_qB6Rfxb4PNwV89br7bq5WzXoEU5pJwvS_wji6iNgEOTYo2MiVNhmBq6zDMg2HPjNUr1MamHvEFttADuLni2g
 import EventBus from '@/event_bus';
 import Vue from 'vue';
+import axios from 'axios';
 
 export default Vue.extend({
   data() {
     return {
       valid: true,
+      newMessage: '',
+      eta: 0,
     };
   },
   computed: {
     etasEnabled(): boolean {
       return this.$store.state.settings.etasEnabled;
     },
-
-    pushEnabled: {
-      get(): boolean {
-        return this.$store.state.settings.pushEnabled;
-      },
-      set(value: boolean) {
-        this.$store.commit('setSettingsPushEnabled', value);
-        if ( value === true ) {
-          this.sendnotify();
-        }
-      },
-    },
   },
   created() {
     if (!('serviceWorker' in navigator)) {
       console.log('ServiceWorker isn\'t supported');
       this.valid = false;
-    }
-    if ( Notification.permission === 'denied' ) {
+    } else if ( Notification.permission === 'denied' ) {
       console.log('User has blocked notifications');
       this.valid = false;
-    }
-    if (!('PushManager' in window)) {
+    } else if (!('PushManager' in window)) {
       console.log('Push isn\'t supported');
       this.valid = false;
+    } else {
+      this.registerServiceWorker();
+      this.readyServiceWorker();
+      EventBus.$on('PUSH', (payload: any) => {
+        this.eta = payload.eta;
+        this.newMessage = payload.newMessage;
+      });
     }
-    this.registerServiceWorker();
-    this.readyServiceWorker();
   },
   methods: {
+    subscribe() {
+      navigator.serviceWorker.ready
+      .then((registration) => {
+        const vapidPublicKey = 'BHu_01FAmOhIaQ1KXX4qqHiJ7ire9s5dYTK4TF2dFXbeWb0fFvfpjJl3zaQjonIjhx1bl7IlQ_MWFsQBzAYZV9I';
+        return registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: this.urlBase64ToUint8Array(vapidPublicKey),
+        });
+      })
+      .then((subscription) => {
+        console.log(
+          JSON.stringify({
+            subscript: subscription,
+          }),
+        );
+      })
+      .catch((err) => console.error(err));
+    },
+
     readyServiceWorker() {
       navigator.serviceWorker.ready
       .then((registration) => {
         return registration.pushManager.getSubscription()
         .then((subscription) => {
           if ( subscription ) {
-            return subscription;
-          }
+            console.log(JSON.stringify({
+              subscript: subscription,
+            }));
+          } else {
           // subscribe
-          const vapidPublicKey = 'BP_qB6Rfxb4PNwV89br7bq5WzXoEU5pJwvS_wji6iNgEOTYo2MiVNhmBq6zDMg2HPjNUr1MamHvEFttADuLni2g';
-          const convertedVapidKey = this.urlBase64ToUint8Array(vapidPublicKey);
-          return registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: convertedVapidKey,
-          });
+            this.subscribe();
+          }
         });
       }).then((subscription) => {
         console.log(JSON.stringify({
-          subscribe: subscription,
+          subscript: subscription,
         }));
       });
     },
@@ -102,7 +113,6 @@ export default Vue.extend({
       navigator.serviceWorker.register('/serviceworker.js')
       .then((reg) => {
         console.log('Service Worker Successfully Registered.');
-        return reg;
       })
       .catch((err) => {
         console.error('Unable to Register Service Worker.', err);
@@ -110,23 +120,17 @@ export default Vue.extend({
     },
 
     sendnotify() {
-      let eta;
-      let newMessage;
-      EventBus.$on('PUSH', (payload: any) => {
-        eta = payload.eta;
-        newMessage = payload.newMessage;
-      });
-      if ( eta == null || eta < 5.5 * 60 * 1000 ) {
-        console.log('No Push Available');
-        this.valid = false;
-        this.pushEnabled = false;
-        console.log(this.pushEnabled);
+      if ( this.eta < 5.5 * 60 * 1000 ) {
+        alert('No ETAs Found!');
       } else {
-        fetch('./sendNotification', {
-          method: 'POST',
-          body: JSON.stringify({
-            delay: eta - 5 * 60 * 1000,
-          }),
+        alert('Notification Set!');
+        console.log(this.eta);
+        axios.post('./sendNotification', {delay: this.eta - 5 * 60 * 1000}, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+        .then((res) => {
+          console.log('sent' + res.data);
+        })
+        .catch((err) => {
+          console.log(err);
         });
       }
     },

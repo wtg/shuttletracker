@@ -4,6 +4,8 @@ require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/SherClockHolmes/webpush-go v1.1.0
 	github.com/Sirupsen/logrus v0.0.0-20151204141443-446d1c146faa
+	github.com/anaskhan96/go-vapidkeys v0.0.0-20171018095305-465221a2246d
+	github.com/enceve/crypto v0.0.0-20160707101852-34d48bb93815 // indirect
 	github.com/go-chi/chi v0.0.0-20180202194135-e223a795a06a
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
