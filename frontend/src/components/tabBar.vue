@@ -31,7 +31,6 @@
 <script lang="ts">
 /*$ npm install -g web-push --save
 $ web-push generate-vapid-keys */
-// Public: BP_qB6Rfxb4PNwV89br7bq5WzXoEU5pJwvS_wji6iNgEOTYo2MiVNhmBq6zDMg2HPjNUr1MamHvEFttADuLni2g
 import EventBus from '@/event_bus';
 import Vue from 'vue';
 import axios from 'axios';
@@ -40,7 +39,7 @@ export default Vue.extend({
   data() {
     return {
       valid: true,
-      newMessage: '',
+      campus: '',
       eta: 0,
     };
   },
@@ -64,7 +63,7 @@ export default Vue.extend({
       this.readyServiceWorker();
       EventBus.$on('PUSH', (payload: any) => {
         this.eta = payload.eta;
-        this.newMessage = payload.newMessage;
+        this.campus = payload.campus;
       });
     }
   },
@@ -120,12 +119,14 @@ export default Vue.extend({
     },
 
     sendnotify() {
-      if ( this.eta < 5.5 * 60 * 1000 ) {
+      if ( this.eta <= 0 ) {
         alert('No ETAs Found!');
+      } else if ( this.eta < 3.5 * 60 * 1000 ) {
+        alert(this.campus + ' Shuttle is Arriving Soon!');
       } else {
         alert('Notification Set!');
         console.log(this.eta);
-        axios.post('./sendNotification', {delay: this.eta - 5 * 60 * 1000}, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+        axios.post('./sendNotification', {delay: this.eta - 3 * 60 * 1000, campus: this.campus}, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
         .then((res) => {
           console.log('sent' + res.data);
         })

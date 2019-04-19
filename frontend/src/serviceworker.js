@@ -1,5 +1,5 @@
 self.addEventListener('push', function(event) {
-  const newMessage = 'Shuttle will arrive in approximately 5 minutes';
+  const newMessage = `${event.data.text()}` + ' Shuttle will arrive in approximately 3 minutes';
   const now = new Date();
   const title = 'Shuttle Tracker';
   console.log('[Service Worker] Push Received.');

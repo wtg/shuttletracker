@@ -29,7 +29,7 @@ export default Vue.extend({
       newMessage += '.';
 
       const payload = {
-        newMessage: notifyMessage,
+        campus: `${this.etaInfo.route.name}`,
         eta: eta_mil,
       };
       EventBus.$emit('PUSH', payload);

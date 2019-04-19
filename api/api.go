@@ -2,9 +2,7 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
-	"strings"
 
 	webpush "github.com/SherClockHolmes/webpush-go"
 
@@ -25,6 +23,11 @@ const (
 	vapidPublicKey = "BHu_01FAmOhIaQ1KXX4qqHiJ7ire9s5dYTK4TF2dFXbeWb0fFvfpjJl3zaQjonIjhx1bl7IlQ_MWFsQBzAYZV9I"
 )
 var vapidPrivateKey string
+
+type Request struct {
+	Delay 	int64 		`json:"delay"`
+	Campus	string 		`json:"campus"`
+}
 
 // Config holds API settings.
 type Config struct {
@@ -196,24 +199,21 @@ func (api *API) SendNotificationHandler(w http.ResponseWriter, r *http.Request) 
 	keys := make([]string, 0, len(r.Form))
 	for k := range r.Form {
 		keys = append(keys, k)
-		fmt.Println(k)
 	}
-	temp1 := strings.Split(keys[0], ":")
-	temp2 := strings.Split(temp1[1], "}")
-	d, _ := time.ParseDuration(temp2[0] + "ms")
-	fmt.Println(d)
+	data := Request{}
+	json.Unmarshal([]byte(keys[0]), &data)
+	d := time.Duration(data.Delay) * time.Millisecond
 	s := &webpush.Subscription{}
 	json.Unmarshal([]byte(subscription), s)
 	time.Sleep(d)
-	res, err := webpush.SendNotification([]byte("test"), s, &webpush.Options{
+	_, err := webpush.SendNotification([]byte(data.Campus), s, &webpush.Options{
 		Subscriber:			"shuttletrackertest@gmail.com",
 		VAPIDPublicKey: 	vapidPublicKey,
 		VAPIDPrivateKey: 	vapidPrivateKey,
 		TTL:				300,
 	})
-	fmt.Println(res)
 	if (err != nil){
-		fmt.Println(err)
+		// Error handling
 	}
 }
 
