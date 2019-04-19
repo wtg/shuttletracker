@@ -103,7 +103,7 @@ export default Vue.extend({
           }
         });
       }).then((subscription) => {
-        this.subscription = JSON.stringify({subscript: subscription});
+        // this.subscription = JSON.stringify({subscript: subscription});
         console.log(JSON.stringify({
           subscript: subscription,
         }));
@@ -128,7 +128,7 @@ export default Vue.extend({
       } else {
         alert('Notification Set!');
         console.log(this.eta);
-        axios.post('./sendNotification', {delay: this.eta - 3 * 60 * 1000, campus: this.campus, subscription: this.subscription}, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+        axios.post('./sendNotification', {delay: this.eta - 3 * 60 * 1000, campus: this.campus}, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
         .then((res) => {
           console.log('sent' + res.data);
         })

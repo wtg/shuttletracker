@@ -22,11 +22,12 @@ const (
 	vapidPublicKey = "BHu_01FAmOhIaQ1KXX4qqHiJ7ire9s5dYTK4TF2dFXbeWb0fFvfpjJl3zaQjonIjhx1bl7IlQ_MWFsQBzAYZV9I"
 )
 var vapidPrivateKey string
+var subscription 	string
 
 type Request struct {
 	Delay 			int64 		`json:"delay"`
 	Campus			string 		`json:"campus"`
-	Subscription 	string      `json:"subscription"`
+	// Subscription 	string      `json:"subscription"`
 }
 
 type Subscript struct {
@@ -42,6 +43,7 @@ type Config struct {
 	ListenURL            string
 	MapboxAPIKey         string
 	PrivateVapidKey		 string
+	Subscription         string
 }
 
 // API is responsible for configuring handlers for HTTP endpoints.
@@ -169,6 +171,8 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	// fmt.Println(vapidpu)
 
 	vapidPrivateKey = api.cfg.PrivateVapidKey
+	subscription = api.cfg.Subscription
+
 
 	r.Post("/sendNotification", api.SendNotificationHandler)
 
@@ -206,11 +210,11 @@ func (api *API) SendNotificationHandler(w http.ResponseWriter, r *http.Request) 
 	}
 	data := Request{}
 	json.Unmarshal([]byte(keys[0]), &data)
-	sub := Subscript{}
-	json.Unmarshal([]byte(data.Subscription), &sub)
+	// sub := Subscript{}
+	// json.Unmarshal([]byte(data.Subscription), &sub)
 	d := time.Duration(data.Delay) * time.Millisecond
 	s := &webpush.Subscription{}
-	json.Unmarshal([]byte(sub.Subscription), s)
+	json.Unmarshal([]byte(subscription), s)
 	time.Sleep(d)
 	_, err := webpush.SendNotification([]byte(data.Campus), s, &webpush.Options{
 		Subscriber:			"shuttletrackertest@gmail.com",
