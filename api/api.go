@@ -204,7 +204,7 @@ func (api *API) SendNotificationHandler(w http.ResponseWriter, r *http.Request) 
 	fmt.Println(d)
 	s := &webpush.Subscription{}
 	json.Unmarshal([]byte(subscription), s)
-	time.Sleep(d * time.Millisecond)
+	time.Sleep(d)
 	res, err := webpush.SendNotification([]byte("test"), s, &webpush.Options{
 		Subscriber:			"shuttletrackertest@gmail.com",
 		VAPIDPublicKey: 	vapidPublicKey,
