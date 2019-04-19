@@ -19,14 +19,18 @@ import (
 
 
 const (
-	subscription = `{"endpoint":"https://fcm.googleapis.com/fcm/send/fOj5jrgo-Vk:APA91bFWNkbuYJ1H_6Yq31rHs8PuVyGB6FpNWeQllkjDaLhP6_dxg5HriR1TcGGWVpM7cf4oHnzxIFMJeDsuNSm0x_JKaE801u7L6q1GlMaGOI_rmGpfGq-eF6YgHDNEbQN_KpP8r3Eo","keys":{"p256dh":"BHcFvRhUe0gtfEXDqOGEI8BpxYLyYrJmHDY1eslb-f_jHYLj6qwWw2OCU0Dw-5-q5C5EE7wnlB_VBcaVE6l2aBk","auth":"OLhh2ZCwmdruKGZvXe_-Kg"}}`
 	vapidPublicKey = "BHu_01FAmOhIaQ1KXX4qqHiJ7ire9s5dYTK4TF2dFXbeWb0fFvfpjJl3zaQjonIjhx1bl7IlQ_MWFsQBzAYZV9I"
 )
 var vapidPrivateKey string
 
 type Request struct {
-	Delay 	int64 		`json:"delay"`
-	Campus	string 		`json:"campus"`
+	Delay 			int64 		`json:"delay"`
+	Campus			string 		`json:"campus"`
+	Subscription 	string      `json:"subscription"`
+}
+
+type Subscript struct {
+	Subscription   	string     	`json:"subscript"`   
 }
 
 // Config holds API settings.
@@ -202,9 +206,11 @@ func (api *API) SendNotificationHandler(w http.ResponseWriter, r *http.Request) 
 	}
 	data := Request{}
 	json.Unmarshal([]byte(keys[0]), &data)
+	sub := Subscript{}
+	json.Unmarshal([]byte(data.Subscription), &sub)
 	d := time.Duration(data.Delay) * time.Millisecond
 	s := &webpush.Subscription{}
-	json.Unmarshal([]byte(subscription), s)
+	json.Unmarshal([]byte(sub.Subscription), s)
 	time.Sleep(d)
 	_, err := webpush.SendNotification([]byte(data.Campus), s, &webpush.Options{
 		Subscriber:			"shuttletrackertest@gmail.com",
