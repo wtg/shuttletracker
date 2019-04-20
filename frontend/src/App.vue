@@ -24,9 +24,11 @@ export default Vue.extend({
   width: 100%;
   height: 100%;
   overflow: hidden;
+  display: flex;
+  flex-flow: column;
 }
 #view-wrapper {
-  height: calc(100% - 40px);
+  flex-grow: 1;
   box-sizing: border-box;
   overflow:hidden;
 }

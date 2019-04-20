@@ -18,4 +18,8 @@ export interface StoreState {
         fusionPositionEnabled: boolean,
     };
     geolocationDenied: boolean;
+
+    // This has three states: it is initially undefined, then it gets set to true
+    // after Fusion client connects, and it gets set to false if it disconnects.
+    fusionConnected: boolean | undefined;
 }

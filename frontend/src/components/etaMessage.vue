@@ -68,29 +68,33 @@ function relativeTime(from: Date, to: Date): string {
     }
 }
 .pop-enter-active {
-    animation: pop-in 0.4s;
+    animation: pop-in 0.3s;
 }
 .pop-leave-active {
     animation: pop-out 0.5s;
 }
 @keyframes pop-in {
     0% {
-        transform: scale(0);
+        transform: scale(0.4);
+        opacity: 0;
     }
     60% {
-        transform: scale(1.05);
+        transform: scale(1.02);
+        opacity: 1;
     }
     100% {
         transform: scale(1);
     }
 }
 @keyframes pop-out {
-    0% {
-        transform: scale(1);
-    }
-    100% {
-        transform: scale(0);
-    }
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
 }
 </style>
  
