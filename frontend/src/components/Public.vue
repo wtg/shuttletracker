@@ -2,6 +2,11 @@
   <div class="parent">
     <div class="titleBar">
       <img src="~../assets/icon.svg">
+      <transition name="pop">
+        <div class="reconnecting" v-if="reconnecting">
+          <span class="fas fa-circle-notch fa-spin"></span> Reconnecting...
+        </div>
+      </transition>
     </div>
     <div id="mymap"></div>
     <span>
@@ -71,11 +76,7 @@ export default Vue.extend({
     const a = new InfoService();
     Promise.all([this.$store.dispatch('grabStops'), this.$store.dispatch('grabRoutes')]);
     this.$store.dispatch('grabVehicles');
-    this.$store.dispatch('grabUpdates');
     this.$store.dispatch('grabAdminMesssage');
-    setInterval(() => {
-      this.$store.dispatch('grabUpdates');
-    }, 5000);
 
     this.$nextTick(() => {
       this.ready = true;
@@ -136,6 +137,9 @@ export default Vue.extend({
     },
     shouldShowETAMessage(): boolean {
       return this.$store.state.settings.etasEnabled;
+    },
+    reconnecting(): boolean {
+      return this.$store.state.fusionConnected === false;
     },
   },
   methods: {
@@ -369,8 +373,9 @@ export default Vue.extend({
 .titleBar {
   height: 40px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  position: relative;
   width: 100%;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -381,10 +386,54 @@ export default Vue.extend({
   user-select: none;
   background: white;
   z-index: 1;
+  padding: 0 6px;
 
   img {
-    flex: 1;
+    flex: 0 1 auto;
     height: 70%;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  div.reconnecting {
+    flex: 0 1 auto;
+    margin-left: auto;
+    background: linear-gradient(0deg, rgb(250, 250, 250), rgb(240, 240, 240));
+    border: 0.5px solid #eee;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+}
+
+.pop-enter-active {
+  animation: pop-in 0.1s;
+}
+.pop-leave-active {
+  animation: pop-out 0.15s;
+}
+@keyframes pop-in {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.02);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes pop-out {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0;
   }
 }
 

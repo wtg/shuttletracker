@@ -2,7 +2,9 @@ package postgres
 
 import (
 	"database/sql"
+	"time"
 
+	"github.com/lib/pq"
 	"github.com/spf13/viper"
 )
 
@@ -37,6 +39,8 @@ func New(cfg Config) (*Postgres, error) {
 		return nil, err
 	}
 
+	listener := pq.NewListener(cfg.URL, time.Second, time.Minute, nil)
+
 	pg := &Postgres{}
 
 	err = pg.VehicleService.initializeSchema(db)
@@ -51,7 +55,7 @@ func New(cfg Config) (*Postgres, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = pg.LocationService.initializeSchema(db)
+	err = pg.LocationService.initializeSchema(db, listener)
 	if err != nil {
 		return nil, err
 	}
@@ -63,6 +67,8 @@ func New(cfg Config) (*Postgres, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	go pg.LocationService.run()
 
 	return pg, nil
 }

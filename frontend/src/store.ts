@@ -5,11 +5,9 @@ import Route from '@/structures/route';
 import InfoServiceProvider from '@/structures/serviceproviders/info.service';
 import { Stop } from '@/structures/stop';
 import Vehicle from '@/structures/vehicle';
-import ETA from '@/structures/eta';
+import Location from '@/structures/location';
 import * as L from 'leaflet';
-import Update from '@/structures/update';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
-import { stat } from 'fs';
 
 Vue.use(Vuex);
 const InfoService = new InfoServiceProvider();
@@ -34,6 +32,7 @@ const store: StoreOptions<StoreState> = {
       fusionPositionEnabled: true,
     },
     geolocationDenied: false,
+    fusionConnected: undefined,
   },
   mutations: {
     setOnline(state, online: boolean) {
@@ -44,12 +43,12 @@ const store: StoreOptions<StoreState> = {
 
       // also ensure that vehicles consider being on any newly-returned routes
       state.Vehicles.forEach((vehicle: Vehicle) => {
-        state.Routes.forEach((route: Route) => {
-          if (vehicle.RouteID === route.id) {
+        for (const route of state.Routes) {
+          if (vehicle.location !== null && vehicle.location.routeID === route.id) {
             vehicle.setRoute(route);
-            return;
+            break;
           }
-        });
+        }
       });
     },
     setStops(state, Stops: Stop[]) {
@@ -68,33 +67,24 @@ const store: StoreOptions<StoreState> = {
         });
       });
     },
-    addUpdates(state, updates: Update[]) {
-      const toHide = new Array<Vehicle>();
-      state.Vehicles.forEach((vehicle: Vehicle) => {
-        let found = false;
-        for (let i = 0; i < updates.length; i++) {
-          if (Number(vehicle.id) === Number(updates[i].vehicle_id)) {
-            vehicle.lastUpdate = new Date(updates[i].time);
-            found = true;
-            vehicle.speed = Number(updates[i].speed);
-            vehicle.setRoute(undefined);
-            for (let j = 0; j < state.Routes.length; j++) {
-              if (state.Routes[j].id === updates[i].route_id) {
-                vehicle.setRoute(state.Routes[j]);
+    updateVehicleLocation(state, location: Location) {
+      // find vehicle
+      for (const vehicle of state.Vehicles) {
+        if (vehicle.id === location.vehicleID) {
+          if (location.routeID) {
+            for (const route of state.Routes) {
+              if (route.id === location.routeID) {
+                vehicle.setRoute(route);
                 break;
               }
             }
-            vehicle.setLatLng(Number(updates[i].latitude), Number(updates[i].longitude));
-            vehicle.setHeading(Number(updates[i].heading));
-            vehicle.showOnMap(true);
-
-            break;
+          } else {
+            vehicle.setRoute(undefined);
           }
+          vehicle.setLocation(location);
+          break;
         }
-        if (!found) {
-          vehicle.showOnMap(false);
-        }
-      });
+      }
     },
     addAdminMessage(state, message: AdminMessageUpdate) {
       state.adminMessage = message;
@@ -135,6 +125,9 @@ const store: StoreOptions<StoreState> = {
     },
     setGeolocationDenied(state, value: boolean) {
       state.geolocationDenied = value;
+    },
+    setFusionConnected(state, value: boolean) {
+      state.fusionConnected = value;
     },
     setRoutesOnStops(state) {
       // set any routes on existing stops
@@ -245,11 +238,6 @@ const store: StoreOptions<StoreState> = {
     },
     grabVehicles({ commit }) {
       InfoService.GrabVehicles().then((ret: Vehicle[]) => commit('setVehicles', ret)).catch(() => {
-        commit('setOnline', false);
-      });
-    },
-    grabUpdates({ commit }) {
-      InfoService.GrabUpdates().then((ret: Update[]) => commit('addUpdates', ret)).catch(() => {
         commit('setOnline', false);
       });
     },

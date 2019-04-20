@@ -29,6 +29,9 @@ type LocationService interface {
 	DeleteLocationsBefore(before time.Time) (int, error)
 	LocationsSince(vehicleID int64, since time.Time) ([]*Location, error)
 	LatestLocation(vehicleID int64) (*Location, error)
+	LatestLocations() ([]*Location, error)
+	Location(id int64) (*Location, error)
+	SubscribeLocations() chan *Location
 }
 
 var (
