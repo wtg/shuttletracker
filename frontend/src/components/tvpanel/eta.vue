@@ -4,10 +4,10 @@
       ETA
     </div>
     <div class="eta-message">
-      East Campus shuttle arriving in 1 minute.
+      West Campus shuttle arriving in 3 minutes.
     </div>
     <div class="eta-message">
-      West Campus shuttle arriving in 3 minutes.
+      East Campus shuttle arriving in 6 minutes.
     </div>
   </div>
 </template>
