@@ -2,6 +2,7 @@ import UserLocationService from '@/structures/userlocation.service';
 import store from '@/store';
 import ETA from '@/structures/eta';
 import Location from '@/structures/location';
+import resources from './resources';
 
 // SocketManager wraps a WebSocket in order to provide guarantees about
 // reliability, reconnections, retries, etc.
@@ -108,7 +109,7 @@ export default class Fusion {
     private serverID = null;
 
     constructor() {
-        const wsURL = this.relativeWSURL('fusion/');
+        const wsURL = this.relativeWSURL(resources.BasePath + 'fusion/');
         this.ws = new SocketManager(wsURL);
         this.ws.registerMessageReceivedCallback((data) => {
             const message = JSON.parse(data);
@@ -299,7 +300,7 @@ export default class Fusion {
         } else {
             url += 'ws:';
         }
-        url += '//' + window.location.host + window.location.pathname;
+        url += '//' + window.location.host;
         return url + wsURL;
     }
 }

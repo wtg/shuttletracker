@@ -12,11 +12,13 @@ import TabBar from '../tabBar.vue';
 import InfoService from '../../structures/serviceproviders/info.service';
 import Vehicle from '../../structures/vehicle';
 import Route from '../../structures/route';
-import Stop from '../../structures/stop';
+import {Stop} from '../../structures/stop';
 import * as L from 'leaflet';
+import Fusion from '@/fusion';
 import getMarkerString from '../../structures/leaflet/rotatedMarker';
 import { Position } from 'geojson';
 import UserLocationService from '../../structures/userlocation.service';
+import ETAMessage from '@/components/etaMessage.vue';
 
 const StopSVG = require('../../assets/circle.svg') as string;
 const UserSVG = require('../../assets/user.svg') as string;
@@ -43,6 +45,7 @@ export default Vue.extend({
       initialized: false,
       legend: new L.Control({ position: 'bottomleft' }),
       locationMarker: undefined,
+      currentETAInfo: null,
     } as {
         vehicles: Vehicle[];
         routes: Route[];
@@ -54,22 +57,17 @@ export default Vue.extend({
         legend: L.Control;
         locationMarker: L.Marker | undefined;
         userShuttleidCount: number;
+        currentETAInfo: {} | null;
       };
   },
   mounted() {
     const ls = UserLocationService.getInstance();
-    const a = new InfoService();
-    this.$store.dispatch('grabRoutes');
-    this.$store.dispatch('grabStops');
-    this.$store.dispatch('grabVehicles');
-    this.$store.dispatch('grabUpdates');
-    
-    // Interval to update current Routes 
-    setInterval(() => {
-      this.$store.dispatch('grabRoutes');
-      this.$store.dispatch('grabUpdates');
-    }, 5000);
 
+    const a = new InfoService();
+    Promise.all([this.$store.dispatch('grabStops'), this.$store.dispatch('grabRoutes')]);
+    this.$store.dispatch('grabVehicles');
+    this.$store.dispatch('grabAdminMesssage');
+  
     this.$nextTick(() => {
       this.ready = true;
       this.Map = L.map('mymap', {
@@ -94,27 +92,29 @@ export default Vue.extend({
           minZoom: 14,
         },
       ).addTo(this.Map);
+
       this.Map.invalidateSize();
+      this.showUserLocation();
     });
-    this.renderRoutes();
     this.$store.subscribe((mutation: any, state: any) => {
       if (mutation.type === 'setRoutes') {
         this.renderRoutes();
-        this.updateLegend();
-      }
-      if (mutation.type === 'setStops') {
+        this.updateStops();
         this.renderStops();
+        this.updateLegend();
       }
       if (mutation.type === 'setVehicles') {
         this.addVehicles();
       }
+      if (mutation.type === 'updateETAs' || mutation.type === 'setRoutes' || mutation.type === 'setStops') {
+        this.updateETA();
+      }
     });
-
+    ls.registerCallback((position) => {
+      this.updateETA();
+    });
   },
   methods: {
-    spawn() {
-      this.spawnShuttleAtPosition(UserLocationService.getInstance().getCurrentLocation());
-    },
     updateLegend() {
       this.legend.onAdd = (map: L.Map) => {
         const div = L.DomUtil.create('div', 'info legend');
@@ -148,7 +148,6 @@ export default Vue.extend({
     routePolyLines(): L.Polyline[] {
       return this.$store.getters.getRoutePolyLines;
     },
-
     renderRoutes() {
       if (this.routePolyLines().length > 0 && !this.initialized) {
         if (
@@ -159,7 +158,6 @@ export default Vue.extend({
           this.Map.fitBounds(this.$store.getters.getBoundsPolyLine.getBounds());
         }
       }
-    
       this.existingRouteLayers.forEach((line) => {
         if (this.Map !== undefined) {
           this.Map.removeLayer(line);
@@ -167,7 +165,6 @@ export default Vue.extend({
       });
       this.existingRouteLayers = new Array<L.Polyline>();
       this.routePolyLines().forEach((line: L.Polyline) => {
-
         if (this.Map !== undefined) {
           this.Map.addLayer(line);
           this.existingRouteLayers.push(line);
@@ -176,22 +173,21 @@ export default Vue.extend({
     },
     renderStops() {
       this.$store.state.Stops.forEach((stop: Stop) => {
-        const marker = L.marker([stop.latitude, stop.longitude], {
-          icon: StopIcon,
-        });
         if (this.Map !== undefined) {
-          marker.bindPopup(stop.name);
-          marker.addTo(this.Map);
+          stop.marker.bindPopup(stop.getMessage());
+          stop.marker.addTo(this.Map);
         }
       });
     },
     addVehicles() {
       this.$store.state.Vehicles.forEach((veh: Vehicle) => {
+        console.log(veh);
         if (this.Map !== undefined) {
           veh.addToMap(this.Map);
         }
       });
     },
+  
     showUserLocation() {
       const userIcon = new L.Icon({
         iconUrl: UserSVG,
@@ -227,6 +223,65 @@ export default Vue.extend({
       });
 
     },
+    updateETA() {
+      // find nearest stop
+      const pos = UserLocationService.getInstance().getCurrentLocation();
+      if (pos === undefined) {
+        this.currentETAInfo = null;
+        return;
+      }
+      const c = pos.coords as Coordinates;
+
+      let minDistance = Infinity;
+      let closestStop: Stop | null = null;
+      for (const stop of this.$store.state.Stops) {
+        const d = Math.hypot(c.longitude - stop.longitude, c.latitude - stop.latitude);
+        if (d < minDistance) {
+          minDistance = d;
+          closestStop = stop;
+        }
+      }
+      if (closestStop === null) {
+        this.currentETAInfo = null;
+        return;
+      }
+
+      // do we have an ETA for this stop? find the next soonest
+      let eta: ETA | null = null;
+      for (const e of this.$store.state.etas) {
+        if (e.stopID === closestStop.id) {
+          // is this the soonest?
+          if (eta === null || e.eta < eta.eta || e.arriving) {
+            eta = e;
+          }
+        }
+      }
+      if (eta === null) {
+        this.currentETAInfo = null;
+        return;
+      }
+
+      // get associated route
+      let route: Route | null = null;
+      for (const r of this.$store.state.Routes) {
+        if (r.id === eta.routeID) {
+          route = r;
+          break;
+        }
+      }
+      if (route === null) {
+        this.currentETAInfo = null;
+        return;
+      }
+
+      this.currentETAInfo = {eta, route, stop: closestStop};
+    },
+    updateStops() {
+      this.$store.commit('setRoutesOnStops');
+    },
+  },
+  components: {
+    etaMessage: ETAMessage,
   },
 });
 </script>
