@@ -9,6 +9,7 @@ import (
 
 	tmock "github.com/stretchr/testify/mock"
 
+	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/mock"
 )
 
@@ -42,6 +43,7 @@ func TestStatic(t *testing.T) {
 	ups := &mock.UpdaterService{}
 	em := &mock.ETAService{}
 	em.On("Subscribe", tmock.AnythingOfType("func(shuttletracker.VehicleETA)")).Return()
+	ms.LocationService.On("SubscribeLocations").Return(make(chan *shuttletracker.Location))
 
 	api, err := New(cfg, ms, msg, us, ups, em)
 	if err != nil {

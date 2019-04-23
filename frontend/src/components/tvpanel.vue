@@ -6,14 +6,17 @@
 
     <!-- Side Bar --> 
     <div class="sidebar has-text-centered">  
-      <TimeDisplay />
-      <div id="queue">
-        <TimesQueue /> 
-        <img class="logo" src="~../assets/icon.svg">
-        <div id="eta"> 
-        <eta > </eta>
-        </div>
-      </div>
+      <TimeDisplay /> 
+          <div id="eta"> 
+            <eta > </eta>
+          </div>
+
+          <div id="queue">
+            <TimesQueue />
+          </div>
+          <div id="bottom">
+              <img src="~../assets/icon.svg" id="shuttle-logo">
+          </div>
     </div>
   </div>
 </template>
@@ -24,9 +27,24 @@ import Vue from "vue";
 import Map from "./tvpanel/Map.vue";
 import TimesQueue from "./tvpanel/TimesQueue.vue";
 import TimeDisplay from "./tvpanel/TimeDisplay.vue";
+import Fusion from '@/fusion';
+
 import ETA from "./tvpanel/eta.vue";
+
 export default Vue.extend({
   name: "tvpanel",
+  data() {
+    return{
+      fusion: new Fusion()
+
+    }as {
+        fusion: Fusion;
+    }
+  },
+  mounted(){
+    this.fusion.start();
+
+  },
   components: {
     TimesQueue,
     Map,
@@ -36,11 +54,13 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" >
+html{
+  overflow-y:hidden;
+}
 html,body {
   height: 100%;
   width: 100%;
-  overflow:hidden;
 }
 #title-RPI {
   text-align: center;
@@ -49,13 +69,17 @@ html,body {
   font-size: 75px;
   color: black;
 }
-
+#shuttle-logo{
+  position:absolute;
+  top:20px;
+  left:180px;
+  height:40px;
+  width:40px;
+}
 .map{
   width: calc( 100% - 400px );
 }
 .tvPanel{
-  width: 100%;
-  height: 100%;
   display: flex;
   flex-flow: row;
   justify-content: space-between;
@@ -64,42 +88,25 @@ html,body {
   width: 400px;
   border-bottom: 0.5px solid #eee;
   box-shadow: -3px 0px 8px 0 #ddd;
-  height:100%;
   z-index: 3;
-  padding-top:20px;
-}
-.titleBar {
-  height: 100%;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  border-bottom: 0.5px solid #eee;
-  box-shadow: -3px 0 8px 0 #ddd;
-  user-select: none;
-  background: white;
-  z-index: 1;
-}
-.logo {
-  height:20px;
-  width:20px;
-  position:relative;
-  top:600px;
-  // left: calc( 100% - 230px );
 }
 #queue {
-  height:100%;
+  height:500px;
   width:100%;
   position:relative;
-  top:0px;
+  top:180px;
 }
 #eta {
   height:200px;
   width:100%;
   position:relative;
-  top:55%;
+  top:0;
+}
+#bottom{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  height:70px;
+  border-top:2px solid#D3D3D3; 
 }
 </style>

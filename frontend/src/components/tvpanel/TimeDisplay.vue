@@ -79,6 +79,7 @@ export default Vue.extend({
 #timeDisplay {
   position: relative;
   padding-bottom:20px;
+  padding-top:20px;
   border-bottom:2px solid 	#D3D3D3; 
   z-index:100;
 }

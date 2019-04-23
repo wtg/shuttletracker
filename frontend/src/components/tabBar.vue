@@ -1,5 +1,5 @@
 <template>
-  <ul>
+  <ul v-if="visible">
     <router-link tag="li" to="/">
       <span>
         <span class="fas fa-location-arrow"></span>
@@ -29,10 +29,32 @@
 import Vue from 'vue';
 
 export default Vue.extend({
+  mounted() {
+    console.log(this.$route.path);
+  },
   computed: {
     etasEnabled(): boolean {
       return this.$store.state.settings.etasEnabled;
     },
+    visible(): boolean {
+      switch (this.$route.path) {
+        case '/': {
+          return true;
+          break;
+        }
+        case '/settings': {
+          return true;
+          break;
+        }
+        case '/schedules': {
+          return true;
+          break;
+        }
+      }
+      return false;
+
+    },
+
   },
 });
 </script>
@@ -42,11 +64,7 @@ export default Vue.extend({
 ul {
   display: flex;
   height: 40px;
-  position: fixed;
-  bottom: 0;
   display: flex;
-  padding: 0;
-  margin: 0;
   justify-content: center;
   align-items: center;
   width: 100%;

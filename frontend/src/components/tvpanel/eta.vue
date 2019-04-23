@@ -1,13 +1,13 @@
 <template>
   <div>
-    <div class="eta-message">
-      East Campus shuttle arriving in 7 minutes.
+    <div id="eta-title">
+      ETA
     </div>
     <div class="eta-message">
       West Campus shuttle arriving in 3 minutes.
     </div>
-    <div class="eta-message" v-if="message">
-      {{ message }}
+    <div class="eta-message">
+      East Campus shuttle arriving in 6 minutes.
     </div>
   </div>
 </template>
@@ -65,18 +65,18 @@ export default Vue.extend({
 
       // this.currentETAInfo = {eta, route, stop: closestStop};
       const etas = this.$store.state.etas;
-      return `${etas.length} etas`;
-    //   if (this.etaInfo === null) {
-    //       return null;
-    //   }
-    //   const now = new Date();
-    //   let newMessage = `${this.etaInfo.route.name} shuttle arriving at ${this.etaInfo.stop.name}`;
-    //   // more than 1 min 30 sec?
-    //   if (this.etaInfo.eta.eta.getTime() - now.getTime() > 1.5 * 60 * 1000 && !this.etaInfo.eta.arriving) {
-    //     newMessage += ` in ${relativeTime(now, this.etaInfo.eta.eta)}`;
-    //   }
-    //   newMessage += '.';
-    //   return newMessage;
+      
+      if (this.etaInfo === null) {
+          return null;
+      }
+      const now = new Date();
+      let newMessage = `${this.etaInfo.route.name} shuttle arriving at ${this.etaInfo.stop.name}`;
+      // more than 1 min 30 sec?
+      if (this.etaInfo.eta.eta.getTime() - now.getTime() > 1.5 * 60 * 1000 && !this.etaInfo.eta.arriving) {
+        newMessage += ` in ${relativeTime(now, this.etaInfo.eta.eta)}`;
+      }
+      newMessage += '.';
+      return newMessage;
     },
   },
 });
@@ -104,8 +104,12 @@ function relativeTime(from: Date, to: Date): string {
     padding: 20px 28px;
     border: 0.5px solid #eee;
     border-radius: 4px;
-    box-shadow: 0 1px 16px -4px #bbb;
+    // box-shadow: 0 1px 16px -4px #bbb;
     font-size: 18px;
+}
+#eta-title{
+  font-size:60px;
+  font-weight:400;
 }
 @media screen and (max-width: 500px) {
     .eta-message {

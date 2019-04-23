@@ -111,12 +111,13 @@ type fusionManager struct {
 	busButtonCount uint64
 
 	em shuttletracker.ETAService
+	ms shuttletracker.ModelService
 
 	// an ID for Fusion clients to tell if they get reconnected to the same server or not
 	id string
 }
 
-func newFusionManager(etaManager shuttletracker.ETAService) (*fusionManager, error) {
+func newFusionManager(etaManager shuttletracker.ETAService, ms shuttletracker.ModelService) (*fusionManager, error) {
 	fm := &fusionManager{
 		addClient:          make(chan *fusionClient),
 		removeClient:       make(chan string),
@@ -128,14 +129,20 @@ func newFusionManager(etaManager shuttletracker.ETAService) (*fusionManager, err
 		subscriptions:      map[string][]string{},
 		subscribeCallbacks: map[string][]func(string){},
 		em:                 etaManager,
+		ms:                 ms,
 	}
 
 	// get notified of new ETAs to push out to the ETA topic
 	etaManager.Subscribe(fm.handleETA)
 
+	// get notified of new vehicle locations to push out
+	locChan := ms.SubscribeLocations()
+	go fm.handleLocations(locChan)
+
 	// add some subscription callbacks (this could be moved into a method on
 	// ETAManager in the future).
 	fm.subscribeCallbacks["eta"] = []func(string){fm.handleETASubscribe}
+	fm.subscribeCallbacks["vehicle_location"] = []func(string){fm.handleVehicleLocationSubscribe}
 
 	// generate a server UUID
 	u, err := uuid.NewV1()
@@ -202,12 +209,40 @@ func (fm *fusionManager) handleETA(eta shuttletracker.VehicleETA) {
 	fm.sendToTopic("eta", fme)
 }
 
+func (fm *fusionManager) handleLocations(locChan chan *shuttletracker.Location) {
+	for location := range locChan {
+		fme := fusionMessageEnvelope{
+			Type:    "vehicle_location",
+			Message: location,
+		}
+		fm.sendToTopic("vehicle_location", fme)
+	}
+}
+
 // this is a callback for Fusion to immediately push out ETAs to newly-subscribed clients
 func (fm *fusionManager) handleETASubscribe(clientID string) {
 	for _, eta := range fm.em.CurrentETAs() {
 		fme := fusionMessageEnvelope{
 			Type:    "eta",
 			Message: eta,
+		}
+		fm.sendToClient(clientID, fme)
+	}
+}
+
+// immediately push out vehicle locations to newly-subscribed clients
+func (fm *fusionManager) handleVehicleLocationSubscribe(clientID string) {
+	// get latest locations for all enabled vehicles
+	locations, err := fm.ms.LatestLocations()
+	if err != nil {
+		log.WithError(err).Error("unable to get latest vehicle locations")
+		return
+	}
+
+	for _, location := range locations {
+		fme := fusionMessageEnvelope{
+			Type:    "vehicle_location",
+			Message: location,
 		}
 		fm.sendToClient(clientID, fme)
 	}

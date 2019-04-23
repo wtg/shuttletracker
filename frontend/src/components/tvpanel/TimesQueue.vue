@@ -3,26 +3,25 @@
     <!-- East Queue -->
     <div id="east" v-if="curr_east">
         <ul>  
-            <li id="type"> East  </li>
+            <li id="type-east"> East  </li>
             <div class="times" >
             <li id="east1" class="time" v-if="east1_time" key="east1_time">{{display(east1_time)}}</li>
-            <transition name="fade">
             <li id="east2" class="time" v-if="east2_time" key="east2_time">{{display(east2_time)}}</li>
-            </transition>
             <li id="east3" class="time" v-if="east3_time" key="east3_time">{{display(east3_time)}}</li>
-            <li id="east3" class="time" v-if="east4_time" key="east4_time">{{display(east4_time)}}</li>
-            <li id="east3" class="time" v-if="east5_time" key="east5_time">{{display(east5_time)}}</li>
+            <li id="east4" class="time" v-if="east4_time" key="east4_time">{{display(east4_time)}}</li>
+            
             </div> 
         </ul>
     </div>
     <!-- West Queue -->
     <div id="west" v-if="curr_west">
         <ul>
-            <li id="type"> West </li>
+            <li id="type-west"> West </li>
             <div class="times">
             <li id="west1" class="time" v-if="west1_time" key="west1_time">{{display(west1_time)}}</li>
             <li id="west2" class="time" v-if="west2_time" key="west2_time">{{display(west2_time)}}</li>
             <li id="west3" class="time" v-if="west3_time" key="west3_time">{{display(west3_time)}}</li>
+            <li id="west4" class="time" v-if="west4_time" key="west4_time">{{display(west4_time)}}</li>
             </div>
         </ul>
     </div>
@@ -34,6 +33,7 @@
             <li id="late1" class="time" v-show="this.curr_weekend_late">{{display(late1_time)}}</li>
             <li id="late2" class="time" v-show="this.curr_weekend_late">{{display(late2_time)}}</li>
             <li id="late3" class="time" v-show="this.curr_weekend_late">{{display(late3_time)}}</li>
+            <li id="late4" class="time" v-show="this.curr_weekend_late">{{display(late4_time)}}</li>
             </div>
         </ul>
     </div>
@@ -56,7 +56,6 @@ import weekdayW from '@/assets/shuttle_times/weekdayW.json';
 import satW from '@/assets/shuttle_times/satW.json';
 import sunW from '@/assets/shuttle_times/sunW.json';
 
-
 export default Vue.extend({
     name: 'TimesQueue',
     data(){
@@ -71,19 +70,17 @@ export default Vue.extend({
             east2_time: null,
             east3_time: null,
             east4_time: null,
-            east5_time: null,
 
             west1_time: null,
             west2_time: null,
             west3_time: null,
             west4_time: null,
-            west5_time: null,
 
             late1_time: null,
             late2_time: null,
             late3_time: null,
             late4_time: null,
-            late5_time: null,
+            
             no_shuttles: "No Avaliable Shuttles",
         }
     },
@@ -194,7 +191,6 @@ export default Vue.extend({
             this.east2_time = this.curr_east[1];
             this.east3_time = this.curr_east[2];
             this.east4_time = this.curr_east[3];
-            this.east5_time = this.curr_east[900];
             
         },
         // Function to update shuttles times for the West Queue
@@ -214,6 +210,7 @@ export default Vue.extend({
             this.west1_time = this.curr_west[0];
             this.west2_time = this.curr_west[1];
             this.west3_time = this.curr_west[2];    
+            this.west4_time = this.curr_west[3];
      },
         // Function to update shuttle times for the Late/Weekend Queue
         updateQueueLate(){
@@ -232,6 +229,7 @@ export default Vue.extend({
             this.late1_time = this.curr_weekend_late[0];
             this.late2_time = this.curr_weekend_late[1];
             this.late3_time = this.curr_weekend_late[2];  
+            this.late4_time = this.curr_weekend_late[3];
         },
         // --------------------------------------------------------------------------
         // Function to convert 24 to 12 hour format and display AM or PM
@@ -269,11 +267,11 @@ export default Vue.extend({
         // Interval every three minutes; 180,000 milliseconds ****
         setInterval(() => {
             this.updateShuttleTimes();
-        }, 1800);
+        }, 18);
     },
 });
 </script>
-<style scoped>
+<style lang="scss" scoped>
     #main{
         text-align:center;
         position:absolute;
@@ -283,17 +281,16 @@ export default Vue.extend({
         color:black;
     }
     .time{
-        font-size:16px;
-        padding: 15px 28px;
-        width:150px;
-        height:55px;
-        box-shadow: 0 1px 16px -4px #bbb;
-        margin-top:10px;
-        margin-bottom:10px;
-        border-radius:5px;
-    }
-    li {
-        flex:50%;
+        font-size:22px;
+        width:160px;
+        height:65px;
+        padding-top:13px;
+        margin-left:25px;
+        margin-top:20px;
+        border: 1.5px solid #eee;
+        border-radius: 4px;
+        z-index:300;
+        font-weight:400;
     }
     #east{
         flex:50%;
@@ -304,9 +301,13 @@ export default Vue.extend({
     #weekendlate{ 
         flex:50%;
     }
-    #type{
+    #type-east{
         font-size:60px; 
-        flex:50%;
+        color:#96C03A;
+    }
+    #type-west{
+        font-size:60px;
+        color:#E1501B;
     }
     .fade-enter-active, .fade-leave-active {
      transition: opacity .5s;

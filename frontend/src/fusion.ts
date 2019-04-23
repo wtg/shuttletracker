@@ -1,6 +1,8 @@
 import UserLocationService from '@/structures/userlocation.service';
 import store from '@/store';
 import ETA from '@/structures/eta';
+import Location from '@/structures/location';
+import resources from './resources';
 
 // SocketManager wraps a WebSocket in order to provide guarantees about
 // reliability, reconnections, retries, etc.
@@ -65,6 +67,7 @@ class SocketManager {
             const ws = new WebSocket(this.url);
             ws.onopen = (event) => {
                 // console.log("socket connected", event);
+                store.commit('setFusionConnected', true);
                 resolve(ws);
             };
             ws.onmessage = (event) => {
@@ -77,6 +80,8 @@ class SocketManager {
             };
             ws.onclose = (event) => {
                 // console.log("socket closed", event);
+
+                store.commit('setFusionConnected', false);
 
                 // try to reconnect after a second
                 setTimeout(() => {
@@ -104,7 +109,7 @@ export default class Fusion {
     private serverID = null;
 
     constructor() {
-        const wsURL = this.relativeWSURL('fusion/');
+        const wsURL = this.relativeWSURL(resources.BasePath + 'fusion/');
         this.ws = new SocketManager(wsURL);
         this.ws.registerMessageReceivedCallback((data) => {
             const message = JSON.parse(data);
@@ -159,6 +164,10 @@ export default class Fusion {
             };
             this.ws.send(JSON.stringify(data));
         });
+
+        // subscribe to vehicle location updates
+        this.subscribe('vehicle_location');
+        this.registerMessageReceivedCallback(this.handleVehicleLocations);
 
         // get notified of bus button setting changes so we can subscribe to the topic
         store.watch((state) => state.settings.busButtonEnabled, (newValue, oldValue) => {
@@ -252,6 +261,26 @@ export default class Fusion {
         store.commit('updateETAs', { vehicleID: message.message.vehicle_id, etas });
     }
 
+    private handleVehicleLocations(message: any) {
+        if (message.type !== 'vehicle_location') {
+            return;
+        }
+
+        const m = message.message;
+        const location = new Location(
+            m.id,
+            m.vehicle_id,
+            new Date(m.created),
+            new Date(m.time),
+            m.latitude,
+            m.longitude,
+            m.heading,
+            m.speed,
+            m.route_id,
+        );
+        store.commit('updateVehicleLocation', location);
+    }
+
     private generateUUID() {
         let d = new Date().getTime();
         if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
@@ -271,7 +300,7 @@ export default class Fusion {
         } else {
             url += 'ws:';
         }
-        url += '//' + window.location.host + window.location.pathname;
+        url += '//' + window.location.host;
         return url + wsURL;
     }
 }
