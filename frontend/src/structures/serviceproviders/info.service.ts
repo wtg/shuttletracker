@@ -3,12 +3,13 @@ import Route from '../route';
 import { Stop } from '../stop';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 import routeScheduleInterval from '../routeScheduleInterval';
+import Resources from '@/resources';
 /**
  * Info service provider grabs the basic information from the api and returns it to the frontend.
  */
 export default class InfoServiceProvider {
     public GrabVehicles(): Promise<Vehicle[]> {
-        return fetch('vehicles').then((data) => data.json()).then((data) => {
+        return fetch(Resources.BasePath + 'vehicles').then((data) => data.json()).then((data) => {
             const ret = new Array<Vehicle>();
             data.forEach((element: {
                 id: number,
@@ -27,7 +28,7 @@ export default class InfoServiceProvider {
     }
 
     public GrabRoutes(): Promise<Route[]> {
-        return fetch('routes').then((data) => data.json()).then((data) => {
+        return fetch(Resources.BasePath + 'routes').then((data) => data.json()).then((data) => {
             const ret = new Array<Route>();
             data.forEach((element: {
                 id: number,
@@ -66,7 +67,7 @@ export default class InfoServiceProvider {
     }
 
     public GrabStops(): Promise<Stop[]> {
-        return fetch('stops').then((data) => data.json()).then((data) => {
+        return fetch(Resources.BasePath + 'stops').then((data) => data.json()).then((data) => {
             const ret = new Array<Stop>();
             data.forEach((element: {
                 id: number,
@@ -85,7 +86,7 @@ export default class InfoServiceProvider {
     }
 
     public GrabAdminMessage(): Promise<AdminMessageUpdate> {
-        return fetch('adminMessage').then((data) => data.json()).then((ret) => {
+        return fetch(Resources.BasePath + 'adminMessage').then((data) => data.json()).then((ret) => {
             return new AdminMessageUpdate(ret.message, Boolean(ret.enabled), new Date(ret.created), new Date(ret.updated));
         }).catch(() => {
             return new AdminMessageUpdate('', false, new Date(), new Date());
@@ -94,7 +95,7 @@ export default class InfoServiceProvider {
     }
 
     public GrabMapboxKey(): Promise<string> {
-        return fetch('getKey/').then((data) => data.json()).then((data: string) => {
+        return fetch(Resources.BasePath + 'getKey/').then((data) => data.json()).then((data: string) => {
             return data;
         });
     }
