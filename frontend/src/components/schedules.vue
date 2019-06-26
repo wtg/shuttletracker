@@ -34,14 +34,20 @@ export default Vue.extend({
         {
           url: 'https://shuttles.rpi.edu/static/EastSchedule.pdf',
           name: 'Summer East Campus',
-          caption: ['Monday–Friday, 7 am–11 pm', 'Weekends: 9:30 am–8 pm'],
+          caption: ['Monday–Friday, 7 am–11 pm', 'Weekends: 9:30 am–5 pm'],
           color: 'green',
         },
         {
           url: 'https://shuttles.rpi.edu/static/WestSchedule.pdf',
           name: 'Summer West Campus',
-          caption: ['Monday–Friday, 7 am–11 pm', 'Weekends: 9:30 am–8 pm'],
+          caption: ['Monday–Friday, 7 am–11 pm', 'Weekends: 9:30 am–5 pm'],
           color: 'red',
+        },
+        {
+          url: 'https://shuttles.rpi.edu/static/WeekendSchedule.pdf',
+          name: 'Weekend/Late Night',
+          caption: ['Friday–Sunday, 8 pm–4 am'],
+          color: 'purple',
         },
       ],
     };
