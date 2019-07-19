@@ -6,20 +6,23 @@ Tracks and maps RPI's shuttles with [Go](https://golang.org/), [Postgres](https:
 
 1. [Install Go](https://golang.org/doc/install). Shuttle Tracker requires Go 1.11 or newer, and we recommend using the latest stable Go release.
 2. Clone the repository to your computer. On macOS, Linux, or WSL, this can be done with `git clone git@github.com:wtg/shuttletracker.git`. If you receive a "permission denied" error, ensure you have [added your SSH key to your GitHub account](https://help.github.com/articles/connecting-to-github-with-ssh/).
-3. Ensure you have [Postgres downloaded](https://www.postgresql.org/download/), installed, and running. On macOS, Homebrew makes this easy.
+3. Ensure you have [Postgres downloaded](https://www.postgresql.org/download/), installed, and running.
+    - On macOS, Homebrew makes this easy.
+    - On Linux, this can be done with `sudo apt-get install postgresql`
 4. Run `createdb shuttletracker` to create a Postgres database.
 5. Switch to the Shuttle Tracker directory (`cd shuttletracker`)
 9. Rename `conf.json.sample` to `conf.json`
 10. Edit `conf.json` with the following, if necessary:
     - `API.MapboxAPIKey`: Necessary for creating routes through the admin interface. [Create your own token](https://www.mapbox.com/help/how-access-tokens-work/) or ask a Shuttle Tracker developer to provide you with one.
-    - `Postgres.URL`: URL where Postgres is located. The provided default typically won't need to be modified.
-11. Install Node.js and npm.
+    - `Postgres.URL`: URL where Postgres is located. This will generally look like `postgres://user:password@localhost/shuttletracker?sslmode=disable` where `user` and `password` are replaced
+11. Install Node.js and npm
+    - On Linux, this can be done with `sudo apt-get install nodejs`
 12. Switch to the `./frontend` directory.
 13. Run `npm install`
 14. Build the frontend using `npx vue-cli-service build --mode development`
     - _Note: if you are working on the frontend, you may instead use `npx vue-cli-service build --mode development --watch` in another terminal to continuously watch for changes and rebuild._
 15. Go back up to the project root directory and build Shuttle Tracker by running `go build -o shuttletracker ./cmd/shuttletracker`
-16. Start the app by running `./shuttletracker` in the project root directory.
+16. Start the app by running `./shuttletracker`
 17. Add yourself as an administrator by using `./shuttletracker admins --add RCS_ID`, replacing `RCS_ID` with your RCS ID. See the "Administrators" section below for more information.
 18. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel.
 
@@ -46,17 +49,17 @@ The admin interface (at `/admin`) is only accessible to users who have been adde
 ```
 > ./shuttletracker admins
 No Shuttle Tracker administrators.
-> ./shuttletracker admins --add kochms
-Added kochms.
-> ./shuttletracker admins --add lyonj4
-Added lyonj4.
+> ./shuttletracker admins --add naraya5
+Added naraya5.
+> ./shuttletracker admins --add lazare2
+Added lazare2.
 > ./shuttletracker admins
-kochms
-lyonj4
-> ./shuttletracker admins --remove lyonj4
-Removed lyonj4.
+naraya5
+lazare2
+> ./shuttletracker admins --remove lazare2
+Removed lazare2.
 > ./shuttletracker admins
-kochms
+naraya5
 ```
 
 ## Setting up (Windows)
@@ -70,7 +73,7 @@ kochms
  * Select `Path` under `User variables for (Username)` and make sure `%GOPATH%\bin` is on the list.  
  * Make sure `GOROOT` is set correctly under `System variables`.   
  * Select `Path` under `System variables` Make sure `GOROOT\bin` is on the list.  
- 
+
  This step should be done for you already.  
 
 ![Step 3](https://user-images.githubusercontent.com/6248819/47713951-e4718600-dc11-11e8-8ebc-73425eea8384.png)  
@@ -99,7 +102,7 @@ kochms
 12. Edit `conf.json` with the following, if necessary:  
    * `API.MapboxAPIKey`: Necessary for creating routes through the admin interface. [Create your own token](https://www.mapbox.com/help/how-access-tokens-work/) or ask a Shuttle Tracker developer to provide you with one.  
    * `Postgres.URL`: URL where Postgres is located which will be the default with postgres:password@localhost added before the database name, where password is your password from step 8. For example: `"URL": "postgres://postgres:shuttle@localhost/shuttletracker?sslmode=disable"`.  
-   
+
 ![Step 12](https://user-images.githubusercontent.com/6248819/47017722-f981eb80-d120-11e8-8ad2-4919c4052dc0.png)  
 
 13. Install [Node.js and npm](https://nodejs.org/en/). Download the recommeneded version and install. Restart your command prompt.  
