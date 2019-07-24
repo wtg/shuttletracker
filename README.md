@@ -9,6 +9,7 @@ Tracks and maps RPI's shuttles with [Go](https://golang.org/), [Postgres](https:
 3. Ensure you have [Postgres downloaded](https://www.postgresql.org/download/), installed, and running.
     - This can be done with `sudo apt-get install postgresql`
 4. Run `createdb shuttletracker` to create a Postgres database.
+	- You could also do this through [pgAdmin](https://www.pgadmin.org/download/) by going to the Servers drop down, then the Databases drop down, and adding a database called shuttletracker by right-clicking on Databases and selecting create
 5. Switch to the Shuttle Tracker directory (`cd shuttletracker`)
 9. Rename `conf.json.sample` to `conf.json`
 10. Edit `conf.json` with the following, if necessary:
