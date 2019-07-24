@@ -29,7 +29,7 @@ Tracks and maps RPI's shuttles with [Go](https://golang.org/), [Postgres](https:
 
 1. [Install Go](https://golang.org/doc/install). Shuttle Tracker requires Go 1.11 or newer, and we recommend using the latest stable Go release.
 2. Clone the repository to your computer. This can be done with `git clone git@github.com:wtg/shuttletracker.git`. If you receive a "permission denied" error, ensure you have [added your SSH key to your GitHub account](https://help.github.com/articles/connecting-to-github-with-ssh/).
-3. If you are already familiar with Postgres and prefer to work from Terminal, run `brew install postgresql` to install Postgres to your machine.  Then run `createdb shuttletracker` to create a Postgres database.
+3. If you are already familiar with Postgres and prefer to work from Terminal, run `brew install postgresql` to install Postgres to your machine.  Then run `createdb shuttletracker` to create a Postgres database.  Then skip to step 7.
 4. If you are unfamiliar with Postgres and prefer to work with a graphical interface, download [Postgres.app](https://postgresapp.com) and [Postico](https://eggerapps.at/postico/).  Postgres.app allows a Postgres server to be started using a graphical interface, while Postico allows a PostgreSQL database to be managed using a graphical interface.
 5. Open Postgres.app and create a new Postgres server by pressing the + in the sidebar.  Name the server "shuttletracker" and specify its port as 5432.  Then press start to run the server.
 6. Open Postico and create a new database named "shuttletracker" by pressing "+ Database".
