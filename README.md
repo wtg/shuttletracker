@@ -8,7 +8,8 @@ Tracks and maps RPI's shuttles with [Go](https://golang.org/), [Postgres](https:
 2. Clone the repository to your computer. On macOS, Linux, or WSL, this can be done with `git clone git@github.com:wtg/shuttletracker.git`. If you receive a "permission denied" error, ensure you have [added your SSH key to your GitHub account](https://help.github.com/articles/connecting-to-github-with-ssh/).
 3. Ensure you have [Postgres downloaded](https://www.postgresql.org/download/), installed, and running.
     - This can be done with `sudo apt-get install postgresql`
-4. Run `createdb shuttletracker` to create a Postgres database.
+4. Run `createdb shuttletracker` in a terminal to create a Postgres database. 
+    - You could also do this through [pgAdmin](https://www.pgadmin.org/download/) by going to the Servers drop down, then the Databases drop down, and adding a database called shuttletracker by right-clicking on Databases and selecting create
 5. Switch to the Shuttle Tracker directory (`cd shuttletracker`)
 9. Rename `conf.json.sample` to `conf.json`
 10. Edit `conf.json` with the following, if necessary:
