@@ -51,6 +51,12 @@ export default class AdminServiceProvider {
         });
     }
 
+    public static DeleteStop(stop: Stop): Promise<Response> {
+        return fetch('/stops?id=' + String(stop.id), {
+            method: 'DELETE',
+        });
+    }
+
     public static SetMessage(message: AdminMessageUpdate): Promise<Response> {
         return fetch('/adminMessage', {
             method: 'POST',
