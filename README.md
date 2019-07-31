@@ -10,6 +10,7 @@ Tracks and maps RPI's shuttles with [Go](https://golang.org/), [Postgres](https:
     - This can be done with `sudo apt-get install postgresql`
 4. Run `createdb shuttletracker` to create a Postgres database.
 	- You could also do this through [pgAdmin](https://www.pgadmin.org/download/) by going to the Servers drop down, then the Databases drop down, and adding a database called shuttletracker by right-clicking on Databases and selecting create
+	- If there is an error `createdb: could not connect to database postgres: FATAL: role "<username>" does not exist`, it is due that adminstrator has not created a PostgreSQL user account for you. It can be fixed by `psql -U postgres` in terminal, `CREATE USER <username>;`, `ALTER USER <username> SUPERUSER CREATEDB;` in `postgres=#`. And you can confirm the success by running `\du` in `postgres=#`.
 5. Switch to the Shuttle Tracker directory (`cd shuttletracker`)
 9. Rename `conf.json.sample` to `conf.json`
 10. Edit `conf.json` with the following, if necessary:
