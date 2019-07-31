@@ -23,7 +23,9 @@ export default Vue.extend({
       if (this.etaInfo.eta.eta.getTime() - now.getTime() > 1.5 * 60 * 1000 && !this.etaInfo.eta.arriving) {
         newMessage += ` in ${relativeTime(now, this.etaInfo.eta.eta)}`;
       }
-      newMessage += '.';
+      if (newMessage.substring(newMessage.length - 1) !== '.') {
+        newMessage += '.';
+      }
 
       return newMessage;
     },
