@@ -2,21 +2,27 @@
 
 Tracks and maps RPI's shuttles with [Go](https://golang.org/), [Postgres](https://www.postgresql.org), [Vue.js](https://vuejs.org/), [TypeScript](https://www.typescriptlang.org), and [Leaflet](https://leafletjs.com). Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 
-## Setting up (Linux)
+Looking to contribute? Please review our Contribution Guidelines.
+
+More project documentation can be found on the [Repository Wiki](https://github.com/wtg/shuttletracker/wiki).
+
+## Setting up (Linux / WSL)
 
 1. [Install Go](https://golang.org/doc/install). Shuttle Tracker requires Go 1.11 or newer, and we recommend using the latest stable Go release.
-2. Clone the repository to your computer. On macOS, Linux, or WSL, this can be done with `git clone git@github.com:wtg/shuttletracker.git`. If you receive a "permission denied" error, ensure you have [added your SSH key to your GitHub account](https://help.github.com/articles/connecting-to-github-with-ssh/).
-3. Ensure you have [Postgres downloaded](https://www.postgresql.org/download/), installed, and running.
+2. Clone the repository to your computer. This can be done with `git clone git@github.com:wtg/shuttletracker.git`. If you receive a "permission denied" error, ensure you have [added your SSH key to your GitHub account](https://help.github.com/articles/connecting-to-github-with-ssh/).
+3. Ensure you have [Postgres downloaded](https://www.postgresql.org/download/), installed.
     - This can be done with `sudo apt-get install postgresql`
-4. Run `createdb shuttletracker` to create a Postgres database.
-	- You could also do this through [pgAdmin](https://www.pgadmin.org/download/) by going to the Servers drop down, then the Databases drop down, and adding a database called shuttletracker by right-clicking on Databases and selecting create
+4. Create a postgres databased titled "shuttletracker".
+  - This can be done by running `createdb shuttletracker`
+  - Alternatively, download the Postgres management software [pgAdmin](https://www.pgadmin.org/download/). Click on the Servers drop down, then the Databases drop down, and add a database titled "shuttletracker" by right-clicking on Databases and selecting create.
 5. Switch to the Shuttle Tracker directory (`cd shuttletracker`)
 9. Rename `conf.json.sample` to `conf.json`
 10. Edit `conf.json` with the following, if necessary:
     - `API.MapboxAPIKey`: Necessary for creating routes through the admin interface. [Create your own token](https://www.mapbox.com/help/how-access-tokens-work/) or ask a Shuttle Tracker developer to provide you with one.
     - `Postgres.URL`: URL where Postgres is located. This will generally look like `postgres://user:password@localhost/shuttletracker?sslmode=disable` where `user` and `password` are replaced
 11. Install Node.js and npm
-    - This can be done with `sudo apt-get install nodejs`
+    - This can be done with `sudo apt-get install nodejs`.
+    - Make sure you are on version 10.16.0 or higher by running `nodejs -v`.
 12. Switch to the `./frontend` directory.
 13. Run `npm install`
 14. Build the frontend using `npx vue-cli-service build --mode development`
@@ -99,6 +105,7 @@ naraya5
 <p style="text-align:center;"><img src="https://user-images.githubusercontent.com/6248819/47713951-e4718600-dc11-11e8-8ebc-73425eea8384.png" alt="3a" width="70%"></p>  
 <p style="text-align:center;"><img src="https://user-images.githubusercontent.com/6248819/47017534-811b2a80-d120-11e8-9a8a-a625b8a74e02.png" alt="3b" width="70%"></p>  
 <p style="text-align:center;"><img src="https://user-images.githubusercontent.com/22043215/47195917-18080280-d32c-11e8-95a4-fca7b5d5f634.png" alt="3c" width="70%"></p>  
+
 3. Open a command prompt by pressing windows + r, then type `cmd` and hit ok, or search for command prompt.
 4. Run `go get github.com/wtg/shuttletracker`.   
 5. Switch to the Shuttle Tracker directory (`$GOPATH/src/github.com/wtg/shuttletracker`).  
