@@ -13,8 +13,8 @@ More project documentation can be found on the [Repository Wiki](https://github.
 3. Ensure you have [Postgres downloaded](https://www.postgresql.org/download/), installed.
     - This can be done with `sudo apt-get install postgresql`
 4. Create a postgres databased titled "shuttletracker".
-  - This can be done by running `createdb shuttletracker`
-  - Alternatively, download the Postgres management software [pgAdmin](https://www.pgadmin.org/download/). Click on the Servers drop down, then the Databases drop down, and add a database titled "shuttletracker" by right-clicking on Databases and selecting create.
+    - This can be done by running `createdb shuttletracker`
+    - Alternatively, download the Postgres management software [pgAdmin](https://www.pgadmin.org/download/). Click on the Servers drop down, then the Databases drop down, and add a database titled "shuttletracker" by right-clicking on Databases and selecting create.
 5. Switch to the Shuttle Tracker directory (`cd shuttletracker`)
 9. Rename `conf.json.sample` to `conf.json`
 10. Edit `conf.json` with the following, if necessary:
