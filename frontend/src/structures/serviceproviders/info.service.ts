@@ -87,9 +87,9 @@ export default class InfoServiceProvider {
 
     public GrabAdminMessage(): Promise<AdminMessageUpdate> {
         return fetch(Resources.BasePath + 'adminMessage').then((data) => data.json()).then((ret) => {
-            return new AdminMessageUpdate(ret.message, Boolean(ret.enabled), new Date(ret.created), new Date(ret.updated));
+            return new AdminMessageUpdate(ret.message, Boolean(ret.enabled), new Date(ret.created), new Date(ret.updated), ret.link);
         }).catch(() => {
-            return new AdminMessageUpdate('', false, new Date(), new Date());
+            return new AdminMessageUpdate('', false, new Date(), new Date(), '');
 
         });
     }

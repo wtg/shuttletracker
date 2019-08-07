@@ -4,8 +4,9 @@
         <div style="margin-top: 15px; margin-bottom: 15px;">
             <div class="field has-addons">
                 <div class="control">
-                    <input v-model="newMessage" class="input" type="text"/>
+                    <input v-model="newMessage" class="input" type="text" placeholder="Message Contents"/>
                     <p v-if="newMessage.length > 251" class="help is-danger">Message must be shorter than 251 characters.</p>
+                    <input v-model="newLink" class="input" type="text" placeholder="Optional Link (Should Begin With http:// or https://)"/>
                 </div>
                 <!-- <div class="control">
                     <button class="button is-info">Set Message</button>
@@ -51,6 +52,8 @@ export default Vue.extend({
             newMessageVisible: false,
             fail: false,
             success: false,
+            currentLink: '',
+            newLink: '',
         }as {
             currentMessage: string;
             currentMessageVisible: boolean;
@@ -58,6 +61,8 @@ export default Vue.extend({
             newMessageVisible: boolean;
             fail: boolean;
             success: boolean;
+            currentLink: string;
+            newLink: string;
         };
     },
     mounted() {
@@ -65,7 +70,7 @@ export default Vue.extend({
     },
     methods: {
         save() {
-            const myMessage = new AdminMessageUpdate(this.newMessage, this.newMessageVisible, new Date(), new Date());
+            const myMessage = new AdminMessageUpdate(this.newMessage, this.newMessageVisible, new Date(), new Date(), this.newLink);
             AdminServiceProvider.SetMessage(myMessage).then((resp) => {
                 if (resp.ok) {
                     this.success = true;
@@ -92,6 +97,8 @@ export default Vue.extend({
                 this.currentMessageVisible = message.enabled;
                 this.newMessage = message.message;
                 this.newMessageVisible = message.enabled;
+                this.currentLink = message.link;
+                this.newLink = message.link;
             });
         },
     },
