@@ -8,12 +8,12 @@
     </div>
     <p v-if="!creation" class="is-size-2">Vehicle Editing</p>
     <p v-if="creation" class="is-size-2">Vehicle Creation</p>
-    
+
     <!-- Text input-->
     <div class="field">
     <label class="label" for="vehicleID">Tracker ID</label>
     <div class="control">
-        <input v-model.number="vehicle.tracker_id" id="vehicleID" name="vehicleID" type="text" placeholder="iTrak Vehicle ID" class="input ">        
+        <input v-model.number="vehicle.tracker_id" id="vehicleID" name="vehicleID" type="text" placeholder="iTrak Vehicle ID" class="input ">
     </div>
     </div>
 

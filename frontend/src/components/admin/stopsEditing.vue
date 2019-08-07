@@ -10,16 +10,19 @@
                 <p>Stop saved successfully</p>
             </div>
 
-            <map-view v-if="false && !creation"></map-view>
+            <p v-if="!creation" class="is-size-2">Stop Editing</p>
+            <p v-if="creation" class="is-size-2">Stop Creation</p>
+
+            <map-view v-if="!creation"></map-view>
             <place-stop v-if="creation" @coordinates="setCoordinates"/>
         </div>
         <div class="form-horizontal column" >
-            
+
             <!-- Text input-->
             <div class="field">
             <label class="label" for="Name">Name</label>
             <div class="control">
-                <input v-model="stop.name" id="Name" name="Name" type="text" placeholder="Name" class="input" :disabled="!creation">
+                <input v-model="stop.name" id="Name" name="Name" type="text" placeholder="Name" class="input">
             </div>
             </div>
 
@@ -27,7 +30,7 @@
             <div class="field">
             <label class="label" for="Description">Description</label>
             <div class="control">
-                <input v-model="stop.description" id="Description" name="Description" type="text" placeholder="Description" class="input " :disabled="!creation">
+                <input v-model="stop.description" id="Description" name="Description" type="text" placeholder="Description" class="input">
             </div>
             </div>
 
@@ -35,7 +38,7 @@
             <div class="field">
             <label class="label" for="Latitude">Latitude</label>
             <div class="control">
-                <input v-model="stop.latitude" id="Latitude" name="Latitude" type="text" placeholder="Latitude" class="input " :disabled="!creation">
+                <input v-model="stop.latitude" id="Latitude" name="Latitude" type="text" placeholder="Latitude" class="input" >
             </div>
             </div>
 
@@ -43,7 +46,7 @@
             <div class="field">
             <label class="label" for="Longitude">Longitude</label>
             <div class="control">
-                <input v-model="stop.longitude" id="Longitude" name="Longitude" type="text" placeholder="Longitude" class="input " :disabled="!creation">
+                <input v-model="stop.longitude" id="Longitude" name="Longitude" type="text" placeholder="Longitude" class="input">
             </div>
             </div>
 
@@ -67,8 +70,13 @@ import AdminServiceProvider from '../../structures/serviceproviders/admin.servic
 import placeStop from '@/components/admin/placeStop.vue';
 import * as L from 'leaflet';
 
-
+// This is the stops editing and creation interface.
 export default Vue.extend({
+    props: {
+        creation: {
+            type: Boolean,
+        },
+    },
     data() {
         return {
             stop: new Stop(-1, '', '', -1, -1, '', ''),
@@ -89,18 +97,12 @@ export default Vue.extend({
         placeStop,
     },
     mounted() {
-        if (this.creation) {
-            return;
-        }
-        // if the routes are not in the state store yet, wait until they are
-        const el = this;
-        if (this.$store.getters.getStops.length === 0) {
-            this.$store.subscribe((mutation) => {
-                if (mutation.type === 'setStops') {
-                    el.grabMyStop();
-                }
-            });
-        } else {
+        this.$store.subscribe((mutation) => {
+            if (mutation.type === 'setVehicles') {
+                this.grabMyStop();
+            }
+        });
+        if (this.$store.getters.getStops.length !== 0) {
             this.grabMyStop();
         }
     },
@@ -125,9 +127,8 @@ export default Vue.extend({
             // may not be needed
             this.grabMyStop();
 
-            // TODO:
-            // Error checking for edit or create
-            AdminServiceProvider.NewStop(this.stop).then(() => {
+            if (this.creation) {
+                AdminServiceProvider.NewStop(this.stop).then(() => {
                     this.sending = false;
                     this.success = true;
                     this.$store.dispatch('grabStops');
@@ -141,6 +142,23 @@ export default Vue.extend({
                         this.failure = false;
                     }, 2000);
                 });
+            } else {
+                AdminServiceProvider.EditStop(this.stop).then(() => {
+                    this.success = true;
+                    this.sending = false;
+                    this.$store.dispatch('grabStops');
+                    setTimeout(() => {
+                        this.success = false;
+                    }, 2000);
+                  }).catch(() => {
+                      this.failure = true;
+                      this.sending = false;
+                      setTimeout(() => {
+                          this.failure = false;
+                      }, 2000);
+                  });
+            }
+
         },
 
         // method responsible for setting the reactive forms
@@ -165,11 +183,6 @@ export default Vue.extend({
                     this.stop.longitude = Number(testStop.longitude);
                 }
             }
-        },
-    },
-    props: {
-        creation: {
-            type: Boolean,
         },
     },
 });

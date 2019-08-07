@@ -57,6 +57,13 @@ export default class AdminServiceProvider {
         });
     }
 
+    public static EditStop(stop: Stop): Promise<Response> {
+        return fetch('/stops/edit', {
+            method: 'POST',
+            body: JSON.stringify(stop.asJSON()),
+        });
+    }
+
     public static SetMessage(message: AdminMessageUpdate): Promise<Response> {
         return fetch('/adminMessage', {
             method: 'POST',

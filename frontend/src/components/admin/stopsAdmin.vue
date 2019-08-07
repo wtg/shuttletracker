@@ -20,13 +20,14 @@
                     <th>{{stop.latitude}}</th>
                     <th>{{stop.longitude}}</th>
                     <th></th>
-                    <th></th>
+                    <th><button @click="$router.push('/admin/stops/' + String(stop.id) + '/edit')" class="button">Edit</button></th>
                     <td><button class="button is-danger" @click="shouldDelete = true; stopToDelete = stop;">Delete</button></td>
                 </tr>
             </thead>
             <tbody>
 
                 <tr>
+                    <th></th>
                     <th></th>
                     <th></th>
                     <th></th>
