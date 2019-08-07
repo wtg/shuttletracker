@@ -21,6 +21,7 @@ Tracks and maps RPI's shuttles with [Go](https://golang.org/), [Postgres](https:
 13. Run `npm install`
 14. Build the frontend using `npx vue-cli-service build --mode development`
     - _Note: if you are working on the frontend, you may instead use `npx vue-cli-service build --mode development --watch` in another terminal to continuously watch for changes and rebuild._
+    - _If you get errors from running this command, restarting your computer may help._
 15. Go back up to the project root directory and build Shuttle Tracker by running `go build -o shuttletracker ./cmd/shuttletracker`
 16. Start the app by running `./shuttletracker`
 17. Add yourself as an administrator by using `./shuttletracker admins --add RCS_ID`, replacing `RCS_ID` with your RCS ID. See the "Administrators" section below for more information.
