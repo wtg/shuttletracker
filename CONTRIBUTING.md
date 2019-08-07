@@ -25,3 +25,7 @@ Unsure where to begin contributing? You can start by looking at issues with the 
 ### Documentation
 
 If you face and resolve any issues not currently documented, feel free to add a page to the [Documentation](https://github.com/wtg/shuttletracker/wiki) to prevent future users from getting stuck on the same issue.
+
+### Additional Resources
+
+Additional resources for the languages used in the project can be found inside the [Developer Guide](https://github.com/wtg/shuttletracker/wiki/Developer-Guide).
