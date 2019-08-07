@@ -15,7 +15,7 @@ Tracks and maps RPI's shuttles with [Go](https://golang.org/), [Postgres](https:
 10. Edit `conf.json` with the following, if necessary:
     - `API.MapboxAPIKey`: Necessary for creating routes through the admin interface. [Create your own token](https://www.mapbox.com/help/how-access-tokens-work/) or ask a Shuttle Tracker developer to provide you with one.
     - `Postgres.URL`: URL where Postgres is located. This will generally look like `postgres://user:password@localhost/shuttletracker?sslmode=disable` where `user` and `password` are replaced
-11. Install Node.js and npm
+11. Install Node.js and npm. Then, restart your command prompt. 
     - This can be done with `sudo apt-get install nodejs`
 12. Switch to the `./frontend` directory.
 13. Run `npm install`
