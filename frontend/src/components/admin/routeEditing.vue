@@ -9,7 +9,7 @@
             <div v-if="success" class="notification is-success">
                 <p>Route saved successfully</p>
             </div>
-            <map-view v-if="false && (routePolyLine !== undefined) && !creation" :route-lines="[routePolyLine]"></map-view>
+            <map-view v-if="(routePolyLine !== undefined) && !creation" :route-lines="[routePolyLine]"></map-view>
             <draw-route @points="setPoints" v-if="creation"/>
         </div>
         <div class="form-horizontal column" >
