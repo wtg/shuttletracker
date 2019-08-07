@@ -2,7 +2,7 @@
 
 Tracks and maps RPI's shuttles with [Go](https://golang.org/), [Postgres](https://www.postgresql.org), [Vue.js](https://vuejs.org/), [TypeScript](https://www.typescriptlang.org), and [Leaflet](https://leafletjs.com). Check it out in action at [shuttles.rpi.edu](https://shuttles.rpi.edu).
 
-Looking to contribute? Please review our Contribution Guidelines.
+Looking to contribute? Please review our [Contribution Guidelines](CONTRIBUTING.md).
 
 More project documentation can be found on the [Repository Wiki](https://github.com/wtg/shuttletracker/wiki).
 
