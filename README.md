@@ -145,8 +145,7 @@ naraya5
 6. Download and run the installer PostgreSQL [from here](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads). Select the latest version. When prompted to set a password, make it something simple, as you will be using this later, for example `shuttle`.  Use default options for everything else. Remember your password.  
 7. When complete, open pgAdmin from your search bar. If you do not see pgAdmin restart your computer. In the Object Browser, open Servers, then open your PostgreSQL server. You will need to enter your password from step 8. Once this is done, right click on Databases and select New Database. Name it `shuttletracker` and hit Ok.  
 
-<p style="text-align:center;"><img src="https://user-images.githubusercontent.com/6248819/47017651-d1928800-d120-11e8-849f-535b48215923.png" alt="11" width="60%"></p>  
-<p style="text-align:center;"><img src="https://user-images.githubusercontent.com/6248819/47017670-e0793a80-d120-11e8-9c26-473a3da6ddb5.png" alt="11" width="60%"></p>  
+<p style="text-align:center;"><img src="https://user-images.githubusercontent.com/6248819/47017651-d1928800-d120-11e8-849f-535b48215923.png" alt="11" width="30%"> &nbsp;&nbsp;&nbsp;&nbsp; <img src="https://user-images.githubusercontent.com/6248819/47017670-e0793a80-d120-11e8-9c26-473a3da6ddb5.png" alt="11" width="35%"></p> 
 
 8. Navigate to your shuttle tracker directory (`$GOPATH/src/github.com/wtg/shuttletracker`) and rename `conf.json.sample` to `conf.json`  
 9. Edit `conf.json` with the following, if necessary:  
