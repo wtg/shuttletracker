@@ -11,6 +11,7 @@ type Message struct {
 	Enabled bool      `json:"enabled"`
 	Created time.Time `json:"created"`
 	Updated time.Time `json:"updated"`
+	Link    string    `json:"link"`
 }
 
 // MessageService is an interface for interacting with Messages.

@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS messages (
 	message text,
 	enabled bool NOT NULL,
 	created timestamp with time zone NOT NULL DEFAULT now(),
-	updated timestamp with time zone NOT NULL DEFAULT now()
+	updated timestamp with time zone NOT NULL DEFAULT now(),
+	link text
 );`
 	_, err := ms.db.Exec(schema)
 	return err
@@ -27,10 +28,10 @@ CREATE TABLE IF NOT EXISTS messages (
 
 // Message returns the Message.
 func (ms *MessageService) Message() (*shuttletracker.Message, error) {
-	query := "SELECT message, enabled, created, updated FROM messages;"
+	query := "SELECT message, enabled, created, updated, link FROM messages;"
 	row := ms.db.QueryRow(query)
 	message := &shuttletracker.Message{}
-	err := row.Scan(&message.Message, &message.Enabled, &message.Created, &message.Updated)
+	err := row.Scan(&message.Message, &message.Enabled, &message.Created, &message.Updated, &message.Link)
 	if err == sql.ErrNoRows {
 		return nil, shuttletracker.ErrMessageNotFound
 	} else if err != nil {
@@ -41,9 +42,9 @@ func (ms *MessageService) Message() (*shuttletracker.Message, error) {
 
 // SetMessage updates the Message.
 func (ms *MessageService) SetMessage(message *shuttletracker.Message) error {
-	statement := "INSERT INTO messages (message, enabled, updated) VALUES ($1, $2, now())" +
-		" ON CONFLICT (id) DO UPDATE SET message = excluded.message, enabled = excluded.enabled, updated = excluded.updated" +
+	statement := "INSERT INTO messages (message, enabled, updated, link) VALUES ($1, $2, now(), $3)" +
+		" ON CONFLICT (id) DO UPDATE SET message = excluded.message, enabled = excluded.enabled, updated = excluded.updated, link = excluded.link" +
 		" RETURNING created, updated;"
-	row := ms.db.QueryRow(statement, message.Message, message.Enabled)
+	row := ms.db.QueryRow(statement, message.Message, message.Enabled, message.Link)
 	return row.Scan(&message.Created, &message.Updated)
 }

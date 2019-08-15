@@ -1,7 +1,8 @@
 <template>
 <span>
     <div v-if="(this.message !== undefined && this.message.enabled === true) && !hide" id="messagebox">
-        <div style="width: 100%;float:left;" v-html="this.message.message"></div>
+        <div v-if="this.message.link === ''" style="width: 100%;float:left;" v-html="this.message.message"></div>
+        <a v-if="this.message.link !== ''" style="width: 100%;float:left;" v-html="this.message.message" v-bind:href="this.message.link" id="messageLink"></a>
         <div @click="hide = !hide" style="cursor: pointer;position:absolute;right:10px;top:6px;color:#333;font-size:20px;">&times;</div>
     </div>
 </span>
@@ -40,4 +41,21 @@ export default Vue.extend({
   text-align: center;
   font-size: 15px;
 }
+
+#messageLink {
+  text-decoration: none;
+}
+
+#messageLink:link {
+  color:white;
+}
+
+#messageLink:visited {
+  color: white;
+}
+
+#messageLink:hover {
+  color: lightgray;
+}
+
 </style>
