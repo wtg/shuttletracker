@@ -7,6 +7,7 @@
                     <input v-model="newMessage" class="input" type="text" placeholder="Message Contents"/>
                     <p v-if="newMessage.length > 251" class="help is-danger">Message must be shorter than 251 characters.</p>
                     <input v-model="newLink" class="input" type="text" placeholder="Optional Link (Should Begin With http:// or https://)"/>
+
                     <p v-if="newLink.length > 1 && newMessage.length < 1" class="help is-danger">Message must be set to add URL.</p>
                 </div>
                 <!-- <div class="control">
