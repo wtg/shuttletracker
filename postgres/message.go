@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS messages (
 	created timestamp with time zone NOT NULL DEFAULT now(),
 	updated timestamp with time zone NOT NULL DEFAULT now(),
 	link text
-);`
+);
+ALTER TABLE messages ADD COLUMN IF NOT EXISTS link text;`
 	_, err := ms.db.Exec(schema)
 	return err
 }
