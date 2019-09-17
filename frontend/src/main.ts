@@ -22,7 +22,7 @@ Vue.use(Buefy);
 Vue.config.productionTip = false;
 
 Vue.use(VueAnalytics, {
-  id: 'G-FF6S44Z4BM',
+  id: 'UA-148143717-1',
   autoTracking: {
     exception: true,
   },
