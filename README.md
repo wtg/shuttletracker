@@ -133,4 +133,3 @@ naraya5
 17. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel.  
 18. Copy the information from [vehicles](https://shuttles.rpi.edu/vehicles), [routes](https://shuttles.rpi.edu/routes), and [stops](https://shuttles.rpi.edu/stops) into the admin panel if you want to mimic the current shuttle tracker site.  
 
-RYAN, CHIKA, and JACKSON DO DO DO DO DO DO
