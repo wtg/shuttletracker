@@ -18,7 +18,6 @@ More project documentation can be found on the [Repository Wiki](https://github.
 5. Switch to the Shuttle Tracker directory (`cd shuttletracker`)
 9. Rename `conf.json.sample` to `conf.json`
 10. Edit `conf.json` with the following, if necessary:
-    - `API.MapboxAPIKey`: Necessary for creating routes through the admin interface. [Create your own token](https://www.mapbox.com/help/how-access-tokens-work/) or ask a Shuttle Tracker developer to provide you with one.
     - `Postgres.URL`: URL where Postgres is located. This will generally look like `postgres://user:password@localhost/shuttletracker?sslmode=disable` where `user` and `password` are replaced
 11. Install Node.js and npm
     - This can be done with `sudo apt-get install nodejs`.
@@ -43,7 +42,6 @@ More project documentation can be found on the [Repository Wiki](https://github.
 7. Switch to the Shuttle Tracker directory (`cd shuttletracker`)
 8. Rename `conf.json.sample` to `conf.json`
 9. Edit `conf.json` with the following, if necessary:
-    - `API.MapboxAPIKey`: Necessary for creating routes through the admin interface. [Create your own token](https://www.mapbox.com/help/how-access-tokens-work/) or ask a Shuttle Tracker developer to provide you with one.
     - `Postgres.URL`: URL where Postgres is located. This will generally look like `postgres://user:password@localhost/shuttletracker?sslmode=disable` where `user` and `password` are replaced
 10. Install [Node.js and npm](https://nodejs.org/en/download/). Be sure to download the latest LTS version. Do not download the current version or errors will occur when building the project
 11. Switch to the `./frontend` directory.
@@ -116,8 +114,7 @@ naraya5
 <p style="text-align:center;"><img src="https://user-images.githubusercontent.com/6248819/47017670-e0793a80-d120-11e8-9c26-473a3da6ddb5.png" alt="11" width="60%"></p>  
 
 8. Navigate to your shuttle tracker directory (`$GOPATH/src/github.com/wtg/shuttletracker`) and rename `conf.json.sample` to `conf.json`  
-9. Edit `conf.json` with the following, if necessary:  
-   * `API.MapboxAPIKey`: Necessary for creating routes through the admin interface. [Create your own token](https://www.mapbox.com/help/how-access-tokens-work/) or ask a Shuttle Tracker developer to provide you with one.  
+9. Edit `conf.json` with the following, if necessary:   
    * `Postgres.URL`: URL where Postgres is located which will be the default with postgres:password@localhost added before the database name, where password is your password from step 8. For example: `"URL": "postgres://postgres:shuttle@localhost/shuttletracker?sslmode=disable"`.  
 
 <p style="text-align:center;"><img src="https://user-images.githubusercontent.com/6248819/47017722-f981eb80-d120-11e8-8ad2-4919c4052dc0.png" alt="11" width="70%"></p>  
