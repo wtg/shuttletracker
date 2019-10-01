@@ -163,18 +163,24 @@ export default Vue.extend({
               getMarkerString(route.color) +
               `
 			      width="12" height="12"> ` +
-              route.name;
+              route.name +
+              `<button type="button">Click Me!</button>`;
           }
         });
         div.innerHTML =
           `<ul style="list-style:none">
 					<li><img class="legend-icon" src='` +
           UserSVG +
-          `' width="12" height="12"> You</li>` +
+          `' width="12" height="12"> You
+          <button type="button">Click Me!</button>
+
+          </li>` +
           legendstring +
           `<li><img class="legend-icon" src="` +
           StopSVG +
-          `" width="12" height="12"> Shuttle Stop</li>
+          `" width="12" height="12"> Shuttle Stop
+          <button type="button">Click Me!</button>
+          </li>
 				</ul>`;
         return div;
       };
@@ -456,8 +462,8 @@ export default Vue.extend({
   border: none;
   animation: fadeOutUp 2s ease;
   display: block;
-  font-size: 20px; 
-  bottom: 0px; 
+  font-size: 20px;
+  bottom: 0px;
   right: 0px;
   z-index: 2000 !important;
 }
@@ -471,7 +477,7 @@ export default Vue.extend({
       opacity: 0;
       transform: translateY(-40px);
    }
-} 
+}
 
 .leaflet-div-icon {
   background: transparent !important;
@@ -482,9 +488,9 @@ export default Vue.extend({
 }
 
 #busbutton{
-  position: absolute; 
-  right: 25px; 
-  bottom: 35px; 
+  position: absolute;
+  right: 25px;
+  bottom: 35px;
   z-index: 2000;
 }
 </style>
