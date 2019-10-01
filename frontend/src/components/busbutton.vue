@@ -19,7 +19,7 @@ export default Vue.extend({
     box-shadow: 0 4px 8px 0 #ddd;
     -webkit-box-shadow: 0 4px 8px 0 #ddd;
     width: 50px;
-    margin: 0;
+    margin: 30px; /* currently at 30px because of admin message, handle more gracefully */
     padding: 0;
     display: flex;
     background-color: rgba(250,250,250,.8);

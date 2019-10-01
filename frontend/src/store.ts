@@ -148,7 +148,11 @@ const store: StoreOptions<StoreState> = {
       if (state.adminMessage === undefined) {
         return state.settings.busButtonEnabled;
       }
-      return state.settings.busButtonEnabled && !state.adminMessage.enabled;
+      // ORIGINALLY:
+      // disabled bus button when admin message was enabled
+      // state.settings.busButtonEnabled && !state.adminMessage.enabled;
+      // removed reliance on admin message as currently it is always enabled
+      return state.settings.busButtonEnabled;
     },
     getPolyLineByRouteId: (state) => (id: number): L.Polyline | undefined => {
       const arr = new Array<L.Polyline>();
