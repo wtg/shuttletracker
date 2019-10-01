@@ -25,8 +25,8 @@ export class Stop {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.latitude = lat;
-        this.longitude = lng;
+        this.latitude = Number(lat.toFixed(2));  // in order to get 2 decimal values
+        this.longitude = Number(lng.toFixed(2)); // for 2 decimal values after the whole
         this.created = created;
         this.updated = updated;
         this.routesOn = [];
