@@ -229,7 +229,7 @@ export default Vue.extend({
       }
       this.userShuttleidCount ++;
       const busIcon = L.divIcon({
-        html: `<span class="shuttleusericon shuttleusericon` + String(this.userShuttleidCount) +  `" >🚐</span>`,
+        html: `<span class="shuttleusericon shuttleusericon` + String(this.userShuttleidCount) +  `" >🚀</span>`,
 
         iconSize: [20, 20], // size of the icon
         iconAnchor: [10, 10], // point of the icon which will correspond to marker's location
