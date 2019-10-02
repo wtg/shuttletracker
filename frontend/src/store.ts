@@ -30,6 +30,7 @@ const store: StoreOptions<StoreState> = {
       busButtonEnabled: false,
       etasEnabled: false,
       fusionPositionEnabled: true,
+      busButtonChoice: `" >🚌</span>`, 
     },
     geolocationDenied: false,
     fusionConnected: undefined,
@@ -114,6 +115,10 @@ const store: StoreOptions<StoreState> = {
     setSettingsBusButtonEnabled(state, value: boolean) {
       state.settings.busButtonEnabled = value;
       localStorage.setItem('st_settings', JSON.stringify(state.settings));
+    },
+    setSettingsBusButtonChoice(state, value: string) {
+      state.settings.busButtonChoice = value;
+      localStorage.setItem('st_settings', JSON.stringify(state.settings))
     },
     setSettingsETAsEnabled(state, value: boolean) {
       state.settings.etasEnabled = value;

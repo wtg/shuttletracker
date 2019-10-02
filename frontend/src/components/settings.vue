@@ -32,6 +32,14 @@ export default Vue.extend({
         this.$store.commit('setSettingsBusButtonEnabled', value);
       },
     },
+    busButtonChoice: {
+      get(): string {
+        return this.$store.state.settings.busButtonChoice;
+      },
+      set(value:string) {
+        this.$store.commit('setSettingsBusButtonChoice', value);
+      },
+    },
     fusionPositionEnabled: {
       get(): boolean {
         return this.$store.state.settings.fusionPositionEnabled && !this.$store.state.geolocationDenied;
