@@ -12,8 +12,9 @@
     </div>
     <div class="field">
       <select v-model="busButtonChoice">
-        <option disabled value=`" >🚌</span>`">🚌</option>
-        <option>" >🚗</span>"</option>
+        <option disabled value="">Customize Emoji</option> 
+        <option>🚌</option>
+        <option>🚗</option>
       </select>
     </div>
     <b-field v-bind:message="['Get notifications when a shuttle is likely to arrive at the stop nearest you. Requires access to your location.', '<i>Warning: this feature is experimental. You’re not allowed to get mad at us if you miss your shuttle.</i>']">

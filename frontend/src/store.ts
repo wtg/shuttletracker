@@ -30,7 +30,7 @@ const store: StoreOptions<StoreState> = {
       busButtonEnabled: false,
       etasEnabled: false,
       fusionPositionEnabled: true,
-      busButtonChoice: `" >🚌</span>`,
+      busButtonChoice: '🚌',
     },
     geolocationDenied: false,
     fusionConnected: undefined,
