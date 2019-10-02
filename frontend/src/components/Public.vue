@@ -67,8 +67,7 @@ export default Vue.extend({
         locationMarker: L.Marker | undefined;
         userShuttleidCount: number;
         fusion: Fusion;
-        currentETAInfo: {} | null;
-        busIconhtml: string; 
+        currentETAInfo: {} | null; 
       };
   },
   mounted() {

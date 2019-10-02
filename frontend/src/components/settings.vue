@@ -36,7 +36,7 @@ export default Vue.extend({
       get(): string {
         return this.$store.state.settings.busButtonChoice;
       },
-      set(value:string) {
+      set(value: string) {
         this.$store.commit('setSettingsBusButtonChoice', value);
       },
     },
