@@ -1,6 +1,6 @@
 <template>
     <button @click="$emit('bus-click');" class="bus-button">
-        <span> 🚐</span>
+<span> {{this.$store.state.settings.busButtonChoice}} </span>
     </button>
 </template>
 <script lang="ts">
