@@ -15,7 +15,10 @@
         <option disabled value="">Customize Emoji</option> 
         <option>🚌</option>
         <option>🚗</option>
+        <option>🚓</option>
+        <option>🚜</option>
       </select>
+      <span>Bus chosen: {{ busButtonChoice }}</span>
     </div>
     <b-field v-bind:message="['Get notifications when a shuttle is likely to arrive at the stop nearest you. Requires access to your location.', '<i>Warning: this feature is experimental. You’re not allowed to get mad at us if you miss your shuttle.</i>']">
       <b-switch v-model="etasEnabled">Estimated times of arrival</b-switch>
