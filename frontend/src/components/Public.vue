@@ -488,6 +488,23 @@ export default Vue.extend({
   background-color: rgba(255, 255, 255, 0.9);
   padding: 5px;
   bottom: 25px;
+  align-content: right;
+
+
+  & ul {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding-left: 0px;
+  }
+}
+
+.info.routeLegend {
+  box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 5px;
+  bottom: 25px;
+  align-content: right;
 
   & ul {
     margin-top: 2px;
