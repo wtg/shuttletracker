@@ -171,7 +171,7 @@ export default Vue.extend({
           }
         });
         div.innerHTML =
-          `<ul style="text-align:right;">
+          `<ul style="list-style:none;">
 					<li><img class="legend-icon" src='` +
           UserSVG +
           `' width="12" height="12"> You
@@ -504,7 +504,6 @@ export default Vue.extend({
   background-color: rgba(255, 255, 255, 0.9);
   padding: 5px;
   bottom: 25px;
-  align-content: right;
 
   & ul {
     margin-top: 2px;
