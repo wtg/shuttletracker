@@ -23,7 +23,7 @@
                 <td>{{route.enabled}}</td>
                 <td><button class="button" @click="$router.push('/admin/routes/' + String(route.id) + '/edit');">Edit</button></td>
                 <td><button class="button is-danger" @click="shouldDelete = true; routeToDelete = route;">Delete</button></td>
-                
+
                 </tr>
                 <tr>
                     <th></th>
@@ -32,6 +32,14 @@
                     <th></th>
                     <th></th>
                     <th><button @click="$router.push('/admin/routes/-1/new')" class="button is-success">New</button></th>
+                </tr>
+                <tr>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th><button @click="" class="button is-success">Export</button></th>
                 </tr>
             </tbody>
         </table>
