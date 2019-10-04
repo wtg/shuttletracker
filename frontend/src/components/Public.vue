@@ -166,8 +166,7 @@ export default Vue.extend({
               getMarkerString(route.color) +
               `
 			      width="12" height="12"> ` +
-              route.name +
-              `<button type="button">Toggle</button>`;
+              route.name;
           }
         });
         div.innerHTML =
@@ -175,14 +174,14 @@ export default Vue.extend({
 					<li><img class="legend-icon" src='` +
           UserSVG +
           `' width="12" height="12"> You
-          <button type="button">Toggle</button>
+
 
           </li>` +
           legendstring +
           `<li><img class="legend-icon" src="` +
           StopSVG +
           `" width="12" height="12"> Shuttle Stop
-          <button type="button">Toggle</button>
+
           </li>
 				</ul>`;
         return div;
@@ -203,22 +202,21 @@ export default Vue.extend({
               `
                   width="12" height="12"> ` +
               route.name +
-              `<button type="button">Toggle</button>`;
+              '<button class="button">' + route.name + '</button>';
           }
         });
         div.innerHTML =
-          `<ul style="text-align:right;">
+          `<ul style="text-align:left;">
                     <li><img class="legend-icon" src='` +
           UserSVG +
           `' width="12" height="12"> You
-          <button type="button">Toggle</button>
-
+          <button class="button">You</button>
           </li>` +
           toggleString +
           `<li><img class="legend-icon" src="` +
           StopSVG +
           `" width="12" height="12"> Shuttle Stop
-          <button type="button">Toggle</button>
+          <button class="button">ShuttleStop</button>
           </li>
                 </ul>`;
         return div;
@@ -515,7 +513,7 @@ export default Vue.extend({
     box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
     border-radius: 5px;
     background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
+    padding: 20px;
     top: 15px;
 
     & ul {
@@ -523,6 +521,15 @@ export default Vue.extend({
       margin-bottom: 2px;
       padding-left: 0px;
     }
+}
+.button {
+    float: right;
+    border-radius: 1px;
+    padding: 0.35em;
+    font-size: 10px;
+    margin: 0;
+    width: 75px;
+    height: 20px;
 }
 
 .shuttleusericon{
