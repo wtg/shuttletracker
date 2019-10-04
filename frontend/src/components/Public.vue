@@ -52,6 +52,7 @@ export default Vue.extend({
       userShuttleidCount: 0,
       initialized: false,
       legend: new L.Control({ position: 'bottomleft' }),
+      toggle: new L.Control({ position : 'topright' }),
       locationMarker: undefined,
       fusion: new Fusion(),
       currentETAInfo: null,
@@ -64,6 +65,7 @@ export default Vue.extend({
         existingRouteLayers: L.Polyline[];
         initialized: boolean;
         legend: L.Control;
+        toggle: L.Control;
         locationMarker: L.Marker | undefined;
         userShuttleidCount: number;
         fusion: Fusion;
@@ -113,6 +115,7 @@ export default Vue.extend({
         this.updateStops();
         this.renderStops();
         this.updateLegend();
+        this.updateToggle();
       }
       if (mutation.type === 'setVehicles') {
         this.addVehicles();
@@ -164,28 +167,64 @@ export default Vue.extend({
               `
 			      width="12" height="12"> ` +
               route.name +
-              `<button type="button">Click Me!</button>`;
+              `<button type="button">Toggle</button>`;
           }
         });
         div.innerHTML =
-          `<ul style="list-style:none">
+          `<ul style="text-align:right;">
 					<li><img class="legend-icon" src='` +
           UserSVG +
           `' width="12" height="12"> You
-          <button type="button">Click Me!</button>
+          <button type="button">Toggle</button>
 
           </li>` +
           legendstring +
           `<li><img class="legend-icon" src="` +
           StopSVG +
           `" width="12" height="12"> Shuttle Stop
-          <button type="button">Click Me!</button>
+          <button type="button">Toggle</button>
           </li>
 				</ul>`;
         return div;
       };
       if (this.Map !== undefined) {
         this.legend.addTo(this.Map);
+      }
+    },
+    updateToggle() {
+      this.toggle.onAdd = (map: L.Map) => {
+        const div = L.DomUtil.create('div', 'info toggle');
+        let toggleString = '';
+        this.$store.state.Routes.forEach((route: Route) => {
+          if (route.shouldShow()) {
+            toggleString +=
+              `<li><img class="legend-icon" src=` +
+              getMarkerString(route.color) +
+              `
+                  width="12" height="12"> ` +
+              route.name +
+              `<button type="button">Toggle</button>`;
+          }
+        });
+        div.innerHTML =
+          `<ul style="text-align:right;">
+                    <li><img class="legend-icon" src='` +
+          UserSVG +
+          `' width="12" height="12"> You
+          <button type="button">Toggle</button>
+
+          </li>` +
+          toggleString +
+          `<li><img class="legend-icon" src="` +
+          StopSVG +
+          `" width="12" height="12"> Shuttle Stop
+          <button type="button">Toggle</button>
+          </li>
+                </ul>`;
+        return div;
+      };
+      if (this.Map !== undefined) {
+        this.toggle.addTo(this.Map);
       }
     },
     routePolyLines(): L.Polyline[] {
@@ -455,6 +494,19 @@ export default Vue.extend({
     margin-bottom: 2px;
     padding-left: 0px;
   }
+}
+.info.toggle {
+    box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    top: 15px;
+
+    & ul {
+      margin-top: 2px;
+      margin-bottom: 2px;
+      padding-left: 0px;
+    }
 }
 
 .shuttleusericon{
