@@ -10,6 +10,11 @@ import (
 	"github.com/wtg/shuttletracker/log"
 )
 
+func (api *API) ETAHandler(w http.ResponseWriter, r *http.Request) {
+	etas := api.etaManager.CurrentETAs()
+	WriteJSON(w, etas)
+}
+
 // RoutesHandler finds all of the routes in the database
 func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
 	routes, err := api.ms.Routes()
