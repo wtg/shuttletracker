@@ -118,6 +118,9 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		})
 	})
 
+	// TV panel display 
+	r.Get("/tvpanel", api.IndexHandler)
+
 	// Fusion
 	r.Mount("/fusion", api.fm.router(cli.casauth))
 
