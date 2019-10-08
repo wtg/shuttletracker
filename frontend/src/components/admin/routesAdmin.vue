@@ -1,3 +1,4 @@
+
 <template>
     <div style="margin-top: 50px;" class="container">
         <are-you-sure @no="shouldDelete = false;" @yes="deleteRoute" :active="shouldDelete"/>
@@ -39,7 +40,7 @@
                   <th></th>
                   <th></th>
                   <th></th>
-                  <th><button @click="" class="button is-success">Export</button></th>
+                  <th><button @click="downloadRoutes();" class="button is-success">Export</button></th>
                 </tr>
             </tbody>
         </table>
@@ -50,7 +51,6 @@ import Vue from 'vue';
 import Route from '../../structures/route';
 import AdminServiceProvider from '../../structures/serviceproviders/admin.service';
 import AreYouSure from '@/components/admin/AreYouSure.vue';
-
 
 export default Vue.extend({
     name: 'routes',
@@ -77,6 +77,15 @@ export default Vue.extend({
                 });
             }
         },
+
+        downloadRoutes() {
+          const link = document.createElement('a');
+          link.href = '/routes';
+          link.setAttribute('download', '/routes') ; // or any other extension
+          document.body.appendChild(link);
+          link.click();
+        },
+
     },
     components: {
         AreYouSure,
