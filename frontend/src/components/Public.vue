@@ -201,26 +201,31 @@ export default Vue.extend({
               getMarkerString(route.color) +
               `
                   width="12" height="12"> ` +
-              route.name +
-              '<button class="button">' + route.name + '</button>';
+              '<label class="control-label">' + route.name + '</label>' +
+              '<input type="button" class="button" value=' + route.name + '>';
+
           }
         });
         div.innerHTML =
           `<ul style="text-align:left;">
                     <li><img class="legend-icon" src='` +
           UserSVG +
-          `' width="12" height="12"> You
-          <button class="button">You</button>
+          `'width="12" height="12">
+          <label class="control-label"> You</label>
+          <input type="button" class="button" value='You'>
+
           </li>` +
           toggleString +
           `<li><img class="legend-icon" src="` +
           StopSVG +
-          `" width="12" height="12"> Shuttle Stop
-          <button class="button">ShuttleStop</button>
+          `" width="12" height="12">
+          <label class="control-label"> Shuttle Stop</label>
+          <input type="button" class="button" value=Shuttle Stop>
           </li>
                 </ul>`;
         return div;
       };
+
       if (this.Map !== undefined) {
         this.toggle.addTo(this.Map);
       }
@@ -408,6 +413,12 @@ export default Vue.extend({
   flex-direction: column;
 }
 
+input, label{
+  display: inline-block;
+  vertical-align: middle;
+  margin: 10px 0;
+}
+
 #mymap {
   flex: 1;
   z-index: 0
@@ -513,8 +524,8 @@ export default Vue.extend({
     box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
     border-radius: 5px;
     background-color: rgba(255, 255, 255, 0.9);
-    padding: 20px;
-    top: 15px;
+    padding: 10px;
+    top: 5px;
 
     & ul {
       margin-top: 2px;
@@ -528,8 +539,9 @@ export default Vue.extend({
     padding: 0.35em;
     font-size: 10px;
     margin: 0;
-    width: 75px;
-    height: 20px;
+    width: 2.75em;
+    height: 1.575em;
+    margin-top: 6px;
 }
 
 .shuttleusericon{
