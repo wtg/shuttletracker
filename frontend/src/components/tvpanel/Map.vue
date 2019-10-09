@@ -1,12 +1,16 @@
 <template>
   <div class="map">
     <div id="mymap"></div>
+    <span>
+      <messagebox ref="msgbox"/>
+    </span>
   </div>
 </template>
 
 <script lang="ts">
 // This component the Map Component on the TV Display Panel
 import Vue from 'vue';
+import messagebox from '../adminmessage.vue';
 import TabBar from '../tabBar.vue';
 import InfoService from '../../structures/serviceproviders/info.service';
 import Vehicle from '../../structures/vehicle';
@@ -54,6 +58,9 @@ export default Vue.extend({
         userShuttleidCount: number;
         currentETAInfo: {} | null;
       };
+  },
+  components: {
+    messagebox,
   },
   mounted() {
     const ls = UserLocationService.getInstance();
@@ -208,6 +215,7 @@ export default Vue.extend({
       this.$store.commit('setRoutesOnStops');
     },
   },
+
 });
 </script>
 
