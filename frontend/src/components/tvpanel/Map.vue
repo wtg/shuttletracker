@@ -8,7 +8,8 @@
 </template>
 
 <script lang="ts">
-// This component the Map Component on the TV Display Panel
+
+// This component is the Map Component on the tv panel
 import Vue from 'vue';
 import messagebox from '../adminmessage.vue';
 import TabBar from '../tabBar.vue';
@@ -220,6 +221,12 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+.map {
+  position: absolute;
+  height: 90%;
+  bottom: 0px;
+  width: 70%;
+}
 #mymap {
   flex: 1;
   z-index: 0;
