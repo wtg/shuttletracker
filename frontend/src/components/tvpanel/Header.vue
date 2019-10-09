@@ -24,7 +24,7 @@ export default Vue.extend({
 
 .header {
   height: 10%;
-  width: 70%;
+  width: 75%;
   position: absolute;
   top: 0px;
   left: 0px;

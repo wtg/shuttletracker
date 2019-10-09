@@ -225,7 +225,7 @@ export default Vue.extend({
   position: absolute;
   height: 90%;
   bottom: 0px;
-  width: 70%;
+  width: 75%;
 }
 #mymap {
   flex: 1;
