@@ -9,6 +9,7 @@
 import Vue from 'vue';
 import Map from './tvpanel/Map.vue';
 import Fusion from '@/fusion';
+import messagebox from './adminmessage.vue';
 export default Vue.extend({
   name: 'tvpanel',
   data() {
