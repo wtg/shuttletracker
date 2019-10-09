@@ -1,13 +1,14 @@
 <template>
   <div>
-    <!-- Map Component -->
-    <Map class="map"/>
+    <Header />
+    <Map />
   </div>
 </template>
 
 <script lang='ts'>
 import Vue from 'vue';
 import Map from './tvpanel/Map.vue';
+import Header from './tvpanel/Header.vue';
 import Fusion from '@/fusion';
 import messagebox from './adminmessage.vue';
 export default Vue.extend({
@@ -24,6 +25,7 @@ mounted() {
 },
   components: {
     Map,
+    Header,
   },
 });
 </script>
@@ -34,9 +36,4 @@ mounted() {
   height: 100%;
 }
 
-.map {
-  position: relative;
-  height: 100%;
-  width: 70%;
-}
 </style>
