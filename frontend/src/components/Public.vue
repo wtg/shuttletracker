@@ -202,7 +202,7 @@ export default Vue.extend({
               `
                   width="12" height="12"> ` +
               '<label class="control-label">' + route.name + '</label>' +
-              '<input type="button" class="legend-icon test" value=' + route.name + '>';
+              '<input type="button" class="legend-icon button_align" value=' + route.name + '>';
 
           }
         });
@@ -212,7 +212,7 @@ export default Vue.extend({
           UserSVG +
           `'width="12" height="12">
           <label class="control-label"> You</label>
-          <input type="button" class="legend-icon test"value='You'>
+          <input type="button" class="legend-icon button_align"value='You'>
 
           </li>` +
           toggleString +
@@ -220,7 +220,7 @@ export default Vue.extend({
           StopSVG +
           `" width="12" height="12">
           <label class="control-label"> Shuttle Stop</label>
-          <input type="button" class="legend-icon test" value=Shuttle Stop>
+          <input type="button" class="legend-icon button_align" value=Shuttle Stop>
           </li>
                 </ul>`;
         return div;
@@ -419,7 +419,7 @@ input, label{
   margin: 10px 0;
 }
 
-.test {
+.button_align {
   float: right;
 }
 
@@ -537,9 +537,7 @@ input, label{
       padding-left: 0px;
     }
 }
-.button {
-    text-align: right;
-}
+
 
 .shuttleusericon{
   background-color: transparent;
