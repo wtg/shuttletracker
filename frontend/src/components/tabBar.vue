@@ -84,9 +84,4 @@ li {
   border-top: 1px solid $primary;
   color: $primary;
 }
-github-link {
-  position: absolute;
-  height: 65%;
-  width: 65%;
-}
 </style>
