@@ -7,19 +7,31 @@
       <p class="help">Use your location to help make Shuttle Tracker more accurate for everyone. Your location is gathered anonymously while Shuttle Tracker is open.</p>
     </div>
     <div class="field">
-      <b-switch v-model="busButtonEnabled">Bus button</b-switch>
+    <b-switch v-model="busButtonEnabled">  Bus button <span>
+      <div class="field">
+          <div class="control">
+              <div class="select is-small">
+                  <div class="select is-danger">
+                      <div class="select is-rounded">
+                          <select v-model="busButtonChoice">
+                              <option>🚌</option>
+                              <option>🚗</option>
+                              <option>🚓</option>
+                              <option>🚜</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      </span>
+      </b-switch>
       <p class="help">Place a bus on other users' maps and let others place buses on your map.</p>
     </div>
-    <div class="field">
-      <select v-model="busButtonChoice">
-        <option disabled value="">Customize Emoji</option> 
-        <option>🚌</option>
-        <option>🚗</option>
-        <option>🚓</option>
-        <option>🚜</option>
-      </select>
-      <span>Bus chosen: {{ busButtonChoice }}</span>
-    </div>
+    
+    
+
+    
     <b-field v-bind:message="['Get notifications when a shuttle is likely to arrive at the stop nearest you. Requires access to your location.', '<i>Warning: this feature is experimental. You’re not allowed to get mad at us if you miss your shuttle.</i>']">
       <b-switch v-model="etasEnabled">Estimated times of arrival</b-switch>
     </b-field>
@@ -77,5 +89,8 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .parent {
   padding: 20px;
+}
+.field {
+    display: inline-block;
 }
 </style>
