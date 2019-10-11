@@ -200,27 +200,17 @@ export default Vue.extend({
               `<li><img class="legend-icon" src=` +
               getMarkerString(route.color) +
               `
-                  width="12" height="12"> ` +
-              '<label class="control-label">' + route.name + '</label>' +
-              '<input type="button" class="legend-icon button_align" value=' + route.name + '>';
+                  width="12" height="12"> ` + route.name +
+              '<b-switch type="checkbox" class="button" v-model="isRounded"> </b-switch>';
 
           }
         });
         div.innerHTML =
-          `<ul style="text-align:left;">
-                    <li><img class="legend-icon" src='` +
-          UserSVG +
-          `'width="12" height="12">
-          <label class="control-label"> You</label>
-          <input type="button" class="legend-icon button_align"value='You'>
-
-          </li>` +
+          `<ul style="text-align:left;">` +
           toggleString +
           `<li><img class="legend-icon" src="` +
           StopSVG +
-          `" width="12" height="12">
-          <label class="control-label"> Shuttle Stop</label>
-          <input type="button" class="legend-icon button_align" value=Shuttle Stop>
+          `
           </li>
                 </ul>`;
         return div;
@@ -394,6 +384,9 @@ export default Vue.extend({
     updateStops() {
       this.$store.commit('setRoutesOnStops');
     },
+    routeToggle() {
+      return true;
+    },
   },
   components: {
     messagebox,
@@ -417,10 +410,6 @@ input, label{
   display: inline-block;
   vertical-align: middle;
   margin: 10px 0;
-}
-
-.button_align {
-  float: right;
 }
 
 #mymap {
@@ -511,19 +500,6 @@ input, label{
   }
 }
 
-.info.routeLegend {
-  box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
-  border-radius: 5px;
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 5px;
-  bottom: 25px;
-
-  & ul {
-    margin-top: 2px;
-    margin-bottom: 2px;
-    padding-left: 0px;
-  }
-}
 .info.toggle {
     box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
     border-radius: 5px;
@@ -537,7 +513,18 @@ input, label{
       padding-left: 0px;
     }
 }
-
+.button {
+    background: #ee2222;
+    color: white;
+    float: right;
+    border-radius: 1px;
+    padding: 0.35em;
+    font-size: 10px;
+    margin: 0;
+    width: 2.75em;
+    height: 1.575em;
+    margin-top: 6px;
+}
 
 .shuttleusericon{
   background-color: transparent;
