@@ -93,13 +93,13 @@ export default Vue.extend({
           for (const r of this.file) {
             AdminServiceProvider.CreateRoute(r).then(() => {
               this.$store.dispatch('grabRoutes');
-            };
+            });
           }
         },
 
         handleFileUpload() {
           this.file = this.$refs.file.files[0];
-        }
+        },
 
         downloadRoutes() {
           const link = document.createElement('a');
