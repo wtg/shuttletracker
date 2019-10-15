@@ -67,7 +67,7 @@ export default Vue.extend({
         return{
             shouldDelete: false,
             routeToDelete: undefined,
-            file: ''
+            file: '',
         } as {
             shouldDelete: boolean,
             routeToDelete: Route | undefined,
@@ -89,11 +89,11 @@ export default Vue.extend({
         },
 
         addImportedRoutes() {
-          //assume routes can be accessed from json
-          for(r in this.file) {
+          // assume routes can be accessed from json
+          for (const r of this.file) {
             AdminServiceProvider.CreateRoute(r).then(() => {
               this.$store.dispatch('grabRoutes');
-            }
+            };
           }
         },
 
