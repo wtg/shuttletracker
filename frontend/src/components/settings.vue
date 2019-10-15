@@ -28,10 +28,7 @@
       </b-switch>
       <p class="help">Place a bus on other users' maps and let others place buses on your map.</p>
     </div>
-    
-    
 
-    
     <b-field v-bind:message="['Get notifications when a shuttle is likely to arrive at the stop nearest you. Requires access to your location.', '<i>Warning: this feature is experimental. You’re not allowed to get mad at us if you miss your shuttle.</i>']">
       <b-switch v-model="etasEnabled">Estimated times of arrival</b-switch>
     </b-field>
