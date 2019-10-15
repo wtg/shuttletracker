@@ -71,6 +71,7 @@ export default Vue.extend({
         } as {
             shouldDelete: boolean,
             routeToDelete: Route | undefined,
+            file: string,
         };
     },
     computed: {
