@@ -21,6 +21,8 @@
 // This component handles everything on the shuttle tracker that is publicly facing.
 
 import Vue from 'vue';
+import Buefy from 'buefy';
+import 'buefy/dist/buefy.css';
 import InfoService from '../structures/serviceproviders/info.service';
 import Vehicle from '../structures/vehicle';
 import Route from '../structures/route';
@@ -39,6 +41,7 @@ import ETAMessage from '@/components/etaMessage.vue';
 
 const UserSVG = require('@/assets/user.svg') as string;
 
+Vue.use(Buefy);
 export default Vue.extend({
   name: 'Public',
   data() {
@@ -195,15 +198,12 @@ export default Vue.extend({
         const div = L.DomUtil.create('div', 'info toggle');
         let toggleString = '';
         this.$store.state.Routes.forEach((route: Route) => {
-          if (route.shouldShow()) {
-            toggleString +=
-              `<li><img class="legend-icon" src=` +
-              getMarkerString(route.color) +
-              `
-                  width="12" height="12"> ` + route.name +
-              '<b-switch type="checkbox" class="button" v-model="isRounded"> </b-switch>';
-
-          }
+          toggleString +=
+            `<li><img class="legend-icon" src=` +
+            getMarkerString(route.color) +
+            `
+                width="12" height="12"> ` +
+            '<label>' + route.name + '</label> <input type="checkbox" class="switch is-rounded" checked="' + route.enabled + '">';
         });
         div.innerHTML =
           `<ul style="text-align:left;">` +
@@ -384,9 +384,7 @@ export default Vue.extend({
     updateStops() {
       this.$store.commit('setRoutesOnStops');
     },
-    routeToggle() {
-      return true;
-    },
+
   },
   components: {
     messagebox,
