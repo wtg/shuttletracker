@@ -59,6 +59,7 @@ import Vue from 'vue';
 import Route from '../../structures/route';
 import AdminServiceProvider from '../../structures/serviceproviders/admin.service';
 import AreYouSure from '@/components/admin/AreYouSure.vue';
+import routeEditing from '../../components/admin/routeEditing.vue';
 
 export default Vue.extend({
     name: 'routes',
@@ -66,6 +67,7 @@ export default Vue.extend({
         return{
             shouldDelete: false,
             routeToDelete: undefined,
+            file: ''
         } as {
             shouldDelete: boolean,
             routeToDelete: Route | undefined,
@@ -85,6 +87,19 @@ export default Vue.extend({
                 });
             }
         },
+
+        addImportedRoutes() {
+          //assume routes can be accessed from json
+          for(r in this.file) {
+            AdminServiceProvider.CreateRoute(r).then(() => {
+              this.$store.dispatch('grabRoutes');
+            }
+          }
+        },
+
+        handleFileUpload() {
+          this.file = this.$refs.file.files[0];
+        }
 
         downloadRoutes() {
           const link = document.createElement('a');
