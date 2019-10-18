@@ -89,10 +89,13 @@ export default Vue.extend({
             }
         },
 
+
         addImportedRoutes() {
           // assume routes can be accessed from json
           for (const r of this.file) {
-            AdminServiceProvider.CreateRoute(r).then(() => {
+            const parsedRoute = JSON.parse(r);
+            const newRoute = new Route(-1, parsedRoute.name, parsedRoute.description, parsedRoute.enabled, parsedRoute.color, parsedRoute.width, parsedRoute.points, parsedRoute.schedule, parsedRoute.active, parsedRoute.stop_ids);
+            AdminServiceProvider.CreateRoute(newRoute).then(() => {
               this.$store.dispatch('grabRoutes');
             });
           }
@@ -100,6 +103,7 @@ export default Vue.extend({
 
         handleFileUpload() {
           this.file = this.$refs.file.files[0];
+          this.addImportedRoutes();
         },
 
         downloadRoutes() {
