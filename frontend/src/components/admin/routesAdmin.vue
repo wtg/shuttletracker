@@ -102,7 +102,7 @@ export default Vue.extend({
         },
 
         handleFileUpload() {
-          this.file = this.$refs.file.files[0];
+          this.file = this.$refs.file;
           this.addImportedRoutes();
         },
 
