@@ -47,7 +47,7 @@
                     <label>File
                       <input type="file" id="file" ref="file" v-on:change="handleFileUpload()"/>
                     </label>
-                      <button v-on:click="submitFile()">Submit</button>
+                      <button v-on:click="addImportedRoutes()">Submit</button>
                   </div>
                 </div>
             </tbody>
@@ -103,7 +103,6 @@ export default Vue.extend({
 
         handleFileUpload() {
           this.file = this.$refs.file;
-          this.addImportedRoutes();
         },
 
         downloadRoutes() {
