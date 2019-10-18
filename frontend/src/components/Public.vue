@@ -21,8 +21,6 @@
 // This component handles everything on the shuttle tracker that is publicly facing.
 
 import Vue from 'vue';
-import Buefy from 'buefy';
-import 'buefy/dist/buefy.css';
 import InfoService from '../structures/serviceproviders/info.service';
 import Vehicle from '../structures/vehicle';
 import Route from '../structures/route';
@@ -41,7 +39,6 @@ import ETAMessage from '@/components/etaMessage.vue';
 
 const UserSVG = require('@/assets/user.svg') as string;
 
-Vue.use(Buefy);
 export default Vue.extend({
   name: 'Public',
   data() {

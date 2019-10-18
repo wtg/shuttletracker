@@ -15,14 +15,40 @@
       <b-switch v-model="etasEnabled">Estimated times of arrival</b-switch>
     </b-field>
 
+    <table class="table">
+        <thead>
+            <tr>
+            <th><abbr title="Name">Name</abbr></th>
+            <th><abbr title="ID">ID</abbr></th>
+            <th><abbr title="Description">Desc.</abbr></th>
+            <th><abbr title="Schedule">Sched.</abbr></th>
+            <th><abbr title="Enabled">Enabled</abbr></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="route in routes" :key="route.id">
+            <th><router-link :to='"/admin/routes/" + String(route.id) + "/"' >{{route.name}}</router-link></th>
+            <td>{{route.id}}</td>
+            <td>{{route.description}}</td>
+            <td><ul>
+                    <li v-for="interval in route.schedule" :key="interval.id">{{String(interval)}}</li>
+                </ul></td>
+            <td>{{route.enabled}}</td>
+
+            </tr>
+        </tbody>
+
+    </table>
     <router-link to="/about">About and privacy policy</router-link>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import Route from '../structures/route';
 
 export default Vue.extend({
+  name: 'routes',
   computed: {
     busButtonEnabled: {
       get(): boolean {
@@ -52,6 +78,9 @@ export default Vue.extend({
       set(value: boolean) {
         this.$store.commit('setSettingsETAsEnabled', value);
       },
+    },
+    routes(): Route[] {
+        return this.$store.state.Routes;
     },
   },
 });
