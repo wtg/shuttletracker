@@ -1,6 +1,11 @@
 <template>
   <div id="etas">
     <div id="title">ETAs</div>
+    <ul>
+      <li>Shuttle 1 - 10:00 away</li>
+      <li>Shuttle 2 - 100:00 away</li>
+      <li>Shuttle 3 - 1000:00 away</li>
+    </ul>
   </div>
 </template>
 
@@ -28,5 +33,11 @@ export default Vue.extend({
     display: inline-block;
     border-bottom: 2px solid #4c4c4c;
   }
+  li {
+  border: 1px solid rgb(228, 228, 228);
+  border-radius: 3px;
+  margin: 10px;
+  padding: 10px;
+}
 
 </style>
