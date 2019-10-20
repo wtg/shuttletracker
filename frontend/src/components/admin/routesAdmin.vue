@@ -45,7 +45,7 @@
                 <div class="container">
                   <div class="large-12 medium-12 small-12 cell">
                     <label>File
-                      <input type="file" id="file" ref="file" v-on:change="handleFileUpload()"/>
+                      <input type="file" id="inputfile" ref="inputfile" v-on:change="handleFileUpload()"/>
                     </label>
                       <button v-on:click="addImportedRoutes()">Submit</button>
                   </div>
@@ -71,7 +71,7 @@ export default Vue.extend({
         } as {
             shouldDelete: boolean,
             routeToDelete: Route | undefined,
-            file: string,
+            file: any,
         };
     },
     computed: {
@@ -92,7 +92,7 @@ export default Vue.extend({
 
         addImportedRoutes() {
           // assume routes can be accessed from json
-          for (const r of this.file) {
+          for (const r of this.file.files[0]) {
             const parsedRoute = JSON.parse(r);
             const newRoute = new Route(-1, parsedRoute.name, parsedRoute.description, parsedRoute.enabled, parsedRoute.color, parsedRoute.width, parsedRoute.points, parsedRoute.schedule, parsedRoute.active, parsedRoute.stop_ids);
             AdminServiceProvider.CreateRoute(newRoute).then(() => {
@@ -102,7 +102,7 @@ export default Vue.extend({
         },
 
         handleFileUpload() {
-          this.file = this.$refs.file.files[0];
+          this.file = (document.getElementById('inputfile') as HTMLInputElement);
         },
 
         downloadRoutes() {
