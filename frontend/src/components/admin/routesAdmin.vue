@@ -105,6 +105,7 @@ export default Vue.extend({
         handleFileUpload(event: any) {
           // this.file = (document.getElementById('inputfile') as HTMLInputElement);
           this.file = event.target.files[0];
+          // make sure the file is recieved
           console.log(this.file);
         },
 
