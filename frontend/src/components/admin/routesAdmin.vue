@@ -45,7 +45,7 @@
                 <div class="container">
                   <div class="large-12 medium-12 small-12 cell">
                     <label>File
-                      <input type="file" id="inputfile" ref="inputfile" v-on:change="handleFileUpload()"/>
+                      <input type="file" id="inputfile" ref="inputfile" @change="handleFileUpload"/>
                     </label>
                       <button v-on:click="addImportedRoutes()">Submit</button>
                   </div>
@@ -67,7 +67,7 @@ export default Vue.extend({
         return{
             shouldDelete: false,
             routeToDelete: undefined,
-            file: '',
+            file: null,
         } as {
             shouldDelete: boolean,
             routeToDelete: Route | undefined,
@@ -92,17 +92,20 @@ export default Vue.extend({
 
         addImportedRoutes() {
           // assume routes can be accessed from json
-          for (const r of this.file.files[0]) {
-            const parsedRoute = JSON.parse(r);
-            const newRoute = new Route(-1, parsedRoute.name, parsedRoute.description, parsedRoute.enabled, parsedRoute.color, parsedRoute.width, parsedRoute.points, parsedRoute.schedule, parsedRoute.active, parsedRoute.stop_ids);
-            AdminServiceProvider.CreateRoute(newRoute).then(() => {
-              this.$store.dispatch('grabRoutes');
-            });
-          }
+          this.file.forEach((x: any) => {
+            // const parsedRoute = JSON.parse(r);
+            // const newRoute = new Route(-1, parsedRoute.name, parsedRoute.description, parsedRoute.enabled, parsedRoute.color, parsedRoute.width, parsedRoute.points, parsedRoute.schedule, parsedRoute.active, parsedRoute.stop_ids);
+            // AdminServiceProvider.CreateRoute(newRoute).then(() => {
+              // this.$store.dispatch('grabRoutes');
+            // });
+            console.log(x);
+          });
         },
 
-        handleFileUpload() {
-          this.file = (document.getElementById('inputfile') as HTMLInputElement);
+        handleFileUpload(event: any) {
+          // this.file = (document.getElementById('inputfile') as HTMLInputElement);
+          this.file = event.target.files[0];
+          console.log(this.file);
         },
 
         downloadRoutes() {
