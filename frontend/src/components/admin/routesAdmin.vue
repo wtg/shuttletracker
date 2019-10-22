@@ -94,24 +94,25 @@ export default Vue.extend({
           // assume routes can be accessed from json
           const reader = new FileReader();
           // Closure to capture the file information.
-
+          let json = '';
           reader.onload = ((theFile) => {
             return (e: any) => {
               console.log('e readAsText = ', e);
               console.log('e readAsText target = ', e.target);
-              const json = JSON.parse(e.target.result);
+              json = JSON.parse(e.target.result);
               console.log('json global var has been set to parsed json of this file here it is unevaled = \n' + JSON.stringify(json));
             };
           })(this.file);
+          reader.readAsText(this.file);
 
-          this.file.forEach((x: any) => {
+          /*json((x: any) => {
             // const parsedRoute = JSON.parse(r);
             // const newRoute = new Route(-1, parsedRoute.name, parsedRoute.description, parsedRoute.enabled, parsedRoute.color, parsedRoute.width, parsedRoute.points, parsedRoute.schedule, parsedRoute.active, parsedRoute.stop_ids);
             // AdminServiceProvider.CreateRoute(newRoute).then(() => {
               // this.$store.dispatch('grabRoutes');
             // });
             console.log(x);
-          });
+          });*/
         },
 
         handleFileUpload(event: any) {
