@@ -92,6 +92,18 @@ export default Vue.extend({
 
         addImportedRoutes() {
           // assume routes can be accessed from json
+          const reader = new FileReader();
+          // Closure to capture the file information.
+          /*
+          reader.onload = (function (theFile) {
+            return function (e) {
+              console.log('e readAsText = ', e);
+              console.log('e readAsText target = ', e.target);
+              const json = JSON.parse(e.target.result);
+              console.log('json global var has been set to parsed json of this file here it is unevaled = \n' + JSON.stringify(json));
+            }
+          })(this.file);
+          */
           this.file.forEach((x: any) => {
             // const parsedRoute = JSON.parse(r);
             // const newRoute = new Route(-1, parsedRoute.name, parsedRoute.description, parsedRoute.enabled, parsedRoute.color, parsedRoute.width, parsedRoute.points, parsedRoute.schedule, parsedRoute.active, parsedRoute.stop_ids);
