@@ -115,7 +115,6 @@ export default Vue.extend({
         this.updateStops();
         this.renderStops();
         this.updateLegend();
-        this.updateToggle();
       }
       if (mutation.type === 'setVehicles') {
         this.addVehicles();
@@ -188,33 +187,6 @@ export default Vue.extend({
       };
       if (this.Map !== undefined) {
         this.legend.addTo(this.Map);
-      }
-    },
-    updateToggle() {
-      this.toggle.onAdd = (map: L.Map) => {
-        const div = L.DomUtil.create('div', 'info toggle');
-        let toggleString = '';
-        this.$store.state.Routes.forEach((route: Route) => {
-          toggleString +=
-            `<li><img class="legend-icon" src=` +
-            getMarkerString(route.color) +
-            `
-                width="12" height="12"> ` +
-            '<label>' + route.name + '</label> <input type="checkbox" class="switch is-rounded" checked="' + route.enabled + '">';
-        });
-        div.innerHTML =
-          `<ul style="text-align:left;">` +
-          toggleString +
-          `<li><img class="legend-icon" src="` +
-          StopSVG +
-          `
-          </li>
-                </ul>`;
-        return div;
-      };
-
-      if (this.Map !== undefined) {
-        this.toggle.addTo(this.Map);
       }
     },
     routePolyLines(): L.Polyline[] {
