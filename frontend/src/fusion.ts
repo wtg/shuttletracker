@@ -201,7 +201,7 @@ export default class Fusion {
     public sendBusButton() {
         const ls = UserLocationService.getInstance();
         const pos = ls.getCurrentLocation();
-        const emoji = store.state.settings.busButtonChoice
+        const emoji = store.state.settings.busButtonChoice;
         if (!pos) {
             // client geolocation isn't enabled or known
             return;
@@ -211,7 +211,7 @@ export default class Fusion {
             message: {
                 latitude: pos.coords.latitude,
                 longitude: pos.coords.longitude,
-                emojiChoice: emoji, 
+                emojiChoice: emoji,
             },
         };
         this.ws.send(JSON.stringify(data));
