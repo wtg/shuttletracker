@@ -104,15 +104,15 @@ export default Vue.extend({
             };
           })(this.file);
           reader.readAsText(this.file);
+          for (number i = 0; i < json.length; i++){
+            var obj = arr[i];
+            const newRoute = new Route(-1, parsedRoute.name, parsedRoute.description, parsedRoute.enabled, parsedRoute.color, parsedRoute.width, parsedRoute.points,
+                parsedRoute.schedule, parsedRoute.active, parsedRoute.stop_ids);
+                AdminServiceProvider.CreateRoute(newRoute).then(() => {
+                    this.$store.dispatch('grabRoutes');
+                });
+          }
 
-          /*json((x: any) => {
-            // const parsedRoute = JSON.parse(r);
-            // const newRoute = new Route(-1, parsedRoute.name, parsedRoute.description, parsedRoute.enabled, parsedRoute.color, parsedRoute.width, parsedRoute.points, parsedRoute.schedule, parsedRoute.active, parsedRoute.stop_ids);
-            // AdminServiceProvider.CreateRoute(newRoute).then(() => {
-              // this.$store.dispatch('grabRoutes');
-            // });
-            console.log(x);
-          });*/
         },
 
         handleFileUpload(event: any) {
