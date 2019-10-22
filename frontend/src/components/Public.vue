@@ -150,7 +150,7 @@ export default Vue.extend({
       if (message.type !== 'bus_button') {
         return;
       }
-      this.spawnShuttleAtPosition(message.message, message.messageChoice);
+      this.spawnShuttleAtPosition(message.message, message.message.emojiChoice);
     },
     updateLegend() {
       this.legend.onAdd = (map: L.Map) => {
