@@ -144,13 +144,13 @@ export default Vue.extend({
   },
   methods: {
     spawn() {
-      this.spawnShuttleAtPosition(UserLocationService.getInstance().getCurrentLocation(), this.$store.state.settings.busButtonChoice);
+      this.spawnShuttleAtPosition(UserLocationService.getInstance().getCurrentLocation());
     },
     saucyspawn(message: any) {
       if (message.type !== 'bus_button') {
         return;
       }
-      this.spawnShuttleAtPosition(message.message, message.message.emojiChoice);
+      this.spawnShuttleAtPosition(message.message);
     },
     updateLegend() {
       this.legend.onAdd = (map: L.Map) => {
@@ -223,13 +223,13 @@ export default Vue.extend({
         }
       });
     },
-    spawnShuttleAtPosition(position: any, emoji: any) {
+    spawnShuttleAtPosition(position: any) {
       if (!this.$store.getters.getBusButtonShowBuses) {
         return;
       }
       this.userShuttleidCount ++;
       const busIcon = L.divIcon({
-        html: `<span class="shuttleusericon shuttleusericon` + String(this.userShuttleidCount) + '">' + emoji + '</span>',
+        html: `<span class="shuttleusericon shuttleusericon` + String(this.userShuttleidCount) + '">' + this.$store.state.settings.busButtonChoice + '</span>',
 
         iconSize: [20, 20], // size of the icon
         iconAnchor: [10, 10], // point of the icon which will correspond to marker's location
