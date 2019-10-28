@@ -93,25 +93,28 @@ export default Vue.extend({
         addImportedRoutes() {
           // assume routes can be accessed from json
           const reader = new FileReader();
+          let json = null;
           // Closure to capture the file information.
-          let json = '';
           reader.onload = ((theFile) => {
             return (e: any) => {
-              console.log('e readAsText = ', e);
-              console.log('e readAsText target = ', e.target);
+              // console.log('e readAsText = ', e);
+              // console.log('e readAsText target = ', e.target);
               json = JSON.parse(e.target.result);
               console.log('json global var has been set to parsed json of this file here it is unevaled = \n' + JSON.stringify(json));
+              for (let i = 0; i < json.length; i++) {
+                  const obj = json[i];
+                  console.log(obj);
+                  const newRoute = new Route(-1, obj.name, obj.description, obj.enabled, obj.color, obj.width, obj.points,
+                   obj.schedule, obj.active, obj.stop_ids);
+                  AdminServiceProvider.CreateRoute(newRoute).then(() => {
+                          this.$store.dispatch('grabRoutes');
+                  });
+              }
             };
           })(this.file);
           reader.readAsText(this.file);
-          for (number i = 0; i < json.length; i++){
-            var obj = arr[i];
-            const newRoute = new Route(-1, parsedRoute.name, parsedRoute.description, parsedRoute.enabled, parsedRoute.color, parsedRoute.width, parsedRoute.points,
-                parsedRoute.schedule, parsedRoute.active, parsedRoute.stop_ids);
-                AdminServiceProvider.CreateRoute(newRoute).then(() => {
-                    this.$store.dispatch('grabRoutes');
-                });
-          }
+
+          // }
 
         },
 
