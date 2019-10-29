@@ -97,9 +97,12 @@ export default Vue.extend({
           // Closure to capture the file information.
           reader.onload = ((theFile) => {
             return (e: any) => {
-              // console.log('e readAsText = ', e);
-              // console.log('e readAsText target = ', e.target);
-              json = JSON.parse(e.target.result);
+              try {
+                json = JSON.parse(e.target.result);
+              }
+              catch(e) {
+                alert(e);
+              }
               console.log('json global var has been set to parsed json of this file here it is unevaled = \n' + JSON.stringify(json));
               for (let i = 0; i < json.length; i++) {
                   const obj = json[i];
