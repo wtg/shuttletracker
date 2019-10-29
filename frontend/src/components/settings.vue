@@ -14,6 +14,7 @@
                   <div class="select is-danger">
                       <div class="select is-rounded">
                           <select v-model="busButtonChoice">
+                              <option>🚐</option>
                               <option>🚌</option>
                               <option>🚗</option>
                               <option>🚓</option>
