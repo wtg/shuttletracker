@@ -116,6 +116,9 @@ export default Vue.extend({
                     });
                 }
               } catch (e) {
+                if (e instanceof SyntaxError) {
+                  e = new Error('Non-JSON file submitted');
+                }
                 alert(e);
                 console.log(e);
               }
