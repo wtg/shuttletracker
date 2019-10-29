@@ -48,6 +48,7 @@ More project documentation can be found on the [Repository Wiki](https://github.
 12. Run `npm install`
 13. Build the frontend using `npx vue-cli-service build --mode development`
     - _Note: if you are working on the frontend, you may instead use `npx vue-cli-service build --mode development --watch` in another terminal to continuously watch for changes and rebuild._
+    - _Note 2: if you are running the newest version of macOS and see an error involving 64-bit support, try using node version 10.16.3._
 14. Go back up to the project root directory and build Shuttle Tracker by running `go build -o shuttletracker ./cmd/shuttletracker`
 15. Start the app by running `./shuttletracker`
 16. Add yourself as an administrator by using `./shuttletracker admins --add RCS_ID`, replacing `RCS_ID` with your RCS ID. See the "Administrators" section below for more information.
