@@ -100,17 +100,24 @@ export default Vue.extend({
               try {
                 json = JSON.parse(e.target.result);
                 console.log('json global var has been set to parsed json of this file here it is unevaled = \n' + JSON.stringify(json));
+                if (json.length === undefined || json.length === 0) {
+                  throw new Error('Improper JSON formatting');
+                }
                 for (let i = 0; i < json.length; i++) {
                     const obj = json[i];
                     console.log(obj);
                     const newRoute = new Route(-1, obj.name, obj.description, obj.enabled, obj.color, obj.width, obj.points,
                       obj.schedule, obj.active, obj.stop_ids);
+                    if (!newRoute) {
+                      throw new Error('Improper JSON formatting');
+                    }
                     AdminServiceProvider.CreateRoute(newRoute).then(() => {
                             this.$store.dispatch('grabRoutes');
                     });
                 }
               } catch (e) {
                 alert(e);
+                console.log(e);
               }
             };
           })(this.file);
