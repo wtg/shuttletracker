@@ -99,19 +99,18 @@ export default Vue.extend({
             return (e: any) => {
               try {
                 json = JSON.parse(e.target.result);
-              }
-              catch(e) {
+                console.log('json global var has been set to parsed json of this file here it is unevaled = \n' + JSON.stringify(json));
+                for (let i = 0; i < json.length; i++) {
+                    const obj = json[i];
+                    console.log(obj);
+                    const newRoute = new Route(-1, obj.name, obj.description, obj.enabled, obj.color, obj.width, obj.points,
+                      obj.schedule, obj.active, obj.stop_ids);
+                    AdminServiceProvider.CreateRoute(newRoute).then(() => {
+                            this.$store.dispatch('grabRoutes');
+                    });
+                }
+              } catch (e) {
                 alert(e);
-              }
-              console.log('json global var has been set to parsed json of this file here it is unevaled = \n' + JSON.stringify(json));
-              for (let i = 0; i < json.length; i++) {
-                  const obj = json[i];
-                  console.log(obj);
-                  const newRoute = new Route(-1, obj.name, obj.description, obj.enabled, obj.color, obj.width, obj.points,
-                   obj.schedule, obj.active, obj.stop_ids);
-                  AdminServiceProvider.CreateRoute(newRoute).then(() => {
-                          this.$store.dispatch('grabRoutes');
-                  });
               }
             };
           })(this.file);
