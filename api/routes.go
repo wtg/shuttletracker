@@ -1,7 +1,6 @@
 package api
 
 import (
-
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -12,7 +11,10 @@ import (
 
 func (api *API) ETAHandler(w http.ResponseWriter, r *http.Request) {
 	etas := api.etaManager.CurrentETAs()
-	WriteJSON(w, etas)
+	err := WriteJSON(w, etas)
+	if err != nil {
+		return
+	}
 }
 
 // RoutesHandler finds all of the routes in the database
