@@ -31,11 +31,9 @@
             <td><ul>
                     <li v-for="interval in route.schedule" :key="interval.id">{{String(interval)}}</li>
                 </ul></td>
-            <td><b-switch v-bind:value="route.enabled" v-on:input="route.Enable()"> {{ route.enabled }}</b-switch></td>
-
+            <td><b-switch v-bind:value="route.enabled" v-on:input="routeEnable(route)"> {{ route.enabled }}</b-switch></td>
             </tr>
         </tbody>
-
     </table>
     <router-link to="/about">About and privacy policy</router-link>
   </div>
@@ -81,14 +79,14 @@ export default Vue.extend({
     routes(): Route[] {
         return this.$store.state.Routes;
     },
-    routeEnable: {
-        set(value: boolean) {
-
-        },
-    },
   },
   methods: {
-
+      routeEnable(thisRoute: Route) {
+          // actually toggle the route
+          thisRoute.enabled = !thisRoute.enabled;
+          // push the changed route to the store
+          this.$store.commit('setRoutes', this.routes);
+      },
   },
 });
 </script>
