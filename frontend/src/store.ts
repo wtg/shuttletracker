@@ -45,6 +45,12 @@ const store: StoreOptions<StoreState> = {
       state.Vehicles.forEach((vehicle: Vehicle) => {
         for (const route of state.Routes) {
           if (vehicle.location !== null && vehicle.location.routeID === route.id) {
+            if (route.enabled === false) {
+              vehicle.showOnMap(false);
+            } else {
+              vehicle.showOnMap(true);
+
+            }
             vehicle.setRoute(route);
             break;
           }
