@@ -99,7 +99,9 @@ const store: StoreOptions<StoreState> = {
           state.etas.splice(i, 1);
         }
       }
-
+      if (etas) {
+        localStorage.setItem('etas', JSON.stringify(etas));
+      }
       // store new ETAs
       for (const eta of etas) {
         state.etas.push(eta);
