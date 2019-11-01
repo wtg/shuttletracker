@@ -64,4 +64,10 @@ export default class Route implements RouteInterface {
         return false;
     }
 
+    public Enable(): boolean {
+        this.enabled = !this.enabled;
+
+        return this.enabled;
+    }
+
 }

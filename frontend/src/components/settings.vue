@@ -31,7 +31,7 @@
             <td><ul>
                     <li v-for="interval in route.schedule" :key="interval.id">{{String(interval)}}</li>
                 </ul></td>
-            <td><b-switch v-bind:value="route.enabled" v-on:input="route.enabled = !route.enabled"> {{ route.enabled }}</b-switch></td>
+            <td><b-switch v-bind:value="route.enabled" v-on:input="route.Enable()"> {{ route.enabled }}</b-switch></td>
 
             </tr>
         </tbody>
@@ -44,6 +44,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Route from '../structures/route';
+import Public from './Public.vue';
 
 export default Vue.extend({
   name: 'routes',
@@ -80,14 +81,9 @@ export default Vue.extend({
     routes(): Route[] {
         return this.$store.state.Routes;
     },
-    routeEnabled: {
-        get(): boolean {
-            console.log(this.$route.params.name);
-            return Boolean(this.$route.params.enabled);
-        },
+    routeEnable: {
         set(value: boolean) {
-            console.log('foo');
-            console.log(this.$route.params.enabled);
+
         },
     },
   },
