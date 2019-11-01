@@ -64,8 +64,4 @@ export default class Route implements RouteInterface {
         return false;
     }
 
-    public toggleRoute(value: boolean) {
-        this.enabled = value;
-    }
-
 }
