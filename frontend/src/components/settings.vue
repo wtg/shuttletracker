@@ -19,7 +19,6 @@
         <thead>
             <tr>
             <th><abbr title="Name">Name</abbr></th>
-            <th><abbr title="Description">Desc.</abbr></th>
             <th><abbr title="Schedule">Sched.</abbr></th>
             <th><abbr title="Enabled">Enabled</abbr></th>
             </tr>
@@ -27,11 +26,10 @@
         <tbody>
             <tr v-for="route in routes" :key="route.id">
             <th><router-link :to='"/admin/routes/" + String(route.id) + "/"' >{{route.name}}</router-link></th>
-            <td>{{route.description}}</td>
             <td><ul>
                     <li v-for="interval in route.schedule" :key="interval.id">{{String(interval)}}</li>
                 </ul></td>
-            <td><b-switch v-bind:value="route.enabled" v-on:input="routeEnable(route)"> {{ route.enabled }}</b-switch></td>
+            <td><b-switch v-bind:value="route.enabled" v-on:input="routeEnable(route)"></b-switch></td>
             </tr>
         </tbody>
     </table>
