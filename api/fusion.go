@@ -59,6 +59,7 @@ type fusionPosition struct {
 type fusionBusButton struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
+	Emoji     string  `json:"emojiChoice"`
 }
 
 type fusionClient struct {
