@@ -42,14 +42,20 @@
                   <th></th>
                   <th><button @click="downloadRoutes();" class="button is-success">Export</button></th>
                 </tr>
-                <div class="container">
-                  <div class="large-12 medium-12 small-12 cell">
-                    <label>File
-                      <input type="file" id="inputfile" ref="inputfile" @change="handleFileUpload"/>
-                    </label>
-                      <button v-on:click="addImportedRoutes()">Submit</button>
-                  </div>
+                <div class="file">
+                  <label class="file-label">
+                    <input class="file-input" type="file" name="import" @change="handleFileUpload">
+                    <span class="file-cta">
+                      <span class="file-icon">
+                        <i class="fas fa-upload"></i>
+                      </span>
+                      <span class="file-label">
+                        Choose a file…
+                      </span>
+                    </span>
+                  </label>
                 </div>
+                <button v-on:click="addImportedRoutes()" class="button is-success">Submit</button>
             </tbody>
         </table>
     </div>
@@ -97,33 +103,33 @@ export default Vue.extend({
           // Closure to capture the file information.
           reader.onload = ((theFile) => {
             return (e: any) => {
-              //Wrap route creation in a try-catch block
+              // Wrap route creation in a try-catch block
               try {
                 json = JSON.parse(e.target.result);
-                //If JSON.parse does not return a usable value, throw an Error
+                // If JSON.parse does not return a usable value, throw an Error
                 if (json.length === undefined || json.length === 0) {
                   throw new Error('Improper JSON formatting');
                 }
                 for (let i = 0; i < json.length; i++) {
                     const obj = json[i];
-                    //Create a new Route object using the data stored in 'obj'
+                    // Create a new Route object using the data stored in 'obj'
                     const newRoute = new Route(-1, obj.name, obj.description, obj.enabled, obj.color, obj.width, obj.points,
                       obj.schedule, obj.active, obj.stop_ids);
-                    //If creating the new Route failed, the JSON file was not formatted correctly. Throw an Error
+                    // If creating the new Route failed, the JSON file was not formatted correctly. Throw an Error
                     if (!newRoute) {
                       throw new Error('Improper JSON formatting');
                     }
-                    //Create the route in the database
+                    // Create the route in the database
                     AdminServiceProvider.CreateRoute(newRoute).then(() => {
                             this.$store.dispatch('grabRoutes');
                     });
                 }
               } catch (e) {
-                //If we get a SyntaxError, we have received a Non-JSON file. Replace the error to reflect this.
+                // If we get a SyntaxError, we have received a Non-JSON file. Replace the error to reflect this.
                 if (e instanceof SyntaxError) {
                   e = new Error('Non-JSON file submitted');
                 }
-                //Display the Error to the user, and log it in the console
+                // Display the Error to the user, and log it in the console
                 alert(e);
                 console.log(e);
               }
@@ -131,7 +137,6 @@ export default Vue.extend({
           })(this.file);
           reader.readAsText(this.file);
 
-          // }
 
         },
 
