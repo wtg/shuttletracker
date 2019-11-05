@@ -41,20 +41,21 @@
                   <th></th>
                   <th><button @click="downloadRoutes();" class="button is-success">Export</button></th>
                 </tr>
+                <br>
                 <div class="file">
                   <label class="file-label">
                     <input class="file-input" type="file" name="import" @change="handleFileUpload">
                     <span class="file-cta">
                       <span class="file-icon">
-                        <i class="fas fa-upload"></i>
+                        <img src="./../../assets/upload-icon.svg"></i>
                       </span>
                       <span class="file-label">
                         Choose a file…
                       </span>
                     </span>
                   </label>
+                  <button v-on:click="addImportedRoutes()" class="button is-success">Submit</button>
                 </div>
-                <button v-on:click="addImportedRoutes()" class="button is-success">Submit</button>
             </tbody>
         </table>
     </div>
