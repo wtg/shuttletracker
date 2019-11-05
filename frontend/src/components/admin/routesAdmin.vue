@@ -45,7 +45,7 @@
                 <div class="container">
                   <div class="large-12 medium-12 small-12 cell">
                     <label>File
-                      <input type="file" id="inputfile" ref="inputfile" @change="handleFileUpload"/>
+                      <input type="file" id="inputfile" ref="inputfile" button="button is-success" @change="handleFileUpload">Import?<input/>
                     </label>
                       <button v-on:click="addImportedRoutes()">Submit</button>
                   </div>
