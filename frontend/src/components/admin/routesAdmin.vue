@@ -1,4 +1,3 @@
-
 <template>
     <div style="margin-top: 50px;" class="container">
         <are-you-sure @no="shouldDelete = false;" @yes="deleteRoute" :active="shouldDelete"/>
