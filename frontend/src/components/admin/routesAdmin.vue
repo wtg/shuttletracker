@@ -140,10 +140,9 @@ export default Vue.extend({
 
         },
 
+        // Gets the user-submitted file and stores it in 'file'
         handleFileUpload(event: any) {
           this.file = event.target.files[0];
-          // make sure the file is recieved
-          console.log(this.file);
         },
 
         downloadRoutes() {
