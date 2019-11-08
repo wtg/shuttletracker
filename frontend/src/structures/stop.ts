@@ -54,6 +54,25 @@ export class Stop {
     public addRoute(route: Route): void {
         this.routesOn.push(route);
     }
+
+    public containsRoute(route_id: number): boolean {
+        for (const route of this.routesOn) {
+            if (route.id === route_id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public shouldShow(): boolean {
+        for (const route of this.routesOn) {
+            if (route.shouldShow()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public asJSON(): {
         name: string; description: string; latitude: number; longitude: number } {
         return {

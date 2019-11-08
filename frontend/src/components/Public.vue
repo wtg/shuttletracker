@@ -218,8 +218,12 @@ export default Vue.extend({
     renderStops() {
       this.$store.state.Stops.forEach((stop: Stop) => {
         if (this.Map !== undefined) {
-          stop.marker.bindPopup(stop.getMessage());
-          stop.marker.addTo(this.Map);
+            if (stop.shouldShow()) {
+                stop.marker.bindPopup(stop.getMessage());
+                stop.marker.addTo(this.Map);
+            } else {
+                stop.marker.removeFrom(this.Map);
+            }
         }
       });
     },

@@ -45,12 +45,6 @@ const store: StoreOptions<StoreState> = {
       state.Vehicles.forEach((vehicle: Vehicle) => {
         for (const route of state.Routes) {
           if (vehicle.location !== null && vehicle.location.routeID === route.id) {
-            if (route.enabled === false) {
-              vehicle.showOnMap(false);
-            } else {
-              vehicle.showOnMap(true);
-
-            }
             vehicle.setRoute(route);
             break;
           }
@@ -140,7 +134,9 @@ const store: StoreOptions<StoreState> = {
       state.Stops.forEach((stop: Stop) => {
         state.Routes.forEach((route: Route) => {
           if (route.containsStop(stop.id) && route.active) {
-            stop.addRoute(route);
+              if (!stop.containsRoute(route.id)) {
+                  stop.addRoute(route);
+              }
           }
         });
       });

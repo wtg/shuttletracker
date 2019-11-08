@@ -23,7 +23,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="route in routes" :key="route.id">
+            <tr v-for="route in routes" :key="route.id" v-if="route.active">
             <th><router-link :to='"/admin/routes/" + String(route.id) + "/"' >{{route.name}}</router-link></th>
             <td><b-switch v-bind:value="route.enabled" v-on:input="routeEnable(route)"></b-switch></td>
             </tr>
