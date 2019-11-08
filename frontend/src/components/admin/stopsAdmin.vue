@@ -19,6 +19,7 @@
                     <th>{{stop.latitude.toFixed(3)}}</th>
                     <th>{{stop.longitude.toFixed(3)}}</th>
                     <th></th>
+                    <td><button class="button" @click="$router.push('/admin/stops/' + String(stop.id) + '/edit');">Edit</button></td>
                     <th></th>
                     <th></th>
                 </tr>
@@ -41,6 +42,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Stop } from '@/structures/stop';
+import stopsEditing from './stopsEditing.vue';
 export default Vue.extend({
     name: 'stops',
 
