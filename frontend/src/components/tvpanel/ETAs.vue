@@ -97,12 +97,13 @@ function relativeTime(from: Date, to: Date): string {
 
 <style lang="scss" scoped>
   #etas {
-    height: 50%;
+    height: 45%;
     width: 100%;
     text-align: center;
-    border-bottom: 1.5px solid #F8F8F8;
+    border-top: 3px solid #F8F8F8;
+    position: relative;
+    top: 10%;
   }
-
   #title {
     margin-top: 20px;
     font-size: 50px;
