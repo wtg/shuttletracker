@@ -19,7 +19,7 @@
             <div class="field">
             <label class="label" for="Name">Name</label>
             <div class="control">
-                <input v-model="stop.name" id="Name" name="Name" type="text" placeholder="Name" class="input" :disabled="!creation">
+                <input v-model="stop.name" id="Name" name="Name" type="text" placeholder="Name" class="input" :disabled="creation">
             </div>
             </div>
 
@@ -27,7 +27,7 @@
             <div class="field">
             <label class="label" for="Description">Description</label>
             <div class="control">
-                <input v-model="stop.description" id="Description" name="Description" type="text" placeholder="Description" class="input " :disabled="!creation">
+                <input v-model="stop.description" id="Description" name="Description" type="text" placeholder="Description" class="input " :disabled="creation">
             </div>
             </div>
 
@@ -35,7 +35,7 @@
             <div class="field">
             <label class="label" for="Latitude">Latitude</label>
             <div class="control">
-                <input v-model="stop.latitude" id="Latitude" name="Latitude" type="text" placeholder="Latitude" class="input " :disabled="!creation">
+                <input v-model="stop.latitude" id="Latitude" name="Latitude" type="text" placeholder="Latitude" class="input " :disabled="creation">
             </div>
             </div>
 
@@ -43,7 +43,7 @@
             <div class="field">
             <label class="label" for="Longitude">Longitude</label>
             <div class="control">
-                <input v-model="stop.longitude" id="Longitude" name="Longitude" type="text" placeholder="Longitude" class="input " :disabled="!creation">
+                <input v-model="stop.longitude" id="Longitude" name="Longitude" type="text" placeholder="Longitude" class="input " :disabled="creation">
             </div>
             </div>
 
