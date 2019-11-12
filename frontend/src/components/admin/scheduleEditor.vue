@@ -54,25 +54,25 @@
 </template>
 <script lang="ts">
 import Vue from 'vue';
-import RotueScheduleInterval from '../../structures/routeScheduleInterval';
+import RouteScheduleInterval from '../../structures/routeScheduleInterval';
 import timepicker from '@/components/admin/timepicker.vue';
 
 // Takes a schedule interval as v-model and allows editing
 export default Vue.extend({
     props: {
         value: {
-            type: Array as () => RotueScheduleInterval[],
+            type: Array as () => RouteScheduleInterval[],
             default: () => [],
         },
     },
     methods: {
         addAndUpdate() {
-            const tmp: RotueScheduleInterval[] = this.value;
-            tmp.push(new RotueScheduleInterval(0, 0, 0, new Date(), 0, new Date()));
+            const tmp: RouteScheduleInterval[] = this.value;
+            tmp.push(new RouteScheduleInterval(0, 0, 0, new Date(), 0, new Date()));
             this.$emit('input', tmp);
         },
         remove(idx: number) {
-            const tmp: RotueScheduleInterval[] = this.value;
+            const tmp: RouteScheduleInterval[] = this.value;
             tmp.splice(idx, 1);
             this.$emit('input', tmp);
         },

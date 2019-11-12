@@ -2,7 +2,7 @@ import Vehicle from '../vehicle';
 import Route from '../route';
 import { Stop } from '../stop';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
-import routeScheduleInterval from '../routeScheduleInterval';
+import RouteScheduleInterval from '../routeScheduleInterval';
 import Resources from '@/resources';
 /**
  * Info service provider grabs the basic information from the api and returns it to the frontend.
@@ -54,9 +54,9 @@ export default class InfoServiceProvider {
                 active: boolean,
                 stop_ids: number[],
             }) => {
-                const myschedule: routeScheduleInterval[] = [];
+                const myschedule: RouteScheduleInterval[] = [];
                 element.schedule.forEach((interval) => {
-                    myschedule.push(new routeScheduleInterval(interval.id, interval.route_id, interval.start_day, new Date(interval.start_time), interval.end_day, new Date(interval.end_time)));
+                    myschedule.push(new RouteScheduleInterval(interval.id, interval.route_id, interval.start_day, new Date(interval.start_time), interval.end_day, new Date(interval.end_time)));
                 });
                 ret.push(new Route(element.id, element.name, element.description,
                     element.enabled, element.color, Number(element.width), element.points, myschedule, element.active,

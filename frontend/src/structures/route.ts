@@ -1,4 +1,4 @@
-import routeScheduleInterval from './routeScheduleInterval';
+import RouteScheduleInterval from './routeScheduleInterval';
 
 export interface RouteInterface {
     id: number;
@@ -7,7 +7,7 @@ export interface RouteInterface {
     enabled: boolean;
     color: string;
     width: number;
-    schedule: routeScheduleInterval[];
+    schedule: RouteScheduleInterval[];
     points: Array<{
         latitude: number,
         longitude: number,
@@ -25,7 +25,7 @@ export default class Route implements RouteInterface {
     public enabled: boolean;
     public color: string;
     public width: number;
-    public schedule: routeScheduleInterval[];
+    public schedule: RouteScheduleInterval[];
     public active: boolean;
     public points: Array<{
         latitude: number,
@@ -37,7 +37,7 @@ export default class Route implements RouteInterface {
                 color: string, width: number, points: Array<{
             latitude: number,
             longitude: number,
-        }>,     schedule: routeScheduleInterval[], active: boolean, stop_ids: number[]) {
+        }>,     schedule: RouteScheduleInterval[], active: boolean, stop_ids: number[]) {
 
         this.active = active;
         this.id = id;

@@ -1,7 +1,7 @@
 const dateToSttr: string[] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 // A helper class for schedules, corresponds to routeActiveInternal
-export default class RotueScheduleInterval {
+export default class RouteScheduleInterval {
     public id: number;
     public route_id: number;
     public start_time: Date;
