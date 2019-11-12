@@ -14,7 +14,7 @@
             <place-stop v-if="creation" @coordinates="setCoordinates"/>
         </div>
         <div class="form-horizontal column" >
-            
+
             <!-- Text input-->
             <div class="field">
             <label class="label" for="Name">Name</label>

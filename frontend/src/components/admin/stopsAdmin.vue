@@ -45,7 +45,6 @@ import { Stop } from '@/structures/stop';
 import stopsEditing from './stopsEditing.vue';
 export default Vue.extend({
     name: 'stops',
-
     computed: {
         stops(): Stop[] {
             return this.$store.state.Stops;
@@ -53,4 +52,6 @@ export default Vue.extend({
     },
 
 });
+
+
 </script>
