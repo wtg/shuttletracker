@@ -24,7 +24,7 @@ func TestCreateEmptySchedule(t *testing.T) {
 	}
 
 	// make sure the schedule is empty and route is active
-	if len(route.Schedule) != 0 {
+	if len(route.schedule) != 0 {
 		t.Error("schedule is not empty")
 	}
 	if !route.Active {
@@ -36,7 +36,7 @@ func TestCreateEmptySchedule(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to get Route: %s", err)
 	}
-	if len(route.Schedule) != 0 {
+	if len(route.schedule) != 0 {
 		t.Error("schedule is not empty")
 	}
 	if !route.Active {
@@ -69,8 +69,8 @@ func TestCreateSchedule(t *testing.T) {
 	}
 
 	// make sure the schedule is the correct size and route is active
-	if len(route.Schedule) != 1 {
-		t.Errorf("wrong schedule length: %d", len(route.Schedule))
+	if len(route.schedule) != 1 {
+		t.Errorf("wrong schedule length: %d", len(route.schedule))
 	}
 	if !route.Active {
 		t.Error("route is not active")
@@ -81,8 +81,8 @@ func TestCreateSchedule(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to get Route: %s", err)
 	}
-	if len(route.Schedule) != 1 {
-		t.Errorf("wrong schedule length: %d", len(route.Schedule))
+	if len(route.schedule) != 1 {
+		t.Errorf("wrong schedule length: %d", len(route.schedule))
 	}
 	if !route.Active {
 		t.Error("route is not active")
@@ -97,8 +97,8 @@ func TestCreateSchedule(t *testing.T) {
 		t.Fatalf("wrong Routes length: %d", len(routes))
 	}
 	route = routes[0]
-	if len(route.Schedule) != 1 {
-		t.Errorf("wrong schedule length: %d", len(route.Schedule))
+	if len(route.schedule) != 1 {
+		t.Errorf("wrong schedule length: %d", len(route.schedule))
 	}
 	if !route.Active {
 		t.Error("route is not active")
@@ -123,15 +123,15 @@ func TestModifySchedule(t *testing.T) {
 	}
 
 	// make sure the schedule is the correct size and route is active
-	if len(route.Schedule) != 0 {
-		t.Errorf("wrong schedule length: %d", len(route.Schedule))
+	if len(route.schedule) != 0 {
+		t.Errorf("wrong schedule length: %d", len(route.schedule))
 	}
 	if !route.Active {
 		t.Error("route is not active")
 	}
 
 	// modify the route schedule and check again
-	route.Schedule = shuttletracker.RouteSchedule{
+	route.schedule = shuttletracker.RouteSchedule{
 		shuttletracker.RouteActiveInterval{
 			StartDay:  time.Sunday,
 			StartTime: time.Date(0, 1, 0, 0, 0, 0, 0, time.UTC),
@@ -143,8 +143,8 @@ func TestModifySchedule(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to modify Route: %s", err)
 	}
-	if len(route.Schedule) != 1 {
-		t.Errorf("wrong schedule length: %d", len(route.Schedule))
+	if len(route.schedule) != 1 {
+		t.Errorf("wrong schedule length: %d", len(route.schedule))
 	}
 	if !route.Active {
 		t.Error("route is not active")
@@ -154,15 +154,15 @@ func TestModifySchedule(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to get Route: %s", err)
 	}
-	if len(route.Schedule) != 1 {
-		t.Errorf("wrong schedule length: %d", len(route.Schedule))
+	if len(route.schedule) != 1 {
+		t.Errorf("wrong schedule length: %d", len(route.schedule))
 	}
 	if !route.Active {
 		t.Error("route is not active")
 	}
 
 	// modify the route schedule and check again
-	route.Schedule = shuttletracker.RouteSchedule{
+	route.schedule = shuttletracker.RouteSchedule{
 		shuttletracker.RouteActiveInterval{
 			StartDay:  time.Sunday,
 			StartTime: time.Date(0, 1, 0, 0, 0, 0, 0, time.UTC),
@@ -180,8 +180,8 @@ func TestModifySchedule(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to modify Route: %s", err)
 	}
-	if len(route.Schedule) != 2 {
-		t.Errorf("wrong schedule length: %d", len(route.Schedule))
+	if len(route.schedule) != 2 {
+		t.Errorf("wrong schedule length: %d", len(route.schedule))
 	}
 	if !route.Active {
 		t.Error("route is not active")
@@ -191,21 +191,21 @@ func TestModifySchedule(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to get Route: %s", err)
 	}
-	if len(route.Schedule) != 2 {
-		t.Errorf("wrong schedule length: %d", len(route.Schedule))
+	if len(route.schedule) != 2 {
+		t.Errorf("wrong schedule length: %d", len(route.schedule))
 	}
 	if !route.Active {
 		t.Error("route is not active")
 	}
 
 	// delete the route schedule and check again
-	route.Schedule = shuttletracker.RouteSchedule{}
+	route.schedule = shuttletracker.RouteSchedule{}
 	err = pg.ModifyRoute(route)
 	if err != nil {
 		t.Fatalf("unable to modify Route: %s", err)
 	}
-	if len(route.Schedule) != 0 {
-		t.Errorf("wrong schedule length: %d", len(route.Schedule))
+	if len(route.schedule) != 0 {
+		t.Errorf("wrong schedule length: %d", len(route.schedule))
 	}
 	if !route.Active {
 		t.Error("route is not active")
@@ -215,8 +215,8 @@ func TestModifySchedule(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to get Route: %s", err)
 	}
-	if len(route.Schedule) != 0 {
-		t.Errorf("wrong schedule length: %d", len(route.Schedule))
+	if len(route.schedule) != 0 {
+		t.Errorf("wrong schedule length: %d", len(route.schedule))
 	}
 	if !route.Active {
 		t.Error("route is not active")

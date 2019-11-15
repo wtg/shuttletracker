@@ -170,7 +170,7 @@ GROUP BY r.id;
 			return nil, err
 		}
 		r.Points = p.points
-		r.Schedule = shuttletracker.RouteSchedule{}
+		r.schedule = shuttletracker.RouteSchedule{}
 		routes = append(routes, r)
 		idsToRoute[r.ID] = r
 	}
@@ -190,7 +190,7 @@ GROUP BY r.id;
 		if !ok {
 			return nil, shuttletracker.ErrRouteNotFound
 		}
-		route.Schedule = append(route.Schedule, interval)
+		route.schedule = append(route.schedule, interval)
 	}
 
 	err = tx.Commit()
@@ -241,7 +241,7 @@ func (rs *RouteService) Route(id int64) (*shuttletracker.Route, error) {
 		if err != nil {
 			return nil, err
 		}
-		r.Schedule = append(r.Schedule, interval)
+		r.schedule = append(r.schedule, interval)
 	}
 
 	err = tx.Commit()
@@ -314,7 +314,7 @@ func (rs *RouteService) CreateRoute(route *shuttletracker.Route) error {
 	}
 
 	// insert route schedule
-	for _, interval := range route.Schedule {
+	for _, interval := range route.schedule {
 		statement = "INSERT INTO route_schedules (route_id, start_day, start_time, end_day, end_time)" +
 			" VALUES ($1, $2, $3, $4, $5) RETURNING id;"
 		row = tx.QueryRow(statement, route.ID, interval.StartDay, interval.StartTime, interval.EndDay, interval.EndTime)
@@ -395,7 +395,7 @@ func (rs *RouteService) ModifyRoute(route *shuttletracker.Route) error {
 	}
 
 	// insert route schedule
-	for _, interval := range route.Schedule {
+	for _, interval := range route.schedule {
 		statement = "INSERT INTO route_schedules (route_id, start_day, start_time, end_day, end_time)" +
 			" VALUES ($1, $2, $3, $4, $5) RETURNING id;"
 		row := tx.QueryRow(statement, route.ID, interval.StartDay, interval.StartTime, interval.EndDay, interval.EndTime)

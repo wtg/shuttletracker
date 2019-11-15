@@ -84,10 +84,10 @@ func (api *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	en := route.Enabled
-	sched := route.Schedule
+	sched := route.schedule
 	route, err = api.ms.Route(route.ID)
 	route.Enabled = en
-	route.Schedule = sched
+	route.schedule = sched
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
