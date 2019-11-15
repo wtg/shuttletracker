@@ -11,20 +11,16 @@
             <th>Stop</th>
             <th>ETA</th>
             <th>Arriving</th>
-            <th>Route ID</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="!etas.length">No ETAS Currently Calculated</tr>
-            <template v-for="(eta) in etas">
-              <tr v-for="(info, i) in eta" v-bind:key="`${i}-${info.stopID}`">
-                <td>{{ info.vehicleID }}</td>
-                <td>{{ info.stopID }}</td>
-                <td>{{ info.eta }}</td>
-                <td>{{ info.arriving }}</td>
-                <td>{{ info.routeID }}</td>
-              </tr>
-            </template>
+          <tr v-for="(eta, i) in etas" v-bind:key="i">
+            <td>{{ String(eta[i]) }}</td>
+            <td>{{ String(eta[i]) }}</td>
+            <td>{{ String(eta[i]) }}</td>
+            <td>{{ String(eta[i]) }}</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -38,48 +34,20 @@ import ETA from '@/structures/eta';
 
 export default Vue.extend({
   computed: {
-    etas(): any[] {
-      const etaArray = [];
-      for (let i = 0; i < 11; i++) {
-        const etaString = localStorage.getItem(String(i + 1));
-        if (etaString) {
-          const localETA = JSON.parse(etaString);
-          const ret = [];
-          if (localETA.length) {
-            for (const eta of localETA) {
-              const now = new Date();
-              const from = new Date(eta.eta);
-              const minuteMs = 60 * 1000;
-              const elapsed = from.getTime() - now.getTime();
-
-              let etaMinutes = `A while`;
-              // cap display at 15 min
-              if (elapsed < minuteMs * 15) {
-                if (Math.round(elapsed / minuteMs) === 0) {
-                  etaMinutes = `Less than a minute`;
-                } else if (Math.round(elapsed / minuteMs) === 1) {
-                  etaMinutes = `${Math.round(elapsed / minuteMs)} minute`;
-                } else {
-                    etaMinutes =  `${Math.round(elapsed / minuteMs)} minutes`;
-                }
-              }
-
-              const e = {eta: etaMinutes,
-                        arriving: eta.arriving,
-                        vehicleID: eta.vehicleID,
-                        stopID: eta.stopID,
-                        routeID: eta.routeID};
-              if (elapsed >= 0) {
-                ret.push(e);
-              }
-            }
-            etaArray.push(ret);
-          }
+    etas(): ETA[] {
+      const ret = [];
+      const etaString = localStorage.getItem('etas');
+      if (etaString) {
+        const localETA = JSON.parse(etaString);
+        console.log(localETA);
+        for (const eta of localETA) {
+          const e = Object.create({eta: localETA.eta, arriving: localETA.arriving,
+          vehicleID: localETA.vehicleID, stopID: localETA.stopID, routeID: localETA.routeID});
+          ret.push(e);
         }
-
       }
-      console.log(etaArray);
-      return etaArray;
+      console.log(ret);
+      return ret;
       // return ret.sort((a, b) => {
       //   if (a.vehicle.name > b.vehicle.name) {
       //     return 1;
@@ -91,10 +59,6 @@ export default Vue.extend({
     },
   },
 
-});
-
-window.addEventListener('storage', () => {
-  location.reload();
 });
 </script>
 
