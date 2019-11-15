@@ -14,11 +14,12 @@
           </tr>
         </thead>
         <tbody>
+          <tr v-if="!etas.length">No ETAS Currently Calculated</tr>
           <tr v-for="(eta, i) in etas" v-bind:key="i">
-            <td>{{ eta.vehicle.name }}</td>
-            <td>{{ eta.stop.name }}</td>
-            <td>{{ eta.eta }}</td>
-            <td>{{ eta.arriving }}</td>
+            <td>{{ String(eta[i]) }}</td>
+            <td>{{ String(eta[i]) }}</td>
+            <td>{{ String(eta[i]) }}</td>
+            <td>{{ String(eta[i]) }}</td>
           </tr>
         </tbody>
       </table>
@@ -33,37 +34,31 @@ import ETA from '@/structures/eta';
 
 export default Vue.extend({
   computed: {
-    etas(): any[] {
+    etas(): ETA[] {
       const ret = [];
-      for (const eta of this.$store.state.etas) {
-        const e = Object.create({eta: eta.eta, arriving: eta.arriving});
-
-        for (const vehicle of this.$store.state.Vehicles) {
-          if (eta.vehicleID === vehicle.id) {
-            e.vehicle = vehicle;
-            break;
-          }
+      const etaString = localStorage.getItem('etas');
+      if (etaString) {
+        const localETA = JSON.parse(etaString);
+        console.log(localETA);
+        for (const eta of localETA) {
+          const e = Object.create({eta: localETA.eta, arriving: localETA.arriving,
+          vehicleID: localETA.vehicleID, stopID: localETA.stopID, routeID: localETA.routeID});
+          ret.push(e);
         }
-
-        for (const stop of this.$store.state.Stops) {
-          if (eta.stopID === stop.id) {
-            e.stop = stop;
-            break;
-          }
-        }
-
-        ret.push(e);
       }
-      return ret.sort((a, b) => {
-        if (a.vehicle.name > b.vehicle.name) {
-          return 1;
-        } else if (a.vehicle.name < b.vehicle.name) {
-          return -1;
-        }
-        return 0;
-      });
+      console.log(ret);
+      return ret;
+      // return ret.sort((a, b) => {
+      //   if (a.vehicle.name > b.vehicle.name) {
+      //     return 1;
+      //   } else if (a.vehicle.name < b.vehicle.name) {
+      //     return -1;
+      //   }
+      //   return 0;
+      // });
     },
   },
+
 });
 </script>
 

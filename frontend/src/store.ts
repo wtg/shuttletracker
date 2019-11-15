@@ -8,6 +8,7 @@ import Vehicle from '@/structures/vehicle';
 import Location from '@/structures/location';
 import * as L from 'leaflet';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
+import ETA from './structures/eta';
 
 Vue.use(Vuex);
 const InfoService = new InfoServiceProvider();
