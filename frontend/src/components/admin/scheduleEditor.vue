@@ -17,7 +17,7 @@
                     <option value=3>Wednesday</option>
                     <option value=4>Thursday</option>
                     <option value=5>Friday</option>
-                    <option value=6>Satruday</option>
+                    <option value=6>Saturday</option>
                     </select>
                 </span>
             </div>
@@ -36,7 +36,7 @@
                     <option value=3>Wednesday</option>
                     <option value=4>Thursday</option>
                     <option value=5>Friday</option>
-                    <option value=6>Satruday</option>
+                    <option value=6>Saturday</option>
                     </select>
                 </span>
             </div>
