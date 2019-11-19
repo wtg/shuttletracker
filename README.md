@@ -30,6 +30,7 @@ More project documentation can be found on the [Repository Wiki](https://github.
 16. Start the app by running `./shuttletracker`
 17. Add yourself as an administrator by using `./shuttletracker admins --add RCS_ID`, replacing `RCS_ID` with your RCS ID. See the "Administrators" section below for more information.
 18. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel.
+19. (Optional) Import live data from [/routes](https://shuttles.rpi.edu/routes), [/stops](https://shuttles.rpi.edu/stops), and [/vehicles](https://shuttles.rpi.edu/vehicles).
 
 ## Setting up (macOS)
 
@@ -52,6 +53,7 @@ More project documentation can be found on the [Repository Wiki](https://github.
 15. Start the app by running `./shuttletracker`
 16. Add yourself as an administrator by using `./shuttletracker admins --add RCS_ID`, replacing `RCS_ID` with your RCS ID. See the "Administrators" section below for more information.
 17. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel.
+18. (Optional) Import live data from [/routes](https://shuttles.rpi.edu/routes), [/stops](https://shuttles.rpi.edu/stops), and [/vehicles](https://shuttles.rpi.edu/vehicles).
 
 ## Configuration
 
