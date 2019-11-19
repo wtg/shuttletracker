@@ -160,7 +160,6 @@ func (u *Updater) update() {
 	}
 }
 
-/*
 // checks if a route should be active
 func (u *Updater) UpdateRoutes() (route *shuttletracker.Route, err error){
 	routes, err := u.ms.Routes()
@@ -169,10 +168,9 @@ func (u *Updater) UpdateRoutes() (route *shuttletracker.Route, err error){
 	}
 
 	for _, route := range routes {
-		if ()
+		route.
 	}
 }
-*/
 
 // nolint: gocyclo
 func (u *Updater) handleVehicleData(vehicleData string) {

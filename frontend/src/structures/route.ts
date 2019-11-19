@@ -64,6 +64,16 @@ export default class Route implements RouteInterface {
         return false;
     }
 
-
+    public containsTime(): boolean {
+        const currentTime = new Date();
+        for (const thisInterval of this.schedule) {
+            if (currentTime.getTime() >= thisInterval.start_time.getTime() && currentTime.getTime() <= thisInterval.end_time.getTime()) {
+                this.active = true;
+                return true;
+            }
+        }
+        this.active = false;
+        return false;
+    }
 
 }
