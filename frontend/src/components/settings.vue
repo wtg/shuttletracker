@@ -44,7 +44,7 @@
         <tbody>
             <tr v-for="route in routes" :key="route.id" v-if="route.active">
             <th class = "route_format">{{route.name}}</th>
-            <td><b-switch v-bind:value="route.enabled" v-on:input="routeEnable(route)"></b-switch></td>
+            <td><b-switch v-bind:value="route.enabled" v-on:input="routeToggle(route)"></b-switch></td>
             </tr>
         </tbody>
     </table>
@@ -122,7 +122,7 @@ export default Vue.extend({
     },
   },
   methods: {
-      routeEnable(thisRoute: Route) {
+      routeToggle(thisRoute: Route) {
           // actually toggle the route
           thisRoute.enabled = !thisRoute.enabled;
           // push the changed route to the store

@@ -52,7 +52,6 @@ export default Vue.extend({
       userShuttleidCount: 0,
       initialized: false,
       legend: new L.Control({ position: 'bottomleft' }),
-      toggle: new L.Control({ position : 'topright' }),
       locationMarker: undefined,
       fusion: new Fusion(),
       currentETAInfo: null,
@@ -65,7 +64,6 @@ export default Vue.extend({
         existingRouteLayers: L.Polyline[];
         initialized: boolean;
         legend: L.Control;
-        toggle: L.Control;
         locationMarker: L.Marker | undefined;
         userShuttleidCount: number;
         fusion: Fusion;
