@@ -153,7 +153,8 @@ export default Vue.extend({
         grabMyStop() {
             for (let i = 0; i < this.$store.getters.getStops.length; i ++) {
                 const testStop = this.$store.getters.getStops[i];
-                const id = this.stop.id;
+                const id = this.$route.params.id;
+                console.log(id);
 
                 // i have no idea how this statement works
                 if (Number(testStop.id) === Number(id)) {
@@ -164,6 +165,8 @@ export default Vue.extend({
                     this.stop.latitude = Number(testStop.latitude);
                     this.stop.longitude = Number(testStop.longitude);
                 }
+                console.log(this.stop.id);
+                console.log(this.stop.latitude);
             }
         },
     },

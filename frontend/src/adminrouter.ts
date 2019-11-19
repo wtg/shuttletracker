@@ -50,7 +50,7 @@ export default new Router({
         path: '/admin/stops/:id/edit',
         name: 'edit stop',
         component: stopsEditing,
-        props: { creation: false },
+        props: { creation: false},
       },
       {
         path: '/admin/stops',
