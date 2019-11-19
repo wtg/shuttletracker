@@ -5,8 +5,8 @@
         <ul id="queue">
           <li>West Shuttle - XX:XX</li>
           <li>East Shuttle - XX:XX</li>
-          <li>West Shuttle - XX:XX</li>
           <li>East Shuttle - XX:XX</li>
+          <li>West Shuttle - XX:XX</li>
         </ul>
       </div>
   </div>
@@ -16,9 +16,16 @@
 
 // This component is the ETAs component for the tv panel
 import Vue from 'vue';
+import ETA from '@/structures/eta';
+import axios from 'axios';
 
 export default Vue.extend({
   props: ['etaInfo', 'show'],
+  data() {
+     return {
+        etas: [],
+     };
+  },
   computed: {
     message(): string | null {
       if (this.etaInfo === null) {
@@ -55,10 +62,22 @@ export default Vue.extend({
         }
       }
     },
+    retrieveEtaData() {
+      axios.get('https://shuttles.rpi.edu/eta', {
+              headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Content-Type': 'application/json',
+                'mode': 'no-cors',
+              },
+              })
+      .then((res) => console.log(res.data));
+
+   },
   },
   // Allow this function to be called on page load
   mounted() {
     this.changeTextColor();
+    this.retrieveEtaData();
   },
 });
 
@@ -93,14 +112,14 @@ function relativeTime(from: Date, to: Date): string {
   li {
   border: 1px solid rgb(228, 228, 228);
   border-radius: 3px;
+  font-size: 20px;
   margin: 10px;
   padding: 10px;
 }
 // West color = #0080FF
 // Weekend late night color = #9b59b6
-// East inclement weather color = #ff9900 
-// West inclement weather color = #FF0 
-// Arch East Campus color = #DCC308 ??? This looks fake 
+// East inclement weather color = #ff9900
+// West inclement weather color = #FF0
 // East color = #96C03A
 
 
