@@ -9,7 +9,7 @@ More project documentation can be found on the [Repository Wiki](https://github.
 ## Setting up (Linux / WSL)
 
 1. [Install Go](https://golang.org/doc/install). Shuttle Tracker requires Go 1.11 or newer, and we recommend using the latest stable Go release.
-2. Clone the repository to your computer. This can be done with `git clone git@github.com:wtg/shuttletracker.git`. If you receive a "permission denied" error, ensure you have [added your SSH key to your GitHub account](https://help.github.com/articles/connecting-to-github-with-ssh/).
+2. Clone the repository to your computer. This can be done with `git clone https://github.com/wtg/shuttletracker`.
 3. Ensure you have [Postgres downloaded](https://www.postgresql.org/download/), installed.
     - This can be done with `sudo apt-get install postgresql`
 4. Create a postgres databased titled "shuttletracker".
@@ -30,6 +30,7 @@ More project documentation can be found on the [Repository Wiki](https://github.
 16. Start the app by running `./shuttletracker`
 17. Add yourself as an administrator by using `./shuttletracker admins --add RCS_ID`, replacing `RCS_ID` with your RCS ID. See the "Administrators" section below for more information.
 18. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel.
+19. (Optional) Import live data from [/routes](https://shuttles.rpi.edu/routes), [/stops](https://shuttles.rpi.edu/stops), and [/vehicles](https://shuttles.rpi.edu/vehicles).
 
 ## Setting up (macOS)
 
@@ -52,6 +53,7 @@ More project documentation can be found on the [Repository Wiki](https://github.
 15. Start the app by running `./shuttletracker`
 16. Add yourself as an administrator by using `./shuttletracker admins --add RCS_ID`, replacing `RCS_ID` with your RCS ID. See the "Administrators" section below for more information.
 17. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel.
+18. (Optional) Import live data from [/routes](https://shuttles.rpi.edu/routes), [/stops](https://shuttles.rpi.edu/stops), and [/vehicles](https://shuttles.rpi.edu/vehicles).
 
 ## Configuration
 

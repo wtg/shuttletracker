@@ -7,7 +7,26 @@
       <p class="help">Use your location to help make Shuttle Tracker more accurate for everyone. Your location is gathered anonymously while Shuttle Tracker is open.</p>
     </div>
     <div class="field">
-      <b-switch v-model="busButtonEnabled">Bus button</b-switch>
+    <b-switch v-model="busButtonEnabled">  Bus button <span>
+      <div class="field">
+          <div class="control">
+              <div class="select is-small">
+                  <div class="select is-danger">
+                      <div class="select is-rounded">
+                          <select v-model="busButtonChoice">
+                              <option>🚐</option>
+                              <option>🚌</option>
+                              <option>🚗</option>
+                              <option>🚓</option>
+                              <option>🚜</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      </span>
+      </b-switch>
       <p class="help">Place a bus on other users' maps and let others place buses on your map.</p>
     </div>
 
@@ -47,6 +66,14 @@ export default Vue.extend({
       },
       set(value: boolean) {
         this.$store.commit('setSettingsBusButtonEnabled', value);
+      },
+    },
+    busButtonChoice: {
+      get(): string {
+        return this.$store.state.settings.busButtonChoice;
+      },
+      set(value: string) {
+        this.$store.commit('setSettingsBusButtonChoice', value);
       },
     },
     fusionPositionEnabled: {
@@ -113,5 +140,8 @@ export default Vue.extend({
 .route_format {
   color: red;
   font-weight: bold;
+}
+.field {
+    display: inline-block;
 }
 </style>
