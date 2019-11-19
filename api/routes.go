@@ -1,7 +1,6 @@
 package api
 
 import (
-
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -9,6 +8,14 @@ import (
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
 )
+
+func (api *API) ETAHandler(w http.ResponseWriter, r *http.Request) {
+	etas := api.etaManager.CurrentETAs()
+	err := WriteJSON(w, etas)
+	if err != nil {
+		return
+	}
+}
 
 // RoutesHandler finds all of the routes in the database
 func (api *API) RoutesHandler(w http.ResponseWriter, r *http.Request) {
