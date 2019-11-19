@@ -380,7 +380,7 @@ export default Vue.extend({
 input, label{
   display: inline-block;
   vertical-align: middle;
-  margin: 10px 0;
+  margin: 2px 0;
 }
 
 #mymap {
