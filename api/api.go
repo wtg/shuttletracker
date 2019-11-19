@@ -108,6 +108,10 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		})
 	})
 
+	r.Route("/eta", func(r chi.Router) {
+		r.Get("/", api.ETAHandler)
+	})
+
 	// Stops
 	r.Route("/stops", func(r chi.Router) {
 		r.Get("/", api.StopsHandler)
