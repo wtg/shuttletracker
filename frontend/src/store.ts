@@ -30,6 +30,7 @@ const store: StoreOptions<StoreState> = {
       busButtonEnabled: false,
       etasEnabled: false,
       fusionPositionEnabled: true,
+      busButtonChoice: '🚌',
     },
     geolocationDenied: false,
     fusionConnected: undefined,
@@ -98,7 +99,9 @@ const store: StoreOptions<StoreState> = {
           state.etas.splice(i, 1);
         }
       }
-
+      if (etas) {
+        localStorage.setItem('etas', JSON.stringify(etas));
+      }
       // store new ETAs
       for (const eta of etas) {
         state.etas.push(eta);
@@ -113,6 +116,10 @@ const store: StoreOptions<StoreState> = {
     },
     setSettingsBusButtonEnabled(state, value: boolean) {
       state.settings.busButtonEnabled = value;
+      localStorage.setItem('st_settings', JSON.stringify(state.settings));
+    },
+    setSettingsBusButtonChoice(state, value: string) {
+      state.settings.busButtonChoice = value;
       localStorage.setItem('st_settings', JSON.stringify(state.settings));
     },
     setSettingsETAsEnabled(state, value: boolean) {
@@ -134,7 +141,9 @@ const store: StoreOptions<StoreState> = {
       state.Stops.forEach((stop: Stop) => {
         state.Routes.forEach((route: Route) => {
           if (route.containsStop(stop.id) && route.active) {
-            stop.addRoute(route);
+              if (!stop.containsRoute(route.id)) {
+                  stop.addRoute(route);
+              }
           }
         });
       });

@@ -146,13 +146,13 @@ export default Vue.extend({
   },
   methods: {
     spawn() {
-      this.spawnShuttleAtPosition(UserLocationService.getInstance().getCurrentLocation());
+      this.spawnShuttleAtPosition(UserLocationService.getInstance().getCurrentLocation(), this.$store.state.settings.busButtonChoice);
     },
     saucyspawn(message: any) {
       if (message.type !== 'bus_button') {
         return;
       }
-      this.spawnShuttleAtPosition(message.message);
+      this.spawnShuttleAtPosition(message.message, message.message.emojiChoice);
     },
     updateLegend() {
       this.legend.onAdd = (map: L.Map) => {
@@ -169,14 +169,19 @@ export default Vue.extend({
           }
         });
         div.innerHTML =
-          `<ul style="list-style:none">
+          `<ul style="list-style:none;">
 					<li><img class="legend-icon" src='` +
           UserSVG +
-          `' width="12" height="12"> You</li>` +
+          `' width="12" height="12"> You
+
+
+          </li>` +
           legendstring +
           `<li><img class="legend-icon" src="` +
           StopSVG +
-          `" width="12" height="12"> Shuttle Stop</li>
+          `" width="12" height="12"> Shuttle Stop
+
+          </li>
 				</ul>`;
         return div;
       };
@@ -213,8 +218,12 @@ export default Vue.extend({
     renderStops() {
       this.$store.state.Stops.forEach((stop: Stop) => {
         if (this.Map !== undefined) {
-          stop.marker.bindPopup(stop.getMessage());
-          stop.marker.addTo(this.Map);
+            if (stop.shouldShow()) {
+                stop.marker.bindPopup(stop.getMessage());
+                stop.marker.addTo(this.Map);
+            } else {
+                stop.marker.removeFrom(this.Map);
+            }
         }
       });
     },
@@ -225,14 +234,13 @@ export default Vue.extend({
         }
       });
     },
-    spawnShuttleAtPosition(position: any) {
+    spawnShuttleAtPosition(position: any, emoji: any) {
       if (!this.$store.getters.getBusButtonShowBuses) {
         return;
       }
       this.userShuttleidCount ++;
       const busIcon = L.divIcon({
-        html: `<span class="shuttleusericon shuttleusericon` + String(this.userShuttleidCount) +  `" >🚐</span>`,
-
+        html: `<span class="shuttleusericon shuttleusericon` + String(this.userShuttleidCount) + '">' + emoji + '</span>',
         iconSize: [20, 20], // size of the icon
         iconAnchor: [10, 10], // point of the icon which will correspond to marker's location
         shadowAnchor: [6, 6], // the same for the shadow
@@ -348,6 +356,7 @@ export default Vue.extend({
     updateStops() {
       this.$store.commit('setRoutesOnStops');
     },
+
   },
   components: {
     messagebox,
@@ -366,6 +375,12 @@ export default Vue.extend({
   position: relative;
   display: flex;
   flex-direction: column;
+}
+
+input, label{
+  display: inline-block;
+  vertical-align: middle;
+  margin: 2px 0;
 }
 
 #mymap {
@@ -446,6 +461,8 @@ export default Vue.extend({
   background-color: rgba(255, 255, 255, 0.9);
   padding: 5px;
   bottom: 25px;
+  align-content: right;
+
 
   & ul {
     margin-top: 2px;
@@ -454,13 +471,39 @@ export default Vue.extend({
   }
 }
 
+.info.toggle {
+    box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    top: 5px;
+
+    & ul {
+      margin-top: 2px;
+      margin-bottom: 2px;
+      padding-left: 0px;
+    }
+}
+.button {
+    background: #ee2222;
+    color: white;
+    float: right;
+    border-radius: 1px;
+    padding: 0.35em;
+    font-size: 10px;
+    margin: 0;
+    width: 2.75em;
+    height: 1.575em;
+    margin-top: 6px;
+}
+
 .shuttleusericon{
   background-color: transparent;
   border: none;
   animation: fadeOutUp 2s ease;
   display: block;
-  font-size: 20px; 
-  bottom: 0px; 
+  font-size: 20px;
+  bottom: 0px;
   right: 0px;
   z-index: 2000 !important;
 }
@@ -474,7 +517,7 @@ export default Vue.extend({
       opacity: 0;
       transform: translateY(-40px);
    }
-} 
+}
 
 .leaflet-div-icon {
   background: transparent !important;
@@ -485,9 +528,9 @@ export default Vue.extend({
 }
 
 #busbutton{
-  position: absolute; 
-  right: 25px; 
-  bottom: 35px; 
+  position: absolute;
+  right: 25px;
+  bottom: 35px;
   z-index: 2000;
 }
 </style>

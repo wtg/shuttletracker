@@ -13,8 +13,6 @@ import (
 	"github.com/wtg/shuttletracker/updater"
 )
 
-const earthRadius = 6371000.0 // meters
-
 // ETAManager implements ETAService and provides ETAs for Vehicles to Stops.
 type ETAManager struct {
 	ms          shuttletracker.ModelService
@@ -47,6 +45,152 @@ func NewManager(ms shuttletracker.ModelService, updater *updater.Updater) (*ETAM
 // determine new ETAs for the vehicle in another goroutine.
 func (em *ETAManager) locationSubscriber(loc *shuttletracker.Location) {
 	go em.handleNewLocation(loc)
+}
+
+func (em *ETAManager) handleNewLocation(loc *shuttletracker.Location) {
+	if loc.VehicleID == nil {
+		// can't do anything...
+		return
+	}
+	vehicleID := *loc.VehicleID
+	eta, err := em.calculateVehicleETAs(vehicleID)
+	if err != nil {
+		log.WithError(err).Errorf("unable to calculate ETAs for vehicle ID %d", vehicleID)
+		return
+	}
+
+	log.Debugf("calculated ETAs for vehicle ID %d", vehicleID)
+	em.etaChan <- eta
+}
+
+func (em *ETAManager) calculateVehicleETAs(vehicleID int64) (*shuttletracker.VehicleETA, error) {
+	// get vehicle info
+	vehicle, err := em.ms.Vehicle(vehicleID)
+	if err != nil {
+		return nil, err
+	}
+
+	loc, err := em.ms.LatestLocation(vehicleID)
+	if err != nil {
+		return nil, err
+	}
+
+	locPoint := shuttletracker.Point{Latitude: loc.Latitude, Longitude: loc.Longitude}
+
+	eta := &shuttletracker.VehicleETA{
+		VehicleID: vehicleID,
+		StopETAs:  []shuttletracker.StopETA{},
+		Updated:   time.Now(),
+	}
+
+	// get route info for vehicle's current route
+	if loc.RouteID == nil {
+		// vehicle isn't on route
+		return eta, nil
+	}
+
+	routeID := *loc.RouteID
+	eta.RouteID = routeID
+	route, err := em.ms.Route(routeID)
+	if err != nil {
+		return nil, err
+	}
+
+	lastDepartureTrack, err := em.getLastDepartureTrack(vehicle, route)
+	if err != nil {
+		return nil, err
+	}
+	if len(lastDepartureTrack) < 1 {
+		return eta, nil
+	}
+
+	// is this track on the route?
+	if !em.trackNearRoute(lastDepartureTrack, route) {
+		return eta, nil
+	}
+
+	// stops visited in correct order?
+	// inOrder, err := em.stopsVisitedInOrder(route, lastDepartureTrack)
+	// if err != nil {
+	// 	log.WithError(err).Error("unable to determine if stops visited in order")
+	// 	return
+	// }
+	// if !inOrder {
+	// 	log.Debug("stops not visited in order")
+	// 	return
+	// }
+
+	durs, err := em.determineAverageTravelTimes(route)
+	if err != nil {
+		return nil, err
+	}
+
+	// find index of stop zone on the route the vehicle is nearest to
+	locIndices, err := em.determineNearestStopIndicesAlongRoute(lastDepartureTrack, route)
+	if err != nil {
+		return nil, err
+	}
+
+	// The last locIndex is where the vehicle is now. If the track is short, we can't determine this.
+	if len(locIndices) == 0 {
+		return eta, nil
+	}
+	locIndex := locIndices[len(locIndices)-1]
+
+	for i, stopID := range route.StopIDs {
+		// find which zoneIndex this stop has
+		zoneIdx := i
+
+		// how many zones do we have to traverse to get there?
+		traversal := zoneIdx - locIndex
+		if traversal < 0 {
+			// we passed the zone
+			continue
+		}
+
+		// If this is zero, then the latest location is in the same zone as the stop.
+		// This is useful to know since ETAs within a zone are probably not great.
+		// Clients can just display a message about a vehicle arriving instead of
+		// an ETA with a specific time.
+		arriving := traversal == 0
+
+		// add up zone travel durations
+		totalDuration := time.Duration(0)
+		for j := locIndex; j < zoneIdx; j++ {
+			totalDuration += durs[j]
+		}
+		// last zone duration is half since stop is halfway through zone
+		totalDuration += durs[zoneIdx] / 2
+
+		etaTime := loc.Created.Add(totalDuration)
+
+		// sanity check
+		if !etaTime.After(time.Now()) {
+			log.Warn("ETA is in the past")
+			continue
+		}
+
+		// would this ETA mean that the vehicle has to travel more than 35 mph (~15.6 meters/sec)?
+		stop, err := em.ms.Stop(stopID)
+		if err != nil {
+			return nil, err
+		}
+		stopPoint := shuttletracker.Point{Latitude: stop.Latitude, Longitude: stop.Longitude}
+		directDistance := distanceBetween(locPoint, stopPoint)
+		if directDistance/totalDuration.Seconds() > 15.6 {
+			log.Warn("ETA is impossibly soon")
+			continue
+		}
+
+		stopETA := shuttletracker.StopETA{
+			StopID:   stopID,
+			ETA:      etaTime,
+			Arriving: arriving,
+		}
+		eta.StopETAs = append(eta.StopETAs, stopETA)
+	}
+
+	return eta, nil
 }
 
 // Run is in charge of managing all of the state inside of ETAManager.
@@ -84,22 +228,6 @@ func (em *ETAManager) createInitialETAs() error {
 		em.etaChan <- eta
 	}
 	return nil
-}
-
-func (em *ETAManager) handleNewLocation(loc *shuttletracker.Location) {
-	if loc.VehicleID == nil {
-		// can't do anything...
-		return
-	}
-	vehicleID := *loc.VehicleID
-	eta, err := em.calculateVehicleETAs(vehicleID)
-	if err != nil {
-		log.WithError(err).Errorf("unable to calculate ETAs for vehicle ID %d", vehicleID)
-		return
-	}
-
-	log.Debugf("calculated ETAs for vehicle ID %d", vehicleID)
-	em.etaChan <- eta
 }
 
 func (em *ETAManager) handleNewETA(eta *shuttletracker.VehicleETA) {
@@ -158,254 +286,6 @@ func (em *ETAManager) CurrentETAs() map[int64]shuttletracker.VehicleETA {
 	etasChan := make(chan map[int64]shuttletracker.VehicleETA)
 	em.etasReqChan <- etasChan
 	return <-etasChan
-}
-
-func haversine(theta float64) float64 {
-	return (1 - math.Cos(theta)) / 2
-}
-
-func toRadians(n float64) float64 {
-	return n * math.Pi / 180
-}
-
-func distanceBetween(p1, p2 shuttletracker.Point) float64 {
-	lat1Rad := toRadians(p1.Latitude)
-	lon1Rad := toRadians(p1.Longitude)
-	lat2Rad := toRadians(p2.Latitude)
-	lon2Rad := toRadians(p2.Longitude)
-
-	return 2 * earthRadius * math.Asin(math.Sqrt(
-		haversine(lat2Rad-lat1Rad)+
-			math.Cos(lat1Rad)*math.Cos(lat2Rad)*
-				haversine(lon2Rad-lon1Rad)))
-}
-
-func calculateRouteDistance(route *shuttletracker.Route) float64 {
-	totalDistance := 0.0
-	for i, p1 := range route.Points {
-		if i == len(route.Points)-1 {
-			break
-		}
-		p2 := route.Points[i+1]
-		totalDistance += distanceBetween(p1, p2)
-	}
-	return totalDistance
-}
-
-type locationDistance struct {
-	loc   *shuttletracker.Location
-	dist  float64
-	index int
-}
-
-func calculateDistance(lds []locationDistance) float64 {
-	total := 0.0
-	if len(lds) < 2 {
-		return total
-	}
-	for i := range lds[1:] {
-		l1 := lds[i].loc
-		p1 := shuttletracker.Point{Latitude: l1.Latitude, Longitude: l1.Longitude}
-		l2 := lds[i+1].loc
-		p2 := shuttletracker.Point{Latitude: l2.Latitude, Longitude: l2.Longitude}
-		total += distanceBetween(p1, p2)
-	}
-	return total
-}
-
-func (em *ETAManager) determineNearestStopIndicesAlongRoute(track []*shuttletracker.Location, route *shuttletracker.Route) ([]int, error) {
-	if len(track) < 1 {
-		return []int{}, nil
-	}
-
-	// get stops
-	stops := make([]*shuttletracker.Stop, len(route.StopIDs))
-	for i, stopID := range route.StopIDs {
-		stop, err := em.ms.Stop(stopID)
-		if err != nil {
-			return nil, err
-		}
-		stops[i] = stop
-	}
-
-	stopPoints := make([]shuttletracker.Point, len(route.StopIDs))
-	for i, stop := range stops {
-		stopPoint := shuttletracker.Point{Latitude: stop.Latitude, Longitude: stop.Longitude}
-		stopPoints[i] = stopPoint
-	}
-
-	// associate locations with nearest stop zones
-	stopZones, err := em.findStopZoneIndices(route, track)
-	if err != nil {
-		return nil, err
-	}
-
-	return stopZones, nil
-}
-
-// Loop over all points in route and return the route's points that are closest
-// to the provided point. We can't just find the distances to all points and then
-// take the two points with smallest distances, since they might not be next to
-// each other on the route (and therefore are not representative of the route).
-func findClosestLine(point shuttletracker.Point, route *shuttletracker.Route) (p1, p2 shuttletracker.Point) {
-	if len(route.Points) < 2 {
-		return
-	}
-
-	// this is the sum of distances from input point to two consecutive points on route.
-	// we want to minimize it.
-	totalDistance := math.Inf(1)
-
-	for i := range route.Points[1:] {
-		tempP1 := route.Points[i]
-		tempP2 := route.Points[i+1]
-		d1 := distanceBetween(point, tempP1)
-		d2 := distanceBetween(point, tempP2)
-		d := d1 + d2
-		if d < totalDistance {
-			p1 = tempP1
-			p2 = tempP2
-			totalDistance = d
-		}
-	}
-
-	return
-}
-
-// for each location, return the index of the stop zone that it is closest to on the route.
-func (em *ETAManager) findStopZoneIndices(route *shuttletracker.Route, locs []*shuttletracker.Location) ([]int, error) {
-	stopPoints := make([]shuttletracker.Point, len(route.StopIDs))
-	for i, stopID := range route.StopIDs {
-		stop, err := em.ms.Stop(stopID)
-		if err != nil {
-			return nil, err
-		}
-		p := shuttletracker.Point{Latitude: stop.Latitude, Longitude: stop.Longitude}
-		stopPoints[i] = p
-	}
-
-	indices := make([]int, len(locs))
-	minIndex := 0
-	for i, loc := range locs {
-		locPoint := shuttletracker.Point{Latitude: loc.Latitude, Longitude: loc.Longitude}
-		minDistance := math.Inf(1)
-		for j := minIndex; j < len(stopPoints); j++ {
-			p := stopPoints[j]
-			d := distanceBetween(p, locPoint)
-			if d < minDistance {
-				minIndex = j
-				minDistance = d
-			}
-		}
-		indices[i] = minIndex
-	}
-
-	return indices, nil
-}
-
-// for each location, return the index of the provided point which it is closest to.
-// this can be used e.g. to figure out the order in which a track traverses a list of stops.
-func findMinimumDistanceIndices(points []shuttletracker.Point, locs []*shuttletracker.Location) []int {
-	indices := make([]int, len(locs))
-	for i, loc := range locs {
-		locPoint := shuttletracker.Point{Latitude: loc.Latitude, Longitude: loc.Longitude}
-		minDistance := math.Inf(1)
-		var minIndex int
-		for j, p := range points {
-			d := distanceBetween(p, locPoint)
-			if d < minDistance {
-				minIndex = j
-				minDistance = d
-			}
-		}
-		indices[i] = minIndex
-	}
-	return indices
-}
-
-// determines if a track has traversed a route in the order of its stops. if a stop was missing,
-// it is ignored. this is because of stops that are close together often not having enough locations.
-// only two stops may be dropped before we bail out.
-func (em *ETAManager) stopsVisitedInOrder(route *shuttletracker.Route, locs []*shuttletracker.Location) (bool, error) {
-	stopPoints := make([]shuttletracker.Point, len(route.StopIDs))
-	for i, stopID := range route.StopIDs {
-		stop, err := em.ms.Stop(stopID)
-		if err != nil {
-			return false, err
-		}
-		p := shuttletracker.Point{Latitude: stop.Latitude, Longitude: stop.Longitude}
-		stopPoints[i] = p
-	}
-
-	// associate locations with nearest stops and then turn indices into stop IDs
-	minIndices := findMinimumDistanceIndices(stopPoints, locs)
-	stopIDs := make([]int64, len(minIndices))
-	for i, min := range minIndices {
-		stopIDs[i] = route.StopIDs[min]
-	}
-
-	// if a stop is missing from the track, ignore it. this can happen if stops are close
-	// together because the location data is sometimes infrequent.
-	desiredStopIDs := []int64{}
-	for _, desiredID := range route.StopIDs {
-		for _, stopID := range stopIDs {
-			if desiredID == stopID {
-				desiredStopIDs = append(desiredStopIDs, desiredID)
-				break
-			}
-		}
-	}
-	// only allow dropping at most two stops
-	if len(route.StopIDs)-len(desiredStopIDs) > 2 {
-		return false, nil
-	}
-
-	// were the stops visited in order?
-	for i := 0; i < len(desiredStopIDs); i++ {
-		found := false
-		for j := i; j < len(stopIDs); j++ {
-			if desiredStopIDs[i] == stopIDs[j] {
-				found = true
-				break
-			}
-		}
-		if !found {
-			return false, nil
-		}
-	}
-
-	return true, nil
-}
-
-// lat/lon. returns bearing in degrees
-func findInitialBearing(p1, p2 shuttletracker.Point) float64 {
-	lat1Rad := toRadians(p1.Latitude)
-	lon1Rad := toRadians(p1.Longitude)
-	lat2Rad := toRadians(p2.Latitude)
-	lon2Rad := toRadians(p2.Longitude)
-	lonDiff := lon2Rad - lon1Rad
-
-	y := math.Sin(lonDiff) * math.Cos(lat2Rad)
-	x := math.Cos(lat1Rad)*math.Sin(lat2Rad) - math.Sin(lat1Rad)*math.Cos(lat2Rad)*math.Cos(lonDiff)
-	return math.Atan2(y, x) / (math.Pi / 180)
-}
-
-// cross-track distance. see http://www.movable-type.co.uk/scripts/latlong.html
-// Sign of returned value indicates which side of route the point is on.
-func crossTrackDistance(p shuttletracker.Point, route *shuttletracker.Route) float64 {
-	// first find two points that define the line
-	p1, p2 := findClosestLine(p, route)
-
-	// find angular distance from first line point to input point
-	angDist := distanceBetween(p1, p) / earthRadius
-
-	// find bearing from first line point to input point
-	b1 := findInitialBearing(p1, p)
-
-	// find bearing from first line point to second line point
-	b2 := findInitialBearing(p1, p2)
-
-	return math.Asin(math.Sin(angDist)*math.Sin(b1-b2)) * earthRadius
 }
 
 // no point on the track more than 100 m from the route?
@@ -692,132 +572,117 @@ func (em *ETAManager) determineAverageTravelTimes(route *shuttletracker.Route) (
 	return durations, nil
 }
 
-func (em *ETAManager) calculateVehicleETAs(vehicleID int64) (*shuttletracker.VehicleETA, error) {
-	// get vehicle info
-	vehicle, err := em.ms.Vehicle(vehicleID)
-	if err != nil {
-		return nil, err
-	}
-
-	loc, err := em.ms.LatestLocation(vehicleID)
-	if err != nil {
-		return nil, err
-	}
-
-	locPoint := shuttletracker.Point{Latitude: loc.Latitude, Longitude: loc.Longitude}
-
-	eta := &shuttletracker.VehicleETA{
-		VehicleID: vehicleID,
-		StopETAs:  []shuttletracker.StopETA{},
-		Updated:   time.Now(),
-	}
-
-	// get route info for vehicle's current route
-	if loc.RouteID == nil {
-		// vehicle isn't on route
-		return eta, nil
-	}
-
-	routeID := *loc.RouteID
-	eta.RouteID = routeID
-	route, err := em.ms.Route(routeID)
-	if err != nil {
-		return nil, err
-	}
-
-	lastDepartureTrack, err := em.getLastDepartureTrack(vehicle, route)
-	if err != nil {
-		return nil, err
-	}
-	if len(lastDepartureTrack) < 1 {
-		return eta, nil
-	}
-
-	// is this track on the route?
-	if !em.trackNearRoute(lastDepartureTrack, route) {
-		return eta, nil
-	}
-
-	// stops visited in correct order?
-	// inOrder, err := em.stopsVisitedInOrder(route, lastDepartureTrack)
-	// if err != nil {
-	// 	log.WithError(err).Error("unable to determine if stops visited in order")
-	// 	return
-	// }
-	// if !inOrder {
-	// 	log.Debug("stops not visited in order")
-	// 	return
-	// }
-
-	durs, err := em.determineAverageTravelTimes(route)
-	if err != nil {
-		return nil, err
-	}
-
-	// find index of stop zone on the route the vehicle is nearest to
-	locIndices, err := em.determineNearestStopIndicesAlongRoute(lastDepartureTrack, route)
-	if err != nil {
-		return nil, err
-	}
-
-	// The last locIndex is where the vehicle is now. If the track is short, we can't determine this.
-	if len(locIndices) == 0 {
-		return eta, nil
-	}
-	locIndex := locIndices[len(locIndices)-1]
-
+// determines if a track has traversed a route in the order of its stops. if a stop was missing,
+// it is ignored. this is because of stops that are close together often not having enough locations.
+// only two stops may be dropped before we bail out.
+func (em *ETAManager) stopsVisitedInOrder(route *shuttletracker.Route, locs []*shuttletracker.Location) (bool, error) {
+	stopPoints := make([]shuttletracker.Point, len(route.StopIDs))
 	for i, stopID := range route.StopIDs {
-		// find which zoneIndex this stop has
-		zoneIdx := i
-
-		// how many zones do we have to traverse to get there?
-		traversal := zoneIdx - locIndex
-		if traversal < 0 {
-			// we passed the zone
-			continue
+		stop, err := em.ms.Stop(stopID)
+		if err != nil {
+			return false, err
 		}
+		p := shuttletracker.Point{Latitude: stop.Latitude, Longitude: stop.Longitude}
+		stopPoints[i] = p
+	}
 
-		// If this is zero, then the latest location is in the same zone as the stop.
-		// This is useful to know since ETAs within a zone are probably not great.
-		// Clients can just display a message about a vehicle arriving instead of
-		// an ETA with a specific time.
-		arriving := traversal == 0
+	// associate locations with nearest stops and then turn indices into stop IDs
+	minIndices := findMinimumDistanceIndices(stopPoints, locs)
+	stopIDs := make([]int64, len(minIndices))
+	for i, min := range minIndices {
+		stopIDs[i] = route.StopIDs[min]
+	}
 
-		// add up zone travel durations
-		totalDuration := time.Duration(0)
-		for j := locIndex; j < zoneIdx; j++ {
-			totalDuration += durs[j]
+	// if a stop is missing from the track, ignore it. this can happen if stops are close
+	// together because the location data is sometimes infrequent.
+	desiredStopIDs := []int64{}
+	for _, desiredID := range route.StopIDs {
+		for _, stopID := range stopIDs {
+			if desiredID == stopID {
+				desiredStopIDs = append(desiredStopIDs, desiredID)
+				break
+			}
 		}
-		// last zone duration is half since stop is halfway through zone
-		totalDuration += durs[zoneIdx] / 2
+	}
+	// only allow dropping at most two stops
+	if len(route.StopIDs)-len(desiredStopIDs) > 2 {
+		return false, nil
+	}
 
-		etaTime := loc.Created.Add(totalDuration)
-
-		// sanity check
-		if !etaTime.After(time.Now()) {
-			log.Warn("ETA is in the past")
-			continue
+	// were the stops visited in order?
+	for i := 0; i < len(desiredStopIDs); i++ {
+		found := false
+		for j := i; j < len(stopIDs); j++ {
+			if desiredStopIDs[i] == stopIDs[j] {
+				found = true
+				break
+			}
 		}
+		if !found {
+			return false, nil
+		}
+	}
 
-		// would this ETA mean that the vehicle has to travel more than 35 mph (~15.6 meters/sec)?
+	return true, nil
+}
+
+func (em *ETAManager) determineNearestStopIndicesAlongRoute(track []*shuttletracker.Location, route *shuttletracker.Route) ([]int, error) {
+	if len(track) < 1 {
+		return []int{}, nil
+	}
+
+	// get stops
+	stops := make([]*shuttletracker.Stop, len(route.StopIDs))
+	for i, stopID := range route.StopIDs {
 		stop, err := em.ms.Stop(stopID)
 		if err != nil {
 			return nil, err
 		}
-		stopPoint := shuttletracker.Point{Latitude: stop.Latitude, Longitude: stop.Longitude}
-		directDistance := distanceBetween(locPoint, stopPoint)
-		if directDistance/totalDuration.Seconds() > 15.6 {
-			log.Warn("ETA is impossibly soon")
-			continue
-		}
-
-		stopETA := shuttletracker.StopETA{
-			StopID:   stopID,
-			ETA:      etaTime,
-			Arriving: arriving,
-		}
-		eta.StopETAs = append(eta.StopETAs, stopETA)
+		stops[i] = stop
 	}
 
-	return eta, nil
+	stopPoints := make([]shuttletracker.Point, len(route.StopIDs))
+	for i, stop := range stops {
+		stopPoint := shuttletracker.Point{Latitude: stop.Latitude, Longitude: stop.Longitude}
+		stopPoints[i] = stopPoint
+	}
+
+	// associate locations with nearest stop zones
+	stopZones, err := em.findStopZoneIndices(route, track)
+	if err != nil {
+		return nil, err
+	}
+
+	return stopZones, nil
+}
+
+// for each location, return the index of the stop zone that it is closest to on the route.
+func (em *ETAManager) findStopZoneIndices(route *shuttletracker.Route, locs []*shuttletracker.Location) ([]int, error) {
+	stopPoints := make([]shuttletracker.Point, len(route.StopIDs))
+	for i, stopID := range route.StopIDs {
+		stop, err := em.ms.Stop(stopID)
+		if err != nil {
+			return nil, err
+		}
+		p := shuttletracker.Point{Latitude: stop.Latitude, Longitude: stop.Longitude}
+		stopPoints[i] = p
+	}
+
+	indices := make([]int, len(locs))
+	minIndex := 0
+	for i, loc := range locs {
+		locPoint := shuttletracker.Point{Latitude: loc.Latitude, Longitude: loc.Longitude}
+		minDistance := math.Inf(1)
+		for j := minIndex; j < len(stopPoints); j++ {
+			p := stopPoints[j]
+			d := distanceBetween(p, locPoint)
+			if d < minDistance {
+				minIndex = j
+				minDistance = d
+			}
+		}
+		indices[i] = minIndex
+	}
+
+	return indices, nil
 }
