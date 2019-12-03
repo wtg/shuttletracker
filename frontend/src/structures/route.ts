@@ -49,6 +49,10 @@ export default class Route implements RouteInterface {
         this.points = points;
         this.schedule = schedule;
         this.stop_ids = stop_ids;
+
+        // To get scheduling to work, you need to call shouldActive at regular intervals
+        // We were unable to test this because the routes they gave us didn't have schedules
+        // attached to them
     }
 
     public shouldShow(): boolean {
@@ -64,14 +68,23 @@ export default class Route implements RouteInterface {
         return false;
     }
 
-    public containsTime(): boolean {
+    // checks whether the route should show up using the current time and the time intervals
+    // that should be active.
+    public shouldActive(): boolean {
+        // this should get the current Date & Time
         const currentTime = new Date();
+        // this should go through all of the active intervals that the route should be active for
         for (const thisInterval of this.schedule) {
-            if (currentTime.getTime() >= thisInterval.start_time.getTime() && currentTime.getTime() <= thisInterval.end_time.getTime()) {
+            // this should check if the current time is within any of those intervals
+            if (currentTime.getTime() >= thisInterval.start_time.getTime() &&
+                currentTime.getTime() <= thisInterval.end_time.getTime()) {
+                // setting this to active should make shouldShow return false, which should
+                // toggle the route in Public.vue
                 this.active = true;
                 return true;
             }
         }
+
         this.active = false;
         return false;
     }
