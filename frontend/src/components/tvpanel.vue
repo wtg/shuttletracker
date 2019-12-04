@@ -17,7 +17,6 @@ import Header from './tvpanel/Header.vue';
 import News from './tvpanel/News.vue';
 import ETAs from './tvpanel/ETAs.vue';
 import TimeDisplay from './tvpanel/TimeDisplay.vue';
-import Fusion from '@/fusion';
 import messagebox from './adminmessage.vue';
 import AdminMessageUpdate from '../structures/adminMessageUpdate';
 import UserLocationService from '../structures/userlocation.service';
@@ -26,16 +25,6 @@ import ETA from '../structures/eta';
 import Route from '../structures/route';
 export default Vue.extend({
   name: 'tvpanel',
-  data() {
-    return{
-      fusion: new Fusion(),
-    } as {
-      fusion: Fusion;
-    };
-  },
-  mounted() {
-    this.fusion.start();
-  },
   components: {
     Map,
     Header,

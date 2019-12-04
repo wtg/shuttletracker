@@ -18,7 +18,6 @@ import Vehicle from '../../structures/vehicle';
 import Route from '../../structures/route';
 import {Stop} from '../../structures/stop';
 import * as L from 'leaflet';
-import Fusion from '@/fusion';
 import getMarkerString from '../../structures/leaflet/rotatedMarker';
 import { Position } from 'geojson';
 import UserLocationService from '../../structures/userlocation.service';
@@ -175,7 +174,6 @@ export default Vue.extend({
     },
     addVehicles() {
       this.$store.state.Vehicles.forEach((veh: Vehicle) => {
-        console.log(veh);
         if (this.Map !== undefined) {
           veh.addToMap(this.Map);
         }

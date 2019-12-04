@@ -1,18 +1,15 @@
 <template>
-  <div id="etas">
-    <div id="title">ETAs</div>
-      <div id="upcoming">
-        <ul id="queue">
-          <li>West Shuttle - XX:XX</li>
-          <li>East Shuttle - XX:XX</li>
-          <li>East Shuttle - XX:XX</li>
-          <li>West Shuttle - XX:XX</li>
+  <div id='etas'>
+    <div id='title'>ETAs</div>
+      <div id='upcoming'>
+        <ul id='queue'>
+           {{unionEtas}}
         </ul>
       </div>
   </div>
 </template>
 
-<script lang="ts">
+<script lang='ts'>
 
 // This component is the ETAs component for the tv panel
 import Vue from 'vue';
@@ -23,7 +20,9 @@ export default Vue.extend({
   props: ['etaInfo', 'show'],
   data() {
      return {
-        etas: [],
+        unionEtas: [],
+        // Dictionary that stores the route ID with its corresponding route name
+        routeNames: {19: 'Modified East Campus', 18: 'Modified West Campus', 1: 'West Campus', 15: 'East Campus'},
      };
   },
   computed: {
@@ -41,7 +40,6 @@ export default Vue.extend({
       if (newMessage.substring(newMessage.length - 1) !== '.') {
         newMessage += '.';
       }
-
       return newMessage;
     },
   },
@@ -62,16 +60,37 @@ export default Vue.extend({
         }
       }
     },
+    // Function to retrieve union vehicle stops from all ETAS
+    parseUnionEtas(allEtas) {
+      const unionStops = [];
+      // Loop through all 11 vehicles
+      for (let i = 1; i < 12; i++) {
+         const charRep = String(i);
+         // Access the stop_etas for the vehicle using char i ('1' instead of 1)
+         for (let j = 0; j < allEtas[charRep].stop_etas.length; j++) {
+            // The union's stop_id is 1
+            if (allEtas[charRep].stop_etas[j].stop_id === 1) {
+               /* Create a tuple to hold the route name (looked up in the dictionary)
+                  and the time this shuttle is arriving at the union */
+               let routeNameAndEta: [string, string];
+               routeNameAndEta = [this.routeNames[allEtas[charRep].route_id], allEtas[charRep].stop_etas[j].eta];
+               unionStops.push(routeNameAndEta);
+            }
+         }
+      }
+      return unionStops;
+    }
+    // Get request to retrieve eta data from localhost:9000/eta
     retrieveEtaData() {
-      axios.get('https://shuttles.rpi.edu/eta', {
-              headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json',
-                'mode': 'no-cors',
-              },
-              })
-      .then((res) => console.log(res.data));
-
+      axios.get('http://localhost:9000/eta', {})
+      .then((res) => {
+         const key = 'data';
+         res = res[key];
+         return res;
+      })
+      .then((res) => {
+         this.unionEtas = this.parseUnionEtas(res);
+      });
    },
   },
   // Allow this function to be called on page load
@@ -95,7 +114,7 @@ function relativeTime(from: Date, to: Date): string {
 
 </script>
 
-<style lang="scss" scoped>
+<style lang='scss' scoped>
   #etas {
     height: 45%;
     width: 100%;

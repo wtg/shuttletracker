@@ -20,28 +20,24 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-
-#news {
-  height: 50%;
-  width: 100%;
-
-  text-align: center;
-  padding: 10px;
-  border-top: 1.5px solid #F8F8F8;
-}
-
-#title {
-  font-size: 50px;
-  display: inline-block;
-  margin-bottom: 10px;
-  border-bottom: 2px solid #4c4c4c;
-}
-
-li {
-  border: 1px solid rgb(228, 228, 228);
-  border-radius: 3px;
-  margin: 10px;
-  padding: 10px;
-}
-
+  #news {
+    height: 45%;
+    width: 100%;
+    text-align: center;
+    border-top: 3px solid #F8F8F8;
+    position:absolute;
+    bottom: 0px;
+  }
+  #title {
+    margin-top: 20px;
+    font-size: 50px;
+    display: inline-block;
+    border-bottom: 2px solid #4c4c4c;
+  }
+  li {
+    border: 1px solid rgb(228, 228, 228);
+    border-radius: 3px;
+    margin: 10px;
+    padding: 10px;
+  }
 </style>
