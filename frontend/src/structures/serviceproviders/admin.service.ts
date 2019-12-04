@@ -2,6 +2,7 @@ import Route, { RouteInterface } from '../route';
 import Vehicle from '../vehicle';
 import { Stop } from '../stop';
 import AdminMessageUpdate from '../adminMessageUpdate';
+import AnnouncementUpdate from '../announcementUpdate';
 
 export default class AdminServiceProvider {
     public static EditRoute(route: Route): Promise<Response> {
@@ -57,4 +58,11 @@ export default class AdminServiceProvider {
             body: JSON.stringify(message),
         });
     }
+    public static SetAnnouncement(message: AnnouncementUpdate): Promise<Response> {
+        return fetch('/announcement', {
+            method: 'POST',
+            body: JSON.stringify(message),
+        });
+    }
+
 }

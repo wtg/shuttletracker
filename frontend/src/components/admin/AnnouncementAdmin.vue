@@ -73,7 +73,7 @@ export default Vue.extend({
     methods: {
         save() {
             const myMessage = new AnnouncementUpdate(this.newMessage, this.newMessageVisible, new Date(), new Date(), this.newLink);
-            AdminServiceProvider.SetMessage(myMessage).then((resp) => {
+            AdminServiceProvider.SetAnnouncement(myMessage).then((resp) => {
                 if (resp.ok) {
                     this.success = true;
                     setTimeout(() => {

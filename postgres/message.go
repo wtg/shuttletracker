@@ -16,6 +16,7 @@ func (ms *MessageService) initializeSchema(db *sql.DB) error {
 	schema := `
 CREATE TABLE IF NOT EXISTS messages (
 	id bool PRIMARY KEY DEFAULT true CHECK (id = true),
+	type text,
 	message text,
 	enabled bool NOT NULL,
 	created timestamp with time zone NOT NULL DEFAULT now(),
@@ -29,7 +30,7 @@ ALTER TABLE messages ADD COLUMN IF NOT EXISTS link text;`
 
 // Message returns the Message.
 func (ms *MessageService) Message() (*shuttletracker.Message, error) {
-	query := "SELECT message, enabled, created, updated, link FROM messages;"
+	query := "SELECT type, message, enabled, created, updated, link FROM messages;"
 	row := ms.db.QueryRow(query)
 	message := &shuttletracker.Message{}
 	err := row.Scan(&message.Message, &message.Enabled, &message.Created, &message.Updated, &message.Link)
@@ -41,10 +42,14 @@ func (ms *MessageService) Message() (*shuttletracker.Message, error) {
 	return message, nil
 }
 
+// func (ms *MessageService) AnnouncementMessage() (*shuttleTracker.Message, error) {
+// 	query := "SELECT "
+// }
+
 // SetMessage updates the Message.
 func (ms *MessageService) SetMessage(message *shuttletracker.Message) error {
-	statement := "INSERT INTO messages (message, enabled, updated, link) VALUES ($1, $2, now(), $3)" +
-		" ON CONFLICT (id) DO UPDATE SET message = excluded.message, enabled = excluded.enabled, updated = excluded.updated, link = excluded.link" +
+	statement := "INSERT INTO messages (type, message, enabled, updated, link) VALUES ($1, $2, now(), $3)" +
+		" ON CONFLICT (id) DO UPDATE SET type=excluded.type, message = excluded.message, enabled = excluded.enabled, updated = excluded.updated, link = excluded.link" +
 		" RETURNING created, updated;"
 	row := ms.db.QueryRow(statement, message.Message, message.Enabled, message.Link)
 	return row.Scan(&message.Created, &message.Updated)
