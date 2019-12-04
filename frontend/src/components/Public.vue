@@ -14,6 +14,7 @@
     </span>
     <bus-button id="busbutton" v-on:bus-click="busClicked()" v-if="busButtonActive" />
     <eta-message v-bind:eta-info="currentETAInfo" v-bind:show="shouldShowETAMessage"></eta-message>
+    <tab-bar></tab-bar>
   </div>
 </template>
 
@@ -36,6 +37,7 @@ import UserLocationService from '@/structures/userlocation.service';
 import BusButton from '@/components/busbutton.vue';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 import ETAMessage from '@/components/etaMessage.vue';
+import TabBar from './tabBar.vue';
 
 const UserSVG = require('@/assets/user.svg') as string;
 
@@ -360,6 +362,7 @@ export default Vue.extend({
     messagebox,
     BusButton,
     etaMessage: ETAMessage,
+    tabBar: TabBar,
   },
 });
 </script>
