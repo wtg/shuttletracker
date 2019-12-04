@@ -19,7 +19,7 @@ export default Vue.extend({
     // Function to display the Current Time
     displayTime() {
       this.today = new Date();
-      const hour = this.today.getHours();
+      let hour = this.today.getHours();
       const minutes = this.today.getMinutes();
       let am_pm;
       // Format Hours
