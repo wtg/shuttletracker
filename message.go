@@ -7,6 +7,7 @@ import (
 
 // Message represents a message displayed to users.
 type Message struct {
+	Type    string    `json:"type"`
 	Message string    `json:"message"`
 	Enabled bool      `json:"enabled"`
 	Created time.Time `json:"created"`

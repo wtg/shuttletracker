@@ -97,6 +97,15 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		})
 	})
 
+	// Announcement message
+	r.Route("/announcement", func(r chi.Router) {
+		r.Get("/", api.AnnouncementHandler)
+		r.Group(func(r chi.Router) {
+			r.Use(cli.casauth)
+			r.Post("/", api.SetAnnouncement)
+		})
+	})
+
 	// Routes
 	r.Route("/routes", func(r chi.Router) {
 		r.Get("/", api.RoutesHandler)

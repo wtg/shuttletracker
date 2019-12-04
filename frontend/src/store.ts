@@ -8,6 +8,7 @@ import Vehicle from '@/structures/vehicle';
 import Location from '@/structures/location';
 import * as L from 'leaflet';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
+import AnnouncementUpdate from '@/structures/announcementUpdate';
 
 Vue.use(Vuex);
 const InfoService = new InfoServiceProvider();
@@ -25,6 +26,7 @@ const store: StoreOptions<StoreState> = {
     Vehicles: [],
     etas: [],
     adminMessage: undefined,
+    announcement: undefined,
     online: true,
     settings: {
       busButtonEnabled: false,
@@ -89,6 +91,9 @@ const store: StoreOptions<StoreState> = {
     },
     addAdminMessage(state, message: AdminMessageUpdate) {
       state.adminMessage = message;
+    },
+    addAnnouncement(state, message: AnnouncementUpdate) {
+      state.announcement = message;
     },
     updateETAs(state, { vehicleID, etas }) {
       // remove this vehicle's ETAs and any ETA that has expired
@@ -252,6 +257,9 @@ const store: StoreOptions<StoreState> = {
     },
     grabAdminMesssage({ commit }) {
       InfoService.GrabAdminMessage().then((ret: AdminMessageUpdate) => commit('addAdminMessage', ret));
+    },
+    grabAnnouncement({ commit }) {
+      InfoService.GrabAnnouncement().then((ret: AnnouncementUpdate) => commit('addAnnouncement', ret));
     },
   },
 

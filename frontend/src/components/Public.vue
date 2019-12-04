@@ -8,6 +8,9 @@
         </div>
       </transition>
     </div>
+    <span>
+      <announcement ref="msgbox"/>
+    </span>
     <div id="mymap"></div>
     <span>
       <messagebox ref="msgbox"/>
@@ -26,6 +29,7 @@ import Vehicle from '../structures/vehicle';
 import Route from '../structures/route';
 import { Stop, StopSVG } from '../structures/stop';
 import ETA from '@/structures/eta';
+import announcement from './announcement.vue';
 import messagebox from './adminmessage.vue';
 import * as L from 'leaflet';
 import { setTimeout, setInterval } from 'timers';
@@ -35,6 +39,7 @@ import Fusion from '@/fusion';
 import UserLocationService from '@/structures/userlocation.service';
 import BusButton from '@/components/busbutton.vue';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
+import AnnouncementUpdate from '@/structures/announcementUpdate';
 import ETAMessage from '@/components/etaMessage.vue';
 
 const UserSVG = require('@/assets/user.svg') as string;
@@ -131,6 +136,9 @@ export default Vue.extend({
   computed: {
     message(): AdminMessageUpdate {
         return this.$store.state.adminMessage;
+    },
+    announcement(): AnnouncementUpdate {
+      return this.$store.state.announcement;
     },
     busButtonActive(): boolean {
       return this.$store.getters.getBusButtonVisible;
@@ -358,6 +366,7 @@ export default Vue.extend({
   },
   components: {
     messagebox,
+    announcement,
     BusButton,
     etaMessage: ETAMessage,
   },

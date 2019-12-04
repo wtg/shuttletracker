@@ -2,6 +2,7 @@ import Vehicle from '../vehicle';
 import Route from '../route';
 import { Stop } from '../stop';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
+import AnnouncementUpdate from '@/structures/announcementUpdate';
 import routeScheduleInterval from '../routeScheduleInterval';
 import Resources from '@/resources';
 /**
@@ -91,6 +92,14 @@ export default class InfoServiceProvider {
         }).catch(() => {
             return new AdminMessageUpdate('', false, new Date(), new Date(), '');
 
+        });
+    }
+
+    public GrabAnnouncement(): Promise<AnnouncementUpdate> {
+        return fetch(Resources.BasePath + 'announcement').then((data) => data.json()).then((ret) => {
+            return new AnnouncementUpdate(ret.message, Boolean(ret.enabled), new Date(ret.created), new Date(ret.updated), ret.link);
+        }).catch(() => {
+            return new AnnouncementUpdate('', false, new Date(), new Date(), '');
         });
     }
 
