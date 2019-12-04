@@ -1,40 +1,42 @@
 <template>
   <div class="parent content">
     <h2>Spring 2020 Route Changes</h2>
-    <p>
-      Shuttle Tracker is
-      <a href="https://github.com/wtg/shuttletracker">open source</a> and maintained by the
-      <a href="https://webtech.union.rpi.edu">Web Technologies Group</a> of the Rensselaer Union Student Senate for the benefit of the student body.
-      It is also an active
-      <a
-        href="https://rcos.io"
-      >RCOS</a> project, and dozens of students have contributed to it through RCOS in previous semesters.
+    <h3>The Changes</h3>
+    <p>Starting January 2020 the current East and West route system will be changed to include three routes: North, South, and West. An image of the new routes is shown below. The new routes can additionally be viewed on the Tracker by toggling them in the /settings page.</p>
+
+    <p>All Shuttle hours will remain the same. These route changes will be occurring only apply for Weekdays, the current East and West routes will remain on Weekends.</p>
+
+    <h3>Purpose</h3>
+    <p>The overall goal of these changes was to reduce shuttle loop time, remove underutilized stops, and add stops where there is current demand. Some things to note about the changes:</p>
+    <ul>
+      <li>All routes will move clockwise</li>
+      <li>Blitman Commons stop is moving to the bus shelter on 6th Ave</li>
+      <li>The City Station stop is moving across the street to City Station East</li>
+      <li>North and South shuttles will both stop at B-lot and LXA</li>
+      <li>South and West shuttles will both stop at the Off Campus Commons</li>
+      <li>North and West shuttles will both stop at the new Ricketts stop</li>
+    </ul>
+
+    <h3>Credit</h3>
+    <p>These changes were designed and proposed by the Facilities and Services Committee of the Student Senate in collaboration with Parking and Transportation. Thank you to all members of FSC for their work over the past several months and to Parking and Transportation for being extremely receptive to feedback and very willing to make these changes.</p>
+    <p class="u">Parking and Transportation</p>
+      Michael Ramella, Director of Parking and Transportation and Auxiliary Services<br>
+      Brent Shako, Operations Manager
     </p>
-    <h3>Why is there no app?</h3>
-    <p>We're focused on making the Shuttle Tracker website as good as it can be. While most of our users are on mobile, we think the best way to deliver a great experience to the most people is to focus our efforts on this website.</p>
-    <h3>How can I contribute?</h3>
+    <p class="u">Facilities and Services Committee</p>
     <p>
-      We have an active
-      <a href="https://github.com/wtg/shuttletracker">repository</a> on GitHub where we track issues and accept pull requests. If you want to get involved in another way, email
-      <a
-        href="mailto:webtech@union.lists.rpi.edu"
-      >webtech@union.lists.rpi.edu</a> for more information.
+      Nick Dybas, Facilities and Services Chair <br>
+      Izzy Dashiell, Transportation Subcommittee Chair<br>
+      Evan Lazaro, Web Technologies Group Chair<br>
+      Tejas Narayan<br>
+      Colleen Corrigan<br>
+      Iris Erlanger<br>
+      Cait Bennett<br>
+      Neha Keshan<br>
+      Noah Cohen<br>
+      Jakob Waryas<br>
     </p>
 
-    <h3>Privacy policy</h3>
-    <p>
-      Shuttle Tracker is operated by the
-      <a
-        href="https://webtech.union.rpi.edu"
-      >Web Technolgies Group</a> (WebTech), a committee of the Rensselaer Union Student Senate. WebTech uses Google Analytics to gather anonymous metrics about the users of its services. This information cannot and will not be used to identify you or any specific user of the service.
-    </p>
-    <p>If you grant permission for Shuttle Tracker to access your location, this information is used for two purposes. The first is to indicate your location on the map. The second is to enhance the accuracy of vehicle tracking. The information Shuttle Tracker gathers is limited to your device's latitude, longitude, speed, and heading. These data are associated with a random identifier that is generated whenever you open Shuttle Tracker. In order to protect your privacy, no two visits to Shuttle Tracker are associated. This identifier is not used to identify any specific user of the service. All data gathered are only analyzed in aggregate in order to improve the quality of vehicle tracking for all users.</p>
-    <p>
-      Any questions about this privacy policy should be directed to
-      <a
-        href="mailto:webtech@union.lists.rpi.edu"
-      >webtech@union.lists.rpi.edu</a>.
-    </p>
   </div>
 </template>
 <script lang="ts">
@@ -49,5 +51,8 @@ export default Vue.extend({});
 }
 p {
   margin-bottom: 1em;
+}
+.u {
+  text-decoration: underline;
 }
 </style>
