@@ -3,7 +3,7 @@
     <div id='title'>ETAs</div>
       <div id='upcoming'>
         <ul id='queue'>
-           {{unionEtas}}
+           {{displayTime(unionEtas[0])}}
         </ul>
       </div>
   </div>
@@ -21,27 +21,11 @@ export default Vue.extend({
   data() {
      return {
         unionEtas: [],
-        // Dictionary that stores the route ID with its corresponding route name
         routeNames: {19: 'Modified East Campus', 18: 'Modified West Campus', 1: 'West Campus', 15: 'East Campus'},
+     } as {
+        unionEtas: string[][],
+        routeNames: {[id: number]: string; },
      };
-  },
-  computed: {
-    message(): string | null {
-      if (this.etaInfo === null) {
-          return null;
-      }
-      const now = new Date();
-
-      let newMessage = `${this.etaInfo.route.name} shuttle arriving at ${this.etaInfo.stop.name}`;
-      // more than 1 min 30 sec?
-      if (this.etaInfo.eta.eta.getTime() - now.getTime() > 1.5 * 60 * 1000 && !this.etaInfo.eta.arriving) {
-        newMessage += ` in ${relativeTime(now, this.etaInfo.eta.eta)}`;
-      }
-      if (newMessage.substring(newMessage.length - 1) !== '.') {
-        newMessage += '.';
-      }
-      return newMessage;
-    },
   },
   methods: {
     changeTextColor() {
@@ -61,28 +45,27 @@ export default Vue.extend({
       }
     },
     // Function to retrieve union vehicle stops from all ETAS
-    parseUnionEtas(allEtas) {
-      const unionStops = [];
-      // Loop through all 11 vehicles
+    parseUnionEtas(allEtas: any): string[][] {
+      let unionStops: string[][];
+      unionStops = [];
+      if (allEtas.length === 0) {
+        return unionStops;
+      }
       for (let i = 1; i < 12; i++) {
          const charRep = String(i);
-         // Access the stop_etas for the vehicle using char i ('1' instead of 1)
          for (let j = 0; j < allEtas[charRep].stop_etas.length; j++) {
-            // The union's stop_id is 1
             if (allEtas[charRep].stop_etas[j].stop_id === 1) {
-               /* Create a tuple to hold the route name (looked up in the dictionary)
-                  and the time this shuttle is arriving at the union */
-               let routeNameAndEta: [string, string];
+               let routeNameAndEta: string[];
                routeNameAndEta = [this.routeNames[allEtas[charRep].route_id], allEtas[charRep].stop_etas[j].eta];
                unionStops.push(routeNameAndEta);
             }
          }
       }
       return unionStops;
-    }
-    // Get request to retrieve eta data from localhost:9000/eta
+    },
+    // Get request to retrieve eta data from the "eta" endpoint
     retrieveEtaData() {
-      axios.get('http://localhost:9000/eta', {})
+      axios.get('/eta', {})
       .then((res) => {
          const key = 'data';
          res = res[key];
@@ -91,26 +74,22 @@ export default Vue.extend({
       .then((res) => {
          this.unionEtas = this.parseUnionEtas(res);
       });
-   },
+    },
+    // Function to find the estimated time of arrival for each ETA of the union
+    displayTime(currTime: string): string {
+      const currTimeDate = Date.parse(currTime);
+      const now = new Date();
+      console.log(currTimeDate);
+      return currTime[0];
+    },
   },
+
   // Allow this function to be called on page load
   mounted() {
     this.changeTextColor();
     this.retrieveEtaData();
   },
 });
-
-function relativeTime(from: Date, to: Date): string {
-  const minuteMs = 60 * 1000;
-  const elapsed = to.getTime() - from.getTime();
-
-  // cap display at thirty min
-  if (elapsed < minuteMs * 30) {
-    return `${Math.round(elapsed / minuteMs)} minutes`;
-  }
-
-  return 'a while';
-}
 
 </script>
 
