@@ -30,6 +30,7 @@ export default Vue.extend({
   }
   #title {
     margin-top: 20px;
+    margin-bottom: 22px;
     font-size: 50px;
     display: inline-block;
     border-bottom: 2px solid #4c4c4c;
@@ -37,7 +38,11 @@ export default Vue.extend({
   li {
     border: 1px solid rgb(228, 228, 228);
     border-radius: 3px;
-    margin: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 18px;
+    margin-bottom: 18px;
     padding: 10px;
+    font-weight: 700;
   }
 </style>

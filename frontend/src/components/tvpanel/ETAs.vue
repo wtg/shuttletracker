@@ -3,7 +3,10 @@
     <div id='title'>ETAs</div>
       <div id='upcoming'>
         <ul id='queue'>
-           {{displayTime(unionEtas[0])}}
+          <li v-if="unionEtas[0]">{{displayTime(unionEtas[0])}}</li>
+          <li v-if="unionEtas[1]">{{displayTime(unionEtas[1])}}</li>
+          <li v-if="unionEtas[2]">{{displayTime(unionEtas[2])}}</li>
+          <li v-if="unionEtas.length === 0"> No Shuttles Avaliable</li>
         </ul>
       </div>
   </div>
@@ -76,18 +79,31 @@ export default Vue.extend({
       });
     },
     // Function to find the estimated time of arrival for each ETA of the union
-    displayTime(currTime: string): string {
-      const currTimeDate = Date.parse(currTime);
+    displayTime(currETA: string[]): string {
+      let message: string;
+      const currTimeDate = Date.parse(currETA[1]);
       const now = new Date();
-      console.log(currTimeDate);
-      return currTime[0];
+      message = currETA[0] + ' arriving ' + this.relativeTime(now, currTimeDate);
+      return message;
+    },
+    // Function to calculate the estimated time in minutes from two Date objects
+    relativeTime(from: Date, to: number): string {
+      const minuteMs = 60 * 1000;
+      const elapsed = to - from.getTime();
+      const minutesTillArrival = Math.round(elapsed / minuteMs);
+      if (minutesTillArrival === 0){
+         return 'now';
+      }
+      return `in ${minutesTillArrival} minutes`;
     },
   },
-
   // Allow this function to be called on page load
   mounted() {
     this.changeTextColor();
     this.retrieveEtaData();
+    setInterval(() => {
+      this.retrieveEtaData();
+    }, 30000);
   },
 });
 
@@ -104,22 +120,24 @@ export default Vue.extend({
   }
   #title {
     margin-top: 20px;
+    margin-bottom: 8px;
     font-size: 50px;
     display: inline-block;
     border-bottom: 2px solid #4c4c4c;
   }
   li {
-  border: 1px solid rgb(228, 228, 228);
-  border-radius: 3px;
-  font-size: 20px;
-  margin: 10px;
-  padding: 10px;
-}
+    border: 1px solid rgb(228, 228, 228);
+    border-radius: 3px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 18px;
+    margin-bottom: 18px;
+    padding: 10px;
+    font-weight: 700;
+  }
 // West color = #0080FF
 // Weekend late night color = #9b59b6
 // East inclement weather color = #ff9900
 // West inclement weather color = #FF0
 // East color = #96C03A
-
-
 </style>

@@ -1,7 +1,7 @@
 <template>
   <!-- Display Current Time and Day -->
   <div id='time-display'>
-    {{displayTime()}}
+    {{displayDay() + ', '+ displayTime()}}
   </div>
 </template>
 
@@ -71,8 +71,7 @@ export default Vue.extend({
     setInterval(() => {
       this.displayTime();
       this.displayDay();
-      console.log('Updated Current Time/Date');
-    }, 60000);
+    }, 30000);
   },
 });
 </script>
