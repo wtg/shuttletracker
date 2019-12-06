@@ -5,6 +5,9 @@
       <TimeDisplay />
       <ETAs />
       <News />
+      <div class="logo-sidebar">
+
+      </div>  
     </div>
   </div>
 </template>
@@ -46,6 +49,17 @@ export default Vue.extend({
   height: 100%;
   width: 25%;
   box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+}
+
+.logo-sidebar {
+  background: url('tvpanel/assets/shuttleTracker.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  width: 300px;
+  height: 200px;
+  margin: 0 auto;
+  position: relative; 
+  top: 45%;
 }
 
 </style>
