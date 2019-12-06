@@ -1,4 +1,5 @@
 <template>
+<div id="outer">
   <ul>
     <router-link tag="li" to="/">
       <span>
@@ -21,12 +22,17 @@
         Settings
       </span>
     </router-link>
+    <router-link tag="li" to="/changes">
+      <span>
+        <span class="fas fa-exclamation"></span>
+        Route Changes
+      </span>
+    </router-link>
     <div class="version">
       <div class="demo version-section">
         <a href="https://github.com/wtg/shuttletracker" class="github-corner">
           <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 750 700" style="position: absolute; bottom: 0; border: 0; right: 0;">
             <g>
-              <title>Layer 1</title>
               <image stroke="null" xlink:href="../../public/githublogo.png" id="svg_2" height="477.99998" width="636.00002" y="2.00001" x="2"/>
             </g>
           </svg>          
@@ -34,6 +40,7 @@
       </div>
     </div>
   </ul>
+</div>
 </template>
 
 
@@ -53,11 +60,11 @@ export default Vue.extend({
 @import "@/assets/vars.scss";
 ul {
   display: flex;
-  height: 40px;
+  height: 50px;
   position: fixed;
   bottom: 0;
   display: flex;
-  padding: 0;
+  padding-right: 30px; //Account for github logo
   margin: 0;
   justify-content: center;
   align-items: center;
@@ -67,6 +74,7 @@ ul {
   font-size: 13px;
   user-select: none;
   background: white;
+  text-align: center;
 }
 li {
   cursor: pointer;
