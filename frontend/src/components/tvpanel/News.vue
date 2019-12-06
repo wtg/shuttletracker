@@ -26,7 +26,6 @@ export default Vue.extend({
     text-align: center;
     border-top: 3px solid #F8F8F8;
     position:absolute;
-    bottom: 0px;
   }
   #title {
     margin-top: 20px;

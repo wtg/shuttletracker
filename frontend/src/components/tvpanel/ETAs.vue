@@ -111,7 +111,7 @@ export default Vue.extend({
 
 <style lang='scss' scoped>
   #etas {
-    height: 45%;
+    height: 35%;
     width: 100%;
     text-align: center;
     border-top: 3px solid #F8F8F8;
