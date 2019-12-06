@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Header />
     <Map />
     <div id="right-panel">
       <TimeDisplay />

@@ -221,7 +221,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .map {
   position: absolute;
-  height: 90%;
+  height: 100%;
   bottom: 0px;
   width: 75%;
 }
