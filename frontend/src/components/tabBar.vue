@@ -1,4 +1,5 @@
 <template>
+<div id="outer">
   <ul>
     <router-link tag="li" to="/">
       <span>
@@ -39,6 +40,7 @@
       </div>
     </div>
   </ul>
+</div>
 </template>
 
 
@@ -58,11 +60,11 @@ export default Vue.extend({
 @import "@/assets/vars.scss";
 ul {
   display: flex;
-  height: 40px;
+  height: 50px;
   position: fixed;
   bottom: 0;
   display: flex;
-  padding: 0;
+  padding-right: 30px; //Account for github logo
   margin: 0;
   justify-content: center;
   align-items: center;
@@ -72,6 +74,7 @@ ul {
   font-size: 13px;
   user-select: none;
   background: white;
+  text-align: center;
 }
 li {
   cursor: pointer;
