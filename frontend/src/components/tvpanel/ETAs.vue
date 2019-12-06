@@ -91,7 +91,7 @@ export default Vue.extend({
       const minuteMs = 60 * 1000;
       const elapsed = to - from.getTime();
       const minutesTillArrival = Math.round(elapsed / minuteMs);
-      if (minutesTillArrival === 0){
+      if (minutesTillArrival === 0) {
          return 'now';
       }
       return `in ${minutesTillArrival} minutes`;
