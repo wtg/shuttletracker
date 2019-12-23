@@ -8,40 +8,42 @@
 
     <p>The overall goal of these changes was to reduce shuttle loop time, remove underutilized stops, and add stops where there is current demand.</p>
 
-    <img src="https://i.imgur.com/EyQY1zH.jpg"/>
+    <p><strong>Note</strong>: These changes were updated on 12/23/2019. West route will now travel down Congress (instead of College Ave), and stops have been added at Winslow (5), West Hall (6), and Georgian Ct (13).</p>
+
+    <img src="https://i.imgur.com/kQfvzxn.png"/>
     <br>
     <div id="text">
     <p><strong>West Route</strong>
         <br>
         <br>1. CBIS stop added by crosswalk
-        <br>• (20) 15th St and College Ave stop moved to South Route
-        <br>3. College St stop added by entrance to Academy Hall lot
-        <br>4. The City Station stop is moving across the street to City Station East by the parking garage entrance
-        <br>5. Blitman Commons stop is moving to the bus shelter on 6th Ave
-        <br>• (19) Polytech stop is moving to the east side of the street at the intersection of Congress and 15th, in front of Muza, will also be part of South Route
-        <br>7. Troy stop is being moved to the east end of Ricketts building
+        <br>2. Polytech stop moved to northwest corner of intersection of 15th St and Congress St (Polytech Transfer)
+        <br>3. The City Station stop moved across the street to City Station East by the parking garage entrance
+        <br>4. Blitman Commons stop is moving to the bus shelter on 6th Ave
+        <br>5. Winslow stop added at north side of building facing parking lot
+        <br>6. West Hall stop added in front of West Hall lot
+        <br>7. Troy stop moved to the east end of Ricketts building (Ricketts Transfer)
         <br>
     </p>
     <p><strong>North Route</strong>
         <br>
         <br>8. All stops along Sage Ave are being merged to in front of E-Complex
-        <br>• Winslow stop is removed
         <br>9. 9th St and Sage Ave will stop on 9th St
         <br>10. Alumni House stop is moving across the street to in front of the Alumni House
         <br>11. Beman Park stop added at 15th St and Jacob St
         <br>12. Colonie stop moved to directly in front of Colonie A on street
-        <br>13. Brinsmade Terrace, Sunset Terrace 1, and Sunset Terrace 2 are unchanged
-        <br>14. E Lot stop is moving to the intersection of Cook Dr and Sunset Terrace
-        <br>15. B Lot stop added by bus shelter
+        <br>13. Stop on Georgian Ct added
+        <br>14. Brinsmade Terrace, Sunset Terrace 1, and Sunset Terrace 2 are unchanged
+        <br>15. E Lot stop is moving to the intersection of Cook Dr and Sunset Terrace
+        <br>16. B Lot stop added by bus shelter
         <br>
     </p>
     <p><strong>South Route</strong>
         <br>
-        <br>16. B Lot stop added by bus shelter
-        <br>17. LXA stop is moving to the southwest corner of the intersection of Cook Dr and Sunset Terrace
-        <br>18. Tibbits Ave stop is moving to intersection of Tibbits Ave and Orchard Ave
-        <br>19. Polytech stop added in front of Muza
-        <br>20. 15th St and College St stop added in front of Fire House</p>
+        <br>17. B Lot stop added by bus shelter
+        <br>18. LXA stop is moving to the southwest corner of the intersection of Cook Dr and Sunset Terrace
+        <br>19. Tibbits Ave stop is moving to intersection of Tibbits Ave and Orchard Ave
+        <br>20. Polytech stop added in front of Muza
+        <br>21. 15th St and College St stop added in front of Fire House</p>
     </div>
 
     <h3>Credit</h3>
