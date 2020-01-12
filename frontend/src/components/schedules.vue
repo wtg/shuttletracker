@@ -36,7 +36,7 @@ export default Vue.extend({
           name: 'Weekday Routes',
           caption: [
                     'North, South, and New West Routes',
-                    'Monday–Friday 7am – 11pm'
+                    'Monday–Friday 7am – 11pm',
                     ],
           color: 'green',
         },
@@ -48,10 +48,10 @@ export default Vue.extend({
                     'Saturday–Sunday 9:30am – 5pm',
                     '⠀',
                     'Weekend Express Route',
-                    'Saturday–Sunday 4:30pm – 8pm'
+                    'Saturday–Sunday 4:30pm – 8pm',
                     '⠀',
                     'Late Night Route',
-                    'Friday–Saturday 8pm – 4am'
+                    'Friday–Saturday 8pm – 4am',
                   ],
           color: 'red',
         },
