@@ -101,7 +101,7 @@ const store: StoreOptions<StoreState> = {
         }
       }
       if (etas) {
-        localStorage.setItem('etas', JSON.stringify(etas));
+        localStorage.setItem(String(vehicleID), JSON.stringify(etas));
       }
       // store new ETAs
       for (const eta of etas) {
