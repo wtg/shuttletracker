@@ -32,7 +32,7 @@ export default Vue.extend({
   overflow-y: auto;
   position: relative;
   z-index: 0;
-  bottom: 10px; //account for moved tabbar size
+  bottom: 0px;
   left: 0;
   right: 0;
   padding: 10px 30px 10px 15px; /* leave some space for the close button */

@@ -22,12 +22,6 @@
         Settings
       </span>
     </router-link>
-    <router-link tag="li" to="/changes">
-      <span>
-        <span class="fas fa-exclamation"></span>
-        Route Changes
-      </span>
-    </router-link>
     <div class="version">
       <div class="demo version-section">
         <a href="https://github.com/wtg/shuttletracker" class="github-corner">
@@ -35,7 +29,7 @@
             <g>
               <image stroke="null" xlink:href="../../public/githublogo.png" id="svg_2" height="477.99998" width="636.00002" y="2.00001" x="2"/>
             </g>
-          </svg>          
+          </svg>
         </a>
       </div>
     </div>
@@ -60,7 +54,7 @@ export default Vue.extend({
 @import "@/assets/vars.scss";
 ul {
   display: flex;
-  height: 50px;
+  height: 40px;
   position: fixed;
   bottom: 0;
   display: flex;
