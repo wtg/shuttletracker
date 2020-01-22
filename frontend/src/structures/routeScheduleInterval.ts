@@ -20,6 +20,6 @@ export default class RotueScheduleInterval {
 
     // Make the interval into a readable string
     public toString(): string {
-        return dateToSttr[this.start_day] + ' at ' + this.end_time.getHours() + ':' + this.end_time.getMinutes() + ' to ' + dateToSttr[this.end_day] + ' at ' + this.end_time;
+        return dateToSttr[this.start_day] + ' at ' + this.end_time.getHours() + ':00 to ' + dateToSttr[this.end_day] + ' at ' + this.end_time.getHours() + ':00';
     }
 }
