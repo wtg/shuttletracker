@@ -98,27 +98,11 @@ export default Vue.extend({
       },
     },
     routes(): Route[] {
-        function compare(a: Route, b: Route) {
-          if (a.enabled === true && b.enabled === false) {
-            return -1;
-          }
-          if (a.enabled === false && b.enabled === true) {
-            return 1;
-          } else {
-              if (a.name > b.name) {
-                return 1;
-              }
-              return -1;
-          }
-          return 0;
-        }
-
         const routes_arr = [];
         for (const stop of this.$store.state.Routes) {
           routes_arr.push(stop);
         }
-
-        return routes_arr.sort(compare);
+        return routes_arr;
     },
   },
   methods: {
