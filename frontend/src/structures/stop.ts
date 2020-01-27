@@ -45,7 +45,7 @@ export class Stop {
         if (this.routesOn.length > 0) {
             return this.name +
                 ` is on route${this.routesOn.length > 1 ? 's' : ''} `
-                + this.routesOn.map((route: Route) => `<i>${route.name}</i>`).join(', ');
+                + this.routesOn.filter((route: Route) => route.shouldShow()).map((route: Route) => `<i>${route.name}</i>`).join(', ');
         } else {
             return this.name;
         }
