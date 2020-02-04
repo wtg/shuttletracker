@@ -31,6 +31,7 @@ const store: StoreOptions<StoreState> = {
       etasEnabled: false,
       fusionPositionEnabled: true,
       busButtonChoice: '🚌',
+      routesToggled: [],
     },
     geolocationDenied: false,
     fusionConnected: undefined,
@@ -51,6 +52,11 @@ const store: StoreOptions<StoreState> = {
           }
         }
       });
+
+      for (const route of state.Routes) {
+          state.settings.routesToggled[route.id] = route.enabled;
+      }
+      localStorage.setItem('st_settings', JSON.stringify(state.settings));
     },
     setStops(state, Stops: Stop[]) {
       state.Stops = Stops;
