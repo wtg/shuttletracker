@@ -171,6 +171,7 @@ const store: StoreOptions<StoreState> = {
 
       if (state.Routes !== undefined && state.Routes.length !== 0) {
         state.Routes.forEach((r: Route) => {
+          r.enabled = state.settings.routesToggled[r.id];
           if (r.enabled) {
             const points = new Array<L.LatLng>();
             if (r.points !== undefined) {
@@ -195,6 +196,7 @@ const store: StoreOptions<StoreState> = {
       const arr = new Array<L.Polyline>();
       if (state.Routes !== undefined && state.Routes.length !== 0) {
         state.Routes.forEach((r: Route) => {
+          r.enabled = state.settings.routesToggled[r.id];
           if (r.shouldShow()) {
             const points = new Array<L.LatLng>();
             if (r.points !== undefined) {
