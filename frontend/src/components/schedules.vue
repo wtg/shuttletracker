@@ -32,22 +32,28 @@ export default Vue.extend({
     return {
       links: [
         {
-          url: 'https://shuttles.rpi.edu/static/EastSchedule.pdf',
-          name: 'East Campus',
-          caption: ['Monday–Friday, 7 am–11 pm', 'Weekends: 9:30 am–5 pm'],
+          url: 'https://shuttles.rpi.edu/static/Weekday.pdf',
+          name: 'Weekday Routes',
+          caption: [
+                    'North, South, and New West Routes',
+                    'Monday–Friday 7am – 11pm',
+                    ],
           color: 'green',
         },
         {
-          url: 'https://shuttles.rpi.edu/static/WestSchedule.pdf',
-          name: 'West Campus',
-          caption: ['Monday–Friday, 7 am–11 pm', 'Weekends: 9:30 am–5 pm'],
+          url: 'https://shuttles.rpi.edu/static/Weekend.pdf',
+          name: 'Weekend Routes',
+          caption: [
+                    'West and East Routes',
+                    'Saturday–Sunday 9:30am – 5pm',
+                    '⠀',
+                    'Weekend Express Route',
+                    'Saturday–Sunday 4:30pm – 8pm',
+                    '⠀',
+                    'Late Night Route',
+                    'Friday–Saturday 8pm – 4am',
+                  ],
           color: 'red',
-        },
-        {
-          url: 'https://shuttles.rpi.edu/static/WeekendSchedule.pdf',
-          name: 'Weekend/Late Night',
-          caption: ['Friday–Sunday, 8 pm–4 am'],
-          color: 'purple',
         },
       ],
     };

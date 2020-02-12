@@ -45,7 +45,7 @@ export class Stop {
         if (this.routesOn.length > 0) {
             return this.name +
                 ` is on route${this.routesOn.length > 1 ? 's' : ''} `
-                + this.routesOn.map((route: Route) => `<i>${route.name}</i>`).join(', ');
+                + this.routesOn.filter((route: Route) => route.shouldShow()).map((route: Route) => `<i>${route.name}</i>`).join(', ');
         } else {
             return this.name;
         }
@@ -54,6 +54,25 @@ export class Stop {
     public addRoute(route: Route): void {
         this.routesOn.push(route);
     }
+
+    public containsRoute(route_id: number): boolean {
+        for (const route of this.routesOn) {
+            if (route.id === route_id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public shouldShow(): boolean {
+        for (const route of this.routesOn) {
+            if (route.shouldShow()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public asJSON(): {
         name: string; description: string; latitude: number; longitude: number } {
         return {

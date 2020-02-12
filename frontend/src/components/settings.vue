@@ -14,6 +14,7 @@
                   <div class="select is-danger">
                       <div class="select is-rounded">
                           <select v-model="busButtonChoice">
+                              <option>🚐</option>
                               <option>🚌</option>
                               <option>🚗</option>
                               <option>🚓</option>
@@ -33,14 +34,31 @@
       <b-switch v-model="etasEnabled">Estimated times of arrival</b-switch>
     </b-field>
 
+    <table class="table">
+        <thead>
+            <tr>
+            <th><abbr title="Name">Name</abbr></th>
+            <th><abbr title="Enabled">Enabled</abbr></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="route in routes" :key="route.id">
+            <th class = "route_format">{{route.name}}</th>
+            <td><b-switch v-bind:value="route.enabled && route.active" v-on:input="routeToggle(route)"></b-switch></td>
+            </tr>
+        </tbody>
+    </table>
     <router-link to="/about">About and privacy policy</router-link>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import Route from '../structures/route';
+import Public from './Public.vue';
 
 export default Vue.extend({
+  name: 'routes',
   computed: {
     busButtonEnabled: {
       get(): boolean {
@@ -79,6 +97,26 @@ export default Vue.extend({
         this.$store.commit('setSettingsETAsEnabled', value);
       },
     },
+    routes(): Route[] {
+        const routes_arr = [];
+        for (const stop of this.$store.state.Routes) {
+          routes_arr.push(stop);
+        }
+        return routes_arr;
+    },
+  },
+  methods: {
+      routeToggle(thisRoute: Route) {
+        // Enable if not currently
+        if (!thisRoute.enabled || !thisRoute.active) {
+            thisRoute.enabled = true;
+            thisRoute.active = true;
+        } else {  // Disable otherwise
+            thisRoute.enabled = false;
+            thisRoute.active = false;
+        }
+        this.$store.commit('setRoutes', this.routes);
+      },
   },
 });
 </script>
@@ -86,6 +124,11 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .parent {
   padding: 20px;
+}
+
+.route_format {
+  color: red;
+  font-weight: bold;
 }
 .field {
     display: inline-block;

@@ -142,7 +142,9 @@ const store: StoreOptions<StoreState> = {
       state.Stops.forEach((stop: Stop) => {
         state.Routes.forEach((route: Route) => {
           if (route.containsStop(stop.id) && route.active) {
-            stop.addRoute(route);
+              if (!stop.containsRoute(route.id)) {
+                  stop.addRoute(route);
+              }
           }
         });
       });
