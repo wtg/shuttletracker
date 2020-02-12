@@ -37,7 +37,7 @@ import ETA from '@/structures/eta';
 export default Vue.extend({
   computed: {
     etas(): any[] {
-      const sean = [];
+      const eta = [];
       for (let i = 0; i < 11; i++) {
         const etaString = localStorage.getItem(String(i + 1));
         if (etaString) {
@@ -50,26 +50,26 @@ export default Vue.extend({
               const minuteMs = 60 * 1000;
               const elapsed = from.getTime() - now.getTime();
 
-              let eatMinutes = `A while`;
+              let etaMinutes = `A while`;
               // cap display at 15 min
               if (elapsed < minuteMs * 15) {
-                eatMinutes =  `${Math.round(elapsed / minuteMs)} minutes`;
+                etaMinutes =  `${Math.round(elapsed / minuteMs)} minutes`;
               }
 
-              const e = {eta: eatMinutes,
+              const e = {eta: etaMinutes,
                         arriving: eta.arriving,
                         vehicleID: eta.vehicleID,
                         stopID: eta.stopID,
                         routeID: eta.routeID};
               ret.push(e);
             }
-            sean.push(ret);
+            eta.push(ret);
           }
         }
 
       }
-      console.log(sean);
-      return sean;
+      console.log(eta);
+      return eta;
       // return ret.sort((a, b) => {
       //   if (a.vehicle.name > b.vehicle.name) {
       //     return 1;
