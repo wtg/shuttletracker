@@ -8,6 +8,7 @@ import Vehicle from '@/structures/vehicle';
 import Location from '@/structures/location';
 import * as L from 'leaflet';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
+import ETA from './structures/eta';
 
 Vue.use(Vuex);
 const InfoService = new InfoServiceProvider();
@@ -106,7 +107,7 @@ const store: StoreOptions<StoreState> = {
         }
       }
       if (etas) {
-        localStorage.setItem('etas', JSON.stringify(etas));
+        localStorage.setItem(String(vehicleID), JSON.stringify(etas));
       }
       // store new ETAs
       for (const eta of etas) {
