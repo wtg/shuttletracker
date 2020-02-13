@@ -37,7 +37,7 @@ import ETA from '@/structures/eta';
 export default Vue.extend({
   computed: {
     etas(): any[] {
-      const eta = [];
+      const sean = [];
       for (let i = 0; i < 11; i++) {
         const etaString = localStorage.getItem(String(i + 1));
         if (etaString) {
@@ -63,13 +63,13 @@ export default Vue.extend({
                         routeID: eta.routeID};
               ret.push(e);
             }
-            eta.push(ret);
+            sean.push(ret);
           }
         }
 
       }
-      console.log(eta);
-      return eta;
+      console.log(sean);
+      return sean;
       // return ret.sort((a, b) => {
       //   if (a.vehicle.name > b.vehicle.name) {
       //     return 1;
