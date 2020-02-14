@@ -29,14 +29,10 @@ func distanceBetween(p1, p2 shuttletracker.Point) float64 {
 				haversine(lon2Rad-lon1Rad)))
 }
 
-<<<<<<< HEAD
 // Naive algorithm to predict the position a shuttle is at, given the last update received
 // Returns the index of the point the shuttle would be at on its route
 func naivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletracker.Location, route *shuttletracker.Route) int {
 	// Find the index of the closest point to this shuttle's last known location
-=======
-func estimatePosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletracker.Location, route *shuttletracker.Route) int {
->>>>>>> 7455a5b74b7d39f0ebbe853533840fe720c232b6
 	index := 0
 	minDistance := 0.0
 	for i, point := range route.Points {
@@ -46,7 +42,6 @@ func estimatePosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletracke
 			index = i
 		}
 	}
-<<<<<<< HEAD
 	// Find the amount of time that has passed since the last update was received, and given that,
 	// the distance the shuttle is predicted to have travelled
 	secondsSinceUpdate := time.Since(lastUpdate.Time).Seconds()
@@ -54,10 +49,6 @@ func estimatePosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletracke
 
 	// Iterate over each point in the route in order, summing the distance between each point,
 	// and stop when the predicted distance has elapsed
-=======
-	secondsSinceUpdate := time.Since(lastUpdate.Time).Seconds()
-	predictedDistance := secondsSinceUpdate * lastUpdate.Speed
->>>>>>> 7455a5b74b7d39f0ebbe853533840fe720c232b6
 	elapsedDistance := 0.0
 	for elapsedDistance < predictedDistance {
 		prevIndex := index
