@@ -8,6 +8,10 @@ import Resources from '@/resources';
  * Info service provider grabs the basic information from the api and returns it to the frontend.
  */
 export default class InfoServiceProvider {
+    // Fetches and uses data from local storage
+    private savedSettings = localStorage.getItem('st_settings');
+    private toggledSettings = this.savedSettings ? JSON.parse(this.savedSettings) : null;
+
     public GrabVehicles(): Promise<Vehicle[]> {
         return fetch(Resources.BasePath + 'vehicles').then((data) => data.json()).then((data) => {
             const ret = new Array<Vehicle>();
@@ -58,6 +62,10 @@ export default class InfoServiceProvider {
                 element.schedule.forEach((interval) => {
                     myschedule.push(new routeScheduleInterval(interval.id, interval.route_id, interval.start_day, new Date(interval.start_time), interval.end_day, new Date(interval.end_time)));
                 });
+                // checks if local storage data is there and sets route preferences accordingly
+                if (this.toggledSettings) {
+                    element.enabled = this.toggledSettings.routesToggled[element.id];
+                }
                 ret.push(new Route(element.id, element.name, element.description,
                     element.enabled, element.color, Number(element.width), element.points, myschedule, element.active,
                     element.stop_ids));

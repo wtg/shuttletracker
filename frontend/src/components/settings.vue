@@ -44,7 +44,7 @@
         <tbody>
             <tr v-for="route in routes" :key="route.id">
             <th class = "route_format">{{route.name}}</th>
-            <td><b-switch v-bind:value="route.enabled && route.active" v-on:input="routeToggle(route)"></b-switch></td>
+            <td><b-switch v-bind:value="route.enabled" v-on:input="routeToggle(route)"></b-switch></td>
             </tr>
         </tbody>
     </table>
@@ -99,8 +99,9 @@ export default Vue.extend({
     },
     routes(): Route[] {
         const routes_arr = [];
-        for (const stop of this.$store.state.Routes) {
-          routes_arr.push(stop);
+        for (const r of this.$store.state.Routes) {
+            r.enabled = this.$store.state.settings.routesToggled[r.id];
+            routes_arr.push(r);
         }
         return routes_arr;
     },
@@ -110,10 +111,8 @@ export default Vue.extend({
         // Enable if not currently
         if (!thisRoute.enabled || !thisRoute.active) {
             thisRoute.enabled = true;
-            thisRoute.active = true;
         } else {  // Disable otherwise
             thisRoute.enabled = false;
-            thisRoute.active = false;
         }
         this.$store.commit('setRoutes', this.routes);
       },

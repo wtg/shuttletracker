@@ -32,6 +32,7 @@ const store: StoreOptions<StoreState> = {
       etasEnabled: false,
       fusionPositionEnabled: true,
       busButtonChoice: '🚌',
+      routesToggled: [],
     },
     geolocationDenied: false,
     fusionConnected: undefined,
@@ -52,6 +53,11 @@ const store: StoreOptions<StoreState> = {
           }
         }
       });
+
+      for (const route of state.Routes) {
+          state.settings.routesToggled[route.id] = route.enabled;
+      }
+      localStorage.setItem('st_settings', JSON.stringify(state.settings));
     },
     setStops(state, Stops: Stop[]) {
       state.Stops = Stops;
@@ -166,6 +172,7 @@ const store: StoreOptions<StoreState> = {
 
       if (state.Routes !== undefined && state.Routes.length !== 0) {
         state.Routes.forEach((r: Route) => {
+          r.enabled = state.settings.routesToggled[r.id];
           if (r.enabled) {
             const points = new Array<L.LatLng>();
             if (r.points !== undefined) {
@@ -190,6 +197,7 @@ const store: StoreOptions<StoreState> = {
       const arr = new Array<L.Polyline>();
       if (state.Routes !== undefined && state.Routes.length !== 0) {
         state.Routes.forEach((r: Route) => {
+          r.enabled = state.settings.routesToggled[r.id];
           if (r.shouldShow()) {
             const points = new Array<L.LatLng>();
             if (r.points !== undefined) {
