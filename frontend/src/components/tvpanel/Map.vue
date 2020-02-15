@@ -176,6 +176,7 @@ export default Vue.extend({
       this.$store.state.Vehicles.forEach((veh: Vehicle) => {
         if (this.Map !== undefined) {
           veh.addToMap(this.Map);
+          console.log(veh);
         }
       });
     },

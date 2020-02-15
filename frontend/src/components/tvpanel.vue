@@ -4,7 +4,7 @@
     <div id="right-panel">
       <TimeDisplay />
       <ETAs />
-      <News />
+      <!-- <News /> -->
       <div class="logo-sidebar">
 
       </div>  
@@ -16,7 +16,7 @@
 import Vue from 'vue';
 import Map from './tvpanel/Map.vue';
 import Header from './tvpanel/Header.vue';
-import News from './tvpanel/News.vue';
+// import News from './tvpanel/News.vue';
 import ETAs from './tvpanel/ETAs.vue';
 import TimeDisplay from './tvpanel/TimeDisplay.vue';
 import messagebox from './adminmessage.vue';
@@ -30,7 +30,7 @@ export default Vue.extend({
   components: {
     Map,
     Header,
-    News,
+    // News,
     ETAs,
     TimeDisplay,
   },

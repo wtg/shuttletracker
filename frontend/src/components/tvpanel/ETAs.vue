@@ -24,7 +24,7 @@ export default Vue.extend({
   data() {
      return {
         unionEtas: [],
-        routeNames: {19: 'Modified East Campus', 18: 'Modified West Campus', 1: 'West Campus', 15: 'East Campus'},
+        routeNames: {19: 'Modified East Campus', 18: 'Modified West Campus', 1: 'West Campus', 15: 'East Campus', 22: 'NEW North Route', 24: 'NEW West Route', 21: 'NEW South Route'},
      } as {
         unionEtas: string[][],
         routeNames: {[id: number]: string; },
