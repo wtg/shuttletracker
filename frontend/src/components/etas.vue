@@ -10,7 +10,6 @@
             <th>Vehicle</th>
             <th>Stop</th>
             <th>ETA</th>
-            <th>Arriving</th>
             <th>Route ID</th>
           </tr>
         </thead>
@@ -21,7 +20,6 @@
                 <td>{{ info.vehicleID }}</td>
                 <td>{{ info.stopID }}</td>
                 <td>{{ info.eta }}</td>
-                <td>{{ info.arriving }}</td>
                 <td>{{ info.routeID }}</td>
               </tr>
             </template>
