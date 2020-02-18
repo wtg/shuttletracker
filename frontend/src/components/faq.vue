@@ -43,7 +43,7 @@
     <h3>Why did the routes change?</h3>
     <p>
         What a complicated question! The short answer: Parking and Transportation, along with some Senate committees, changed the routes to make them shorter and more streamlined 
-        (most notably, cutting the East route into two different routes). The long answer can be found at <a href = "https://shuttles.rpi.edu/changes">https://shuttles.rpi.edu/changes</a>.
+        (most notably, cutting the East route into two different routes). The long answer can be found <router-link to="/changes">here</router-link>.
     </p>
     <h3>Why are the shuttles spewing buses and tractor emojis?</h3>
     <p>
@@ -53,20 +53,6 @@
     <h3>How do you pronounce "track?"</h3>
     <p>
         “Tra-cc”, it's pretty straightforward.
-    </p>
-    <h3>Privacy policy</h3>
-    <p>
-      Shuttle Tracker is operated by the
-      <a href="https://webtech.union.rpi.edu">Web Technolgies Group</a> (WebTech), a committee of the Rensselaer Union Student Senate. 
-      WebTech uses Google Analytics to gather anonymous metrics about the users of its services. This information cannot and will not 
-      be used to identify you or any specific user of the service.
-    </p>
-    <p>If you grant permission for Shuttle Tracker to access your location, this information is used for two purposes. The first is to indicate your location on the map. The second is to enhance the accuracy of vehicle tracking. The information Shuttle Tracker gathers is limited to your device's latitude, longitude, speed, and heading. These data are associated with a random identifier that is generated whenever you open Shuttle Tracker. In order to protect your privacy, no two visits to Shuttle Tracker are associated. This identifier is not used to identify any specific user of the service. All data gathered are only analyzed in aggregate in order to improve the quality of vehicle tracking for all users.</p>
-    <p>
-      Any questions about this privacy policy should be directed to
-      <a
-        href="mailto:webtech@union.lists.rpi.edu"
-      >webtech@union.lists.rpi.edu</a>.
     </p>
   </div>
 </template>
