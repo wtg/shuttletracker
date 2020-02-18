@@ -1,7 +1,7 @@
 <template>
   <div class="parent">
     <div class="titleBar">
-      <img src="~../assets/icon.svg">
+      <img id = "icon" src="~../assets/icon.svg">
       <transition name="pop">
         <div class="reconnecting" v-if="reconnecting">
           <span class="fas fa-circle-notch fa-spin"></span> Reconnecting...
@@ -9,6 +9,7 @@
       </transition>
     </div>
     <div id="mymap"></div>
+    <img id = "qMark" src="~../assets/q-mark.svg">
     <span>
       <messagebox ref="msgbox"/>
     </span>
@@ -403,12 +404,12 @@ input, label{
   z-index: 1;
   padding: 0 6px;
 
-  img {
+  #icon {
     flex: 0 1 auto;
     height: 70%;
     position: absolute;
-    left: 50%;
     transform: translateX(-50%);
+    left: 50%;
   }
 
   div.reconnecting {
@@ -420,6 +421,16 @@ input, label{
     border-radius: 4px;
     font-size: 13px;
   }
+}
+
+
+img#qMark {
+  position: absolute;
+  height: 30px;
+  width: 30px;
+  right: 25px;
+  top: 45px;
+  mix-blend-mode: multiply;
 }
 
 .pop-enter-active {
@@ -530,4 +541,5 @@ input, label{
   bottom: 35px;
   z-index: 2000;
 }
+
 </style>

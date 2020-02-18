@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Public from './components/Public.vue';
 import about from './components/about.vue';
+import faq from './components/faq.vue';
 import schedules from '@/components/schedules.vue';
 import settings from '@/components/settings.vue';
 import etas from '@/components/etas.vue';
@@ -23,6 +24,11 @@ export default new Router({
       path: '/about',
       name: 'about',
       component: about,
+    },
+    {
+      path: '/faq',
+      name: 'faq',
+      component: faq,
     },
     {
       path: '/etas',
