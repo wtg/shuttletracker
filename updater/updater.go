@@ -14,6 +14,7 @@ import (
 
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
+	"github.com/wtg/shuttletracker/smooth"
 )
 
 // Updater handles periodically grabbing the latest vehicle location data from iTrak.
@@ -36,10 +37,10 @@ type Config struct {
 // New creates an Updater.
 func New(cfg Config, ms shuttletracker.ModelService) (*Updater, error) {
 	updater := &Updater{
-		cfg:   cfg,
-		ms:    ms,
-		mutex: &sync.Mutex{},
-		sm: &sync.Mutex{},
+		cfg:         cfg,
+		ms:          ms,
+		mutex:       &sync.Mutex{},
+		sm:          &sync.Mutex{},
 		subscribers: []func(*shuttletracker.Location){},
 	}
 
@@ -240,6 +241,13 @@ func (u *Updater) handleVehicleData(vehicleData string) {
 	}
 	if route != nil {
 		update.RouteID = &route.ID
+
+		// SMOOTH TRACKING
+		log.Debugf("Tracked location: %f, %f", update.Latitude, update.Longitude)
+		predicted_location := smooth.NaivePredictPosition(vehicle, update, route)
+		update.Latitude = predicted_location.Latitude
+		update.Longitude = predicted_location.Longitude
+		log.Debugf("Predicted location: %f, %f", update.Latitude, update.Longitude)
 	}
 
 	if err := u.ms.CreateLocation(update); err != nil {
