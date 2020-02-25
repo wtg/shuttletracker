@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/wtg/shuttletracker"
+	"github.com/wtg/shuttletracker/log"
 )
 
 const earthRadius = 6371000.0 // meters
@@ -42,6 +43,7 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 			index = i
 		}
 	}
+	log.Debugf("Initial point index: %d", index)
 	// Find the amount of time that has passed since the last update was received, and given that,
 	// the distance the shuttle is predicted to have travelled
 	secondsSinceUpdate := time.Since(lastUpdate.Time).Seconds()
@@ -58,5 +60,6 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 		}
 		elapsedDistance += distanceBetween(route.Points[prevIndex], route.Points[index])
 	}
+	log.Debugf("Final point index: %d", index)
 	return route.Points[index]
 }
