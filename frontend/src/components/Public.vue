@@ -365,6 +365,8 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
+@import "@/assets/vars.scss";
+
 .parent {
   padding: 0px;
   margin: 0px;
@@ -372,6 +374,7 @@ export default Vue.extend({
   position: relative;
   display: flex;
   flex-direction: column;
+  background: var(--color-bg-normal);
 }
 
 input, label{
@@ -396,10 +399,10 @@ input, label{
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  border-bottom: 0.5px solid #eee;
-  box-shadow: 0 -3px 8px 0 #ddd;
+  border-bottom: 0.5px solid var(--color-bg-less);
+  box-shadow: 0 -3px 8px 0 var(--color-bg-least);
   user-select: none;
-  background: white;
+  background: var(--color-bg-normal);
   z-index: 1;
   padding: 0 6px;
 
@@ -423,8 +426,8 @@ input, label{
   div.reconnecting {
     flex: 0 1 auto;
     margin-left: auto;
-    background: linear-gradient(0deg, rgb(250, 250, 250), rgb(240, 240, 240));
-    border: 0.5px solid #eee;
+    background: linear-gradient(0deg, var(--color-bg-less), var(--color-bg-least));
+    border: 0.5px solid var(--color-bg-less);
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 13px;
@@ -462,9 +465,9 @@ input, label{
 }
 
 .info.legend {
-  box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
+  box-shadow: rgba(var(--color-fg-strong-rgb), 0.8) 0px 1px 1px;
   border-radius: 5px;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(var(--color-bg-normal-rgb), 0.9);
   padding: 5px;
   bottom: 25px;
   align-content: right;
@@ -478,9 +481,9 @@ input, label{
 }
 
 .info.toggle {
-    box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
+    box-shadow: rgba(var(--color-fg-strong-rgb), 0.8) 0px 1px 1px;
     border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(var(--color-bg-normal-rgb), 0.9);
     padding: 10px;
     top: 5px;
 
@@ -491,8 +494,8 @@ input, label{
     }
 }
 .button {
-    background: #ee2222;
-    color: white;
+    background: var(--color-primary);
+    color: var(--color-bg-normal);
     float: right;
     border-radius: 1px;
     padding: 0.35em;
