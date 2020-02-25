@@ -48,7 +48,8 @@
             </tr>
         </tbody>
     </table>
-    <router-link to="/about">About and privacy policy</router-link>
+    <router-link to="/faq">Frequently Asked Questions</router-link>
+    <router-link to="/about">Privacy Policy</router-link>
   </div>
 </template>
 

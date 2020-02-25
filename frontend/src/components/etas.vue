@@ -17,7 +17,7 @@
         <tbody>
           <tr v-if="!etas.length">No ETAS Currently Calculated</tr>
             <template v-for="(eta) in etas">
-              <tr v-for="(info, j) in eta" v-bind:key="j">
+              <tr v-for="(info, i) in eta" v-bind:key="`${i}-${info.stopID}`">
                 <td>{{ info.vehicleID }}</td>
                 <td>{{ info.stopID }}</td>
                 <td>{{ info.eta }}</td>

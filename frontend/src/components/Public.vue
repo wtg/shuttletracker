@@ -78,7 +78,6 @@ export default Vue.extend({
     Promise.all([this.$store.dispatch('grabStops'), this.$store.dispatch('grabRoutes')]);
     this.$store.dispatch('grabVehicles');
     this.$store.dispatch('grabAdminMesssage');
-
     this.$nextTick(() => {
       this.ready = true;
       this.Map = L.map('mymap', {
