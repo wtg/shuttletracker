@@ -35,7 +35,7 @@ func distanceBetween(p1, p2 shuttletracker.Point) float64 {
 func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletracker.Location, route *shuttletracker.Route) shuttletracker.Point {
 	// Find the index of the closest point to this shuttle's last known location
 	index := 0
-	minDistance := 0.0
+	minDistance := math.Inf(1)
 	for i, point := range route.Points {
 		distance := distanceBetween(point, shuttletracker.Point{Latitude: lastUpdate.Latitude, Longitude: lastUpdate.Longitude})
 		if distance < minDistance {
