@@ -80,7 +80,11 @@ export default Vue.extend({
       // });
     },
   },
-
+  watch: {
+    etas(): function() {
+      console.log(this.$store.state);
+    }
+  }
 });
 
 window.addEventListener('storage', () => {
