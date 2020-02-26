@@ -1,7 +1,8 @@
 <template>
   <div class="parent">
     <div class="titleBar">
-      <img src="~../assets/icon.svg">
+      <img id = "icon" src="~../assets/icon.svg">
+      <router-link to="/faq"><img id = "q-mark" src="~../assets/q-mark.svg"></router-link>
       <transition name="pop">
         <div class="reconnecting" v-if="reconnecting">
           <span class="fas fa-circle-notch fa-spin"></span> Reconnecting...
@@ -77,7 +78,6 @@ export default Vue.extend({
     Promise.all([this.$store.dispatch('grabStops'), this.$store.dispatch('grabRoutes')]);
     this.$store.dispatch('grabVehicles');
     this.$store.dispatch('grabAdminMesssage');
-
     this.$nextTick(() => {
       this.ready = true;
       this.Map = L.map('mymap', {
@@ -407,9 +407,18 @@ input, label{
     flex: 0 1 auto;
     height: 70%;
     position: absolute;
-    left: 50%;
     transform: translateX(-50%);
   }
+
+  img#icon {
+    left: 50%;
+  }
+
+  img#q-mark {
+    right: 2px;
+    top: 5px;
+  }
+
 
   div.reconnecting {
     flex: 0 1 auto;
@@ -530,4 +539,5 @@ input, label{
   bottom: 35px;
   z-index: 2000;
 }
+
 </style>

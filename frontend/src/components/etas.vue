@@ -17,7 +17,7 @@
         <tbody>
           <tr v-if="!etas.length">No ETAS Currently Calculated</tr>
             <template v-for="(eta) in etas">
-              <tr v-for="(info, j) in eta" v-bind:key="j">
+              <tr v-for="(info, i) in eta" v-bind:key="`${i}-${info.stopID}`">
                 <td>{{ info.vehicleID }}</td>
                 <td>{{ info.stopID }}</td>
                 <td>{{ info.eta }}</td>
@@ -55,7 +55,13 @@ export default Vue.extend({
               let etaMinutes = `A while`;
               // cap display at 15 min
               if (elapsed < minuteMs * 15) {
-                etaMinutes =  `${Math.round(elapsed / minuteMs)} minutes`;
+                if (Math.round(elapsed / minuteMs) === 0) {
+                  etaMinutes = `Less than a minute`;
+                } else if (Math.round(elapsed / minuteMs) === 1) {
+                  etaMinutes = `${Math.round(elapsed / minuteMs)} minute`;
+                } else {
+                    etaMinutes =  `${Math.round(elapsed / minuteMs)} minutes`;
+                }
               }
 
               const e = {eta: etaMinutes,
@@ -63,7 +69,9 @@ export default Vue.extend({
                         vehicleID: eta.vehicleID,
                         stopID: eta.stopID,
                         routeID: eta.routeID};
-              ret.push(e);
+              if (elapsed >= 0) {
+                ret.push(e);
+              }
             }
             etaArray.push(ret);
           }
