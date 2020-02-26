@@ -1,56 +1,55 @@
 <template>
   <div class="parent content">
     <h2>Frequently Asked Questions</h2>
-    <h3>What is Shuttle Tracker?</h3>
+    <h4>What is Shuttle Tracker?</h4>
     <p>
       Shuttle Tracker is
       <a href="https://github.com/wtg/shuttletracker">open source</a> and maintained by the
       <a href="https://webtech.union.rpi.edu">Web Technologies Group</a> of the Rensselaer Union Student Senate for the benefit of the student body.
-      It is also an active 
-      <a href="https://rcos.io">RCOS</a> project, and dozens of students have contributed to it through RCOS in previous semesters.
+      It is also an active
+      <a href="https://rcos.io">RCOS</a> project, and over 50 students have contributed to it through RCOS in previous semesters.
     </p>
-    <h3>How can I contribute?</h3>
+    <h4>Why is there no app?</h4>
     <p>
-      We have an active
-      <a href="https://github.com/wtg/shuttletracker">repository</a> on GitHub where we track issues and accept pull requests. 
-      If you want to get involved in another way, email
-      <a href="mailto:webtech@union.lists.rpi.edu">webtech@union.lists.rpi.edu</a> for more information.
+        There is a Shuttle Tracker app in development right now, although we currently have no timeline to offer.
+        In the meantime, we're focused on making the Shuttle Tracker website the best it can be.
     </p>
-    <h3>Why is there no app?</h3>
+    <h4>Why are there shuttles in downtown Troy?</h4>
     <p>
-        There is a Shuttle Tracker app in development right now, although we currently have no timeline to offer. 
-        In the meantime, we're focused on making the Shuttle Tracker website as good as it can be.
-    </p>
-    <h3>Why are there shuttles in downtown Troy?</h3>
-    <p>
-        The shuttle station is located in downtown Troy. As shuttles are driving from the station to the Union to begin their route, they are still being tracked. 
+        The shuttle station is located in downtown Troy. As shuttles are driving to and from the station each day, they are still being tracked.
         These are the shuttles you see in downtown Troy.
     </p>
-    <h3>Why are the shuttles the wrong color?</h3>
+    <h4>Why are the shuttles the wrong color?</h4>
     <p>
-        There’s a few reasons that the shuttles you’re seeing could be wrong. Check the routes you have toggled on first. Different routes have different colors, 
-        so the late night shuttle has a different color than the daytime shuttles. When a shuttle is off a route, it will be colored white. Secondly, some of the routes overlap, 
-        so take a closer look. If you’re still experiencing problems, send us a message!
+        Since both the shuttles and routes change on a daily basis, a shuttle's route is determined dynamically by looking at which route it has been closest to
+        recently. However, due to routes overlapping and drivers going on break or off-course, a shuttle's route may be incorrectly determined. This
+        should resolve itself within a few minutes, however if there are repeated issues feel free to send us a message.
     </p>
-    <h3>Why are some shuttles colored white?</h3>
+    <h4>Why are some shuttles colored white?</h4>
     <p>
-        If shuttles are off-route for multiple minutes, their color will change to a white color to indicate they are no longer on a route. 
+        If shuttles are off-route for multiple minutes, their color will change to a white color to indicate they are no longer on a route.
     </p>
-    <h3>Why do the shuttles jump on the map?</h3>
+    <h4>Why do the shuttles jump on the map?</h4>
     <p>
         When the shuttle is traveling at a certain speed for 8 seconds, the shuttle location will update.
     </p>
-    <h3>Why did the routes change?</h3>
+    <h4>Why did the routes change?</h4>
     <p>
-        What a complicated question! The short answer: Parking and Transportation, along with some Senate committees, changed the routes to make them shorter and more streamlined 
-        (most notably, cutting the East route into two different routes). The long answer can be found <router-link to="/changes">here</router-link>.
+        Parking and Transportation, along with some Senate committees, updated the routes (beginning Spring 2020) to make them faster and serve more students
+        (most notably by cutting the East route into two different routes). More information can be found <router-link to="/changes">here</router-link>.
     </p>
-    <h3>Why are the shuttles spewing buses and tractor emojis?</h3>
+    <h4>How can I contribute?</h4>
     <p>
-        A: The beloved 𝐵𝓊𝓈 𝐵𝓊𝓉𝓉𝑜𝓃 is used for a variety of reasons. You can press the 𝐵𝓊𝓈 𝐵𝓊𝓉𝓉𝑜𝓃 to let people know where a shuttle is, how fast you’re going, 
+      We have an active
+      <a href="https://github.com/wtg/shuttletracker">repository</a> on GitHub where we track issues and accept pull requests.
+      Learn more about what we do on our <a href="https://webtech.union.rpi.edu">website</a> or by sending us an <a href="mailto:webtech@union.lists.rpi.edu">email</a>.
+    </p>
+    <h4>Why are the shuttles spewing buses and other emojis?</h4>
+    <p>
+        A: The beloved 𝐵𝓊𝓈 𝐵𝓊𝓉𝓉𝑜𝓃 can be used for a variety of reasons. You can press the 𝐵𝓊𝓈 𝐵𝓊𝓉𝓉𝑜𝓃 to let people know where a shuttle is, how fast you’re going,
         or to assert your dominance.
     </p>
-    <h3>How do you pronounce "track?"</h3>
+    <h4>How do you pronounce "track?"</h4>
     <p>
         “Tra-cc”, it's pretty straightforward.
     </p>
@@ -65,8 +64,11 @@ export default Vue.extend({});
 <style lang="scss" scoped>
 .parent {
   padding: 20px;
+  p {
+    margin-bottom: .8em;
+  }
 }
-p {
-  margin-bottom: 1em;
+h4 {
+  margin-bottom:.1em;
 }
 </style>
