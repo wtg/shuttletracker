@@ -43,6 +43,17 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 			index = i
 		}
 	}
+	// Figures out whether or not the shuttle is currently at a stop
+	atStop := false
+	thisStop = -1
+	for i, stop := range route.StopIDs{
+		if route.points[index] == route.StopIDs[i]{
+			atStop = true
+			thisStop = i
+			break
+		}
+	}
+
 	// Find the amount of time that has passed since the last update was received, and given that,
 	// the distance the shuttle is predicted to have travelled
 	secondsSinceUpdate := time.Since(lastUpdate.Time).Seconds()
