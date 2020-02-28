@@ -43,11 +43,16 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 			index = i
 		}
 	}
-	log.Debugf("Initial point index: %d", index)
 	// Find the amount of time that has passed since the last update was received, and given that,
 	// the distance the shuttle is predicted to have travelled
 	secondsSinceUpdate := time.Since(lastUpdate.Time).Seconds()
 	predictedDistance := secondsSinceUpdate * lastUpdate.Speed
+
+	// Debug
+	log.Debugf("START PREDICTION FOR VEHICLE %d", vehicle.ID)
+	log.Debugf("Initial point index: %d", index)
+	log.Debugf("Seconds since update: %f", secondsSinceUpdate)
+	log.Debugf("Predicted distance: %f", predictedDistance)
 
 	// Iterate over each point in the route in order, summing the distance between each point,
 	// and stop when the predicted distance has elapsed
