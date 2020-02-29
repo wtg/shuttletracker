@@ -18,7 +18,7 @@ func toRadians(n float64) float64 {
 	return n * math.Pi / 180
 }
 
-func distanceBetween(p1, p2 shuttletracker.Point) float64 {
+func DistanceBetween(p1, p2 shuttletracker.Point) float64 {
 	lat1Rad := toRadians(p1.Latitude)
 	lon1Rad := toRadians(p1.Longitude)
 	lat2Rad := toRadians(p2.Latitude)
@@ -37,7 +37,7 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 	index := 0
 	minDistance := math.Inf(1)
 	for i, point := range route.Points {
-		distance := distanceBetween(point, shuttletracker.Point{Latitude: lastUpdate.Latitude, Longitude: lastUpdate.Longitude})
+		distance := DistanceBetween(point, shuttletracker.Point{Latitude: lastUpdate.Latitude, Longitude: lastUpdate.Longitude})
 		if distance < minDistance {
 			minDistance = distance
 			index = i
@@ -49,10 +49,10 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 	predictedDistance := secondsSinceUpdate * lastUpdate.Speed
 
 	// Debug
-	log.Debugf("START PREDICTION FOR VEHICLE %d", vehicle.ID)
-	log.Debugf("Initial point index: %d", index)
-	log.Debugf("Seconds since update: %f", secondsSinceUpdate)
-	log.Debugf("Predicted distance: %f", predictedDistance)
+	//log.Debugf("START PREDICTION FOR VEHICLE %d", vehicle.ID)
+	//log.Debugf("Initial point index: %d", index)
+	//log.Debugf("Seconds since update: %f", secondsSinceUpdate)
+	//log.Debugf("Predicted distance: %f", predictedDistance)
 
 	// Iterate over each point in the route in order, summing the distance between each point,
 	// and stop when the predicted distance has elapsed
@@ -63,8 +63,9 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 		if index >= len(route.Points) {
 			index = 0
 		}
-		elapsedDistance += distanceBetween(route.Points[prevIndex], route.Points[index])
+		elapsedDistance += DistanceBetween(route.Points[prevIndex], route.Points[index])
 	}
-	log.Debugf("Final point index: %d", index)
+	//log.Debugf("Final point index: %d", index)
+	log.Debugf("Predicted for %d; L/L %f, %f; Point %d", vehicle.ID, route.Points[index].Latitude, route.Points[index].Longitude, index)
 	return route.Points[index]
 }

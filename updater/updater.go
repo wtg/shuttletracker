@@ -179,7 +179,7 @@ func (u *Updater) update() {
 	}
 
 	// Clear vehicle IDs before we add new ones
-	u.vehicleIDs = u.vehicleIDs[:0]
+	//u.vehicleIDs = u.vehicleIDs[:0]
 
 	wg := sync.WaitGroup{}
 	// for parsed data, update each vehicle
@@ -282,15 +282,26 @@ func (u *Updater) handleVehicleData(vehicleData string) {
 		Speed:     speedMPH,
 		Time:      newTime,
 	}
+
+	// Only add this vehicle ID to the active vehicle list if it has a route and isn't already there
+	index := -1
+	for i, id := range u.vehicleIDs {
+		if id == vehicle.ID {
+			index = i
+			break
+		}
+	}
+
 	if route != nil {
 		update.RouteID = &route.ID
-
-		// SMOOTH TRACKING
-		//log.Debugf("Tracked location: %f, %f", update.Latitude, update.Longitude)
-		//predicted_location := smooth.NaivePredictPosition(vehicle, update, route)
-		//update.Latitude = predicted_location.Latitude
-		//update.Longitude = predicted_location.Longitude
-		//log.Debugf("Predicted location: %f, %f", update.Latitude, update.Longitude)
+		if index < 0 {
+			u.vehicleIDs = append(u.vehicleIDs, vehicle.ID)
+		}
+	} else if index >= 0 {
+		// This vehicle is no longer on a route; remove it from the active vehicles list
+		u.vehicleIDs[index] = u.vehicleIDs[len(u.vehicleIDs)-1]
+		u.vehicleIDs[len(u.vehicleIDs)-1] = 0
+		u.vehicleIDs = u.vehicleIDs[:len(u.vehicleIDs)-1]
 	}
 
 	if err := u.ms.CreateLocation(update); err != nil {
@@ -298,8 +309,21 @@ func (u *Updater) handleVehicleData(vehicleData string) {
 		return
 	}
 
-	// SMOOTH TRACKING
-	u.vehicleIDs = append(u.vehicleIDs, vehicle.ID)
+	// Debug; find the route point closest to this newly updated vehicle
+	index = 0
+	if route != nil {
+		index = 0
+		minDistance := math.Inf(1)
+		for i, point := range route.Points {
+			distance := smooth.DistanceBetween(point, shuttletracker.Point{Latitude: lastUpdate.Latitude, Longitude: lastUpdate.Longitude})
+			if distance < minDistance {
+				minDistance = distance
+				index = i
+			}
+		}
+	}
+
+	log.Debugf("Updated for %d; L/L %f, %f; Point %d", vehicle.ID, latitude, longitude, index)
 
 	u.notifySubscribers(update)
 }
