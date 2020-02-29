@@ -117,7 +117,7 @@ export default Vue.extend({
       },
     },
     darkThemeAllModes(): DarkThemeMode[] {
-      return DarkTheme.allModes;
+      return DarkThemeMode.allModes();
     },
     fusionPositionEnabled: {
       get(): boolean {

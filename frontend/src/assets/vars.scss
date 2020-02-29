@@ -1,4 +1,5 @@
 @import "~bulma/sass/utilities/all";
+@import "~buefy/src/scss/utils/functions";
 
 /* Master colors definition. */
 $primary: #ed1c24;
@@ -14,6 +15,8 @@ $twitter-invert: findColorInvert($twitter);
  *            a { color: var(--color-primary); }
  * Also defines a var `${name}-rgb` to have only the raw values, for use with functions like rgba().
  *   Example: a { color: rgba(var(--color-primary-rgb), 0.5); }
+ *
+ * https://codyhouse.co/blog/post/how-to-combine-sass-color-functions-and-css-variables
  */
 @mixin defineColor($name, $css-color) {
   #{$name}: #{$css-color};
@@ -22,6 +25,33 @@ $twitter-invert: findColorInvert($twitter);
 @mixin defineColorRGB($name, $red, $green, $blue) {
   #{$name}: unquote("rgb(#{$red}, #{$green}, #{$blue})");
   #{$name}-rgb: unquote("#{$red}, #{$green}, #{$blue}");
+}
+/**
+ * This function overrides the SASS rgba() function to support CSS variables. If a variable is the argument of rgba(),
+ * the built-in CSS rgba() function is used instead.
+ *
+ * BUG! This function will NOT work if the argument is any more complex than a single var(--xxx). Caveat emptor.
+ */
+@function rgba($args...) {
+  // I could not figure out how to call the original rgba function. So.... enjoy this HACK BULLSHIT :(.
+  $color: null;
+  $alpha: null;
+  @if length($args) == 4 {
+    $color: rgb(nth($args, 1), nth($args, 2), nth($args, 3));
+    $alpha: nth($args, 4);
+  } @else {
+    $color: nth($args, 1);
+    $alpha: nth($args, 2);
+  }
+
+  @if type_of($color) == "string" and str-index($color, "var(") == 1 {
+    $color: str-replace($color, "var(", "");
+    $color: str-replace($color, ")");
+    $color: str-replace($color, "-rgb");
+    @return unquote("rgba(var(#{$color}-rgb), #{$alpha})");
+  } @else {
+    @return hsla(hue($color), saturation($color), lightness($color), $alpha);
+  }
 }
 
 /** This is the (default) light theme for the app. These variables are native CSS vars. They are evaluated at runtime. */
@@ -36,7 +66,7 @@ body {
 }
 
 /** This is the dark theme for the app. */
-body[data-theme="dark"] {
+[data-theme="dark"] {
   @include defineColor(--color-fg-strong, $white);
   @include defineColor(--color-fg-normal, darken($white, 15%));
   @include defineColor(--color-fg-light, darken($white, 30%));
@@ -49,12 +79,12 @@ body[data-theme="dark"] {
 $custom-colors: (
     "twitter": ($twitter, $twitter-invert)
 );
-$scheme-main: unquote("var(--color-bg)");
-$scheme-invert: unquote("var(--color-fg-strong)");
-$text-strong: unquote("var(--color-fg-strong)");
-$text: unquote("var(--color-fg-normal)");
-$text-light: unquote("var(--color-fg-light)");
-$text-invert: unquote("var(--color-bg)");
+$scheme-main: var(--color-bg-normal);
+$scheme-invert: var(--color-fg-strong);
+$text-strong: var(--color-fg-strong);
+$text: var(--color-fg-normal);
+$text-light: var(--color-fg-light);
+$text-invert: var(--color-bg-normal);
 
 
 @import "~bulma";
