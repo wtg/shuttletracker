@@ -28,6 +28,7 @@ type Updater struct {
 	sm                   *sync.Mutex
 	vehicleIDs           []int64
 	subscribers          []func(*shuttletracker.Location)
+	predictions          map[int64]smooth.Prediction // DEBUG: Track recent positions
 }
 
 type Config struct {
@@ -43,6 +44,7 @@ func New(cfg Config, ms shuttletracker.ModelService) (*Updater, error) {
 		mutex:       &sync.Mutex{},
 		sm:          &sync.Mutex{},
 		subscribers: []func(*shuttletracker.Location){},
+		predictions: make(map[int64]smooth.Prediction),
 	}
 
 	interval, err := time.ParseDuration(cfg.UpdateInterval)
@@ -124,16 +126,22 @@ func (u *Updater) predict(vehicleID int64) {
 		route, err = u.GuessRouteForVehicle(vehicle)
 	}
 	if route != nil {
-		newLocation := smooth.NaivePredictPosition(vehicle, update, route)
+		prediction := smooth.NaivePredictPosition(vehicle, update, route)
+		newLocation := prediction.Point
 		newUpdate := &shuttletracker.Location{
 			TrackerID: update.TrackerID,
 			Latitude:  newLocation.Latitude,
 			Longitude: newLocation.Longitude,
 			Heading:   update.Heading,
 			Speed:     update.Speed,
-			Time:      update.Time,
+			Time:      time.Now(),
 		}
-		u.notifySubscribers(newUpdate)
+		u.predictions[vehicle.ID] = prediction // DEBUG
+		if err := u.ms.CreateLocation(newUpdate); err != nil {
+			log.WithError(err).Errorf("could not create location")
+			return
+		}
+		//u.notifySubscribers(newUpdate)
 	}
 }
 
@@ -312,18 +320,18 @@ func (u *Updater) handleVehicleData(vehicleData string) {
 	// Debug; find the route point closest to this newly updated vehicle
 	index = 0
 	if route != nil {
-		index = 0
-		minDistance := math.Inf(1)
-		for i, point := range route.Points {
-			distance := smooth.DistanceBetween(point, shuttletracker.Point{Latitude: lastUpdate.Latitude, Longitude: lastUpdate.Longitude})
-			if distance < minDistance {
-				minDistance = distance
-				index = i
-			}
-		}
+		index = smooth.ClosestPointTo(latitude, longitude, route)
 	}
 
-	log.Debugf("Updated for %d; L/L %f, %f; Point %d", vehicle.ID, latitude, longitude, index)
+	// DEBUG
+	if prediction, exists := u.predictions[vehicle.ID]; exists {
+		diffIndex := int64(math.Abs(float64(prediction.Index - index)))
+		diffDistance := smooth.DistanceBetween(prediction.Point, shuttletracker.Point{Latitude: latitude, Longitude: longitude})
+		log.Debugf("UPDATED VEHICLE %d", vehicle.ID)
+		log.Debugf("Predicted: %d, (%f, %f)", prediction.Index, prediction.Point.Latitude, prediction.Point.Longitude)
+		log.Debugf("Actual: %d, (%f, %f)", index, latitude, longitude)
+		log.Debugf("Difference: %d points or %f meters", diffIndex, diffDistance)
+	}
 
 	u.notifySubscribers(update)
 }

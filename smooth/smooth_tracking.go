@@ -5,8 +5,12 @@ import (
 	"time"
 
 	"github.com/wtg/shuttletracker"
-	"github.com/wtg/shuttletracker/log"
 )
+
+type Prediction struct {
+	Point shuttletracker.Point
+	Index int
+}
 
 const earthRadius = 6371000.0 // meters
 
@@ -30,29 +34,30 @@ func DistanceBetween(p1, p2 shuttletracker.Point) float64 {
 				haversine(lon2Rad-lon1Rad)))
 }
 
-// Naive algorithm to predict the position a shuttle is at, given the last update received
-// Returns the index of the point the shuttle would be at on its route
-func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletracker.Location, route *shuttletracker.Route) shuttletracker.Point {
-	// Find the index of the closest point to this shuttle's last known location
+// Returns the index of the closest point on the route to the given latitude and longitude coordinates
+func ClosestPointTo(latitude, longitude float64, route *shuttletracker.Route) int {
 	index := 0
 	minDistance := math.Inf(1)
 	for i, point := range route.Points {
-		distance := DistanceBetween(point, shuttletracker.Point{Latitude: lastUpdate.Latitude, Longitude: lastUpdate.Longitude})
+		distance := DistanceBetween(point, shuttletracker.Point{Latitude: latitude, Longitude: longitude})
 		if distance < minDistance {
 			minDistance = distance
 			index = i
 		}
 	}
+	return index
+}
+
+// Naive algorithm to predict the position a shuttle is at, given the last update received
+// Returns the index of the point the shuttle would be at on its route
+func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletracker.Location, route *shuttletracker.Route) Prediction {
+	// Find the index of the closest point to this shuttle's last known location
+	index := ClosestPointTo(lastUpdate.Latitude, lastUpdate.Longitude, route)
+
 	// Find the amount of time that has passed since the last update was received, and given that,
 	// the distance the shuttle is predicted to have travelled
 	secondsSinceUpdate := time.Since(lastUpdate.Time).Seconds()
 	predictedDistance := secondsSinceUpdate * lastUpdate.Speed
-
-	// Debug
-	//log.Debugf("START PREDICTION FOR VEHICLE %d", vehicle.ID)
-	//log.Debugf("Initial point index: %d", index)
-	//log.Debugf("Seconds since update: %f", secondsSinceUpdate)
-	//log.Debugf("Predicted distance: %f", predictedDistance)
 
 	// Iterate over each point in the route in order, summing the distance between each point,
 	// and stop when the predicted distance has elapsed
@@ -65,7 +70,5 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 		}
 		elapsedDistance += DistanceBetween(route.Points[prevIndex], route.Points[index])
 	}
-	//log.Debugf("Final point index: %d", index)
-	log.Debugf("Predicted for %d; L/L %f, %f; Point %d", vehicle.ID, route.Points[index].Latitude, route.Points[index].Longitude, index)
-	return route.Points[index]
+	return Prediction{Point: route.Points[index], Index: index}
 }
