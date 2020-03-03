@@ -8,6 +8,11 @@ import (
 	"github.com/wtg/shuttletracker/log"
 )
 
+type SmoothTracking struct {
+	ms          shuttletracker.ModelService
+	
+}
+
 const earthRadius = 6371000.0 // meters
 
 func haversine(theta float64) float64 {
@@ -30,10 +35,26 @@ func distanceBetween(p1, p2 shuttletracker.Point) float64 {
 				haversine(lon2Rad-lon1Rad)))
 }
 
+func findClosestPointOnRoute(route *shuttletracker.Route, p1 shuttletracker.Point) int {
+	// Find the index of the closest point to this shuttle's last known location
+	index := 0
+	minDistance := math.Inf(1)
+	for i, point := range route.Points {
+		distance := distanceBetween(point, p1)
+		if distance < minDistance {
+			minDistance = distance
+			index = i
+		}
+	}
+
+	return index
+}
+
 // Naive algorithm to predict the position a shuttle is at, given the last update received
 // Returns the index of the point the shuttle would be at on its route
 func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletracker.Location, route *shuttletracker.Route) shuttletracker.Point {
 	// Find the index of the closest point to this shuttle's last known location
+	/*
 	index := 0
 	minDistance := math.Inf(1)
 	for i, point := range route.Points {
@@ -43,11 +64,15 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 			index = i
 		}
 	}
+	*/
+	index := findClosestPointOnRoute(route, shuttletracker.Point{Latitude: lastUpdate.Latitude, Longitude: lastUpdate.Longitude})
+
 	// Figures out whether or not the shuttle is currently at a stop
 	atStop := false
-	thisStop = -1
-	for i, stop := range route.StopIDs{
-		if route.points[index] == route.StopIDs[i]{
+	var thisStop = -1
+	for i, stop := range route.StopIDs {
+		stopIndex := findClosestPointOnRoute(route, shuttletracker.Point{Latitude: stop.Latitude, Longitude: stop.Longitude})
+		if route.Points[index] == route.StopIDs[i]{
 			atStop = true
 			thisStop = i
 			break
