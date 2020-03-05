@@ -8,6 +8,7 @@ import settings from '@/components/settings.vue';
 import etas from '@/components/etas.vue';
 import changes from '@/components/changes.vue';
 import Resources from '@/resources';
+import feedback from '@/components/feedback.vue';
 
 Vue.use(Router);
 
@@ -49,6 +50,11 @@ export default new Router({
       path: '/changes',
       name: 'changes',
       component: changes,
+    },
+    {
+      path: '/feedback',
+      name: 'feedback',
+      component: feedback,
     },
   ],
 });
