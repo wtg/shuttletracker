@@ -28,7 +28,8 @@ type Updater struct {
 	sm                   *sync.Mutex
 	vehicleIDs           []int64
 	subscribers          []func(*shuttletracker.Location)
-	predictions          map[int64]smooth.Prediction // DEBUG: Track recent positions
+	predictions          map[int64]smooth.Prediction       // DEBUG: Track recent positions
+	locations            map[int64]shuttletracker.Location // Tracks the last real update each vehicle received
 }
 
 type Config struct {
@@ -45,6 +46,7 @@ func New(cfg Config, ms shuttletracker.ModelService) (*Updater, error) {
 		sm:          &sync.Mutex{},
 		subscribers: []func(*shuttletracker.Location){},
 		predictions: make(map[int64]smooth.Prediction),
+		locations:   make(map[int64]shuttletracker.Location),
 	}
 
 	interval, err := time.ParseDuration(cfg.UpdateInterval)
@@ -85,9 +87,10 @@ func (u *Updater) Run() {
 		if intervalTracker%10 == 0 {
 			u.update()
 			intervalTracker = 0
-		}
-		for _, id := range u.vehicleIDs {
-			go u.predict(id)
+		} else {
+			for _, id := range u.vehicleIDs {
+				u.predict(id)
+			}
 		}
 		intervalTracker++
 	}
@@ -108,40 +111,39 @@ func (u *Updater) notifySubscribers(loc *shuttletracker.Location) {
 	u.sm.Unlock()
 }
 
+// Makes a prediction on this vehicle's current location, stores it in the updater's predictions map,
+// and updates the vehicle's marker on the map. Assumes the vehicle is on a valid route.
 func (u *Updater) predict(vehicleID int64) {
 	vehicle, err := u.ms.Vehicle(vehicleID)
 	if err != nil {
 		log.WithError(err).Error("unable to get vehicle from ID")
 		return
 	}
-	update, err := u.ms.LatestLocation(vehicle.ID)
-	if err != nil {
-		log.WithError(err).Error("unable to get last location")
-		return
-	}
-	var route *shuttletracker.Route = nil
-	if update.RouteID != nil {
-		route, err = u.ms.Route(*update.RouteID)
+	if update, exists := u.locations[vehicle.ID]; exists {
+		route, err := u.ms.Route(*update.RouteID)
+		if err != nil {
+			log.WithError(err).Error("unable to get route for prediction")
+		}
+		if route != nil {
+			prediction := smooth.NaivePredictPosition(vehicle, &update, route)
+			newLocation := prediction.Point
+			newUpdate := &shuttletracker.Location{
+				TrackerID: update.TrackerID,
+				Latitude:  newLocation.Latitude,
+				Longitude: newLocation.Longitude,
+				Heading:   update.Heading,
+				Speed:     update.Speed,
+				Time:      time.Now(),
+				RouteID:   &route.ID,
+			}
+			u.predictions[vehicle.ID] = prediction // DEBUG
+			if err := u.ms.CreateLocation(newUpdate); err != nil {
+				log.WithError(err).Error("could not create location for prediction")
+			}
+			//u.notifySubscribers(newUpdate)
+		}
 	} else {
-		route, err = u.GuessRouteForVehicle(vehicle)
-	}
-	if route != nil {
-		prediction := smooth.NaivePredictPosition(vehicle, update, route)
-		newLocation := prediction.Point
-		newUpdate := &shuttletracker.Location{
-			TrackerID: update.TrackerID,
-			Latitude:  newLocation.Latitude,
-			Longitude: newLocation.Longitude,
-			Heading:   update.Heading,
-			Speed:     update.Speed,
-			Time:      time.Now(),
-		}
-		u.predictions[vehicle.ID] = prediction // DEBUG
-		if err := u.ms.CreateLocation(newUpdate); err != nil {
-			log.WithError(err).Errorf("could not create location")
-			return
-		}
-		//u.notifySubscribers(newUpdate)
+		log.Debugf("no updates to make a prediction from")
 	}
 }
 
@@ -302,6 +304,7 @@ func (u *Updater) handleVehicleData(vehicleData string) {
 
 	if route != nil {
 		update.RouteID = &route.ID
+		u.locations[vehicle.ID] = *update
 		if index < 0 {
 			u.vehicleIDs = append(u.vehicleIDs, vehicle.ID)
 		}
