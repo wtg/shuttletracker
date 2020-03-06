@@ -38,18 +38,17 @@ func DistanceBetween(p1, p2 shuttletracker.Point) float64 {
 				haversine(lon2Rad-lon1Rad)))
 }
 
-func ClosestPointTo(lat Latitude, lon Longitude, route *shuttletracker.Route) int {
-	// Find the index of the closest point to this shuttle's last known location
+// Returns the index of the closest point on the route to the given latitude and longitude coordinates
+func ClosestPointTo(latitude, longitude float64, route *shuttletracker.Route) int {
 	index := 0
 	minDistance := math.Inf(1)
 	for i, point := range route.Points {
-		distance := distanceBetween(point, p1)
+		distance := DistanceBetween(point, shuttletracker.Point{Latitude: latitude, Longitude: longitude})
 		if distance < minDistance {
 			minDistance = distance
 			index = i
 		}
 	}
-
 	return index
 }
 
