@@ -8,8 +8,9 @@ import (
 )
 
 type Prediction struct {
-	Point shuttletracker.Point
-	Index int
+	VehicleID int64
+	Point     shuttletracker.Point
+	Index     int
 }
 
 const earthRadius = 6371000.0 // meters
@@ -70,5 +71,5 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 		}
 		elapsedDistance += DistanceBetween(route.Points[prevIndex], route.Points[index])
 	}
-	return Prediction{Point: route.Points[index], Index: index}
+	return Prediction{VehicleID: vehicle.ID, Point: route.Points[index], Index: index}
 }
