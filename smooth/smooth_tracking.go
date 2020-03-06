@@ -8,6 +8,7 @@ import (
 )
 
 type Prediction struct {
+	ms        shuttletracker.ModelService
 	VehicleID int64
 	Point     shuttletracker.Point
 	Index     int
@@ -49,23 +50,43 @@ func ClosestPointTo(latitude, longitude float64, route *shuttletracker.Route) in
 	return index
 }
 
+func ClosestStopTo(route *shuttletracker.Route, loc *shuttletracker.Location) (shuttletracker.Point, error){
+	stopPoints := make([]shuttletracker.Point, len(route.StopIDs))
+	for i, stopID := range route.StopIDs {
+		stop, err := Prediction.ms.Stop(stopID)
+		if err != nil {
+			return nil, err
+		}
+		p := shuttletracker.Point{Latitude: stop.Latitude, Longitude: stop.Longitude}
+		stopPoints[i] = p
+	}
+
+	minIndex := 0
+	minDistance := math.Inf(1)
+	locPoint := shuttletracker.Point{Latitude: loc.Latitude, Longitude: loc.Longitude}
+	for j := minIndex; j < len(stopPoints); j++ {
+		p := stopPoints[j]
+		d := distanceBetween(p, locPoint)
+		if d < minDistance {
+			minIndex = j
+			minDistance = d
+		}
+	}
+
+	return stopPoints[minIndex], nil;
+}
+
 // Naive algorithm to predict the position a shuttle is at, given the last update received
 // Returns the index of the point the shuttle would be at on its route
 func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletracker.Location, route *shuttletracker.Route) Prediction {
 	// Find the index of the closest point to this shuttle's last known location
 	index := ClosestPointTo(lastUpdate.Latitude, lastUpdate.Longitude, route)
 
-	// Figures out whether or not the shuttle is currently at a stop
-	atStop := false
-	var thisStop = -1
-	for i, stop := range route.StopIDs {
-		stopIndex := ClosestPointTo(stop.Latitude, stop.Longitude, route)
-		if route.Points[index] == route.StopIDs[i]{
-			atStop = true
-			thisStop = i
-			break
-		}
-	}
+	stopInd, err := ClosestStopTo(route, lastUpdate);
+	closestStop := em.ms.Stop(stopID)
+
+	locPoint := shuttletracker.Point{Latitude: lastUpdate.Latitude, Longitude: lastUpdate.Longitude}
+	directDistance := distanceBetween(locPoint, stopPoint)
 
 	// Find the amount of time that has passed since the last update was received, and given that,
 	// the distance the shuttle is predicted to have travelled
