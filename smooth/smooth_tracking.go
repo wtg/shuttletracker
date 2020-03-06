@@ -7,9 +7,6 @@ import (
 	"github.com/wtg/shuttletracker"
 )
 
-type SmoothTracking struct {
-	ms          shuttletracker.ModelService
-
 type Prediction struct {
 	VehicleID int64
 	Point     shuttletracker.Point
