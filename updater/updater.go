@@ -14,7 +14,6 @@ import (
 
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
-	"github.com/wtg/shuttletracker/smooth"
 )
 
 // Updater handles periodically grabbing the latest vehicle location data from iTrak.
@@ -26,7 +25,6 @@ type Updater struct {
 	mutex                *sync.Mutex
 	lastDataFeedResponse *shuttletracker.DataFeedResponse
 	sm                   *sync.Mutex
-	vehicleIDs           []int64
 	subscribers          []func(*shuttletracker.Location)
 }
 
@@ -72,22 +70,13 @@ func NewConfig(v *viper.Viper) *Config {
 // Run updater forever.
 func (u *Updater) Run() {
 	log.Debug("Updater started.")
-	ticker := time.Tick(time.Second)
+	ticker := time.Tick(u.updateInterval)
 
 	// Do one initial update.
 	u.update()
 
-	// Call predict(id) every 1s and update() every 10s
-	intervalTracker := 1
 	for range ticker {
-		if intervalTracker%10 == 0 {
-			u.update()
-			intervalTracker = 0
-		}
-		for _, id := range u.vehicleIDs {
-			go u.predict(id)
-		}
-		intervalTracker++
+		u.update()
 	}
 }
 
@@ -104,37 +93,6 @@ func (u *Updater) notifySubscribers(loc *shuttletracker.Location) {
 		go sub(loc)
 	}
 	u.sm.Unlock()
-}
-
-func (u *Updater) predict(vehicleID int64) {
-	vehicle, err := u.ms.Vehicle(vehicleID)
-	if err != nil {
-		log.WithError(err).Error("unable to get vehicle from ID")
-		return
-	}
-	update, err := u.ms.LatestLocation(vehicle.ID)
-	if err != nil {
-		log.WithError(err).Error("unable to get last location")
-		return
-	}
-	var route *shuttletracker.Route = nil
-	if update.RouteID != nil {
-		route, err = u.ms.Route(*update.RouteID)
-	} else {
-		route, err = u.GuessRouteForVehicle(vehicle)
-	}
-	if route != nil {
-		newLocation := smooth.NaivePredictPosition(vehicle, update, route)
-		newUpdate := &shuttletracker.Location{
-			TrackerID: update.TrackerID,
-			Latitude:  newLocation.Latitude,
-			Longitude: newLocation.Longitude,
-			Heading:   update.Heading,
-			Speed:     update.Speed,
-			Time:      update.Time,
-		}
-		u.notifySubscribers(newUpdate)
-	}
 }
 
 // Send a request to iTrak API, get updated shuttle info,
@@ -177,9 +135,6 @@ func (u *Updater) update() {
 	if len(vehiclesData) <= 1 {
 		log.Warnf("Found no vehicles delineated by '%s'.", delim)
 	}
-
-	// Clear vehicle IDs before we add new ones
-	u.vehicleIDs = u.vehicleIDs[:0]
 
 	wg := sync.WaitGroup{}
 	// for parsed data, update each vehicle
@@ -282,24 +237,15 @@ func (u *Updater) handleVehicleData(vehicleData string) {
 		Speed:     speedMPH,
 		Time:      newTime,
 	}
+
 	if route != nil {
 		update.RouteID = &route.ID
-
-		// SMOOTH TRACKING
-		//log.Debugf("Tracked location: %f, %f", update.Latitude, update.Longitude)
-		//predicted_location := smooth.NaivePredictPosition(vehicle, update, route)
-		//update.Latitude = predicted_location.Latitude
-		//update.Longitude = predicted_location.Longitude
-		//log.Debugf("Predicted location: %f, %f", update.Latitude, update.Longitude)
 	}
 
 	if err := u.ms.CreateLocation(update); err != nil {
 		log.WithError(err).Errorf("could not create location")
 		return
 	}
-
-	// SMOOTH TRACKING
-	u.vehicleIDs = append(u.vehicleIDs, vehicle.ID)
 
 	u.notifySubscribers(update)
 }

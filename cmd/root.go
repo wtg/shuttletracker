@@ -13,6 +13,7 @@ import (
 	"github.com/wtg/shuttletracker/eta"
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/postgres"
+	"github.com/wtg/shuttletracker/smooth"
 	"github.com/wtg/shuttletracker/updater"
 )
 
@@ -60,6 +61,13 @@ var rootCmd = &cobra.Command{
 			return
 		}
 		runner.Add(etaManager)
+
+		smoothTrackingManager, err := smooth.NewManager(ms, updater)
+		if err != nil {
+			log.WithError(err).Error("unable to create smooth tracking manager")
+			return
+		}
+		runner.Add(smoothTrackingManager)
 
 		// Make API server
 		api, err := api.New(*cfg.API, ms, msg, us, updater, etaManager)
