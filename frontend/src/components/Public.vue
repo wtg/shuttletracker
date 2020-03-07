@@ -37,6 +37,7 @@ import UserLocationService from '@/structures/userlocation.service';
 import BusButton from '@/components/busbutton.vue';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 import ETAMessage from '@/components/etaMessage.vue';
+import {DarkTheme} from '@/structures/theme';
 
 const UserSVG = require('@/assets/user.svg') as string;
 
@@ -49,6 +50,7 @@ export default Vue.extend({
       stops: [],
       ready: false,
       Map: undefined,
+      mapTileLayer: undefined,
       existingRouteLayers: [],
       userShuttleidCount: 0,
       initialized: false,
@@ -62,6 +64,7 @@ export default Vue.extend({
         stops: Stop[];
         ready: boolean;
         Map: L.Map | undefined; // Leaflets types are not always useful
+        mapTileLayer: L.TileLayer | undefined,
         existingRouteLayers: L.Polyline[];
         initialized: boolean;
         legend: L.Control;
@@ -90,12 +93,15 @@ export default Vue.extend({
           prefix: '',
         }),
       );
-      L.tileLayer(
-        'https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png',
+      this.mapTileLayer = L.tileLayer(
+        // https://wiki.openstreetmap.org/wiki/Tile_servers
+        this.mapTileLayerURL,
         {
           attribution:
-            'Map tiles: <a href="http://stamen.com">Stamen Design</a> ' +
-            '(<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0)</a> ' +
+            'Map tiles: <a href="http://stamen.com">Stamen Design</a>, ' +
+            '(<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>), ' +
+            '<a href="https://carto.com/">Carto</a> ' +
+            '(<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>) ' +
             'Data: <a href="http://openstreetmap.org">OpenStreetMap</a> ' +
             '(<a href="http://www.openstreetmap.org/copyright">ODbL</a>)',
           maxZoom: 17,
@@ -140,6 +146,21 @@ export default Vue.extend({
     },
     reconnecting(): boolean {
       return this.$store.state.fusionConnected === false;
+    },
+    mapTileLayerURL(): string {
+      return DarkTheme.isDarkThemeVisible(this.$store.state)
+        ? 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png'
+        : 'https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png';
+    },
+  },
+  watch: {
+    mapTileLayerURL: {
+      handler(newValue: string) {
+        if (this.mapTileLayer !== undefined) {
+          this.mapTileLayer.setUrl(newValue);
+        }
+      },
+      immediate: true,
     },
   },
   methods: {
