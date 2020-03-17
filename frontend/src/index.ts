@@ -7,6 +7,7 @@ import schedules from '@/components/schedules.vue';
 import settings from '@/components/settings.vue';
 import etas from '@/components/etas.vue';
 import changes from '@/components/changes.vue';
+import evan from '@/components/evan.vue';
 import Resources from '@/resources';
 
 Vue.use(Router);
@@ -49,6 +50,11 @@ export default new Router({
       path: '/changes',
       name: 'changes',
       component: changes,
+    },
+    {
+      path: '/evan',
+      name: 'evan',
+      component: evan,
     },
   ],
 });
