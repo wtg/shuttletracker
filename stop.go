@@ -12,6 +12,7 @@ type Stop struct {
 	Longitude float64   `json:"longitude"`
 	Created   time.Time `json:"created"`
 	Updated   time.Time `json:"updated"`
+	Routes    []string  `json:"routesOn"`
 
 	// Name and Description are pointers because they may be nil.
 	Name        *string `json:"name"`

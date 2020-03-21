@@ -4,6 +4,8 @@ import (
 	"database/sql"
 
 	"github.com/wtg/shuttletracker"
+
+	"github.com/lib/pq"
 )
 
 // StopService is an implementation of shuttletracker.StopService.
@@ -20,6 +22,7 @@ CREATE TABLE IF NOT EXISTS stops (
 	description text,
 	latitude double precision NOT NULL,
 	longitude double precision NOT NULL,
+	routes text[],
 	created timestamp with time zone NOT NULL DEFAULT now(),
 	updated timestamp with time zone NOT NULL DEFAULT now()
 );`
@@ -29,9 +32,9 @@ CREATE TABLE IF NOT EXISTS stops (
 
 // CreateStop creates a Stop.
 func (ss *StopService) CreateStop(stop *shuttletracker.Stop) error {
-	statement := "INSERT INTO stops (name, description, latitude, longitude) VALUES" +
-		" ($1, $2, $3, $4) RETURNING id, created, updated;"
-	row := ss.db.QueryRow(statement, stop.Name, stop.Description, stop.Latitude, stop.Longitude)
+	statement := "INSERT INTO stops (name, description, latitude, longitude, routes) VALUES" +
+		" ($1, $2, $3, $4, $5) RETURNING id, created, updated;"
+	row := ss.db.QueryRow(statement, stop.Name, stop.Description, stop.Latitude, stop.Longitude, pq.Array(&stop.Routes))
 	return row.Scan(&stop.ID, &stop.Created, &stop.Updated)
 }
 
@@ -41,10 +44,10 @@ func (ss *StopService) Stop(id int64) (*shuttletracker.Stop, error) {
 		ID: id,
 	}
 
-	statement := "SELECT s.name, s.created, s.updated, s.description, s.latitude, s.longitude" +
+	statement := "SELECT s.name, s.created, s.updated, s.description, s.latitude, s.longitude, s.routes" +
 		" FROM stops s WHERE id = $1;"
 	row := ss.db.QueryRow(statement, id)
-	err := row.Scan(&s.Name, &s.Created, &s.Updated, &s.Description, &s.Latitude, &s.Longitude)
+	err := row.Scan(&s.Name, &s.Created, &s.Updated, &s.Description, &s.Latitude, &s.Longitude, pq.Array(&s.Routes))
 	if err == sql.ErrNoRows {
 		return nil, shuttletracker.ErrStopNotFound
 	}
@@ -55,7 +58,7 @@ func (ss *StopService) Stop(id int64) (*shuttletracker.Stop, error) {
 // Stops returns all Stops.
 func (ss *StopService) Stops() ([]*shuttletracker.Stop, error) {
 	stops := []*shuttletracker.Stop{}
-	query := "SELECT s.id, s.name, s.created, s.updated, s.description, s.latitude, s.longitude" +
+	query := "SELECT s.id, s.name, s.created, s.updated, s.description, s.latitude, s.longitude, s.routes" +
 		" FROM stops s;"
 	rows, err := ss.db.Query(query)
 	if err != nil {
@@ -63,7 +66,7 @@ func (ss *StopService) Stops() ([]*shuttletracker.Stop, error) {
 	}
 	for rows.Next() {
 		s := &shuttletracker.Stop{}
-		err := rows.Scan(&s.ID, &s.Name, &s.Created, &s.Updated, &s.Description, &s.Latitude, &s.Longitude)
+		err := rows.Scan(&s.ID, &s.Name, &s.Created, &s.Updated, &s.Description, &s.Latitude, &s.Longitude, pq.Array(&s.Routes))
 		if err != nil {
 			return nil, err
 		}

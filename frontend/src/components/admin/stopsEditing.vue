@@ -47,6 +47,20 @@
             </div>
             </div>
 
+            <!-- Text input -->
+            <div class="field">
+            <label class="label" for="Route">Routes</label>
+            <div class="control">
+                <div v-for="(item,i) in this.$store.state.Routes" v-bind:key="`${i}-${item.id}`">
+                    <b-checkbox :id="item.name" :native-value="item.name" v-model="stop.routesOn" type="is-danger" size="is-small">
+                    <label :for="item.name">{{ item.name }}</label>
+                    </b-checkbox>
+                </div>
+            </div>
+            </div>
+
+            <span>Routes: {{ stop.routesOn }}</span>
+
             <!-- Submit -->
             <div class="field">
             <div class="control">
@@ -66,12 +80,16 @@ import scheduleEditor from '@/components/admin/scheduleEditor.vue';
 import AdminServiceProvider from '../../structures/serviceproviders/admin.service';
 import placeStop from '@/components/admin/placeStop.vue';
 import * as L from 'leaflet';
+import Buefy from 'buefy';
+import 'buefy/dist/buefy.css';
 
+
+Vue.use(Buefy);
 
 export default Vue.extend({
     data() {
         return {
-            stop: new Stop(-1, '', '', -1, -1, '', ''),
+            stop: new Stop(-1, '', '', -1, -1, '', '', []),
             routePolyLine: undefined,
             sending: false,
             success: false,
@@ -89,6 +107,7 @@ export default Vue.extend({
         placeStop,
     },
     mounted() {
+        console.log(this.$store.state);
         if (this.creation) {
             return;
         }
@@ -127,6 +146,8 @@ export default Vue.extend({
 
             // TODO:
             // Error checking for edit or create
+
+            console.log(this.stop);
             AdminServiceProvider.NewStop(this.stop).then(() => {
                     this.sending = false;
                     this.success = true;

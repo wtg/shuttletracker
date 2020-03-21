@@ -21,7 +21,7 @@ export class Stop {
     public marker: L.Marker;
 
     constructor(id: number, name: string, description: string,
-                lat: number, lng: number, created: string, updated: string) {
+                lat: number, lng: number, created: string, updated: string, routes: Route[]) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -29,7 +29,7 @@ export class Stop {
         this.longitude = lng;
         this.created = created;
         this.updated = updated;
-        this.routesOn = [];
+        this.routesOn = routes;
         this.marker = L.marker([this.latitude, this.longitude], {
             icon: L.icon({
                 iconUrl: StopSVG,
@@ -74,13 +74,14 @@ export class Stop {
     }
 
     public asJSON(): {
-        name: string; description: string; latitude: number; longitude: number } {
+        name: string; description: string; latitude: number; longitude: number; routesOn: Route[]; } {
         return {
             // id: this.id,
             name: this.name,
             description: this.description,
             latitude: Number(this.latitude),
             longitude: Number(this.longitude),
+            routesOn: this.routesOn,
         };
     }
 }
