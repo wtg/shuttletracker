@@ -63,11 +63,11 @@ ul {
   justify-content: center;
   align-items: center;
   width: 100%;
-  border-top: 0.5px solid var(--color-bg-less);
-  box-shadow: 0 3px 8px 0 var(--color-bg-least);
+  border-top: 0.5px solid #eee;
+  box-shadow: 0 3px 8px 0 #ddd;
   font-size: 13px;
   user-select: none;
-  background: var(--color-bg-normal);
+  background: white;
   text-align: center;
 }
 li {
@@ -76,14 +76,14 @@ li {
   height: 100%;
   padding: 5px 15px;
   margin: 0 5px;
-  border-top: 1px solid rgba(var(--color-fg-strong-rgb), 0);
+  border-top: 1px solid rgba(0, 0, 0, 0);
   position: relative;
   top: -0.5px;
   display: flex;
   align-items: center;
 }
 .router-link-exact-active {
-  border-top: 1px solid var(--color-primary);
-  color: var(--color-primary);
+  border-top: 1px solid $primary;
+  color: $primary;
 }
 </style>

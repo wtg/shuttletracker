@@ -37,7 +37,6 @@ import UserLocationService from '@/structures/userlocation.service';
 import BusButton from '@/components/busbutton.vue';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 import ETAMessage from '@/components/etaMessage.vue';
-import {DarkTheme} from '@/structures/theme';
 
 const UserSVG = require('@/assets/user.svg') as string;
 
@@ -50,7 +49,6 @@ export default Vue.extend({
       stops: [],
       ready: false,
       Map: undefined,
-      mapTileLayer: undefined,
       existingRouteLayers: [],
       userShuttleidCount: 0,
       initialized: false,
@@ -64,7 +62,6 @@ export default Vue.extend({
         stops: Stop[];
         ready: boolean;
         Map: L.Map | undefined; // Leaflets types are not always useful
-        mapTileLayer: L.TileLayer | undefined,
         existingRouteLayers: L.Polyline[];
         initialized: boolean;
         legend: L.Control;
@@ -93,15 +90,12 @@ export default Vue.extend({
           prefix: '',
         }),
       );
-      this.mapTileLayer = L.tileLayer(
-        // https://wiki.openstreetmap.org/wiki/Tile_servers
-        this.mapTileLayerURL,
+      L.tileLayer(
+        'https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png',
         {
           attribution:
-            'Map tiles: <a href="http://stamen.com">Stamen Design</a>, ' +
-            '(<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>), ' +
-            '<a href="https://carto.com/">Carto</a> ' +
-            '(<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>) ' +
+            'Map tiles: <a href="http://stamen.com">Stamen Design</a> ' +
+            '(<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0)</a> ' +
             'Data: <a href="http://openstreetmap.org">OpenStreetMap</a> ' +
             '(<a href="http://www.openstreetmap.org/copyright">ODbL</a>)',
           maxZoom: 17,
@@ -146,21 +140,6 @@ export default Vue.extend({
     },
     reconnecting(): boolean {
       return this.$store.state.fusionConnected === false;
-    },
-    mapTileLayerURL(): string {
-      return DarkTheme.isDarkThemeVisible(this.$store.state)
-        ? 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png'
-        : 'https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png';
-    },
-  },
-  watch: {
-    mapTileLayerURL: {
-      handler(newValue: string) {
-        if (this.mapTileLayer !== undefined) {
-          this.mapTileLayer.setUrl(newValue);
-        }
-      },
-      immediate: true,
     },
   },
   methods: {
@@ -386,8 +365,6 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-@import "@/assets/vars.scss";
-
 .parent {
   padding: 0px;
   margin: 0px;
@@ -395,7 +372,6 @@ export default Vue.extend({
   position: relative;
   display: flex;
   flex-direction: column;
-  background: var(--color-bg-normal);
 }
 
 input, label{
@@ -420,10 +396,10 @@ input, label{
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  border-bottom: 0.5px solid var(--color-bg-less);
-  box-shadow: 0 -3px 8px 0 var(--color-bg-least);
+  border-bottom: 0.5px solid #eee;
+  box-shadow: 0 -3px 8px 0 #ddd;
   user-select: none;
-  background: var(--color-bg-normal);
+  background: white;
   z-index: 1;
   padding: 0 6px;
 
@@ -447,8 +423,8 @@ input, label{
   div.reconnecting {
     flex: 0 1 auto;
     margin-left: auto;
-    background: linear-gradient(0deg, var(--color-bg-less), var(--color-bg-least));
-    border: 0.5px solid var(--color-bg-less);
+    background: linear-gradient(0deg, rgb(250, 250, 250), rgb(240, 240, 240));
+    border: 0.5px solid #eee;
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 13px;
@@ -486,9 +462,9 @@ input, label{
 }
 
 .info.legend {
-  box-shadow: rgba(var(--color-fg-strong-rgb), 0.8) 0px 1px 1px;
+  box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
   border-radius: 5px;
-  background-color: rgba(var(--color-bg-normal-rgb), 0.9);
+  background-color: rgba(255, 255, 255, 0.9);
   padding: 5px;
   bottom: 25px;
   align-content: right;
@@ -502,9 +478,9 @@ input, label{
 }
 
 .info.toggle {
-    box-shadow: rgba(var(--color-fg-strong-rgb), 0.8) 0px 1px 1px;
+    box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
     border-radius: 5px;
-    background-color: rgba(var(--color-bg-normal-rgb), 0.9);
+    background-color: rgba(255, 255, 255, 0.9);
     padding: 10px;
     top: 5px;
 
@@ -515,8 +491,8 @@ input, label{
     }
 }
 .button {
-    background: var(--color-primary);
-    color: var(--color-bg-normal);
+    background: #ee2222;
+    color: white;
     float: right;
     border-radius: 1px;
     padding: 0.35em;
