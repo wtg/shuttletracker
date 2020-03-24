@@ -34,6 +34,19 @@
       <b-switch v-model="etasEnabled">Estimated times of arrival</b-switch>
     </b-field>
 
+    <div class="field">
+      <b-switch v-model="darkThemeEnabled">Dark theme
+        <div class="control select is-small is-danger is-rounded">
+          <select v-model="darkThemeMode" v-bind:disabled="!darkThemeEnabled">
+            <option v-for="mode in darkThemeAllModes" :value="mode.id">
+              {{mode.description}}
+            </option>
+          </select>
+        </div>
+      </b-switch>
+      <p class="help">Change the theme to Dark across all pages.</p>
+    </div>
+
     <table class="table">
         <thead>
             <tr>
@@ -57,6 +70,7 @@
 import Vue from 'vue';
 import Route from '../structures/route';
 import Public from './Public.vue';
+import {DarkTheme, DarkThemeMode} from '@/structures/theme';
 
 export default Vue.extend({
   name: 'routes',
@@ -76,6 +90,34 @@ export default Vue.extend({
       set(value: string) {
         this.$store.commit('setSettingsBusButtonChoice', value);
       },
+    },
+    // darkThemeEnabled is really just a proxy for darkThemeMode. It makes the UI nicer for people who simply want to
+    // turn it on or off, while still allowing for more advanced dark theme options via the dropdown.
+    darkThemeEnabled: {
+      get(): boolean {
+        return this.$store.state.settings.darkThemeMode !== 'off';
+      },
+      set(value: boolean) {
+        // These assignments will call darkThemeMode.set().
+        if (!value) {
+          // !enabled -> set mode to off
+          this.darkThemeMode = 'off';
+        } else if (this.darkThemeMode === 'off') {
+          // enabled -> ensure mode is not off. This prevents overwriting to 'Always' if the user picks a different mode.
+          this.darkThemeMode = 'on';
+        }
+      },
+    },
+    darkThemeMode: {
+      get(): string {
+        return this.$store.state.settings.darkThemeMode;
+      },
+      set(value: string) {
+        this.$store.commit('setSettingsDarkThemeMode', value);
+      },
+    },
+    darkThemeAllModes(): DarkThemeMode[] {
+      return DarkThemeMode.allModes();
     },
     fusionPositionEnabled: {
       get(): boolean {
