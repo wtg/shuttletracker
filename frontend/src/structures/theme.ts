@@ -1,4 +1,5 @@
 import {StoreState} from '@/StoreState';
+const SunCalc = require('suncalc');
 
 /**
  * == How dark theme works in this app ==
@@ -20,14 +21,12 @@ import {StoreState} from '@/StoreState';
 
 /** Describes a dark theme mode. */
 export class DarkThemeMode {
-  public static readonly OFF = new DarkThemeMode('off', 'Off', () => false);
-  public static readonly ON = new DarkThemeMode('on', 'Always', () => true);
+  public static readonly OFF = new DarkThemeMode('off', 'Off', (state) => false);
+  public static readonly ON = new DarkThemeMode('on', 'Always', (state) => true);
   public static readonly AT_NIGHT = new DarkThemeMode('timeauto', 'At night 🌙',
-    () => {
-      // Simple hour check for nighttime. Future improvement is to use a time library to get the actual sunset and
-      // sunrise times for the local user.
-      const hr = new Date().getHours();
-      return 17 <= hr || hr <= 7;
+    (state) => {
+      const times = SunCalc.getTimes(state.now, 42.7299, -73.6766, 72 /* lat, long, and elevation(m) of RPI Union. */);
+      return state.now < times.sunrise || state.now > times.sunset;
     },
   );
 
@@ -55,9 +54,9 @@ export class DarkThemeMode {
   /** The name of this mode when seen by the user. */
   public description: string;
   /** Asks if dark theme should be enabled at this moment. Some modes have dynamic behavior. */
-  public isDarkThemeVisible: () => boolean;
+  public isDarkThemeVisible: (state: StoreState) => boolean;
 
-  constructor(id: string, description: string, visibleFn: () => boolean) {
+  constructor(id: string, description: string, visibleFn: (state: StoreState) => boolean) {
     this.id = id;
     this.description = description;
     this.isDarkThemeVisible = visibleFn;
@@ -73,7 +72,7 @@ export class DarkTheme {
    * This is DIFFERENT from checking the mode in {@link StoreState} because some modes are dynamic.
    */
   public static isDarkThemeVisible(state: StoreState): boolean {
-    return DarkThemeMode.fromString(state.settings.darkThemeMode).isDarkThemeVisible();
+    return DarkThemeMode.fromString(state.settings.darkThemeMode).isDarkThemeVisible(state);
   }
 
   /**
