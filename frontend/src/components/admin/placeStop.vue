@@ -11,17 +11,33 @@ import * as L from 'leaflet';
 import 'leaflet-routing-machine';
 
 export default Vue.extend({
+    props: {
+        stopPoint: {
+            type: () => L.marker,
+        },
+    },
     data() {
         return {
             Map: undefined,
+            RoutingControl: undefined,
             APIKey: 'pk.eyJ1Ijoiamx5b24xIiwiYSI6ImNqNmR4ZTVmejAwaTEzM3FsMmU0d2RmYjIifQ._VUaEMHioVwJIf11PzIqAQ',
+            RoutingWaypoint: undefined,
             coordinates : new L.LatLng(-1, -1),
         } as {
             Map: L.Map | undefined;
+            RoutingControl: L.Routing.Control | undefined;
             APIKey: string;
+            RoutingWaypoint: any;
             coordinates: L.LatLng | undefined;
         };
     },
+    /*
+    watch: {
+        stopPoint() {
+            this.renderStops();
+        },
+    },
+    */
     methods: {
         mountMap() {
             if (this.Map === undefined) {
@@ -48,6 +64,16 @@ export default Vue.extend({
                 });
             }
         },
+        /*
+        renderStops(): any {
+            const el = this;
+            if (el.Map !== undefined) {
+                el.stop.marker.removeFrom(this.Map);
+                el.stop.marker.bindPopup(stop.getMessage());
+                el.stop.marker.addTo(this.Map);
+            }
+        },
+        */
     },
     mounted() {
         this.$nextTick(() => {
@@ -62,7 +88,7 @@ export default Vue.extend({
         width: 100%;
         height: 500px;
     }
-    
+
     .leaflet-bar {
         display: none !important;
     }
