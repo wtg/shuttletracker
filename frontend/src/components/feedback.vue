@@ -15,7 +15,6 @@
             <button class="submit" type="submit" form="feedback" value="Submit"
             id="submit">Submit</button>
             </td>
-        </p>
     </div>
 </template>
 
