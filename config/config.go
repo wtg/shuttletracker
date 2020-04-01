@@ -8,6 +8,7 @@ import (
 	"github.com/wtg/shuttletracker/api"
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/postgres"
+	"github.com/wtg/shuttletracker/spoofer"
 	"github.com/wtg/shuttletracker/updater"
 )
 
@@ -17,6 +18,7 @@ type Config struct {
 	API      *api.Config
 	Log      *log.Config
 	Postgres *postgres.Config
+	Spoofer  *spoofer.Config
 }
 
 // New creates a new, global Config. Reads in configuration from config files.
@@ -31,6 +33,7 @@ func New() (*Config, error) {
 
 	cfg.API = api.NewConfig(v)
 	cfg.Updater = updater.NewConfig(v)
+	cfg.Spoofer = spoofer.NewConfig(v)
 	cfg.Log = log.NewConfig(v)
 
 	pgCfg, err := postgres.NewConfig(v)
