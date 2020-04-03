@@ -19,25 +19,23 @@ export default Vue.extend({
     data() {
         return {
             Map: undefined,
-            RoutingControl: undefined,
+            existingStopMarker: undefined,
             APIKey: 'pk.eyJ1Ijoiamx5b24xIiwiYSI6ImNqNmR4ZTVmejAwaTEzM3FsMmU0d2RmYjIifQ._VUaEMHioVwJIf11PzIqAQ',
-            RoutingWaypoint: undefined,
             coordinates : new L.LatLng(-1, -1),
         } as {
             Map: L.Map | undefined;
-            RoutingControl: L.Routing.Control | undefined;
+            existingStopMarker: L.Marker | undefined,
             APIKey: string;
-            RoutingWaypoint: any;
             coordinates: L.LatLng | undefined;
         };
     },
-    /*
+
     watch: {
         stopPoint() {
             this.renderStops();
         },
     },
-    */
+
     methods: {
         mountMap() {
             if (this.Map === undefined) {
@@ -53,6 +51,7 @@ export default Vue.extend({
                         maxZoom: 17,
                         minZoom: 14,
                     }).addTo(this.Map);
+
                     const el = this;
                     this.Map.on('click', (e: any) => {
                             this.coordinates = (e as any).latlng;
@@ -60,20 +59,26 @@ export default Vue.extend({
                             this.$emit('coordinates', this.coordinates);
                     });
                     this.Map.invalidateSize();
-
+                    this.renderStops();
                 });
             }
         },
-        /*
+
         renderStops(): any {
-            const el = this;
-            if (el.Map !== undefined) {
-                el.stop.marker.removeFrom(this.Map);
-                el.stop.marker.bindPopup(stop.getMessage());
-                el.stop.marker.addTo(this.Map);
+            // i think this should work, but it doesn't. might need to assign an image.
+            if (this.existingStopMarker) {
+                if (this.Map !== undefined) {
+                    this.existingStopMarker.removeFrom(this.Map);
+                }
+            }
+            if (this.coordinates) {
+                this.existingStopMarker = new L.Marker(this.coordinates);
+                if (this.Map !== undefined) {
+                    this.existingStopMarker.addTo(this.Map);
+                }
             }
         },
-        */
+
     },
     mounted() {
         this.$nextTick(() => {
