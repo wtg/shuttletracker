@@ -1,6 +1,7 @@
 package spoofer
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"os"
 	"regexp"
@@ -107,23 +108,44 @@ func (s *Spoofer) spoof() {
 		log.WithError(err).Errorf("Error getting working directory")
 		return
 	}
-	filename := wd + "/spoof_data/update" + strconv.Itoa(s.spoofIndex) + ".json"
-	spooffile, err := os.Open(filename)
-	if err != nil {
-		log.WithError(err).Errorf("Error opening update %d file", s.spoofIndex)
-		return
-	}
-	bytes, err := ioutil.ReadAll(spooffile)
-	if err != nil {
-		log.WithError(err).Errorf("Error spoofing update %d", s.spoofIndex)
-	}
-	var update *shuttletracker.Location
-	// TODO: create update from JSON data
+	filenamePrefix := wd + "/spoof_data/update" + strconv.Itoa(s.spoofIndex)
+	vehicleId := 0
+	filename := filenamePrefix + "-vehicle" + strconv.Itoa(vehicleId) + ".json"
+	_, err = os.Stat(filename)
+	for err == nil {
+		spooffile, err := os.Open(filename)
+		if err != nil {
+			log.WithError(err).Errorf("Error opening update %d file", s.spoofIndex)
+			return
+		}
+		bytes, err := ioutil.ReadAll(spooffile)
+		if err != nil {
+			log.WithError(err).Errorf("Error spoofing update %d", s.spoofIndex)
+		}
+		var update shuttletracker.Location
+		json.Unmarshal(bytes, &update)
 
-	if err := s.ms.CreateLocation(update); err != nil {
-		log.WithError(err).Errorf("Could not create spoofed location")
-		return
+		update.Created = time.Now()
+		update.Time = time.Now()
+
+		if err := s.ms.CreateLocation(&update); err != nil {
+			log.WithError(err).Errorf("Could not create spoofed location")
+			return
+		}
+		log.Debugf("Spoofed location for vehicle %d", vehicleId)
+
+		s.notifySubscribers(&update)
+
+		vehicleId += 1
+		filename = filenamePrefix + "-vehicle" + strconv.Itoa(vehicleId) + ".json"
+		if _, err = os.Stat(filename); err != nil {
+			break
+		}
 	}
 
-	s.notifySubscribers(update)
+	s.spoofIndex += 1
+	spoofIndexTestFilename := wd + "/spoof_data/update" + strconv.Itoa(s.spoofIndex) + "-vehicle0.json"
+	if _, err = os.Stat(spoofIndexTestFilename); err != nil {
+		s.spoofIndex = 0
+	}
 }
