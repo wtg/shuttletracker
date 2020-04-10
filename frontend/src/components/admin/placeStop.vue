@@ -73,7 +73,6 @@ export default Vue.extend({
                         popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
                     }),
                 });
-                console.log(this.existingStopMarker.getLatLng());
                 if (this.Map !== undefined) {
                     this.existingStopMarker.addTo(this.Map);
                 }
