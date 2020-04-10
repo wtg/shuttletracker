@@ -9,6 +9,7 @@
 import Vue from 'vue';
 import * as L from 'leaflet';
 import 'leaflet-routing-machine';
+import { Stop, StopSVG } from '../../structures/stop';
 
 export default Vue.extend({
     props: {
@@ -72,7 +73,15 @@ export default Vue.extend({
                 }
             }
             if (this.coordinates) {
-                this.existingStopMarker = new L.Marker(this.coordinates);
+                this.existingStopMarker = L.marker(this.coordinates, {
+                    icon: L.icon({
+                        iconUrl: StopSVG,
+                        iconSize: [12, 12], // size of the icon
+                        iconAnchor: [6, 6], // point of the icon which will correspond to marker's location
+                        shadowAnchor: [6, 6], // the same for the shadow
+                        popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
+                    }),
+                });
                 if (this.Map !== undefined) {
                     this.existingStopMarker.addTo(this.Map);
                 }
@@ -83,6 +92,7 @@ export default Vue.extend({
     mounted() {
         this.$nextTick(() => {
             this.mountMap();
+            this.renderStops();
         });
     },
 });
