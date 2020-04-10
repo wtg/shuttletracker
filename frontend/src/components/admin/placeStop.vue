@@ -12,11 +12,6 @@ import 'leaflet-routing-machine';
 import { Stop, StopSVG } from '../../structures/stop';
 
 export default Vue.extend({
-    props: {
-        stopPoint: {
-            type: () => L.marker,
-        },
-    },
     data() {
         return {
             Map: undefined,
@@ -29,12 +24,6 @@ export default Vue.extend({
             APIKey: string;
             coordinates: L.LatLng | undefined;
         };
-    },
-
-    watch: {
-        stopPoint() {
-            this.renderStops();
-        },
     },
 
     methods: {
@@ -57,6 +46,7 @@ export default Vue.extend({
                     this.Map.on('click', (e: any) => {
                             this.coordinates = (e as any).latlng;
                             // sends the coordinates to the form
+                            this.renderStops();
                             this.$emit('coordinates', this.coordinates);
                     });
                     this.Map.invalidateSize();
@@ -73,7 +63,8 @@ export default Vue.extend({
                 }
             }
             if (this.coordinates) {
-                this.existingStopMarker = L.marker(this.coordinates, {
+                this.existingStopMarker = L.marker(
+                    this.coordinates, {
                     icon: L.icon({
                         iconUrl: StopSVG,
                         iconSize: [12, 12], // size of the icon
@@ -82,6 +73,7 @@ export default Vue.extend({
                         popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
                     }),
                 });
+                console.log(this.existingStopMarker.getLatLng());
                 if (this.Map !== undefined) {
                     this.existingStopMarker.addTo(this.Map);
                 }
