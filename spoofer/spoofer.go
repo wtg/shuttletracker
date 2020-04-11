@@ -19,7 +19,7 @@ type Spoofer struct {
 	cfg           Config
 	spoofInterval time.Duration
 	SpoofUpdates  bool
-	spoofIndex    int
+	spoofIndexes  map[int]int
 	dataRegexp    *regexp.Regexp
 	ms            shuttletracker.ModelService
 	mutex         *sync.Mutex
@@ -55,7 +55,7 @@ func New(cfg Config, ms shuttletracker.ModelService) (*Spoofer, error) {
 	//   Specify named capturing groups to store each field from data feed
 	spoofer.dataRegexp = regexp.MustCompile(`(?P<id>Vehicle ID:([\d\.]+)) (?P<lat>lat:([\d\.-]+)) (?P<lng>lon:([\d\.-]+)) (?P<heading>dir:([\d\.-]+)) (?P<speed>spd:([\d\.-]+)) (?P<lock>lck:([\d\.-]+)) (?P<time>time:([\d]+)) (?P<date>date:([\d]+)) (?P<status>trig:([\d]+))`)
 
-	spoofer.spoofIndex = 0
+	spoofer.spoofIndexes = make(map[int]int)
 
 	return spoofer, nil
 }
@@ -108,19 +108,19 @@ func (s *Spoofer) spoof() {
 		log.WithError(err).Errorf("Error getting working directory")
 		return
 	}
-	filenamePrefix := wd + "/spoof_data/update" + strconv.Itoa(s.spoofIndex)
-	vehicleId := 0
-	filename := filenamePrefix + "-vehicle" + strconv.Itoa(vehicleId) + ".json"
+	vehicleIndex := 0
+	filenamePrefix := wd + "/spoof_data/update" + strconv.Itoa(s.spoofIndexes[vehicleIndex])
+	filename := filenamePrefix + "-vehicle" + strconv.Itoa(vehicleIndex) + ".json"
 	_, err = os.Stat(filename)
 	for err == nil {
 		spooffile, err := os.Open(filename)
 		if err != nil {
-			log.WithError(err).Errorf("Error opening update %d file", s.spoofIndex)
+			log.WithError(err).Errorf("Error opening update %d file", s.spoofIndexes[vehicleIndex])
 			return
 		}
 		bytes, err := ioutil.ReadAll(spooffile)
 		if err != nil {
-			log.WithError(err).Errorf("Error spoofing update %d", s.spoofIndex)
+			log.WithError(err).Errorf("Error spoofing update %d", s.spoofIndexes[vehicleIndex])
 		}
 		var update shuttletracker.Location
 		json.Unmarshal(bytes, &update)
@@ -132,20 +132,20 @@ func (s *Spoofer) spoof() {
 			log.WithError(err).Errorf("Could not create spoofed location")
 			return
 		}
-		log.Debugf("Spoofed location for vehicle %d", vehicleId)
+		log.Debugf("Spoofed location for vehicle %d", vehicleIndex)
 
 		s.notifySubscribers(&update)
 
-		vehicleId += 1
-		filename = filenamePrefix + "-vehicle" + strconv.Itoa(vehicleId) + ".json"
+		s.spoofIndexes[vehicleIndex] += 1
+		spoofIndexTestFilename := wd + "/spoof_data/update" + strconv.Itoa(s.spoofIndexes[vehicleIndex]) + "-vehicle0.json"
+		if _, err = os.Stat(spoofIndexTestFilename); err != nil {
+			s.spoofIndexes[vehicleIndex] = 0
+		}
+
+		vehicleIndex += 1
+		filename = filenamePrefix + "-vehicle" + strconv.Itoa(vehicleIndex) + ".json"
 		if _, err = os.Stat(filename); err != nil {
 			break
 		}
-	}
-
-	s.spoofIndex += 1
-	spoofIndexTestFilename := wd + "/spoof_data/update" + strconv.Itoa(s.spoofIndex) + "-vehicle0.json"
-	if _, err = os.Stat(spoofIndexTestFilename); err != nil {
-		s.spoofIndex = 0
 	}
 }
