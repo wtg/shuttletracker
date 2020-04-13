@@ -8,15 +8,17 @@ import (
 	"github.com/wtg/shuttletracker/api"
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/postgres"
+	"github.com/wtg/shuttletracker/smooth"
 	"github.com/wtg/shuttletracker/updater"
 )
 
 // Config is the global configuration struct.
 type Config struct {
-	Updater  *updater.Config
-	API      *api.Config
-	Log      *log.Config
-	Postgres *postgres.Config
+	Updater               *updater.Config
+	API                   *api.Config
+	Log                   *log.Config
+	Postgres              *postgres.Config
+	SmoothTrackingManager *smooth.Config
 }
 
 // New creates a new, global Config. Reads in configuration from config files.
@@ -56,6 +58,7 @@ func New() (*Config, error) {
 	log.Debugf("Updater configuration: %+v", cfg.Updater)
 	log.Debugf("Log configuration: %+v", cfg.Log)
 	log.Debugf("Postgres configuration: %+v", cfg.Postgres)
+	log.Debugf("Smooth tracking configuration: %+v", cfg.SmoothTrackingManager)
 
 	return cfg, nil
 }

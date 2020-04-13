@@ -62,7 +62,7 @@ var rootCmd = &cobra.Command{
 		}
 		runner.Add(etaManager)
 
-		smoothTrackingManager, err := smooth.NewManager(ms, updater)
+		smoothTrackingManager, err := smooth.NewManager(*cfg.SmoothTrackingManager, ms, updater)
 		if err != nil {
 			log.WithError(err).Error("unable to create smooth tracking manager")
 			return

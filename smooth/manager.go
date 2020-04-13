@@ -11,29 +11,44 @@ import (
 )
 
 type SmoothTrackingManager struct {
-	ms shuttletracker.ModelService
+	cfg                Config
+	ms                 shuttletracker.ModelService
+	predictions        map[int64]*Prediction
+	predictionInterval time.Duration
+	predictUpdates     bool
+	updates            map[int64]*shuttletracker.Location
+	vehicleIDs         []int64
+	sm                 *sync.Mutex
+	subscribers        []func(Prediction)
 	//predictionChan     chan *Prediction
-	predictions map[int64]*Prediction
 	//predictionsReqChan chan chan map[int64]Prediction
-	updates    map[int64]*shuttletracker.Location
-	vehicleIDs []int64
-
-	sm          *sync.Mutex
-	subscribers []func(Prediction)
 }
 
-func NewManager(ms shuttletracker.ModelService, updater *updater.Updater) (*SmoothTrackingManager, error) {
+type Config struct {
+	PredictionInterval string
+	PredictUpdates     bool
+}
+
+func NewManager(cfg Config, ms shuttletracker.ModelService, updater *updater.Updater) (*SmoothTrackingManager, error) {
 	stm := &SmoothTrackingManager{
-		ms: ms,
-		//predictionChan:     make(chan *Prediction, 50),
+		cfg:         cfg,
+		ms:          ms,
 		predictions: map[int64]*Prediction{},
-		//predictionsReqChan: make(chan chan map[int64]Prediction),
 		updates:     map[int64]*shuttletracker.Location{},
 		sm:          &sync.Mutex{},
 		subscribers: []func(Prediction){},
+		//predictionChan:     make(chan *Prediction, 50),
+		//predictionsReqChan: make(chan chan map[int64]Prediction),
 	}
 
-	// subscribe to new Locations with Updater
+	interval, err := time.ParseDuration(cfg.PredictionInterval)
+	if err != nil {
+		return nil, err
+	}
+	stm.predictionInterval = interval
+	stm.predictUpdates = cfg.PredictUpdates
+
+	// Subscribe to new Locations with Updater
 	updater.Subscribe(stm.locationSubscriber)
 
 	return stm, nil
@@ -109,10 +124,12 @@ func (stm *SmoothTrackingManager) predictVehiclePosition(vehicleID int64) {
 
 // Run is in charge of managing all of the state inside of ETAManager.
 func (stm *SmoothTrackingManager) Run() {
-	ticker := time.Tick(time.Second)
-	for range ticker {
-		for _, id := range stm.vehicleIDs {
-			stm.predictVehiclePosition(id)
+	if stm.predictUpdates {
+		ticker := time.Tick(stm.predictionInterval)
+		for range ticker {
+			for _, id := range stm.vehicleIDs {
+				stm.predictVehiclePosition(id)
+			}
 		}
 	}
 	/*for {
