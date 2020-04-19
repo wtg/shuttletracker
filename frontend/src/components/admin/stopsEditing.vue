@@ -48,7 +48,7 @@
             </div>
 
             <!-- Text input -->
-            <div class="field">
+            <!-- <div class="field">
             <label class="label" for="Route">Routes</label>
             <div class="control">
                 <div v-for="(item,i) in this.$store.state.Routes" v-bind:key="`${i}-${item.id}`">
@@ -59,7 +59,7 @@
             </div>
             </div>
 
-            <span>Routes: {{ stop.routesOn }}</span>
+            <span>Routes: {{ stop.routesOn }}</span> -->
 
             <!-- Submit -->
             <div class="field">
@@ -89,7 +89,7 @@ Vue.use(Buefy);
 export default Vue.extend({
     data() {
         return {
-            stop: new Stop(-1, '', '', -1, -1, '', '', []),
+            stop: new Stop(-1, '', '', -1, -1, '', ''),
             routePolyLine: undefined,
             sending: false,
             success: false,
