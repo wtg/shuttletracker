@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
-	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -18,8 +18,8 @@ type Spoofer struct {
 	cfg           Config
 	spoofInterval time.Duration
 	SpoofUpdates  bool
-	spoofIndexes  map[int]int
-	updates       map[int][]shuttletracker.Location
+	spoofIndexes  map[int64]int
+	updates       map[int64][]shuttletracker.Location
 	updateID      int64
 	ms            shuttletracker.ModelService
 	mutex         *sync.Mutex
@@ -50,8 +50,8 @@ func New(cfg Config, ms shuttletracker.ModelService) (*Spoofer, error) {
 	}
 	spoofer.spoofInterval = interval
 	spoofer.SpoofUpdates = cfg.SpoofUpdates
-	spoofer.spoofIndexes = make(map[int]int)
-	spoofer.updates = make(map[int][]shuttletracker.Location)
+	spoofer.spoofIndexes = make(map[int64]int)
+	spoofer.updates = make(map[int64][]shuttletracker.Location)
 	spoofer.updateID = 1
 
 	return spoofer, nil
@@ -93,57 +93,56 @@ func (s *Spoofer) parseUpdates() {
 		log.WithError(err).Errorf("Error getting working directory")
 		return
 	}
-	vehicleIndex := 0
-	filename := wd + "/spoof_data/vehicle" + strconv.Itoa(vehicleIndex) + ".json"
-	_, err = os.Stat(filename)
-	for err == nil {
-		vehiclefile, err := os.Open(filename)
-		if err != nil {
-			log.WithError(err).Errorf("Error opening vehicle %d file", vehicleIndex)
-			return
-		}
-		bytes, err := ioutil.ReadAll(vehiclefile)
-		if err != nil {
-			log.WithError(err).Errorf("Error reading vehicle %d file", vehicleIndex)
-		}
-		var updates []shuttletracker.Location
-		json.Unmarshal(bytes, &updates)
+	files, err := ioutil.ReadDir(wd + "/spoof_data/")
+	if err != nil {
+		log.WithError(err).Errorf("Error finding spoof files")
+		return
+	}
+	for _, f := range files {
+		extensionIndex := strings.Index(f.Name(), ".")
+		if !f.IsDir() && extensionIndex > -1 && f.Name()[extensionIndex+1:] == "json" {
+			vehiclefile, err := os.Open(wd + "/spoof_data/" + f.Name())
+			if err != nil {
+				log.WithError(err).Errorf("Error opening spoof data file %s", f.Name())
+				return
+			}
+			bytes, err := ioutil.ReadAll(vehiclefile)
+			if err != nil {
+				log.WithError(err).Errorf("Error reading spoof file %s", f.Name())
+			}
+			var updates []shuttletracker.Location
+			json.Unmarshal(bytes, &updates)
 
-		log.Debugf("Read %d updates for vehicle %d", len(updates), vehicleIndex)
+			log.Debugf("Read %d updates from spoof file %s", len(updates), f.Name())
 
-		// Only cache data for this vehicle if it has updates
-		if len(updates) > 0 {
-			s.updates[vehicleIndex] = updates
-			s.spoofIndexes[vehicleIndex] = 0
-		}
-
-		vehicleIndex += 1
-		filename = wd + "/spoof_data/vehicle" + strconv.Itoa(vehicleIndex) + ".json"
-		if _, err = os.Stat(filename); err != nil {
-			break
+			// Only cache data for this vehicle if it has updates
+			if len(updates) > 0 {
+				vehicleID := *updates[0].VehicleID
+				s.updates[vehicleID] = updates
+				s.spoofIndexes[vehicleID] = 0
+			}
 		}
 	}
 }
 
 // Spoofs the next location for each vehicle
 func (s *Spoofer) spoof() {
-	for vehicleIndex, updates := range s.updates {
-		update := updates[s.spoofIndexes[vehicleIndex]]
+	for vehicleID, updates := range s.updates {
+		update := updates[s.spoofIndexes[vehicleID]]
 		update.Created = time.Now()
 		update.Time = time.Now()
-		update.TrackerID = "4572001148" // TODO
 		update.ID = s.updateID
 		if err := s.ms.CreateLocation(&update); err != nil {
-			log.WithError(err).Errorf("Could not create spoofed location")
+			log.WithError(err).Errorf("Could not create spoofed location for vehicle %d", vehicleID)
 			return
 		}
-		log.Debugf("Spoofed location for vehicle %d", vehicleIndex)
+		log.Debugf("Spoofed location for vehicle %d", vehicleID)
 
 		s.notifySubscribers(&update)
 
-		s.spoofIndexes[vehicleIndex] += 1
-		if s.spoofIndexes[vehicleIndex] >= len(updates) {
-			s.spoofIndexes[vehicleIndex] = 0
+		s.spoofIndexes[vehicleID] += 1
+		if s.spoofIndexes[vehicleID] >= len(updates) {
+			s.spoofIndexes[vehicleID] = 0
 		}
 		s.updateID += 1
 	}
