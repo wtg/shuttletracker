@@ -29,6 +29,7 @@ import { Stop, StopSVG } from '../structures/stop';
 import ETA from '@/structures/eta';
 import messagebox from './adminmessage.vue';
 import * as L from 'leaflet';
+import '../../lib/L.TileLayer.NoGap';
 import { setTimeout, setInterval } from 'timers';
 import getMarkerString from '../structures/leaflet/rotatedMarker';
 import { Position } from 'geojson';
