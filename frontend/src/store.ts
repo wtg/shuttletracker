@@ -27,11 +27,16 @@ const store: StoreOptions<StoreState> = {
     etas: [],
     adminMessage: undefined,
     online: true,
+    /** Current time, with minute accuracy. */
+    // Having the current time stored in the Vue state makes it a reactive variable. Data, computed, and watch variables
+    // that use this value will automatically update as the time changes.
+    now: new Date(),
     settings: {
       busButtonEnabled: false,
       etasEnabled: false,
       fusionPositionEnabled: true,
       busButtonChoice: '🚌',
+      darkThemeMode: 'off',
     },
     geolocationDenied: false,
     fusionConnected: undefined,
@@ -39,6 +44,9 @@ const store: StoreOptions<StoreState> = {
   mutations: {
     setOnline(state, online: boolean) {
       state.online = online;
+    },
+    updateTime(state) {
+      state.now = new Date();
     },
     setRoutes(state, routes: Route[]) {
       state.Routes = routes;
@@ -121,6 +129,10 @@ const store: StoreOptions<StoreState> = {
     },
     setSettingsBusButtonChoice(state, value: string) {
       state.settings.busButtonChoice = value;
+      localStorage.setItem('st_settings', JSON.stringify(state.settings));
+    },
+    setSettingsDarkThemeMode(state, darkThemeId: string) {
+      state.settings.darkThemeMode = darkThemeId;
       localStorage.setItem('st_settings', JSON.stringify(state.settings));
     },
     setSettingsETAsEnabled(state, value: boolean) {
@@ -254,8 +266,15 @@ const store: StoreOptions<StoreState> = {
     grabAdminMesssage({ commit }) {
       InfoService.GrabAdminMessage().then((ret: AdminMessageUpdate) => commit('addAdminMessage', ret));
     },
+    startTimeUpdater(context) {
+      setInterval(() => {
+        context.commit('updateTime');
+      }, 1000 * 60 /* 1 minute */);
+    },
   },
 
 };
 
-export default new Vuex.Store(store);
+const exportedStore = new Vuex.Store(store);
+exportedStore.dispatch('startTimeUpdater'); // Called here to ensure it's only called once.
+export default exportedStore;
