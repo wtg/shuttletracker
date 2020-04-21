@@ -555,7 +555,11 @@ input, label{
   border: none !important;
   width: 20px !important;
   height: 20px !important;
+}
 
+.leaflet-container .leaflet-control-attribution {
+  color: var(--color-fg-light);
+  background-color: rgba(var(--color-bg-normal-rgb), 0.7);
 }
 
 #busbutton{
