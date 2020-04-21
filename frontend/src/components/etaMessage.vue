@@ -46,8 +46,6 @@ function relativeTime(from: Date, to: Date): string {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/vars.scss";
-
 .eta-message {
     width: 320px;
     position: fixed;
@@ -56,11 +54,11 @@ function relativeTime(from: Date, to: Date): string {
     right: 0;
     margin: 60px 20px auto auto;
     z-index: 1000;
-    background: var(--color-bg-normal);
+    background: white;
     padding: 20px 28px;
-    border: 0.5px solid var(--color-bg-less);
+    border: 0.5px solid #eee;
     border-radius: 4px;
-    box-shadow: 0 1px 16px -4px var(--color-bg-least);
+    box-shadow: 0 1px 16px -4px #bbb;
     font-size: 17px;
 }
 @media screen and (max-width: 500px) {

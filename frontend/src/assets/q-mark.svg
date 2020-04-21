@@ -1,55 +1,22 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   id="svg23"
-   version="1.1"
-   height="399"
-   width="261">
-  <metadata
-     id="metadata29">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <defs
-     id="defs27" />
-  <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
-  <g
-     id="g21">
-    <title
-       id="title10">Layer 1</title>
-    <metadata
-       id="metadata12"
-       transform="matrix(0.4627701332437937,0,0,0.4627701332437937,0,0) ">Created by potrace 1.15, written by Peter Selinger 2001-2017</metadata>
-    <g
-       id="svg_7" />
-    <metadata
-       id="metadata15"
-       transform="matrix(0.4627701332437937,0,0,0.4627701332437937,0,0) ">Created by potrace 1.15, written by Peter Selinger 2001-2017</metadata>
-    <g
-       transform="matrix(0.2094227790347628,0,0,-0.2094227790347628,-7.8947870794246455,405.42761638036393) "
-       fill="#000000"
-       id="svg_11">
-      <path
-         d="m573.77503,1895.22497c-135,-21 -282,-104 -361,-203c-78,-98 -138,-267 -138,-387l0,-40l190,0l190,0l0,28c0,57 29,127 67,164c54,51 93,68 159,68c105,0 174,-65 174,-163c0,-73 -41,-136 -204,-317c-119,-132 -156,-212 -156,-342l0,-68l185,0l185,0l0,48c0,73 36,133 169,287c151,174 190,246 198,361c23,345 -299,621 -658,564z"
-         id="svg_12"
-         fill="#da0531" />
-      <path
-         d="m634.77503,493.22497c-83,-24 -139,-100 -140,-190c0,-58 13,-94 48,-132c129,-137 353,-42 340,145c-9,126 -129,212 -248,177z"
-         id="svg_13"
-         fill="#da0531" />
-    </g>
-    <g
-       id="svg_14" />
+<svg width="261" height="399" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+
+ <g>
+  <title>background</title>
+  <rect fill="#ffffff" id="canvas_background" height="401" width="263" y="-1" x="-1"/>
+  <g display="none" overflow="visible" y="0" x="0" height="100%" width="100%" id="canvasGrid">
+   <rect fill="url(#gridpattern)" stroke-width="0" y="1" x="1" height="480" width="640"/>
   </g>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <metadata transform="matrix(0.4627701332437937,0,0,0.4627701332437937,0,0) ">Created by potrace 1.15, written by Peter Selinger 2001-2017</metadata>
+  <g id="svg_7"/>
+  <metadata transform="matrix(0.4627701332437937,0,0,0.4627701332437937,0,0) ">Created by potrace 1.15, written by Peter Selinger 2001-2017</metadata>
+  <g id="svg_11" fill="#000000" transform="matrix(0.2094227790347628,0,0,-0.2094227790347628,-7.8947870794246455,405.42761638036393) ">
+   <path fill="#da0531" id="svg_12" d="m573.77503,1895.22497c-135,-21 -282,-104 -361,-203c-78,-98 -138,-267 -138,-387l0,-40l190,0l190,0l0,28c0,57 29,127 67,164c54,51 93,68 159,68c105,0 174,-65 174,-163c0,-73 -41,-136 -204,-317c-119,-132 -156,-212 -156,-342l0,-68l185,0l185,0l0,48c0,73 36,133 169,287c151,174 190,246 198,361c23,345 -299,621 -658,564z"/>
+   <path fill="#da0531" id="svg_13" d="m634.77503,493.22497c-83,-24 -139,-100 -140,-190c0,-58 13,-94 48,-132c129,-137 353,-42 340,145c-9,126 -129,212 -248,177z"/>
+  </g>
+  <g id="svg_14"/>
+ </g>
 </svg>

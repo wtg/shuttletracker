@@ -11,19 +11,18 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/vars.scss";
 
 .bus-button{
     touch-action: manipulation;
-    border: 1px solid var(--color-fg-light);
+    border: 1px solid #ccc;
     border-radius: 50%;
-    box-shadow: 0 4px 8px 0 var(--color-bg-least);
-    -webkit-box-shadow: 0 4px 8px 0 var(--color-bg-least);
+    box-shadow: 0 4px 8px 0 #ddd;
+    -webkit-box-shadow: 0 4px 8px 0 #ddd;
     width: 50px;
     margin: 0;
     padding: 0;
     display: flex;
-    background-color: rgba(var(--color-bg-less-rgb), .8);
+    background-color: rgba(250,250,250,.8);
     justify-content: center;
     align-items: center;
     height: 50px;
@@ -33,7 +32,7 @@ export default Vue.extend({
     outline: 0;
 
     &:hover{
-        background-color: var(--color-bg-normal);
+        background-color: #fff;
     }
 }
 
