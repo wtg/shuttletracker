@@ -17,7 +17,6 @@ export interface StoreState {
         etasEnabled: boolean,
         fusionPositionEnabled: boolean,
         busButtonChoice: string,
-        darkThemeMode: string,
     };
     geolocationDenied: boolean;
 
