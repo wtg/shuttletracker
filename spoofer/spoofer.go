@@ -113,14 +113,18 @@ func (s *Spoofer) parseUpdates() {
 			var updates []shuttletracker.Location
 			json.Unmarshal(bytes, &updates)
 
-			log.Debugf("Read %d updates from spoof file %s", len(updates), f.Name())
-
 			// Only cache data for this vehicle if it has updates
 			if len(updates) > 0 {
+				if updates[0].VehicleID == nil {
+					log.Errorf("Missing vehicle ID from spoof file %s", f.Name())
+					return
+				}
 				vehicleID := *updates[0].VehicleID
 				s.updates[vehicleID] = updates
 				s.spoofIndexes[vehicleID] = 0
 			}
+
+			log.Debugf("Read %d updates from spoof file %s", len(updates), f.Name())
 		}
 	}
 }
