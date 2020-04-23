@@ -99,7 +99,7 @@ func (s *Spoofer) parseUpdates() {
 		return
 	}
 	for _, f := range files {
-		extensionIndex := strings.Index(f.Name(), ".")
+		extensionIndex := strings.LastIndex(f.Name(), ".")
 		if !f.IsDir() && extensionIndex > -1 && f.Name()[extensionIndex+1:] == "json" {
 			vehiclefile, err := os.Open(wd + "/spoof_data/" + f.Name())
 			if err != nil {
@@ -117,7 +117,7 @@ func (s *Spoofer) parseUpdates() {
 			if len(updates) > 0 {
 				if updates[0].VehicleID == nil {
 					log.Errorf("Missing vehicle ID from spoof file %s", f.Name())
-					return
+					continue
 				}
 				vehicleID := *updates[0].VehicleID
 				s.updates[vehicleID] = updates
