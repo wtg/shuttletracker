@@ -59,6 +59,7 @@ func New() (*Config, error) {
 	log.Debugf("Updater configuration: %+v", cfg.Updater)
 	log.Debugf("Log configuration: %+v", cfg.Log)
 	log.Debugf("Postgres configuration: %+v", cfg.Postgres)
+	log.Debugf("Spoofer configuration: %+v", cfg.Spoofer)
 
 	return cfg, nil
 }

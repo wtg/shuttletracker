@@ -30,8 +30,8 @@ type Spoofer struct {
 // Configuration for Spoofer; determines whether or not spoofed updates will be created and the interval
 // at which it will occur
 type Config struct {
-	SpoofInterval string
 	SpoofUpdates  bool
+	SpoofInterval string
 }
 
 // Creates a new Spoofer
@@ -59,11 +59,11 @@ func New(cfg Config, ms shuttletracker.ModelService) (*Spoofer, error) {
 
 func NewConfig(v *viper.Viper) *Config {
 	cfg := &Config{
-		SpoofInterval: "10s",
 		SpoofUpdates:  false,
+		SpoofInterval: "10s",
 	}
-	v.SetDefault("spoof.spoofInterval", cfg.SpoofInterval)
 	v.SetDefault("spoof.spoofUpdates", cfg.SpoofUpdates)
+	v.SetDefault("spoof.spoofInterval", cfg.SpoofInterval)
 	return cfg
 }
 
