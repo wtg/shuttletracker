@@ -9,7 +9,7 @@
 import Vue from 'vue';
 import * as L from 'leaflet';
 import 'leaflet-routing-machine';
-import { Stop, StopSVG } from '../../structures/stop';
+import { Stop, StopSVGLight } from '../../structures/stop';
 
 export default Vue.extend({
     data() {
@@ -66,7 +66,7 @@ export default Vue.extend({
                 this.existingStopMarker = L.marker(
                     this.coordinates, {
                     icon: L.icon({
-                        iconUrl: StopSVG,
+                        iconUrl: StopSVGLight,
                         iconSize: [12, 12], // size of the icon
                         iconAnchor: [6, 6], // point of the icon which will correspond to marker's location
                         shadowAnchor: [6, 6], // the same for the shadow

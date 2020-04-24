@@ -25,7 +25,7 @@ import Vue from 'vue';
 import InfoService from '../structures/serviceproviders/info.service';
 import Vehicle from '../structures/vehicle';
 import Route from '../structures/route';
-import { Stop, StopSVG } from '../structures/stop';
+import {Stop, StopSVGLight, StopSVGDark} from '../structures/stop';
 import ETA from '@/structures/eta';
 import messagebox from './adminmessage.vue';
 import * as L from 'leaflet';
@@ -153,6 +153,9 @@ export default Vue.extend({
         ? 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png'
         : 'https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png';
     },
+    stopIcon(): L.Icon {
+      return Stop.createMarkerIconForCurrentTheme(this.$store.state);
+    },
   },
   watch: {
     mapTileLayerURL: {
@@ -160,6 +163,15 @@ export default Vue.extend({
         if (this.mapTileLayer !== undefined) {
           this.mapTileLayer.setUrl(newValue);
         }
+      },
+      immediate: true,
+    },
+    stopIcon: {
+      handler(newValue: L.Icon) {
+        this.$store.state.Stops.forEach((stop: Stop) => {
+          stop.getOrCreateMarker(this.$store.state).setIcon(newValue);
+        });
+        this.updateLegend();
       },
       immediate: true,
     },
@@ -198,7 +210,7 @@ export default Vue.extend({
           </li>` +
           legendstring +
           `<li><img class="legend-icon" src="` +
-          StopSVG +
+          this.stopIcon.options.iconUrl +
           `" width="12" height="12"> Shuttle Stop
 
           </li>
@@ -239,10 +251,10 @@ export default Vue.extend({
       this.$store.state.Stops.forEach((stop: Stop) => {
         if (this.Map !== undefined) {
             if (stop.shouldShow()) {
-                stop.marker.bindPopup(stop.getMessage());
-                stop.marker.addTo(this.Map);
+                stop.getOrCreateMarker(this.$store.state).bindPopup(stop.getMessage());
+                stop.getOrCreateMarker(this.$store.state).addTo(this.Map);
             } else {
-                stop.marker.removeFrom(this.Map);
+                stop.getOrCreateMarker(this.$store.state).removeFrom(this.Map);
             }
         }
       });
