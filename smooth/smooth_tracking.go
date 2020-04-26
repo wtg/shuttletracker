@@ -51,6 +51,8 @@ func ClosestPointTo(latitude, longitude float64, route *shuttletracker.Route) in
 
 // Naive algorithm to predict the position a shuttle is at, given the last update received
 // Returns the index of the point the shuttle would be at on its route
+// TODO: More factors this algorithm should consider: shuttle's proximity to a stop, whether
+// the shuttle is going around a sharp turn, etc.
 func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletracker.Location, route *shuttletracker.Route) Prediction {
 	// Find the index of the closest point to this shuttle's last known location
 	index := ClosestPointTo(lastUpdate.Latitude, lastUpdate.Longitude, route)
