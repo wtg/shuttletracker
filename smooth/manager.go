@@ -20,8 +20,6 @@ type SmoothTrackingManager struct {
 	vehicleIDs         []int64
 	sm                 *sync.Mutex
 	subscribers        []func(Prediction)
-	//predictionChan     chan *Prediction
-	//predictionsReqChan chan chan map[int64]Prediction
 }
 
 type Config struct {
@@ -37,8 +35,6 @@ func NewManager(cfg Config, ms shuttletracker.ModelService, updater *updater.Upd
 		updates:     map[int64]*shuttletracker.Location{},
 		sm:          &sync.Mutex{},
 		subscribers: []func(Prediction){},
-		//predictionChan:     make(chan *Prediction, 50),
-		//predictionsReqChan: make(chan chan map[int64]Prediction),
 	}
 
 	interval, err := time.ParseDuration(cfg.PredictionInterval)
@@ -78,7 +74,11 @@ func (stm *SmoothTrackingManager) locationSubscriber(loc *shuttletracker.Locatio
 		stm.vehicleIDs = stm.vehicleIDs[:len(stm.vehicleIDs)-1]
 	}
 
-	if prediction, exists := stm.predictions[*loc.VehicleID]; exists {
+	stm.sm.Lock()
+	prediction, exists := stm.predictions[*loc.VehicleID]
+	stm.sm.Unlock()
+
+	if exists {
 		diffIndex := int64(math.Abs(float64(prediction.Index - index)))
 		diffDistance := DistanceBetween(prediction.Point, shuttletracker.Point{Latitude: loc.Latitude, Longitude: loc.Longitude})
 		log.Debugf("UPDATED VEHICLE %d", *loc.VehicleID)
@@ -86,6 +86,17 @@ func (stm *SmoothTrackingManager) locationSubscriber(loc *shuttletracker.Locatio
 		log.Debugf("Actual: %d, (%f, %f)", index, loc.Latitude, loc.Longitude)
 		log.Debugf("Difference: %d points or %f meters", diffIndex, diffDistance)
 	}
+}
+
+func (stm *SmoothTrackingManager) predict() {
+	wg := sync.WaitGroup{}
+	for _, id := range stm.vehicleIDs {
+		wg.Add(1)
+		go func(id int64) {
+			stm.predictVehiclePosition(id)
+		}(id)
+	}
+	wg.Wait()
 }
 
 func (stm *SmoothTrackingManager) predictVehiclePosition(vehicleID int64) {
@@ -114,12 +125,10 @@ func (stm *SmoothTrackingManager) predictVehiclePosition(vehicleID int64) {
 		Time:      time.Now(),
 		RouteID:   &route.ID,
 	}
-	//stm.predictions[vehicle.ID] = &prediction
 	if err := stm.ms.CreateLocation(newUpdate); err != nil {
 		log.WithError(err).Error("could not create location for prediction")
 	}
-	stm.predictions[vehicle.ID] = &prediction
-	//stm.predictionChan <- &prediction
+	stm.handleNewPrediction(&prediction)
 }
 
 // Run is in charge of managing all of the state inside of ETAManager.
@@ -127,44 +136,18 @@ func (stm *SmoothTrackingManager) Run() {
 	if stm.predictUpdates {
 		ticker := time.Tick(stm.predictionInterval)
 		for range ticker {
-			for _, id := range stm.vehicleIDs {
-				stm.predictVehiclePosition(id)
-			}
+			stm.predict()
 		}
 	}
-	/*for {
-		select {
-		case prediction := <-stm.predictionChan:
-			stm.handleNewPrediction(prediction)
-		case predictionsReplyChan := <-stm.predictionsReqChan:
-			stm.processPredictionsRequest(predictionsReplyChan)
-		case <-ticker:
-			for _, id := range stm.vehicleIDs {
-				go stm.predictVehiclePosition(id)
-			}
-		}
-	}*/
 }
 
 func (stm *SmoothTrackingManager) handleNewPrediction(prediction *Prediction) {
-	stm.predictions[prediction.VehicleID] = prediction
-
-	// notify subscribers
 	stm.sm.Lock()
+	stm.predictions[prediction.VehicleID] = prediction
 	for _, sub := range stm.subscribers {
 		sub(*prediction)
 	}
 	stm.sm.Unlock()
-}
-
-// spit out all current ETAs over the provided channel
-func (stm *SmoothTrackingManager) processPredictionsRequest(c chan map[int64]Prediction) {
-	predictions := map[int64]Prediction{}
-	for k, v := range stm.predictions {
-		predictions[k] = *v
-	}
-
-	c <- predictions
 }
 
 // Subscribe allows callers to provide a callback to receive new VehicleETAs.
@@ -173,11 +156,3 @@ func (stm *SmoothTrackingManager) Subscribe(sub func(Prediction)) {
 	stm.subscribers = append(stm.subscribers, sub)
 	stm.sm.Unlock()
 }
-
-// CurrentETAs can be called by anyone to get ETAManager's current view of vehicle ETAs.
-// It returns structs as values in order to prevent data races.
-/*func (stm *SmoothTrackingManager) CurrentPredictions() map[int64]Prediction {
-	predictionsChan := make(chan map[int64]Prediction)
-	stm.predictionsReqChan <- predictionsChan
-	return <-predictionsChan
-}*/
