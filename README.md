@@ -12,7 +12,7 @@ More project documentation can be found on the [Repository Wiki](https://github.
 2. Clone the repository to your computer. This can be done with `git clone https://github.com/wtg/shuttletracker`.
 3. Ensure you have [Postgres downloaded](https://www.postgresql.org/download/), installed.
     - This can be done with `sudo apt-get install postgresql`
-4. Create a postgres databased titled "shuttletracker".
+4. Create a postgres databased titled "shuttletracker". (WE HIGHLY RECOMMEND USING PGADMIN)
     - This can be done by running `createdb shuttletracker`. If there is an error `createdb: could not connect to database postgres: FATAL: role "<username>" does not exist`, it is due that adminstrator has not created a PostgreSQL user account for you. It can be fixed by `psql -U postgres` in terminal, `CREATE USER <username>;`, `ALTER USER <username> SUPERUSER CREATEDB;` in `postgres=#`. And you can confirm the success by running `\du` in `postgres=#`.
     - Alternatively, download the Postgres management software [pgAdmin](https://www.pgadmin.org/download/). Click on the Servers drop down, then the Databases drop down, and add a database titled "shuttletracker" by right-clicking on Databases and selecting create.
 5. Switch to the Shuttle Tracker directory (`cd shuttletracker`)
@@ -36,24 +36,23 @@ More project documentation can be found on the [Repository Wiki](https://github.
 
 1. [Install Go](https://golang.org/doc/install). Shuttle Tracker requires Go 1.11 or newer, and we recommend using the latest stable Go release.
 2. Clone the repository to your computer. This can be done with `git clone git@github.com:wtg/shuttletracker.git`. If you receive a "permission denied" error, ensure you have [added your SSH key to your GitHub account](https://help.github.com/articles/connecting-to-github-with-ssh/).
-3. If you are already familiar with Postgres and prefer to work from Terminal, run `brew install postgresql` to install Postgres to your machine.  Then run `createdb shuttletracker` to create a Postgres database.  Then skip to step 7.
-4. If you are unfamiliar with Postgres and prefer to work with a graphical interface, download [Postgres.app](https://postgresapp.com) and [Postico](https://eggerapps.at/postico/).  Postgres.app allows a Postgres server to be started using a graphical interface, while Postico allows a PostgreSQL database to be managed using a graphical interface.
-5. Open Postgres.app and create a new Postgres server by pressing the + in the sidebar.  Name the server "shuttletracker" and specify its port as 5432.  Then press start to run the server.
-6. Open Postico and create a new database named "shuttletracker" by pressing "+ Database".
-7. Switch to the Shuttle Tracker directory (`cd shuttletracker`)
-8. Rename `conf.json.sample` to `conf.json`
-9. Edit `conf.json` with the following, if necessary:
+3. Download [Postgres.app](https://postgresapp.com) and [Postico](https://eggerapps.at/postico/).  Postgres.app allows a Postgres server to be started using a graphical interface, while Postico allows a PostgreSQL database to be managed using a graphical interface.
+4. Open Postgres.app and create a new Postgres server by pressing the + in the sidebar.  Name the server "shuttletracker" and specify its port as 5432.  Then press start to run the server.
+5. Open Postico and create a new database named "shuttletracker" by pressing "+ Database".
+6. Switch to the Shuttle Tracker directory (`cd shuttletracker`)
+7. Rename `conf.json.sample` to `conf.json`
+8. Edit `conf.json` with the following, if necessary:
     - `Postgres.URL`: URL where Postgres is located. This will generally look like `postgres://user:password@localhost/shuttletracker?sslmode=disable` where `user` and `password` are replaced
-10. Install [Node.js and npm](https://nodejs.org/en/download/). Be sure to download the latest LTS version. Do not download the current version or errors will occur when building the project
-11. Switch to the `./frontend` directory.
-12. Run `npm install`
-13. Build the frontend using `npx vue-cli-service build --mode development`
+9. Install [Node.js and npm](https://nodejs.org/en/download/). Be sure to download the latest LTS version. Do not download the current version or errors will occur when building the project
+10. Switch to the `./frontend` directory.
+11. Run `npm install`
+12. Build the frontend using `npx vue-cli-service build --mode development`
     - _Note: if you are working on the frontend, you may instead use `npx vue-cli-service build --mode development --watch` in another terminal to continuously watch for changes and rebuild._
-14. Go back up to the project root directory and build Shuttle Tracker by running `go build -o shuttletracker ./cmd/shuttletracker`
-15. Start the app by running `./shuttletracker`
-16. Add yourself as an administrator by using `./shuttletracker admins --add RCS_ID`, replacing `RCS_ID` with your RCS ID. See the "Administrators" section below for more information.
-17. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel.
-18. (Optional) Import live data from [/routes](https://shuttles.rpi.edu/routes), [/stops](https://shuttles.rpi.edu/stops), and [/vehicles](https://shuttles.rpi.edu/vehicles).
+13. Go back up to the project root directory and build Shuttle Tracker by running `go build -o shuttletracker ./cmd/shuttletracker`
+14. Start the app by running `./shuttletracker`
+15. Add yourself as an administrator by using `./shuttletracker admins --add RCS_ID`, replacing `RCS_ID` with your RCS ID. See the "Administrators" section below for more information.
+16. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel.
+17. (Optional) Import live data from [/routes](https://shuttles.rpi.edu/routes), [/stops](https://shuttles.rpi.edu/stops), and [/vehicles](https://shuttles.rpi.edu/vehicles).
 
 ## Configuration
 
