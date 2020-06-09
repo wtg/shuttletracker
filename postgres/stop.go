@@ -4,8 +4,6 @@ import (
 	"database/sql"
 
 	"github.com/wtg/shuttletracker"
-
-	"github.com/lib/pq"
 )
 
 // StopService is an implementation of shuttletracker.StopService.
