@@ -21,7 +21,10 @@ More project documentation can be found on the [Repository Wiki](https://github.
     - `Postgres.URL`: URL where Postgres is located. This will generally look like `postgres://user:password@localhost/shuttletracker?sslmode=disable` where `user` and `password` are replaced
 11. Install Node.js and npm
     - This can be done with `sudo apt-get install nodejs`.
-    - Make sure you are on version 10.16.0 or higher by running `nodejs -v`.
+    - Make sure you are on version 10.16.0 or higher by running `node -v`.
+    - If your version of node is old, install n by running `npm install -g n`.
+    - Type `apt-get remove nodejs` to remove all versions of node installed through apt-get.
+    - Type `n stable` to install the latest version of nodejs. Type `node -v` after to verify.
 12. Switch to the `./frontend` directory.
 13. Run `npm install`
 14. Build the frontend using `npx vue-cli-service build --mode development`
