@@ -15,6 +15,7 @@
             <button class="submit" type="submit" form="feedback" value="Submit"
             id="submit">Submit</button>
             </td>
+        </p>
     </div>
 </template>
 
@@ -22,14 +23,8 @@
 <script lang="ts">
 import Vue from 'vue';
 export default Vue.extend({});
-// maybe clear the page and show thanks message on button click
-// function clearAndThanks(elementID)
-// {
-//     document.getElementById(elementID).innerHTML = "";
-// }
 </script>
 <style lang="scss" scoped>
-// <button class="submit" type="submit" form="feedback" value="Submit" id="submit" onclick="clearAndThanks('submit')" href="#popup1">Submit</button>
 .parent{
     padding: 50px;
     p {

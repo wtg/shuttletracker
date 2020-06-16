@@ -1,6 +1,7 @@
 import Route, { RouteInterface } from '../route';
 import Vehicle from '../vehicle';
 import { Stop } from '../stop';
+import Form from '../form';
 import AdminMessageUpdate from '../adminMessageUpdate';
 
 export default class AdminServiceProvider {
@@ -57,4 +58,19 @@ export default class AdminServiceProvider {
             body: JSON.stringify(message),
         });
     }
+
+    //FEEDBACK - needs to be confirmed
+    public static NewForm(form: Form): Promise<Response> {
+        return fetch('/forms/create', {
+            method: 'POST',
+            body: JSON.stringify(form.asJSON()),
+        });
+    }
+
+    public static DeleteForm(form: Form): Promise<Response> {
+        return fetch('/forms?id=' + String(form.id), {
+            method: 'DELETE',
+        });
+    }
+
 }
