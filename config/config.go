@@ -34,6 +34,7 @@ func New() (*Config, error) {
 	cfg.API = api.NewConfig(v)
 	cfg.Updater = updater.NewConfig(v)
 	cfg.Log = log.NewConfig(v)
+	cfg.SmoothTrackingManager = smooth.NewConfig(v)
 
 	pgCfg, err := postgres.NewConfig(v)
 	if err != nil {

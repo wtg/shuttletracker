@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/spf13/viper"
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/updater"
@@ -25,6 +26,17 @@ type SmoothTrackingManager struct {
 type Config struct {
 	PredictionInterval string
 	PredictUpdates     bool
+}
+
+func NewConfig(v *viper.Viper) *Config {
+	cfg := &Config{
+		PredictionInterval: "1s",
+		PredictUpdates:     true,
+	}
+	v.SetDefault("smooth.predictionInterval", cfg.PredictionInterval)
+	v.SetDefault("smooth.predictUpdates", cfg.PredictUpdates)
+
+	return cfg
 }
 
 // Creates a new SmoothTrackingManager

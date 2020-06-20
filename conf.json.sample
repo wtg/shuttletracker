@@ -13,5 +13,9 @@
   },
   "Log": {
     "Level": "debug"
+  },
+  "Smooth": {
+    "PredictionInterval": "1s",
+    "PredictUpdates": true
   }
 }
