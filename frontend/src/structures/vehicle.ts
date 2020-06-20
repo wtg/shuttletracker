@@ -4,6 +4,7 @@ import Location from '@/structures/location';
 import getMarkerString from '@/structures/leaflet/rotatedMarker';
 import getCardinalDirection from '@/structures/cardinalDirection';
 import 'leaflet-rotatedmarker';
+import 'leaflet.marker.slideto';
 
 // vehicles are hidden when their most recent location update becomes this old
 const vehicleInactiveDurationMS = 5 * 60 * 1000;  // five minutes in milliseconds
@@ -127,6 +128,7 @@ export default class Vehicle {
         this.lat = lat;
         this.lng = lng;
         (this.marker as any).slideTo([this.lat, this.lng], { duration: 1000, keepAtCenter: false });
+        // this.marker.setLatLng([this.lat, this.lng]);
     }
 
     public removeFromMap(map: L.Map) {
