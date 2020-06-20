@@ -77,6 +77,7 @@ export default class InfoServiceProvider {
                 longitude: string,
                 created: string,
                 updated: string,
+                // routesOn: Route[],
             }) => {
                 ret.push(new Stop(element.id, element.name, element.description, Number(element.latitude),
                     Number(element.longitude), element.created, element.updated));

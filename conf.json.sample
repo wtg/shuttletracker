@@ -17,5 +17,9 @@
   "Smooth": {
     "PredictionInterval": "1s",
     "PredictUpdates": true
+  },
+  "Spoofer": {
+    "SpoofUpdates": false,
+    "SpoofInterval": "10s"
   }
 }
