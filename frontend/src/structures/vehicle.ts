@@ -126,7 +126,7 @@ export default class Vehicle {
     public setLatLng(lat: number, lng: number) {
         this.lat = lat;
         this.lng = lng;
-        this.marker.setLatLng([this.lat, this.lng]);
+        (this.marker as any).slideTo([this.lat, this.lng], { duration: 1000, keepAtCenter: false });
     }
 
     public removeFromMap(map: L.Map) {
