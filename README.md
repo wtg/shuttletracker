@@ -27,6 +27,7 @@ More project documentation can be found on the [Repository Wiki](https://github.
     - If your version of node is old, install n by running `npm install -g n`.
     - Type `apt-get remove nodejs` to remove all versions of node installed through apt-get.
     - Type `n stable` to install the latest version of nodejs. Type `node -v` after to verify.
+    - Type `npm rebuild node-sass` if you're using n after step 13
 12. Switch to the `./frontend` directory.
 13. Run `npm install`
 14. Build the frontend using `npx vue-cli-service build --mode development`
