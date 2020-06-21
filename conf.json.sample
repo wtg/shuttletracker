@@ -15,10 +15,10 @@
     "Level": "debug"
   },
   "Smooth": {
-    "PredictionInterval": "1s",
-    "PredictUpdates": true
+    "PredictUpdates": false,
+    "PredictionInterval": "1s"
   },
-  "Spoofer": {
+  "Spoof": {
     "SpoofUpdates": false,
     "SpoofInterval": "10s"
   }

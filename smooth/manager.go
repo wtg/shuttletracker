@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
+	"github.com/wtg/shuttletracker/spoofer"
 	"github.com/wtg/shuttletracker/updater"
 )
 
@@ -24,23 +25,38 @@ type SmoothTrackingManager struct {
 }
 
 type Config struct {
-	PredictionInterval string
 	PredictUpdates     bool
+	PredictionInterval string
 }
 
 func NewConfig(v *viper.Viper) *Config {
 	cfg := &Config{
-		PredictionInterval: "1s",
 		PredictUpdates:     true,
+		PredictionInterval: "1s",
 	}
-	v.SetDefault("smooth.predictionInterval", cfg.PredictionInterval)
-	v.SetDefault("smooth.predictUpdates", cfg.PredictUpdates)
+
+	v.SetDefault("smooth.predictupdates", cfg.PredictUpdates)
+	v.SetDefault("smooth.predictioninterval", cfg.PredictionInterval)
 
 	return cfg
 }
 
+func BackupConfig(v *viper.Viper) *Config {
+	cfg := &Config{
+		PredictUpdates:     false,
+		PredictionInterval: "1s",
+	}
+	if v.IsSet("smooth.predictupdates") {
+		cfg.PredictUpdates = v.GetBool("smooth.predictupdates")
+	}
+	if v.IsSet("smooth.predictioninterval") {
+		cfg.PredictionInterval = v.GetString("smooth.predictioninterval")
+	}
+	return cfg
+}
+
 // Creates a new SmoothTrackingManager
-func NewManager(cfg Config, ms shuttletracker.ModelService, updater *updater.Updater) (*SmoothTrackingManager, error) {
+func NewManager(cfg Config, ms shuttletracker.ModelService, updater *updater.Updater, spoofer *spoofer.Spoofer, spoofUpdates bool) (*SmoothTrackingManager, error) {
 	stm := &SmoothTrackingManager{
 		cfg:         cfg,
 		ms:          ms,
@@ -58,7 +74,11 @@ func NewManager(cfg Config, ms shuttletracker.ModelService, updater *updater.Upd
 	stm.predictUpdates = cfg.PredictUpdates
 
 	// Subscribe to new Locations with Updater
-	updater.Subscribe(stm.locationSubscriber)
+	if spoofUpdates {
+		spoofer.Subscribe(stm.locationSubscriber)
+	} else {
+		updater.Subscribe(stm.locationSubscriber)
+	}
 
 	return stm, nil
 }

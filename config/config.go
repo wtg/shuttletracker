@@ -35,9 +35,9 @@ func New() (*Config, error) {
 
 	cfg.API = api.NewConfig(v)
 	cfg.Updater = updater.NewConfig(v)
-	cfg.Spoofer = spoofer.NewConfig(v)
 	cfg.Log = log.NewConfig(v)
 	cfg.SmoothTrackingManager = smooth.NewConfig(v)
+	cfg.Spoofer = spoofer.NewConfig(v)
 
 	pgCfg, err := postgres.NewConfig(v)
 	if err != nil {
@@ -54,6 +54,10 @@ func New() (*Config, error) {
 	if err := v.Unmarshal(&cfg); err != nil {
 		return nil, err
 	}
+
+	// I have no idea why, but these two configs need to be reset after reading the file
+	cfg.SmoothTrackingManager = smooth.BackupConfig(v)
+	cfg.Spoofer = spoofer.BackupConfig(v)
 
 	// Special case for setting log level after reading config
 	log.SetLevel(cfg.Log.Level)
