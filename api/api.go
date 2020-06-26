@@ -33,11 +33,12 @@ type API struct {
 	updater    shuttletracker.UpdaterService
 	fm         *fusionManager
 	etaManager shuttletracker.ETAService
+	fdb        shuttletracker.FeedbackService
 }
 
 // New initializes the application given a config and connects to backends.
 // It also seeds any needed information to the database.
-func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageService, us shuttletracker.UserService, updater shuttletracker.UpdaterService, etaManager shuttletracker.ETAService) (*API, error) {
+func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageService, us shuttletracker.UserService, updater shuttletracker.UpdaterService, etaManager shuttletracker.ETAService, fdb shuttletracker.FeedbackService) (*API, error) {
 	// Set up CAS authentication
 	url, err := url.Parse(cfg.CasURL)
 	if err != nil {
@@ -58,6 +59,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		updater:    updater,
 		fm:         fm,
 		etaManager: etaManager,
+		fdb:        fdb, //feedback - need to make feedback api first
 	}
 
 	r := chi.NewRouter()
@@ -124,11 +126,11 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 
 	// Feedback
 	r.Form("/forms", func(r chi.Router) {
-		r.Get("/", api.RoutesHandler)
+		r.Get("/", api.FeedbackHandler)
 		r.Group(func(r chi.Router) {
 			r.Use(cli.casauth)
-			r.Post("/create", api.RoutesCreateHandler)
-			r.Delete("/", api.RoutesDeleteHandler)
+			r.Post("/edit", api.FeedbackEditHandler)
+			r.Delete("/", api.FeedbackDeleteHandler)
 		})
 	})
 

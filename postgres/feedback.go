@@ -16,6 +16,7 @@ func (fs *FeedbackService) initializeSchema(db *sql.DB) error {
 	schema := `
 CREATE TABLE IF NOT EXISTS forms (
 	id serial PRIMARY KEY,
+	topic text,
 	message text,
 	created timestamp with time zone NOT NULL DEFAULT now(),
 	read bool NOT NULL,
@@ -24,25 +25,16 @@ CREATE TABLE IF NOT EXISTS forms (
 	return err
 }
 
-// not sure if needs to be added ! check
-// CreateForm creates a Form.
-func (fs *FeedbackService) CreateForm(form *shuttletracker.Form) error {
-	statement := "INSERT INTO forms (message) VALUES" +
-		" ($1) RETURNING id, created, read;"
-	row := fs.db.QueryRow(statement, form.Message)
-	return row.Scan(&form.ID, &form.Created, &form.Read)
-}
-
 // Form returns a Form by its ID.
 func (fs *FeedbackService) Form(id int64) (*shuttletracker.Form, error) {
 	f := &shuttletracker.Form{
 		ID: id,
 	}
 
-	statement := "SELECT f.created, f.message, f.read" +
+	statement := "SELECT f.created, f.topic, f.message, f.read" +
 		" FROM forms f WHERE id = $1;"
 	row := fs.db.QueryRow(statement, id)
-	err := row.Scan(&f.Created, &f.Message, &f.Read)
+	err := row.Scan(&f.Created, &f.Topic, &f.Message, &f.Read)
 	if err == sql.ErrNoRows {
 		return nil, shuttletracker.ErrFormNotFound
 	}
@@ -53,7 +45,7 @@ func (fs *FeedbackService) Form(id int64) (*shuttletracker.Form, error) {
 // Forms returns all Forms.
 func (fs *FeedbackService) Forms() ([]*shuttletracker.Form, error) {
 	forms := []*shuttletracker.Form{}
-	query := "SELECT f.id, f.created, f.message, f.read" +
+	query := "SELECT f.id, f.topic, f.created, f.message, f.read" +
 		" FROM forms s;"
 	rows, err := fs.db.Query(query)
 	if err != nil {
@@ -61,7 +53,7 @@ func (fs *FeedbackService) Forms() ([]*shuttletracker.Form, error) {
 	}
 	for rows.Next() {
 		f := &shuttletracker.Form{}
-		err := rows.Scan(&f.ID, &f.Created, &f.Message, &f.Read)
+		err := rows.Scan(&f.ID, &f.Topic, &f.Created, &f.Message, &f.Read)
 		if err != nil {
 			return nil, err
 		}
@@ -70,7 +62,31 @@ func (fs *FeedbackService) Forms() ([]*shuttletracker.Form, error) {
 	return forms, nil
 }
 
-// DeleteStop deletes a Stop.
+// not sure if properly made
+// EditForm updates read status of the form
+func (fs *FeedbackService) EditForm(form *shuttletracker.Form) error {
+	tx, err := fs.db.Begin()
+	if err != nil {
+		return err
+	}
+	// We can't really do anything if rolling back a transaction fails.
+	// nolint: errcheck
+	defer tx.Rollback()
+
+	// change read status
+	statement := "UPDATE forms SET read = $1" +
+		" WHERE id = $2 RETURNING read;"
+	row := tx.QueryRow(statement, form.Read, form.ID)
+	// not sure if able to scan like this;
+	// wanted to return a true/false to show it was successfully set
+	err = row.Scan(&form.Read)
+	if err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
+// DeleteForm deletes a Form.
 func (fs *FeedbackService) DeleteForm(id int64) error {
 	statement := "DELETE FROM forms WHERE id = $1;"
 	result, err := fs.db.Exec(statement, id)

@@ -59,9 +59,17 @@ export default class AdminServiceProvider {
         });
     }
 
-    //FEEDBACK - needs to be confirmed
-    public static NewForm(form: Form): Promise<Response> {
-        return fetch('/forms/create', {
+    // FEEDBACK - needs to be confirmed
+    
+    // public static NewForm(form: Form): Promise<Response> {
+    //     return fetch('/forms/create', {
+    //         method: 'POST',
+    //         body: JSON.stringify(form.asJSON()),
+    //     });
+    // }
+
+    public static EditForm(form: Form): Promise<Response> {
+        return fetch('/forms/edit', {
             method: 'POST',
             body: JSON.stringify(form.asJSON()),
         });
