@@ -1,0 +1,8 @@
+Contains solutions to common installation problems
+## Go
+- Make sure to try ('echo $GOPATH') to confirm that Go has been added to your system path, If it returns a blank line, it didn't work. In this case use ('sudo vim ~/.profile') press Capslock and then G to navigate to the bottom of the file and add the lines ('export GOPATH=$HOME/work') and ('export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin'). Use Shift + ZZ to save and exit. Restart your command prompt and confirm that ('echo $GOPATH') now turns something.
+  
+ ## PostgreSQL
+  -when you install, if it gives a message stating that it couldn't start the server use ('sudo service postgresql start') before trying to create the database
+  -if when running ('createdb shuttletracker') you get an error about not being able to do this as root, follow theses steps to create a new linux super user: https://phoenixnap.com/kb/how-to-create-sudo-user-on-ubuntu
+  -when changing the `postgres://user:password@localhost/shuttletracker?sslmode=disable` line in the conf file, you might be unsure of what the password is, in this case open postgresSQL, like you did to create your user and type ('ALTER ROLE username') followed by  ('WITH PASSWORD 'password';') 
