@@ -10,7 +10,6 @@ More project documentation can be found on the [Repository Wiki](https://github.
 
 1. [Install Go](https://golang.org/doc/install). Shuttle Tracker requires Go 1.11 or newer, and we recommend using the latest stable Go release.
     - Other instructions found [here](https://www.educative.io/edpresso/how-to-install-go-on-ubuntu)
-    - Make sure to true ('echo $GOPATH') to confirm that Go has been added to your system path. If it returns a blank line, it didn't work. In this case use ('sudo vim ~/.profile'), press Capslock and then G to navigate to the bottom of the file and add the lines ('export GOPATH=$HOME/work') and ('export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin'). Use Shift + ZZ to save and exit. Restart your command prompt and confirm that ('echo $GOPATH') now turns something.
 2. Clone the repository to your computer. This can be done with `git clone https://github.com/wtg/shuttletracker`.
 3. Ensure you have [Postgres downloaded](https://www.postgresql.org/download/), installed.
     - This can be done with `sudo apt-get install postgresql`
@@ -27,7 +26,6 @@ More project documentation can be found on the [Repository Wiki](https://github.
     - If your version of node is old, install n by running `npm install -g n`.
     - Type `apt-get remove nodejs` to remove all versions of node installed through apt-get.
     - Type `n stable` to install the latest version of nodejs. Type `node -v` after to verify.
-    - Type `npm rebuild node-sass` if you're using n after step 13
 12. Switch to the `./frontend` directory.
 13. Run `npm install`
 14. Build the frontend using `npx vue-cli-service build --mode development`
