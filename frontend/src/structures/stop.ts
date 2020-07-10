@@ -7,7 +7,7 @@ import {DarkTheme} from '@/structures/theme';
  * SVGs used for representing a stop on the map and in the legend
  */
 export const StopSVGLight = require('@/assets/circle.svg') as string;
-export const StopSVGDark = require('@/assets/cirle.svg') as string;
+export const StopSVGDark = require('@/assets/circle.svg') as string;
 
 /**
  * Stop represents a single stop on a route
