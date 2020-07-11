@@ -82,8 +82,7 @@ $scheme-invert: var(--color-fg-strong);
 $text-strong: var(--color-fg-strong);
 $text: var(--color-fg-normal);
 $text-light: var(--color-fg-light);
-$text-invert: var(--color-bg-normal);
-
+$text-invert: var(--color-bg-normal);	
 
 @import "~bulma";
 @import "~buefy/src/scss/buefy";

@@ -1,19 +1,16 @@
 <template>
   <div class="parent">
     <h1 class="title">Schedules</h1>
-    <p class="subtitle">
-      Official shuttle schedules from the Parking and Transportation office.
-    </p>
-    <hr>
+    <p class="subtitle">Official shuttle schedules from the Parking and Transportation office.</p>
+    <hr />
     <div class="columns">
       <div class="column" v-for="link in links" v-bind:key="link.url">
-        <div class="card">
-          <header class="card-header">
-            <p class="card-header-title">
-              {{ link.name }}
-            </p>
-          </header>
-          <div class="card-content">
+        <div class="box">
+          <!-- <header class="card-header"> -->
+          <strong class="link-header">{{ link.name }}</strong>
+          <hr />
+          <!-- </header> -->
+          <div class="box-section">
             <div class="caption">
               <p v-for="line in link.caption" v-bind:key="line">{{ line }}</p>
             </div>
@@ -35,24 +32,24 @@ export default Vue.extend({
           url: 'https://shuttles.rpi.edu/static/Weekday.pdf',
           name: 'Weekday Routes',
           caption: [
-                    'North, South, and New West Routes',
-                    'Monday–Friday 7am – 11pm',
-                    ],
+            'North, South, and New West Routes',
+            'Monday–Friday 7am – 11pm',
+          ],
           color: 'green',
         },
         {
           url: 'https://shuttles.rpi.edu/static/Weekend.pdf',
           name: 'Weekend Routes',
           caption: [
-                    'West and East Routes',
-                    'Saturday–Sunday 9:30am – 5pm',
-                    '⠀',
-                    'Weekend Express Route',
-                    'Saturday–Sunday 4:30pm – 8pm',
-                    '⠀',
-                    'Late Night Route',
-                    'Friday–Saturday 8pm – 4am',
-                  ],
+            'West and East Routes',
+            'Saturday–Sunday 9:30am – 5pm',
+            '⠀',
+            'Weekend Express Route',
+            'Saturday–Sunday 4:30pm – 8pm',
+            '⠀',
+            'Late Night Route',
+            'Friday–Saturday 8pm – 4am',
+          ],
           color: 'red',
         },
       ],
@@ -67,5 +64,11 @@ export default Vue.extend({
 }
 .caption {
   margin-bottom: 1em;
+}
+.link-header {
+  margin-left: 1em;
+}
+.box-section {
+  margin-left: 1em;
 }
 </style>
