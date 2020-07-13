@@ -499,9 +499,9 @@ input, label{
 }
 
 .info.legend {
-  box-shadow: rgba(var(--color-fg-strong-rgb), 0.8) 0px 1px 1px;
+  box-shadow: 0 0.5em 1em -0.125em rgba(var(--color-box-shadow), 0.1), 0 0px 0 1px rgba(var(--color-box-shadow), 0.02);
   border-radius: 5px;
-  background-color: rgba(var(--color-bg-normal-rgb), 0.9);
+  background-color: rgba(var(--color-bg-normal-rgb), 1);
   padding: 5px;
   bottom: 25px;
   align-content: right;
@@ -517,7 +517,7 @@ input, label{
 .info.toggle {
     box-shadow: rgba(var(--color-fg-strong-rgb), 0.8) 0px 1px 1px;
     border-radius: 5px;
-    background-color: rgba(var(--color-bg-normal-rgb), 0.9);
+    background-color: rgba(var(--color-bg-normal-rgb), 1);
     padding: 10px;
     top: 5px;
 

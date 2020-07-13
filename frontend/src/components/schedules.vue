@@ -2,14 +2,12 @@
   <div class="parent">
     <h1 class="title">Schedules</h1>
     <p class="subtitle">Official shuttle schedules from the Parking and Transportation office.</p>
-    <hr />
+    <hr>
     <div class="columns">
       <div class="column" v-for="link in links" v-bind:key="link.url">
-        <div class="box">
-          <!-- <header class="card-header"> -->
+        <div class="box dimmed">
           <strong class="link-header">{{ link.name }}</strong>
           <hr />
-          <!-- </header> -->
           <div class="box-section">
             <div class="caption">
               <p v-for="line in link.caption" v-bind:key="line">{{ line }}</p>
@@ -70,5 +68,23 @@ export default Vue.extend({
 }
 .box-section {
   margin-left: 1em;
+}
+
+.dimmed {
+  position: relative;
+  border-radius: 10px;
+}
+
+.dimmed:after {
+  content: " ";
+  z-index: 10;
+  display: block;
+  position: absolute;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-radius: 10px;
+  background: var(--color-box-color);
 }
 </style>

@@ -2,50 +2,71 @@
   <div class="parent">
     <h1 class="title">Settings</h1>
     <hr>
-    <div class="field">
-      <b-switch v-model="fusionPositionEnabled" v-bind:disabled="geolocationDenied">Send position updates</b-switch>
-      <p class="help">Use your location to help make Shuttle Tracker more accurate for everyone. Your location is gathered anonymously while Shuttle Tracker is open.</p>
+    <div class="general_section">
+      <p class="section_title">General</p>
     </div>
-    <div class="field">
-    <b-switch v-model="busButtonEnabled">  Bus button <span>
-      <div class="field">
-          <div class="control">
-              <div class="select is-small">
-                  <div class="select is-danger">
-                      <div class="select is-rounded">
-                          <select v-model="busButtonChoice">
-                              <option>🚐</option>
-                              <option>🚌</option>
-                              <option>🚗</option>
-                              <option>🚓</option>
-                              <option>🚜</option>
-                          </select>
+    <table class="table">
+        <tbody>
+            <tr>
+              <th class="route_format">
+                <p class="setting_title">Send position updates</p>
+                <p class="help">Use your location to help make Shuttle Tracker more accurate for everyone. Your location is gathered anonymously while Shuttle Tracker is open.</p>
+              </th>
+              <td><b-switch v-model="fusionPositionEnabled" v-bind:disabled="geolocationDenied"></b-switch></td>
+            </tr>
+            <tr>
+              <th class="route_format">
+                <p class="setting_title">Bus Button</p>
+                <p class="help">Place a bus on other users' maps and let others place buses on your map.</p>
+              </th>
+              <td>
+                <b-switch v-model="busButtonEnabled"><span>
+                  <div class="field">
+                      <div class="control">
+                          <div class="select is-small">
+                              <div class="select is-danger">
+                                  <div class="select is-rounded">
+                                      <select v-model="busButtonChoice">
+                                          <option>🚐</option>
+                                          <option>🚌</option>
+                                          <option>🚗</option>
+                                          <option>🚓</option>
+                                          <option>🚜</option>
+                                      </select>
+                                  </div>
+                              </div>
+                          </div>
                       </div>
                   </div>
-              </div>
-          </div>
-      </div>
-      </span>
-      </b-switch>
-      <p class="help">Place a bus on other users' maps and let others place buses on your map.</p>
-    </div>
-
-    <b-field v-bind:message="['Get notifications when a shuttle is likely to arrive at the stop nearest you. Requires access to your location.', '<i>Warning: this feature is experimental. You’re not allowed to get mad at us if you miss your shuttle.</i>']">
-      <b-switch v-model="etasEnabled">Estimated times of arrival</b-switch>
-    </b-field>
-
-    <div class="field">
-      <b-switch v-model="darkThemeEnabled">Dark theme
-        <div class="control select is-small is-danger is-rounded">
-          <select v-model="darkThemeMode" v-bind:disabled="!darkThemeEnabled">
-            <option v-for="mode in darkThemeAllModes" :value="mode.id">
-              {{mode.description}}
-            </option>
-          </select>
-        </div>
-      </b-switch>
-      <p class="help">Change the theme to Dark across all pages.</p>
-    </div>
+                </span>
+                </b-switch>
+              </td>
+            </tr>
+            <tr>
+              <th class="route_format">
+                <p class="setting_title">Send position updates</p>
+                <p class="help">Get notifications when a shuttle is likely to arrive at the stop nearest you. Requires access to your location.</p>
+                <p class="help"><i>Warning: this feature is experimental. You’re not allowed to get mad at us if you miss your shuttle.</i> </p>
+              </th>
+              <td><b-switch v-model="etasEnabled"></b-switch></td>
+            </tr>
+            <tr>
+              <th class="route_format">
+                <p class="setting_title">Dark theme</p>
+                <p class="help">Change the theme to Dark across all pages.</p>
+              </th>
+              <td><b-switch v-model="darkThemeEnabled">
+                <div class="control select is-small is-danger is-rounded">
+                  <select v-model="darkThemeMode" v-bind:disabled="!darkThemeEnabled">
+                    <option v-for="mode in darkThemeAllModes" :value="mode.id">
+                      {{mode.description}}
+                    </option>
+                  </select>
+                </div>
+              </b-switch></td>
+            </tr>
+        </tbody>
+    </table>
 
     <table class="table">
         <thead>
@@ -56,13 +77,14 @@
         </thead>
         <tbody>
             <tr v-for="route in routes" :key="route.id">
-            <th class = "route_format">{{route.name}}</th>
-            <td><b-switch v-bind:value="route.enabled && route.active" v-on:input="routeToggle(route)"></b-switch></td>
+              <th class = "route_format">{{route.name}}</th>
+              <td><b-switch v-bind:value="route.enabled && route.active" v-on:input="routeToggle(route)"></b-switch></td>
             </tr>
         </tbody>
     </table>
     <router-link to="/faq">Frequently Asked Questions</router-link>
     <router-link to="/about">Privacy Policy</router-link>
+
   </div>
 </template>
 
@@ -70,7 +92,7 @@
 import Vue from 'vue';
 import Route from '../structures/route';
 import Public from './Public.vue';
-import {DarkTheme, DarkThemeMode} from '@/structures/theme';
+import {DarkTheme, DarkThemeMode} from '../structures/theme';
 
 export default Vue.extend({
   name: 'routes',
@@ -170,10 +192,31 @@ export default Vue.extend({
 }
 
 .route_format {
-  color: red;
+  color: var(--color-primary);
   font-weight: bold;
+  border-bottom: 1px solid var(--color-divider);
 }
+
+td {
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.help {
+  color: var(--color-fg-strong);
+}
+
+.section_title {
+  color: var(--color-primary);
+  padding: 5px;
+  font-size: 1.2em;
+}
+
+.setting_title {
+  color: var(--color-fg-normal);
+}
+
 .field {
-    display: inline-block;
+  padding: 5px;
+  display: inline-block;
 }
 </style>

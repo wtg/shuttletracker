@@ -3,11 +3,8 @@
 
 /* Master colors definition. */
 $primary: #ed1c24;
-$link: #ff0000;
 $black: #181818;
 $white: #ffffff;
-$twitter: #4099ff;
-$twitter-invert: findColorInvert($twitter);
 
 /*
  * The define-color* family of functions define a CSS variable `${name}` to be the given color.
@@ -61,28 +58,46 @@ body {
   @include define-color(--color-bg-less, darken($white, 12%));
   @include define-color(--color-bg-least, darken($white, 25%));
   @include define-color(--color-primary, $primary);
+
+  @include define-color(--color-divider, $white-ter);
+  @include define-color(--color-box-shadow, $black);
+  @include define-color(--color-box-color, rgba(255,255,255,0))
+
+
 }
 
 // This is the dark theme for the app.
 [data-theme="dark"] {
-  @include define-color(--color-fg-strong, $white);
-  @include define-color(--color-fg-normal, darken($white, 15%));
-  @include define-color(--color-fg-light, darken($white, 30%));
+  @include define-color(--color-fg-strong, rgba(255,255,255,0.87));
+  @include define-color(--color-fg-normal, rgba(255,255,255,0.6));
+  @include define-color(--color-fg-light, rgba(255,255,255,0.38));
   @include define-color(--color-bg-normal, $black);
-  @include define-color(--color-bg-less, lighten($black, 12%));
-  @include define-color(--color-bg-least, lighten($black, 25%));
-}
+  @include define-color(--color-bg-less, $black);
+  @include define-color(--color-bg-least, $black);
+  @include define-color(--color-primary, #ef5350);
 
+  @include define-color(--color-divider, rgba(255,255,255,0.12));
+  @include define-color(--color-box-shadow, #181818);
+  @include define-color(--color-box-color, rgba(255,255,255,0.08))
+  // @include define-color(--color-bg-less, lighten($black, 12%));
+  // @include define-color(--color-bg-least, lighten($black, 25%));
+}
+ 
 // Bulma color overrides.
-$custom-colors: (
-    "twitter": ($twitter, $twitter-invert)
-);
 $scheme-main: var(--color-bg-normal);
 $scheme-invert: var(--color-fg-strong);
 $text-strong: var(--color-fg-strong);
 $text: var(--color-fg-normal);
 $text-light: var(--color-fg-light);
 $text-invert: var(--color-bg-normal);	
+$link: var(--color-primary);
+
+// $box-color: var(--color-box-color);
+$box-shadow: 0 0.5em 1em -0.125em rgba(var(--color-box-shadow), 0.1), 0 0px 0 1px rgba(var(--color-box-shadow), 0.02);
+
+// Changes the hr dividers to a less intense white in dark mode
+$hr-background-color: var(--color-divider);
+$radius-large: 10px;
 
 @import "~bulma";
 @import "~buefy/src/scss/buefy";
