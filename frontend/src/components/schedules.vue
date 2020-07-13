@@ -5,15 +5,18 @@
     <hr>
     <div class="columns">
       <div class="column" v-for="link in links" v-bind:key="link.url">
-        <div class="box dimmed">
-          <strong class="link-header">{{ link.name }}</strong>
-          <hr />
-          <div class="box-section">
-            <div class="caption">
-              <p v-for="line in link.caption" v-bind:key="line">{{ line }}</p>
+        <div class="dimmed">
+          <div class="box">
+            <strong class="link-header">{{ link.name }}</strong>
+            <hr>
+            <div class="box-section">
+              <div class="caption">
+                <p v-for="line in link.caption" v-bind:key="line">{{ line }}</p>
+              </div>
+              <a target="_blank" rel="noopener noreferrer" v-bind:href="link.url">View PDF</a>
             </div>
-            <a target="_blank" rel="noopener noreferrer" v-bind:href="link.url">View PDF</a>
           </div>
+          
         </div>
       </div>
     </div>
@@ -75,8 +78,8 @@ export default Vue.extend({
   border-radius: 10px;
 }
 
-.dimmed:after {
-  content: " ";
+.dimmed::after {
+  content: "";
   z-index: 10;
   display: block;
   position: absolute;

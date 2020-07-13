@@ -3,6 +3,7 @@
 
 /* Master colors definition. */
 $primary: #ed1c24;
+
 $black: #181818;
 $white: #ffffff;
 
@@ -84,6 +85,8 @@ body {
 }
  
 // Bulma color overrides.
+$switch-active-background-color: var(--color-primary);
+
 $scheme-main: var(--color-bg-normal);
 $scheme-invert: var(--color-fg-strong);
 $text-strong: var(--color-fg-strong);

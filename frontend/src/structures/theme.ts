@@ -23,7 +23,7 @@ const SunCalc = require('suncalc');
 export class DarkThemeMode {
   public static readonly OFF = new DarkThemeMode('off', 'Off', (state) => false);
   public static readonly ON = new DarkThemeMode('on', 'Always', (state) => true);
-  public static readonly AT_NIGHT = new DarkThemeMode('timeauto', 'At night 🌙',
+  public static readonly AT_NIGHT = new DarkThemeMode('timeauto', 'Auto',
     (state) => {
       const times = SunCalc.getTimes(state.now, 42.7299, -73.6766, 72 /* lat, long, and elevation(m) of RPI Union. */);
       return state.now < times.sunrise || state.now > times.sunset;

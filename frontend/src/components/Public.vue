@@ -579,6 +579,8 @@ input, label{
   right: 25px;
   bottom: 35px;
   z-index: 2000;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+
 }
 
 </style>
