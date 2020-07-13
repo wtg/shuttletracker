@@ -18,7 +18,7 @@ type Form struct {
 type FeedbackService interface {
 	Form(id int64) (*Form, error)
 	Forms() ([]*Form, error)
-	// CreateForm(form *Form) error //idk if needs to be added with user input forms
+	CreateForm(form *Form) error //idk if needs to be added with user input forms
 	EditForm(form *Form) error
 	DeleteForm(id int64) error
 }

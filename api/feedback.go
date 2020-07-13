@@ -31,26 +31,7 @@ func (api *API) FeedbackCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// FormsEditHandler (idk if needed)
-
-// FeedbackDeleteHandler deletes a form from database
-func (api *API) FeedbackDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseInt(r.URL.Query().Get("id"), 10, 64)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	err = api.fdb.DeleteForm(id)
-	if err != nil {
-		if err == shuttletracker.ErrVehicleNotFound {
-			http.Error(w, "Form not found", http.StatusNotFound)
-		} else {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	}
-}
-
-// FeedbackEditHandler Only handles editing enabled flag for now
+// FeedbackEditHandler edits forms to be unread / read
 func (api *API) FeedbackEditHandler(w http.ResponseWriter, r *http.Request) {
 	form := &shuttletracker.Form{}
 	err := json.NewDecoder(r.Body).Decode(form)
@@ -69,5 +50,22 @@ func (api *API) FeedbackEditHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+}
+
+// FeedbackDeleteHandler deletes a form from database
+func (api *API) FeedbackDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(r.URL.Query().Get("id"), 10, 64)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = api.fdb.DeleteForm(id)
+	if err != nil {
+		if err == shuttletracker.ErrVehicleNotFound {
+			http.Error(w, "Form not found", http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }

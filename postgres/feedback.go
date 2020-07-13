@@ -86,6 +86,15 @@ func (fs *FeedbackService) EditForm(form *shuttletracker.Form) error {
 	return tx.Commit()
 }
 
+// CreateForm creates a Form.
+func (fs *FeedbackService) CreateForm(id int64) error {
+	statement := "INSERT INTO forms (topic, message) VALUES" +
+		" ($1, $2) RETURNING id, created, read;"
+	f := &shuttletracker.Form{}
+	row := fs.db.QueryRow(statement, f.Topic, f.Message)
+	return row.Scan(&f.ID, &f.Created, &f.Read)
+}
+
 // DeleteForm deletes a Form.
 func (fs *FeedbackService) DeleteForm(id int64) error {
 	statement := "DELETE FROM forms WHERE id = $1;"
