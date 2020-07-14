@@ -73,21 +73,4 @@ export default Vue.extend({
   margin-left: 1em;
 }
 
-.dimmed {
-  position: relative;
-  border-radius: 10px;
-}
-
-.dimmed::after {
-  content: "";
-  z-index: 10;
-  display: block;
-  position: absolute;
-  height: 100%;
-  top: 0;
-  left: 0;
-  right: 0;
-  border-radius: 10px;
-  background: var(--color-box-color);
-}
 </style>

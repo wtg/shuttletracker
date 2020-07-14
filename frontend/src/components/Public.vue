@@ -102,7 +102,7 @@ export default Vue.extend({
             'Map tiles: <a href="http://stamen.com">Stamen Design</a>, ' +
             '(<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>), ' +
             '<a href="https://carto.com/">Carto</a> ' +
-            '(<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>)\n' +
+            '(<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>) ' +
             'Data: <a href="http://openstreetmap.org">OpenStreetMap</a> ' +
             '(<a href="http://www.openstreetmap.org/copyright">ODbL</a>)',
           maxZoom: 17,

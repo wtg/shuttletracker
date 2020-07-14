@@ -80,8 +80,6 @@ body {
   @include define-color(--color-divider, rgba(255,255,255,0.12));
   @include define-color(--color-box-shadow, #181818);
   @include define-color(--color-box-color, rgba(255,255,255,0.08))
-  // @include define-color(--color-bg-less, lighten($black, 12%));
-  // @include define-color(--color-bg-least, lighten($black, 25%));
 }
  
 // Bulma color overrides.
@@ -94,9 +92,11 @@ $text: var(--color-fg-normal);
 $text-light: var(--color-fg-light);
 $text-invert: var(--color-bg-normal);	
 $link: var(--color-primary);
+$link-hover: var(--color-fg-strong);
 
 // $box-color: var(--color-box-color);
 $box-shadow: 0 0.5em 1em -0.125em rgba(var(--color-box-shadow), 0.1), 0 0px 0 1px rgba(var(--color-box-shadow), 0.02);
+$box-background-color: var(--color-box-color);
 
 // Changes the hr dividers to a less intense white in dark mode
 $hr-background-color: var(--color-divider);
