@@ -23,7 +23,34 @@
             </div>
           </td>
         </tr>
+
         <tr>
+          <th class="route_format">
+            <p class="setting_title">Estimated times of arrival</p>
+            <p
+              class="help"
+            >Get notifications when a shuttle is likely to arrive at the stop nearest you. Requires access to your location.</p>
+            <p class="help">
+              <i>Experimental: You’re not allowed to get mad at us if you miss your shuttle.</i>
+            </p>
+          </th>
+          <td>
+            <div class="switches">
+              <div class="switch_direction">
+                <b-switch v-model="etasEnabled"></b-switch>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="general_section">
+      <p class="section_title">Appearance</p>
+    </div>
+    <table class="table">
+      <tbody>
+         <tr>
           <th class="route_format">
             <p class="setting_title">Bus button</p>
             <p class="help">Place a bus on other users' maps and let others place buses on your map.</p>
@@ -41,25 +68,6 @@
                     <option>🚜</option>
                   </select>
                 </div>
-              </div>
-            </div>
-          </td>
-        </tr>
-
-        <tr>
-          <th class="route_format">
-            <p class="setting_title">Estimated times of arrival</p>
-            <p
-              class="help"
-            >Get notifications when a shuttle is likely to arrive at the stop nearest you. Requires access to your location.</p>
-            <p class="help">
-              <i>Experimental: You’re not allowed to get mad at us if you miss your shuttle.</i>
-            </p>
-          </th>
-          <td>
-            <div class="switches">
-              <div class="switch_direction">
-                <b-switch v-model="etasEnabled"></b-switch>
               </div>
             </div>
           </td>
@@ -99,7 +107,11 @@
         <tr v-for="route in routes" :key="route.id">
           <th class="route_format">{{route.name}}</th>
           <td>
-            <b-switch v-bind:value="route.enabled && route.active" v-on:input="routeToggle(route)"></b-switch>
+            <div class="switches">
+              <div class="switch_direction">
+                <b-switch v-bind:value="route.enabled && route.active" v-on:input="routeToggle(route)"></b-switch>
+              </div>
+            </div>
           </td>
         </tr>
       </tbody>
