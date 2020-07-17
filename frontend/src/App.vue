@@ -57,6 +57,7 @@ export default Vue.extend({
   height: calc(100% - 40px);
   box-sizing: border-box;
 }
+
 #router-view {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;

@@ -59,6 +59,8 @@ body {
   @include define-color(--color-bg-less, darken($white, 12%));
   @include define-color(--color-bg-least, darken($white, 25%));
   @include define-color(--color-primary, $primary);
+  @include define-color(--color-scrollbar, darken($white, 24%));
+  @include define-color(--color-scrollbar-bg, darken($white, 4%));
 
   @include define-color(--color-divider, $white-ter);
   @include define-color(--color-box-shadow, $black);
@@ -73,9 +75,11 @@ body {
   @include define-color(--color-fg-normal, rgba(255,255,255,0.6));
   @include define-color(--color-fg-light, rgba(255,255,255,0.38));
   @include define-color(--color-bg-normal, $black);
-  @include define-color(--color-bg-less, $black);
+  @include define-color(--color-bg-less, lighten($black, 12%));
   @include define-color(--color-bg-least, $black);
   @include define-color(--color-primary, #ef5350);
+  @include define-color(--color-scrollbar, rgba(255,255,255,0.38));
+  @include define-color(--color-scrollbar-bg, lighten($black, 4%));
 
   @include define-color(--color-divider, rgba(255,255,255,0.12));
   @include define-color(--color-box-shadow, #181818);

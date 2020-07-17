@@ -36,7 +36,7 @@ html, body {
   right: 0;
   padding: 10px 30px 10px 15px; /* leave some space for the close button */
   background: #ee2222;
-  color: #ffffff
+  color: #ffffff;
   text-align: center;
   font-size: 15px;
   /*overflow: hidden;*/
