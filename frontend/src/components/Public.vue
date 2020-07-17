@@ -37,6 +37,9 @@ import UserLocationService from '@/structures/userlocation.service';
 import BusButton from '@/components/busbutton.vue';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 import ETAMessage from '@/components/etaMessage.vue';
+// imported feedback use; still have yet to implement below
+import Form from '../structures/form';
+import FeedbackMessageUpdate from '@/structures/feedbackMessageUpdate';
 
 const UserSVG = require('@/assets/user.svg') as string;
 
