@@ -6,6 +6,8 @@ Looking to contribute? Please review our [Contribution Guidelines](CONTRIBUTING.
 
 More project documentation can be found on the [Repository Wiki](https://github.com/wtg/shuttletracker/wiki).
 
+If you encounter issues setting up, check [troubleshoot.txt](CONTRIBUTING.md) for potential solutions
+
 ## Setting up (Linux / WSL)
 
 1. [Install Go](https://golang.org/doc/install). Shuttle Tracker requires Go 1.11 or newer, and we recommend using the latest stable Go release.
