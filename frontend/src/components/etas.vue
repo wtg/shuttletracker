@@ -7,7 +7,7 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Vehicle</th>
+                    <th>Vehicles</th>
                     <th>Stop</th>
                     <th>ETA</th>
                     <th>Arriving</th>
@@ -55,6 +55,29 @@ export default Vue.extend({
                 console.log(dictionary);
                 this.posts = dictionary;
                 console.log(this.posts.get(21));
+                // this.posts = response.data;
+                // console.log(this.posts);
+                // console.log(this.posts[0].name);
+            })
+            .catch((error) => console.log(error));
+    },
+       data() {
+        return {
+            stops: new Map(),
+
+        };
+    },
+    mounted() {
+        axios
+            .get('http://localhost:8080/stops')
+            .then((response) => {
+                const dictionary = new Map();
+                response.data.forEach((x: any) => {
+                    dictionary.set(x.id, x.name);
+                });
+                console.log(dictionary);
+                this.stops = dictionary;
+                console.log(this.stops.get(21));
                 // this.posts = response.data;
                 // console.log(this.posts);
                 // console.log(this.posts[0].name);
