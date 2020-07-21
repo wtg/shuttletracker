@@ -55,21 +55,23 @@
             <p class="setting_title">Bus button</p>
             <p class="help">Place a bus on other users' maps and let others place buses on your map.</p>
           </th>
-          <td>
-            <div class="switches">
+          <td height="80">
+            <div class="switches" style="top: 50%">
               <div class="switch_direction">
                 <b-switch class="internal_switch" v-model="busButtonEnabled"></b-switch>
-                <div class="control select is-small is-rounded">
-                  <select v-model="busButtonChoice" v-bind:disabled="!busButtonEnabled">
-                    <option>🚐</option>
-                    <option>🚌</option>
-                    <option>🚗</option>
-                    <option>🚓</option>
-                    <option>🚜</option>
-                  </select>
-                </div>
               </div>
             </div>
+            <transition name="slide-fade">
+              <div class="control select is-small is-rounded switch-option" v-if="busButtonEnabled">
+                    <select v-model="busButtonChoice" v-bind:disabled="!busButtonEnabled">
+                      <option>🚐</option>
+                      <option>🚌</option>
+                      <option>🚗</option>
+                      <option>🚓</option>
+                      <option>🚜</option>
+                    </select>
+              </div>
+            </transition>
           </td>
         </tr>
         <tr>
@@ -77,17 +79,19 @@
             <p class="setting_title">Dark theme</p>
             <p class="help">Turn on dark theme for ShuttleTracker.</p>
           </th>
-          <td>
+          <td height="80">
             <div class="switches">
               <div class="switch_direction">
-                <b-switch v-model="darkThemeEnabled"></b-switch>
-                <div class="control select is-small is-rounded">
+                <b-switch class="internal_switch" v-model="darkThemeEnabled"></b-switch>
+              </div>
+            </div>
+            <transition name="slide-fade">
+              <div class="control select is-small is-rounded switch-option" v-if="darkThemeEnabled">
                   <select class="is-small" v-model="darkThemeMode" v-bind:disabled="!darkThemeEnabled">
                     <option v-for="mode in darkThemeAllModes" :value="mode.id">{{mode.description}}</option>
                   </select>
-                </div>
               </div>
-            </div>
+            </transition>
           </td>
         </tr>
       </tbody>
@@ -274,5 +278,22 @@ th {
 .field {
   padding: 5px;
   display: inline-block;
+}
+
+.switch-option {
+  float: right;
+  right: 7px;
+}
+
+.slide-fade-enter-active {
+  transition: all .8s ease;
+}
+.slide-fade-leave-active {
+  transition: all .8s ease;
+}
+.slide-fade-enter, .slide-fade-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+  transform: translateX(-10px);
+  opacity: 0;
 }
 </style>
