@@ -1,7 +1,6 @@
 <template>
   <div class="parent">
-    <h1 class="title">Settings</h1>
-    <hr />
+    <h1 class="title">Settings<hr></h1>
     <div class="general_section">
       <p class="section_title">General</p>
     </div>
