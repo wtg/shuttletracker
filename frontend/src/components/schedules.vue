@@ -1,8 +1,7 @@
 <template>
   <div class="parent">
     <h1 class="title">Schedules</h1>
-    <p class="subtitle">Official shuttle schedules from the Parking and Transportation office.</p>
-    <hr>
+    <h2 class="subtitle">Official shuttle schedules from the Parking and Transportation office.<hr></h2>
     <div class="columns">
       <div class="column" v-for="link in links" v-bind:key="link.url">
         <div class="dimmed">
