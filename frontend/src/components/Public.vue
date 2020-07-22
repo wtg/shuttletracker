@@ -242,6 +242,10 @@ export default Vue.extend({
       this.existingRouteLayers = new Array<L.Polyline>();
       this.routePolyLines().forEach((line: L.Polyline) => {
         if (this.Map !== undefined) {
+          console.log(line.options.color);
+          if (DarkTheme.isDarkThemeVisible(this.$store.state)) {
+            //mute color
+          } 
           this.Map.addLayer(line);
           this.existingRouteLayers.push(line);
         }
