@@ -247,8 +247,8 @@ export default Vue.extend({
           if (DarkTheme.isDarkThemeVisible(this.$store.state)) {
             // mute color
             const darkColor = tinycolor(line.options.color);
-            console.log(darkColor.toHsvString()); // "hsv(0, 100%, 100%)"
-            darkColor.desaturate(30);
+            console.log(darkColor.toHsvString());
+            darkColor.darken(15);
             console.log(darkColor.toString());
             line.options.color = darkColor.toString();
           }
