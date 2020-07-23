@@ -244,8 +244,8 @@ export default Vue.extend({
         if (this.Map !== undefined) {
           console.log(line.options.color);
           if (DarkTheme.isDarkThemeVisible(this.$store.state)) {
-            //mute color
-          } 
+            // mute color
+          }
           this.Map.addLayer(line);
           this.existingRouteLayers.push(line);
         }

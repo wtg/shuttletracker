@@ -11,24 +11,24 @@
 
 
 <script lang="ts">
-import Vue from "vue";
-import TabBar from "@/components/tabBar.vue";
-import UserLocationService from "@/structures/userlocation.service";
-import { DarkTheme } from "@/structures/theme";
+import Vue from 'vue';
+import TabBar from '@/components/tabBar.vue';
+import UserLocationService from '@/structures/userlocation.service';
+import { DarkTheme } from '@/structures/theme';
 
 UserLocationService.getInstance();
 
 export default Vue.extend({
-  name: "app",
+  name: 'app',
   components: {
-    TabBar
+    TabBar,
   },
   computed: {
     // The theme code is in this file rather than Public.vue because we need the theme to apply to the tab bar and
     // router tabs as well.
     currentCSSTheme(): string {
       return DarkTheme.getCurrentCSSThemeAttribute(this.$store.state);
-    }
+    },
   },
   watch: {
     // A watcher is used rather than a bind because we need to put the `data-theme` attribute on <body>, and Vue
@@ -39,11 +39,11 @@ export default Vue.extend({
     // NOT see the updated values of the theme variables because their inherited property comes from <body>.
     currentCSSTheme: {
       handler(newValue: string) {
-        document.body.setAttribute("data-theme", newValue);
+        document.body.setAttribute('data-theme', newValue);
       },
-      immediate: true
-    }
-  }
+      immediate: true,
+    },
+  },
 });
 </script>
 <style lang="scss">

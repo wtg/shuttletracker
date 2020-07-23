@@ -126,54 +126,54 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Route from "../structures/route";
-import Public from "./Public.vue";
-import { DarkTheme, DarkThemeMode } from "../structures/theme";
+import Vue from 'vue';
+import Route from '../structures/route';
+import Public from './Public.vue';
+import { DarkTheme, DarkThemeMode } from '../structures/theme';
 
 export default Vue.extend({
-  name: "routes",
+  name: 'routes',
   computed: {
     busButtonEnabled: {
       get(): boolean {
         return this.$store.state.settings.busButtonEnabled;
       },
       set(value: boolean) {
-        this.$store.commit("setSettingsBusButtonEnabled", value);
-      }
+        this.$store.commit('setSettingsBusButtonEnabled', value);
+      },
     },
     busButtonChoice: {
       get(): string {
         return this.$store.state.settings.busButtonChoice;
       },
       set(value: string) {
-        this.$store.commit("setSettingsBusButtonChoice", value);
-      }
+        this.$store.commit('setSettingsBusButtonChoice', value);
+      },
     },
     // darkThemeEnabled is really just a proxy for darkThemeMode. It makes the UI nicer for people who simply want to
     // turn it on or off, while still allowing for more advanced dark theme options via the dropdown.
     darkThemeEnabled: {
       get(): boolean {
-        return this.$store.state.settings.darkThemeMode !== "off";
+        return this.$store.state.settings.darkThemeMode !== 'off';
       },
       set(value: boolean) {
         // These assignments will call darkThemeMode.set().
         if (!value) {
           // !enabled -> set mode to off
-          this.darkThemeMode = "off";
-        } else if (this.darkThemeMode === "off") {
+          this.darkThemeMode = 'off';
+        } else if (this.darkThemeMode === 'off') {
           // enabled -> ensure mode is not off. This prevents overwriting to 'Always' if the user picks a different mode.
-          this.darkThemeMode = "on";
+          this.darkThemeMode = 'on';
         }
-      }
+      },
     },
     darkThemeMode: {
       get(): string {
         return this.$store.state.settings.darkThemeMode;
       },
       set(value: string) {
-        this.$store.commit("setSettingsDarkThemeMode", value);
-      }
+        this.$store.commit('setSettingsDarkThemeMode', value);
+      },
     },
     darkThemeAllModes(): DarkThemeMode[] {
       return DarkThemeMode.allModes();
@@ -186,21 +186,21 @@ export default Vue.extend({
         );
       },
       set(value: boolean) {
-        this.$store.commit("setSettingsFusionPositionEnabled", value);
-      }
+        this.$store.commit('setSettingsFusionPositionEnabled', value);
+      },
     },
     geolocationDenied: {
       get(): boolean {
         return this.$store.state.geolocationDenied;
-      }
+      },
     },
     etasEnabled: {
       get(): boolean {
         return this.$store.state.settings.etasEnabled;
       },
       set(value: boolean) {
-        this.$store.commit("setSettingsETAsEnabled", value);
-      }
+        this.$store.commit('setSettingsETAsEnabled', value);
+      },
     },
     routes(): Route[] {
       const routes_arr = [];
@@ -208,7 +208,7 @@ export default Vue.extend({
         routes_arr.push(stop);
       }
       return routes_arr;
-    }
+    },
   },
   methods: {
     routeToggle(thisRoute: Route) {
@@ -221,9 +221,9 @@ export default Vue.extend({
         thisRoute.enabled = false;
         thisRoute.active = false;
       }
-      this.$store.commit("setRoutes", this.routes);
-    }
-  }
+      this.$store.commit('setRoutes', this.routes);
+    },
+  },
 });
 </script>
 
