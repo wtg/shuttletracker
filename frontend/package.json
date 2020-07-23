@@ -22,6 +22,7 @@
     "leaflet-rotatedmarker": "^0.2.0",
     "leaflet-routing-machine": "^3.2.12",
     "suncalc": "^1.8.0",
+    "tinycolor2": "^1.4.1",
     "typeface-open-sans": "0.0.54",
     "vue": "^2.5.17",
     "vue-analytics": "^5.16.4",

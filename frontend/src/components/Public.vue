@@ -40,6 +40,7 @@ import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 import ETAMessage from '@/components/etaMessage.vue';
 import {DarkTheme} from '@/structures/theme';
 
+const tinycolor = require('tinycolor2');
 const UserSVG = require('@/assets/user.svg') as string;
 
 export default Vue.extend({
@@ -245,6 +246,11 @@ export default Vue.extend({
           console.log(line.options.color);
           if (DarkTheme.isDarkThemeVisible(this.$store.state)) {
             // mute color
+            const darkColor = tinycolor(line.options.color);
+            console.log(darkColor.toHsvString()); // "hsv(0, 100%, 100%)"
+            darkColor.desaturate(30);
+            console.log(darkColor.toString());
+            line.options.color = darkColor.toString();
           }
           this.Map.addLayer(line);
           this.existingRouteLayers.push(line);
