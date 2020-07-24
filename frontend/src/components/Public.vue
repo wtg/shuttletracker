@@ -157,6 +157,9 @@ export default Vue.extend({
     stopIcon(): L.Icon {
       return Stop.createMarkerIconForCurrentTheme(this.$store.state);
     },
+    darkThemeEnabled(): boolean {
+      return DarkTheme.isDarkThemeVisible(this.$store.state);
+    },
   },
   watch: {
     mapTileLayerURL: {
@@ -175,6 +178,11 @@ export default Vue.extend({
         this.updateLegend();
       },
       immediate: true,
+    },
+    darkThemeEnabled: {
+      handler(newValue: boolean) {
+        this.renderRoutes();
+      },
     },
   },
   methods: {
@@ -247,13 +255,19 @@ export default Vue.extend({
           if (DarkTheme.isDarkThemeVisible(this.$store.state)) {
             // mute color
             const darkColor = tinycolor(line.options.color);
-            console.log(darkColor.toHsvString());
             darkColor.darken(15);
-            console.log(darkColor.toString());
-            line.options.color = darkColor.toString();
+            const newPolyLine = new L.Polyline(line.getLatLngs() as [], {color: line.options.color});
+            newPolyLine.options.color = darkColor.toString();
+            console.log(newPolyLine.options.color);
+            console.log("Pushing darkened line");
+            this.Map.addLayer(newPolyLine);
+            this.existingRouteLayers.push(newPolyLine);
+            return;
+          } else {
+            console.log("Pushing lightened line");
+            this.Map.addLayer(line);
+            this.existingRouteLayers.push(line);
           }
-          this.Map.addLayer(line);
-          this.existingRouteLayers.push(line);
         }
       });
     },
