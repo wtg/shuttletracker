@@ -197,6 +197,7 @@ export default Vue.extend({
     },
     updateLegend() {
       this.legend.onAdd = (map: L.Map) => {
+        const overlay = L.DomUtil.create('div', 'overlay-theme');
         const div = L.DomUtil.create('div', 'info legend');
         let legendstring = '';
         this.$store.state.Routes.forEach((route: Route) => {
@@ -223,8 +224,9 @@ export default Vue.extend({
           `" width="12" height="12"> Shuttle Stop
 
           </li>
-				</ul>`;
-        return div;
+        </ul>`;
+        overlay.appendChild(div);
+        return overlay;
       };
       if (this.Map !== undefined) {
         this.legend.addTo(this.Map);
@@ -520,9 +522,11 @@ input, label{
 }
 
 .info.legend {
-  box-shadow: 0 0.5em 1em -0.125em rgba(var(--color-box-shadow), 0.1), 0 0px 0 1px rgba(var(--color-box-shadow), 0.02);
+  box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14),
+              0 3px 14px 2px rgba(0, 0, 0, 0.12),
+              0 5px 5px -3px rgba(0, 0, 0, 0.2);
   border-radius: 5px;
-  background-color: rgba(var(--color-bg-normal-rgb), 1);
+  background-color: var(--color-legend-color);
   padding: 5px;
   bottom: 25px;
   align-content: right;
@@ -533,6 +537,12 @@ input, label{
     margin-bottom: 2px;
     padding-left: 0px;
   }
+}
+
+.overlay-theme {
+  background-color: rgba(var(--color-bg-normal-rgb), 1);
+  bottom: 25px;
+  border-radius: 5px;
 }
 
 .info.toggle {

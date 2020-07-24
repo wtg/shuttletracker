@@ -65,6 +65,7 @@ body {
   @include define-color(--color-divider, $white-ter);
   @include define-color(--color-box-shadow, $black);
   @include define-color(--color-box-color, rgba(255,255,255,0));
+  @include define-color(--color-legend-color, rgba(255,255,255,0));
 
   @include define-color(--color-button-bg, $white);
   @include define-color(--color-button-hover, darken($white, 12%));
@@ -85,6 +86,7 @@ body {
   @include define-color(--color-divider, rgba(255,255,255,0.12));
   @include define-color(--color-box-shadow, #181818);
   @include define-color(--color-box-color, rgba(255,255,255,0.08));
+  @include define-color(--color-legend-color, rgba(255,255,255,0.12));
 
   @include define-color(--color-button-bg, lighten($black, 10%));
   @include define-color(--color-button-hover, lighten($black, 14%));
