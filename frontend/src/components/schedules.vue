@@ -43,7 +43,7 @@ export default Vue.extend({
           caption: [
             'West and East Routes',
             'Saturday–Sunday 9:30am – 5pm',
-            '⠀',
+            '⠀ ',
             'Weekend Express Route',
             'Saturday–Sunday 4:30pm – 8pm',
             '⠀',

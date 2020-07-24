@@ -1,13 +1,10 @@
 <template>
-    <b-button @click="$emit('bus-click');" class="bus-button">
+    <button @click="$emit('bus-click');" class="bus-button">
 <span> {{this.$store.state.settings.busButtonChoice}} </span>
-    </b-button>
+    </button>
 </template>
 <script lang="ts">
 import Vue from 'vue';
-export default Vue.extend({
-
-});
 </script>
 
 <style lang="scss" scoped>
@@ -15,7 +12,7 @@ export default Vue.extend({
 
 .bus-button{
     touch-action: manipulation;
-    // border: 2px solid var(--color-primary);
+    border: 1px solid var(--color-button-bg);
     border-radius: 50%;
     box-shadow: 0.5px 0.5px 3px 1px rgba(var(--color-box-shadow), 0.3);
     -webkit-box-shadow: 0.5px 0.5px 3px 1px rgba(var(--color-box-shadow), 0.3);

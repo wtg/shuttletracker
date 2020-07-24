@@ -87,7 +87,7 @@ body {
   @include define-color(--color-box-color, rgba(255,255,255,0.08));
 
   @include define-color(--color-button-bg, lighten($black, 10%));
-  @include define-color(--color-button-hover, lighten($black, 10%));
+  @include define-color(--color-button-hover, lighten($black, 14%));
 }
  
 // Bulma color overrides.
@@ -102,8 +102,6 @@ $text-invert: var(--color-bg-normal);
 $link: var(--color-primary);
 $link-hover: var(--color-fg-strong);
 
-$dropdown-content-padding-top: 5px;
-// $box-color: var(--color-box-color);
 $box-shadow: 0 0.5em 1em -0.125em rgba(var(--color-box-shadow), 0.1), 0 0px 0 1px rgba(var(--color-box-shadow), 0.02);
 $box-background-color: var(--color-box-color);
 

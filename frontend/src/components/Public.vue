@@ -26,14 +26,14 @@ import InfoService from '../structures/serviceproviders/info.service';
 import Vehicle from '../structures/vehicle';
 import Route from '../structures/route';
 import {Stop, StopSVGLight, StopSVGDark} from '../structures/stop';
-import ETA from '@/structures/eta';
+import ETA from '../structures/eta';
 import messagebox from './adminmessage.vue';
 import * as L from 'leaflet';
 import '../../lib/L.TileLayer.NoGap';
 import { setTimeout, setInterval } from 'timers';
 import getMarkerString from '../structures/leaflet/rotatedMarker';
 import { Position } from 'geojson';
-import Fusion from '@/fusion';
+import Fusion from '../fusion';
 import UserLocationService from '@/structures/userlocation.service';
 import BusButton from '@/components/busbutton.vue';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
@@ -259,12 +259,10 @@ export default Vue.extend({
             const newPolyLine = new L.Polyline(line.getLatLngs() as [], {color: line.options.color});
             newPolyLine.options.color = darkColor.toString();
             console.log(newPolyLine.options.color);
-            console.log("Pushing darkened line");
             this.Map.addLayer(newPolyLine);
             this.existingRouteLayers.push(newPolyLine);
             return;
           } else {
-            console.log("Pushing lightened line");
             this.Map.addLayer(line);
             this.existingRouteLayers.push(line);
           }
