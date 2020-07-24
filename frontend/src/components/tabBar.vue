@@ -63,7 +63,7 @@ ul {
   justify-content: center;
   align-items: center;
   width: 100%;
-  border-top: 0.5px solid var(--color-bg-less);
+  // border-top: 0.5px solid var(--color-bg-less);
   box-shadow: 0 3px 8px 0 var(--color-bg-least);
   font-size: 13px;
   user-select: none;

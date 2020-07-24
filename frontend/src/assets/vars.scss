@@ -64,9 +64,10 @@ body {
 
   @include define-color(--color-divider, $white-ter);
   @include define-color(--color-box-shadow, $black);
-  @include define-color(--color-box-color, rgba(255,255,255,0))
+  @include define-color(--color-box-color, rgba(255,255,255,0));
 
-
+  @include define-color(--color-button-bg, $white);
+  @include define-color(--color-button-hover, darken($white, 12%));
 }
 
 // This is the dark theme for the app.
@@ -80,10 +81,13 @@ body {
   @include define-color(--color-primary, #ef5350);
   @include define-color(--color-scrollbar, rgba(255,255,255,0.38));
   @include define-color(--color-scrollbar-bg, lighten($black, 4%));
-
+  
   @include define-color(--color-divider, rgba(255,255,255,0.12));
   @include define-color(--color-box-shadow, #181818);
-  @include define-color(--color-box-color, rgba(255,255,255,0.08))
+  @include define-color(--color-box-color, rgba(255,255,255,0.08));
+
+  @include define-color(--color-button-bg, lighten($black, 10%));
+  @include define-color(--color-button-hover, lighten($black, 10%));
 }
  
 // Bulma color overrides.
@@ -98,6 +102,7 @@ $text-invert: var(--color-bg-normal);
 $link: var(--color-primary);
 $link-hover: var(--color-fg-strong);
 
+$dropdown-content-padding-top: 5px;
 // $box-color: var(--color-box-color);
 $box-shadow: 0 0.5em 1em -0.125em rgba(var(--color-box-shadow), 0.1), 0 0px 0 1px rgba(var(--color-box-shadow), 0.02);
 $box-background-color: var(--color-box-color);

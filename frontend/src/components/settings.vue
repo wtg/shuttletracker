@@ -60,17 +60,20 @@
                 <b-switch class="internal_switch" v-model="busButtonEnabled"></b-switch>
               </div>
             </div>
-            <transition name="slide-fade">
-              <div class="control select is-small is-rounded switch-option" v-if="busButtonEnabled">
-                    <select v-model="busButtonChoice" v-bind:disabled="!busButtonEnabled">
-                      <option>🚐</option>
-                      <option>🚌</option>
-                      <option>🚗</option>
-                      <option>🚓</option>
-                      <option>🚜</option>
-                    </select>
-              </div>
-            </transition>
+            <div class="drop-control">
+              <transition name="slide-fade">
+                <div class="control select is-small is-rounded switch-option" v-if="busButtonEnabled">
+                      <select v-model="busButtonChoice" v-bind:disabled="!busButtonEnabled">
+                        <option>🚐</option>
+                        <option>🚌</option>
+                        <option>🚗</option>
+                        <option>🚓</option>
+                        <option>🚜</option>
+                      </select>
+                </div>
+              </transition>
+            </div>
+            
           </td>
         </tr>
         <tr>
@@ -84,13 +87,15 @@
                 <b-switch class="internal_switch" v-model="darkThemeEnabled"></b-switch>
               </div>
             </div>
-            <transition name="slide-fade">
-              <div class="control select is-small is-rounded switch-option" v-if="darkThemeEnabled">
-                  <select class="is-small" v-model="darkThemeMode" v-bind:disabled="!darkThemeEnabled">
-                    <option v-for="mode in darkThemeAllModes" :value="mode.id">{{mode.description}}</option>
-                  </select>
-              </div>
-            </transition>
+            <div class="drop-control">
+              <transition name="slide-fade">
+                <div class="control select is-small is-rounded switch-option" v-if="darkThemeEnabled">
+                    <select class="drop-control is-small" v-model="darkThemeMode" v-bind:disabled="!darkThemeEnabled">
+                      <option v-for="mode in darkThemeAllModes" :value="mode.id">{{mode.description}}</option>
+                    </select>
+                </div>
+              </transition>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -294,4 +299,9 @@ th {
 /* .slide-fade-leave-active below version 2.1.8 */ {
   opacity: 0;
 }
+
+.drop-control {
+  padding-top: 5px;
+}
+
 </style>

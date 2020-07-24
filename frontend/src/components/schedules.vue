@@ -72,4 +72,8 @@ export default Vue.extend({
   margin-left: 1em;
 }
 
+hr {
+  margin: 1rem 0;
+}
+
 </style>

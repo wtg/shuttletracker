@@ -443,7 +443,6 @@ input, label{
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  border-bottom: 0.5px solid var(--color-bg-less);
   box-shadow: 0 -3px 8px 0 var(--color-bg-least);
   user-select: none;
   background: var(--color-bg-normal);
@@ -589,7 +588,7 @@ input, label{
   right: 25px;
   bottom: 35px;
   z-index: 2000;
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-tap-highlight-color: none;
 
 }
 
