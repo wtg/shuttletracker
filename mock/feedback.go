@@ -31,7 +31,7 @@ func (fs *FeedbackService) Form(id int64) (*shuttletracker.Form, error) {
 
 // EditForm edits form
 func (fs *FeedbackService) EditForm(form *shuttletracker.Form) error {
-	args := fs.Called(route)
+	args := fs.Called(form)
 	return args.Error(0)
 }
 

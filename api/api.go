@@ -125,7 +125,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	})
 
 	// Feedback
-	r.Form("/forms", func(r chi.Router) {
+	r.Route("/forms", func(r chi.Router) {
 		r.Get("/", api.FeedbackHandler)
 		r.Group(func(r chi.Router) {
 			r.Use(cli.casauth)
