@@ -4,11 +4,6 @@ import (
 	"database/sql"
 
 	"github.com/wtg/shuttletracker"
-<<<<<<< Updated upstream
-=======
-
-	
->>>>>>> Stashed changes
 )
 
 // StopService is an implementation of shuttletracker.StopService.
