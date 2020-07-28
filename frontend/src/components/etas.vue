@@ -41,8 +41,8 @@ export default Vue.extend({
     data() {
         return {
             posts: new Map(),
-
-        };
+            stops: new Map(),
+         };
     },
     mounted() {
         axios
@@ -60,14 +60,6 @@ export default Vue.extend({
                 // console.log(this.posts[0].name);
             })
             .catch((error) => console.log(error));
-    },
-       data() {
-        return {
-            stops: new Map(),
-
-        };
-    },
-    mounted() {
         axios
             .get('http://localhost:8080/stops')
             .then((response) => {
