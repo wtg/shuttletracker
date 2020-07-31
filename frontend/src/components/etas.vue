@@ -19,7 +19,7 @@
                 <template v-for="(eta) in etas">
                     <tr v-for="(info, i) in eta" v-bind:key="`${i}-${info.stopID}`">
                         <td>{{ info.vehicleID }}</td>
-                        <td>{{ info.stopID }}</td>
+                        <td>{{ this.stops.get(info.stopID) }}</td>
                         <td>{{ info.eta }}</td>
                         <td>{{ info.arriving }}</td>
                         <td>{{ this.posts.get(info.routeID) }}</td>
