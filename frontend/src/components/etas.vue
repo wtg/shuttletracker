@@ -44,6 +44,7 @@ export default Vue.extend({
     data() {
         return {
             posts: new Map(),
+            colors: new Map(),
             stops: new Map(),
          };
     },
@@ -52,12 +53,18 @@ export default Vue.extend({
             .get('http://localhost:8080/routes')
             .then((response) => {
                 const dictionary = new Map();
+                const dictionary2 = new Map();
                 response.data.forEach((x: any) => {
                     dictionary.set(x.id, x.name);
+                    dictionary2.set(x.id, x.color);
                 });
                 console.log(dictionary);
                 this.posts = dictionary;
                 console.log(this.posts.get(21));
+                console.log(dictionary2);
+                this.colors = dictionary2;
+                console.log(this.colors.get(21));
+
                 // this.posts = response.data;
                 // console.log(this.posts);
                 // console.log(this.posts[0].name);
