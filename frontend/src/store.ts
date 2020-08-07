@@ -9,6 +9,8 @@ import Location from '@/structures/location';
 import * as L from 'leaflet';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 import ETA from './structures/eta';
+import {DarkTheme} from '@/structures/theme';
+
 
 Vue.use(Vuex);
 const InfoService = new InfoServiceProvider();
@@ -55,7 +57,7 @@ const store: StoreOptions<StoreState> = {
       state.Vehicles.forEach((vehicle: Vehicle) => {
         for (const route of state.Routes) {
           if (vehicle.location !== null && vehicle.location.routeID === route.id) {
-            vehicle.setRoute(route);
+            vehicle.setRoute(route,  DarkTheme.isDarkThemeVisible(state));
             break;
           }
         }
@@ -71,7 +73,7 @@ const store: StoreOptions<StoreState> = {
       state.Vehicles.forEach((vehicle: Vehicle) => {
         state.Routes.forEach((route: Route) => {
           if (vehicle.RouteID === route.id) {
-            vehicle.setRoute(route);
+            vehicle.setRoute(route, DarkTheme.isDarkThemeVisible(state));
             return;
           }
         });
@@ -84,12 +86,12 @@ const store: StoreOptions<StoreState> = {
           if (location.routeID) {
             for (const route of state.Routes) {
               if (route.id === location.routeID) {
-                vehicle.setRoute(route);
+                vehicle.setRoute(route, DarkTheme.isDarkThemeVisible(state));
                 break;
               }
             }
           } else {
-            vehicle.setRoute(undefined);
+            vehicle.setRoute(undefined, DarkTheme.isDarkThemeVisible(state));
           }
           vehicle.setLocation(location);
           break;

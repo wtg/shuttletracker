@@ -182,6 +182,7 @@ export default Vue.extend({
     darkThemeEnabled: {
       handler(newValue: boolean) {
         this.renderRoutes();
+        this.updateLegend();
       },
     },
   },
@@ -202,9 +203,15 @@ export default Vue.extend({
         let legendstring = '';
         this.$store.state.Routes.forEach((route: Route) => {
           if (route.shouldShow()) {
+            let markerColor = route.color;
+            if (DarkTheme.isDarkThemeVisible(this.$store.state)) {
+              const darkColor = tinycolor(route.color);
+              darkColor.darken(15);
+              markerColor = darkColor.toString();
+            }
             legendstring +=
               `<li><img class="legend-icon" src=` +
-              getMarkerString(route.color) +
+              getMarkerString(markerColor) +
               `
 			      width="12" height="12"> ` +
               route.name;
