@@ -6,7 +6,7 @@ We present to you a set of guidelines for contributing to Shuttle Tracker, hoste
 
 ## Communication
 
-ShuttleTracker uses Mattermost for communication. Join the Shuttle Tracker channel on https://chat.rcos.io.
+ShuttleTracker uses Mattermost for communication. Join the Shuttle Tracker channel on https://chat.rcos.io. ShuttleTracker also uses Discord, our server can be found [here](https://discord.gg/CeNyCtg).
 
 ## Code of Conduct
 
@@ -16,7 +16,7 @@ This project and everyone participating in it is governed by the [WebTech Code o
 
 ### Submitting Issues
 
-Any bugs or issues with the site can be reported on the [GitHub issue tracker](https://github.com/wtg/shuttletracker/issues). Proposed feature suggestions are also welcome.
+Any bugs or issues with the site can be reported on the [GitHub issue tracker](https://github.com/wtg/shuttletracker/issues) using the issue template. Proposed feature suggestions are also welcome.
 
 ### First Contributions
 

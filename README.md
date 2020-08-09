@@ -6,9 +6,12 @@ Looking to contribute? Please review our [Contribution Guidelines](CONTRIBUTING.
 
 More project documentation can be found on the [Repository Wiki](https://github.com/wtg/shuttletracker/wiki).
 
+If you encounter issues setting up, check the [Troubleshooting Guide](troubleshoot.txt) for potential solutions
+
 ## Setting up (Linux / WSL)
 
 1. [Install Go](https://golang.org/doc/install). Shuttle Tracker requires Go 1.11 or newer, and we recommend using the latest stable Go release.
+    - Other instructions found [here](https://www.educative.io/edpresso/how-to-install-go-on-ubuntu)
 2. Clone the repository to your computer. This can be done with `git clone https://github.com/wtg/shuttletracker`.
 3. Ensure you have [Postgres downloaded](https://www.postgresql.org/download/), installed.
     - This can be done with `sudo apt-get install postgresql`
