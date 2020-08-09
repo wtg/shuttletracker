@@ -28,7 +28,7 @@ const store: StoreOptions<StoreState> = {
     adminMessage: undefined,
     online: true,
     settings: {
-      busButtonEnabled: false,
+      busButtonEnabled: true,
       etasEnabled: false,
       fusionPositionEnabled: true,
       busButtonChoice: '🚌',
