@@ -6,6 +6,7 @@ import getCardinalDirection from '@/structures/cardinalDirection';
 import 'leaflet-rotatedmarker';
 
 // vehicles are hidden when their most recent location update becomes this old
+const tinycolor = require('tinycolor2');
 const vehicleInactiveDurationMS = 5 * 60 * 1000;  // five minutes in milliseconds
 
 
@@ -100,7 +101,7 @@ export default class Vehicle {
         this.marker.bindPopup(this.getMessage());
     }
 
-    public setRoute(r: Route | undefined) {
+    public setRoute(r: Route | undefined, darkEnabled: boolean) {
         if (r === undefined) {
             this.marker.setIcon(L.icon({
                 iconUrl: getMarkerString('#FFF'),
@@ -113,6 +114,12 @@ export default class Vehicle {
         }
         this.Route = r;
         this.RouteID = r.id;
+        let markerColor = r.color;
+        if (darkEnabled) {
+            const darkColor = tinycolor(r.color);
+            darkColor.darken(15);
+            markerColor = darkColor.toString();
+        }
         this.marker.setIcon(L.icon({
             iconUrl: getMarkerString(r.color),
             iconSize: [32, 32], // size of the icon

@@ -1,24 +1,115 @@
 @import "~bulma/sass/utilities/all";
+@import "~buefy/src/scss/utils/functions";
 
+/* Master colors definition. */
 $primary: #ed1c24;
-$link: #ff0000;
-$primary-invert: findColorInvert($primary);
-$twitter: #4099ff;
-$twitter-invert: findColorInvert($twitter);
 
-$colors: (
-    "white": ($white, $black),
-    "black": ($black, $white),
-    "light": ($light, $light-invert),
-    "dark": ($dark, $dark-invert),
-    "primary": ($primary, $primary-invert),
-    "info": ($info, $info-invert),
-    "success": ($success, $success-invert),
-    "warning": ($warning, $warning-invert),
-    "danger": ($danger, $danger-invert),
-    "twitter": ($twitter, $twitter-invert)
-);
+$black: #181818;
+$white: #ffffff;
 
+/*
+ * The define-color* family of functions define a CSS variable `${name}` to be the given color.
+ *   Example: @include define-color-RGB(--color-primary, 0, 255, 0);
+ *            a { color: var(--color-primary); }
+ * Also defines a var `${name}-rgb` to have only the raw values, for use with functions like rgba().
+ *   Example: a { color: rgba(var(--color-primary-rgb), 0.5); }
+ *
+ * https://codyhouse.co/blog/post/how-to-combine-sass-color-functions-and-css-variables
+ */
+@mixin define-color($name, $css-color) {
+  #{$name}: #{$css-color};
+  #{$name}-rgb: unquote("#{red($css-color)}, #{green($css-color)}, #{blue($css-color)}");
+}
+@mixin define-color-RGB($name, $red, $green, $blue) {
+  #{$name}: unquote("rgb(#{$red}, #{$green}, #{$blue})");
+  #{$name}-rgb: unquote("#{$red}, #{$green}, #{$blue}");
+}
+
+// This function overrides the SASS rgba() function to support CSS variables. If a variable is the argument of rgba(),
+// the built-in CSS rgba() function is used instead.
+// BUG! This function will NOT work if the argument is any more complex than a single var(--xxx). Caveat emptor.
+@function rgba($args...) {
+  // I could not figure out how to call the original rgba function. So.... enjoy this HACK BS :(.
+  $color: null;
+  $alpha: null;
+  @if length($args) == 4 {
+    $color: rgb(nth($args, 1), nth($args, 2), nth($args, 3));
+    $alpha: nth($args, 4);
+  } @else {
+    $color: nth($args, 1);
+    $alpha: nth($args, 2);
+  }
+
+  @if type_of($color) == "string" and str-index($color, "var(") == 1 {
+    $color: str-replace($color, "var(", "");
+    $color: str-replace($color, ")");
+    $color: str-replace($color, "-rgb");
+    @return unquote("rgba(var(#{$color}-rgb), #{$alpha})");
+  } @else {
+    @return hsla(hue($color), saturation($color), lightness($color), $alpha);
+  }
+}
+
+// This is the (default) light theme for the app. These variables are native CSS vars. They are evaluated at runtime.
+body {
+  @include define-color(--color-fg-strong, $black);
+  @include define-color(--color-fg-normal, lighten($black, 15%));
+  @include define-color(--color-fg-light, lighten($black, 30%));
+  @include define-color(--color-bg-normal, $white);
+  @include define-color(--color-bg-less, darken($white, 12%));
+  @include define-color(--color-bg-least, darken($white, 25%));
+  @include define-color(--color-primary, $primary);
+  @include define-color(--color-scrollbar, darken($white, 24%));
+  @include define-color(--color-scrollbar-bg, darken($white, 4%));
+
+  @include define-color(--color-divider, $white-ter);
+  @include define-color(--color-box-shadow, $black);
+  @include define-color(--color-box-color, rgba(255,255,255,0));
+  @include define-color(--color-legend-color, rgba(255,255,255,0));
+
+  @include define-color(--color-button-bg, $white);
+  @include define-color(--color-button-hover, darken($white, 12%));
+}
+
+// This is the dark theme for the app.
+[data-theme="dark"] {
+  @include define-color(--color-fg-strong, rgba(255,255,255,0.87));
+  @include define-color(--color-fg-normal, rgba(255,255,255,0.6));
+  @include define-color(--color-fg-light, rgba(255,255,255,0.38));
+  @include define-color(--color-bg-normal, $black);
+  @include define-color(--color-bg-less, lighten($black, 12%));
+  @include define-color(--color-bg-least, $black);
+  @include define-color(--color-primary, #ef5350);
+  @include define-color(--color-scrollbar, rgba(255,255,255,0.38));
+  @include define-color(--color-scrollbar-bg, lighten($black, 4%));
+  
+  @include define-color(--color-divider, rgba(255,255,255,0.12));
+  @include define-color(--color-box-shadow, #181818);
+  @include define-color(--color-box-color, rgba(255,255,255,0.08));
+  @include define-color(--color-legend-color, rgba(255,255,255,0.12));
+
+  @include define-color(--color-button-bg, lighten($black, 10%));
+  @include define-color(--color-button-hover, lighten($black, 14%));
+}
+ 
+// Bulma color overrides.
+$switch-active-background-color: var(--color-primary);
+
+$scheme-main: var(--color-bg-normal);
+$scheme-invert: var(--color-fg-strong);
+$text-strong: var(--color-fg-strong);
+$text: var(--color-fg-normal);
+$text-light: var(--color-fg-light);
+$text-invert: var(--color-bg-normal);	
+$link: var(--color-primary);
+$link-hover: var(--color-fg-strong);
+
+$box-shadow: 0 0.5em 1em -0.125em rgba(var(--color-box-shadow), 0.1), 0 0px 0 1px rgba(var(--color-box-shadow), 0.02);
+$box-background-color: var(--color-box-color);
+
+// Changes the hr dividers to a less intense white in dark mode
+$hr-background-color: var(--color-divider);
+$radius-large: 10px;
 
 @import "~bulma";
 @import "~buefy/src/scss/buefy";

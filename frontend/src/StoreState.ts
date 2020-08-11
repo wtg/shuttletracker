@@ -12,11 +12,13 @@ export interface StoreState {
     etas: ETA[];
     adminMessage: AdminMessageUpdate | undefined;
     online: boolean;
+    now: Date;
     settings: {
         busButtonEnabled: boolean,
         etasEnabled: boolean,
         fusionPositionEnabled: boolean,
         busButtonChoice: string,
+        darkThemeMode: string,
     };
     geolocationDenied: boolean;
 
