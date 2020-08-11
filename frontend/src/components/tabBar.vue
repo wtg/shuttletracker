@@ -27,7 +27,8 @@
         <a href="https://github.com/wtg/shuttletracker" class="github-corner">
           <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 750 700" style="position: absolute; bottom: 0; border: 0; right: 0;">
             <g>
-              <image stroke="null" xlink:href="../../public/githublogo.png" id="svg_2" height="477.99998" width="636.00002" y="2.00001" x="2"/>
+              <image stroke="null" v-if="!darkThemeEnabled" xlink:href="../../public/githublogo.png" id="svg_2" height="477.99998" width="636.00002" y="2.00001" x="2"/>
+              <image stroke="null" v-if="darkThemeEnabled" xlink:href="../../public/dark-githublogo.png" id="svg_2" height="477.99998" width="636.00002" y="2.00001" x="2"/>
             </g>
           </svg>
         </a>
@@ -40,11 +41,15 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import {DarkTheme} from '@/structures/theme';
 
 export default Vue.extend({
   computed: {
     etasEnabled(): boolean {
       return this.$store.state.settings.etasEnabled;
+    },
+    darkThemeEnabled(): boolean {
+      return DarkTheme.isDarkThemeVisible(this.$store.state);
     },
   },
 });
