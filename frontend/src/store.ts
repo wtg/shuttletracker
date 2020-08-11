@@ -34,7 +34,7 @@ const store: StoreOptions<StoreState> = {
     // that use this value will automatically update as the time changes.
     now: new Date(),
     settings: {
-      busButtonEnabled: false,
+      busButtonEnabled: true,
       etasEnabled: false,
       fusionPositionEnabled: true,
       busButtonChoice: '🚌',
