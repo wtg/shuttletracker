@@ -607,6 +607,10 @@ input, label{
   height: 20px !important;
 }
 
+.leaflet-container {
+  background: var(--color-tile-background);
+}
+
 .leaflet-container .leaflet-control-attribution {
   color: var(--color-fg-light);
   background-color: rgba(var(--color-bg-normal-rgb), 0.7);
