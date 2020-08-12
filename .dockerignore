@@ -11,6 +11,7 @@
 !postgres
 !static
 !updater
+!spoofer
 !*.go
 !CHECKS
 !frontend
