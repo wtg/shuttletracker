@@ -69,6 +69,7 @@ body {
 
   @include define-color(--color-button-bg, $white);
   @include define-color(--color-button-hover, darken($white, 12%));
+  @include define-color(--color-tile-background, #ddd);
 }
 
 // This is the dark theme for the app.
@@ -90,6 +91,7 @@ body {
 
   @include define-color(--color-button-bg, lighten($black, 10%));
   @include define-color(--color-button-hover, lighten($black, 14%));
+  @include define-color(--color-tile-background, #181818);
 }
  
 // Bulma color overrides.
