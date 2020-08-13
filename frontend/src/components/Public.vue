@@ -615,6 +615,12 @@ input, label{
   color: var(--color-fg-light);
   background-color: rgba(var(--color-bg-normal-rgb), 0.7);
 }
+
+.leaflet-popup-content-wrapper {
+  background: var(--color-leaflet-background);
+  color: var(--color-leaflet-color);
+}
+
 #busbutton{
   position: absolute;
   right: 25px;
