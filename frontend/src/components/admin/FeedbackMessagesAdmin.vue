@@ -39,7 +39,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import InfoServiceProvider from '@/structures/serviceproviders/info.service';
-import FeedbackMessageUpdate from '@/structures/adminMessageUpdate';
+import FeedbackMessageUpdate from '@/structures/feedbackMessageUpdate';
 import AdminServiceProvider from '@/structures/serviceproviders/admin.service';
 import { setTimeout } from 'timers';
 
@@ -89,7 +89,7 @@ export default Vue.extend({
                 }, 1000);
             });
         },
-        // GrabAdminMessage for adminMessage; need to find where located
+        // GrabFeedbackMessage for feedbackMessage; need to find where located
         getCurrentMessage() {
             sp.GrabFeedbackMessage().then((message: FeedbackMessageUpdate) => {
                 this.currentMessage = message.message;
