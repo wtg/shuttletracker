@@ -21,6 +21,72 @@
           </div>
         </div>
       </div>
+        <div class="column">
+          <div class="card">
+           <header class="card-header">
+            <p class="card-header-title">
+              ETAs
+            </p>
+          </header>
+            <div class="card-content">
+                <table class="table">
+                  <thead>
+                      <tr>
+                          <th>Vehicles</th>
+                          <th>Stop</th>
+                          <th>ETA</th>
+                          <th>Arriving</th>
+                          <th>Route ID</th>
+                        </tr>
+                    </thead>
+                  <tbody>
+                        <tr v-if="!etas.length">
+                          <td colspan="3">No ETAS Currently Calculated</td>
+                        </tr>
+                          
+                      <template v-for="(eta) in etas">
+                          <tr v-for="(info, i) in eta" v-bind:key="`${i}-${info.stopID}`">
+                              <td v-if="this.colors.get(info.routeID) == '#0080FF' " > 
+                                <font style="color:#0080FF"> &#9830 </font> {{ info.vehicleID }}
+                                </td>
+                              <td v-else-if="this.colors.get(info.routeID) == '#9b59b6' " > 
+                                <font style="color:#9b59b6"> &#9830 </font> {{ info.vehicleID }}
+                                </td>
+                             <td v-else-if="this.colors.get(info.routeID) == '#96C03A' " > 
+                                <font style="color:#96C03A"> &#9830 </font> {{ info.vehicleID }}
+                                </td>
+                            <td v-else-if="this.colors.get(info.routeID) == '#DCC308' " > 
+                                <font style="color:#DCC308"> &#9830 </font> {{ info.vehicleID }}
+                                </td>   
+                            <td v-else-if="this.colors.get(info.routeID) == '#FF0000' " > 
+                                <font style="color:#FF0000"> &#9830 </font> {{ info.vehicleID }}
+                                </td> 
+                            <td v-else-if="this.colors.get(info.routeID) == '#0080FF' " > 
+                                <font style="color:#0080FF"> &#9830 </font> {{ info.vehicleID }}
+                                </td> 
+                            <td v-else-if="this.colors.get(info.routeID) == '#aa08dc' " > 
+                                <font style="color:#aa08dc"> &#9830 </font> {{ info.vehicleID }}
+                                </td> 
+                            <td v-else-if="this.colors.get(info.routeID) == '#00ff00' " > 
+                                <font style="color:#00ff00"> &#9830 </font> {{ info.vehicleID }}
+                                </td> 
+                            <td v-else-if="this.colors.get(info.routeID) == '#ff9d00' " > 
+                                <font style="color:#ff9d00"> &#9830 </font> {{ info.vehicleID }}
+                                </td> 
+                            <td v-else-if="this.colors.get(info.routeID) == '#ffa500' " > 
+                                <font style="color:##ffa500"> &#9830 </font> {{ info.vehicleID }}
+                                </td> 
+                              <td v-else>{{info.vehicleID}}</td>
+                              <td>{{ this.stops.get(info.stopID) }}</td>
+                              <td>{{ info.eta }}</td>
+                              <td>{{ info.arriving }}</td>
+                              <td>{{ this.posts.get(info.routeID) }}</td>
+                          </tr>
+                      </template>
+                    </tbody>
+                </table>
+             </div>
+        </div>
       </div>
     </div>
   </div>
@@ -173,3 +239,4 @@ window.addEventListener('storage', () => {
   margin-bottom: 1em;
 }
 </style>
+
