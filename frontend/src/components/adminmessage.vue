@@ -23,6 +23,13 @@ export default Vue.extend({
             return this.$store.state.adminMessage;
         },
     },
+    watch: {
+      hide() {
+        if (this.hide) {
+          this.$store.state.adminMessage.enabled = false;
+        }
+      },
+    },
 });
 </script>
 
@@ -36,8 +43,8 @@ export default Vue.extend({
   left: 0;
   right: 0;
   padding: 10px 30px 10px 15px; /* leave some space for the close button */
-  background: #ee2222;
-  color: #ffffff;
+  background: var(--color-banner-background);
+  color: var(--color-banner-color);
   text-align: center;
   font-size: 15px;
 }
