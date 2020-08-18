@@ -23,6 +23,13 @@ export default Vue.extend({
             return this.$store.state.adminMessage;
         },
     },
+    watch: {
+      hide() {
+        if (this.hide) {
+          this.$store.state.adminMessage.enabled = false;
+        }
+      },
+    },
 });
 </script>
 
