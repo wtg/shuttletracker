@@ -7,7 +7,7 @@
     <hr>
     <div class="columns">
       <div class="column" v-for="link in links" v-bind:key="link.url">
-        <div class="card">
+        <div class="card" style= "min-width: 300px">
           <header class="card-header">
             <p class="card-header-title">
               {{ link.name }}
