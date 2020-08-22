@@ -8,12 +8,12 @@
     <table class="table">
       <tbody>
         <tr>
-          <th class="route_format">
+          <td class="route_format">
             <p class="setting_title">Send position updates</p>
             <p
               class="help"
             >Use your location to help make Shuttle Tracker more accurate for everyone. Your location is gathered anonymously while Shuttle Tracker is open.</p>
-          </th>
+          </td>
           <td>
             <div class="switches">
               <div class="switch_direction">
@@ -24,7 +24,7 @@
         </tr>
 
         <tr>
-          <th class="route_format">
+          <td class="route_format">
             <p class="setting_title">Estimated times of arrival</p>
             <p
               class="help"
@@ -32,7 +32,7 @@
             <p class="help">
               <i>Experimental: You’re not allowed to get mad at us if you miss your shuttle.</i>
             </p>
-          </th>
+          </td>
           <td>
             <div class="switches">
               <div class="switch_direction">
@@ -50,10 +50,10 @@
     <table class="table">
       <tbody>
          <tr>
-          <th class="route_format">
+          <td class="route_format">
             <p class="setting_title">Bus button</p>
             <p class="help">Place a bus on other users' maps and let others place buses on your map.</p>
-          </th>
+          </td>
           <td height="80">
             <div class="switches" style="top: 50%">
               <div class="switch_direction">
@@ -77,10 +77,10 @@
           </td>
         </tr>
         <tr>
-          <th class="route_format">
+          <td class="route_format">
             <p class="setting_title">Dark theme</p>
             <p class="help">Turn on dark theme for ShuttleTracker.</p>
-          </th>
+          </td>
           <td height="80">
             <div class="switches">
               <div class="switch_direction">
@@ -302,6 +302,10 @@ th {
 
 .drop-control {
   padding-top: 5px;
+}
+
+.table {
+  width: 100%;
 }
 
 </style>
