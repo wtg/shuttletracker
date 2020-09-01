@@ -34,9 +34,12 @@ export default Vue.extend({
           name: 'Weekday Routes',
           caption: [
             'North and West Routes',
-            'Monday–Friday 7am – 12am\n',
+            'Monday–Friday 7am – 12am',
+            '  ',
             'Hudson Valley College Suites Shuttles',
             'All Week 7am - 7pm',
+            'CDTA Express Route',
+            'Monday-Friday 7am - 7pm',
           ],
           color: 'green',
         },
@@ -46,7 +49,8 @@ export default Vue.extend({
           caption: [
             'North and West Routes',
             'Saturday 9am - 12am',
-            'Sunday 9am - 8pm\n',
+            'Sunday 9am - 8pm',
+            '  ',
             'Hudson Valley College Suites Shuttles',
             'All Week 7am - 7pm',
           ],

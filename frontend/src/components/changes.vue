@@ -6,7 +6,20 @@
       Given the current events, there have been some substantial changes made to the Shuttle routes and the Shuttle system to help keep Covid-19 in check. 
       This page serves to detail the changes that have been made this semester along with general question both answered and unanswered by Parking & Transporation. 
       If you have any additional questions, feel free to contact FSC Chair Cait Bennett (<a href="mailto:bennec6@rpi.edu">bennec6@rpi.edu</a>) or 
-      WTG Chair Sean Heffernan (<a href="mailto:heffes2@rpi.edu">heffes2@rpi.edu</a>)</p>
+      WTG Chair Sean Heffernan (<a href="mailto:heffes2@rpi.edu">heffes2@rpi.edu</a>)
+    </p>
+
+    <h4><strong>COVID Precautions</strong></h4>
+    <p>
+      <strong>Students and drivers will be required to wear masks at all times and must show RPI ID prior to boarding.</strong>
+    </p>
+    <p>
+      Capacity of the Shuttles are capped at 9 students. Plexi barriers have been installed between each row in the Shuttle
+    </p>
+    <p>
+      Shuttle Drivers will be provided with PPE.
+    </p>
+      
 
     <h4><strong>Important Route Changes</strong></h4>
     <p>There will only be two Shuttle routes this semester: North and West, which will be reflected on the Shuttle Tracker.</p>
