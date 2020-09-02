@@ -12,7 +12,7 @@
               <div class="caption">
                 <p v-for="line in link.caption" v-bind:key="line">{{ line }}</p>
               </div>
-              <div style="color: var(--color-primary)">No schedules this semester</div>
+              <div style="color: var(--color-primary)">No paper schedules this semester</div>
               <!-- <a target="_blank" rel="noopener noreferrer" v-bind:href="link.url">View PDF</a> -->
             </div>
           </div>
@@ -35,11 +35,14 @@ export default Vue.extend({
           caption: [
             'North and West Routes',
             'Monday–Friday 7am – 12am',
-            '  ',
+            'Saturday 9am – 12am',
+            'Sunday 9am – 8pm',
+            '⠀ ',
             'Hudson Valley College Suites Shuttles',
-            'All Week 7am - 7pm',
+            'Monday – Friday 7am – 7pm',
+            '⠀',
             'CDTA Express Route',
-            'Monday-Friday 7am - 7pm',
+            'Monday–Friday 7am – 7pm',
           ],
           color: 'green',
         },
@@ -48,11 +51,11 @@ export default Vue.extend({
           name: 'Weekend Routes',
           caption: [
             'North and West Routes',
-            'Saturday 9am - 12am',
-            'Sunday 9am - 8pm',
-            '  ',
+            'Saturday 9am – 12am',
+            'Sunday 9am – 8pm',
+            '⠀ ',
             'Hudson Valley College Suites Shuttles',
-            'All Week 7am - 7pm',
+            'Saturday–Sunday 7am – 7pm',
           ],
           color: 'red',
         },
