@@ -80,7 +80,7 @@
     <p>An express route will be offerred Monday to Friday 7:00am - 7:00pm aboard two RPI student only CDTA buses.</p>
     <p>
       Bus route will be Student Union &rarr; Houston Field House &rarr; 15th & Peoples &rarr; Ricketts &rarr; Blitman Bus Stop &rarr; Ricketts &rarr; Student Union.
-      A more in depth schedule for the CDTA route can be found <a href="/static/CDTA Express Pamphlet.pdf">here</a>.
+      A more in depth schedule for the CDTA route can be found <a href="/static/F20_CDTA_Express_Schedule.pdf">here</a>.
     </p>
     <p>Occupancy will be limited to 26 riders, masks and RPI IDs are required.</p>
     <p>Please note that these buses will <strong>NOT</strong> be tracked by Shuttle Tracker!</p>
