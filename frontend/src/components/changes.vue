@@ -16,9 +16,9 @@
       (<a href="https://info.rpi.edu/safe-ride" target="_blank">Safe Ride Info</a>).</p>
 
     <div id="text">
-    <p>The hours of operation for Shuttles this semester is as follows:
-      <br>
-      <br><strong>On Campus:</strong>
+    <p>The hours of operation for Shuttles this semester are as follows:</p>
+    <p id="schedules">
+      <strong>On Campus:</strong>
       <br>7am - 12am (Weekdays)
       <br>9am - 12am (Saturday)
       <br>9am - 8pm (Sunday)
@@ -59,8 +59,9 @@
         <br>4. West Hall
       </p>
       <p>
-        According to the Department of Parking & Transportation, these stops were removed to maximize effiency of vehicles and rider density given the limited 
-        capacity of the shuttles.
+        According to the Department of Parking & Transportation, these stops were removed because of limitations on CDTA busses, the 
+        unknown and dynamic quantity of off-campus students and to maximize effiency of vehicles and rider density (given the limited 
+        capacity of the shuttles).
       </p>
     </div>
 
@@ -137,5 +138,8 @@ img{
   max-width: 60em;
   margin-left:auto;
   margin-right:auto;
+}
+#schedules {
+  text-align: center;
 }
 </style>
