@@ -9,6 +9,28 @@
       WTG Chair Sean Heffernan (<a href="mailto:heffes2@rpi.edu">heffes2@rpi.edu</a>)
     </p>
 
+    <h4><strong>Schedule Changes</strong></h4>
+    <p>There will be no set schedule, or "paper schedule" this semester.</p>
+
+    <p>There will be no on call Shuttle this Fall. Alternatives include Safe Ride, which runs from 7pm - 12am this Fall 
+      (<a href="https://info.rpi.edu/safe-ride" target="_blank">Safe Ride Info</a>).</p>
+
+    <div id="text">
+    <p>The hours of operation for Shuttles this semester is as follows:
+      <br>
+      <br><strong>On Campus:</strong>
+      <br>7am - 12am (Weekdays)
+      <br>9am - 12am (Saturday)
+      <br>9am - 8pm (Sunday)
+      <br><strong>College Suites:</strong>
+      <br>7am - 7pm (All Week)
+      <br><strong>CDTA Express</strong>
+      <br>7am - 7pm (Weekdays)
+    </p>
+    <p>Weekend times for On Campus shuttles are subject to change due to Safe Ride scheduling. This page will be updated as necessary.</p>
+    <p>Please note that this information can also be viewed on Shuttle Tracker's <a href="/schedules">/schedules</a> page.</p>
+    </div>
+
     <h4><strong>COVID Precautions</strong></h4>
     <p>
       <strong>Students and drivers will be required to wear masks at all times and must show RPI ID prior to boarding.</strong>
@@ -36,7 +58,10 @@
         <br>3. Winslow
         <br>4. West Hall
       </p>
-      <p>According to the Department of Parking & Transportation, these stops were removed for efficiency given the decreased capacity of the shuttles.</p>
+      <p>
+        According to the Department of Parking & Transportation, these stops were removed to maximize effiency of vehicles and rider density given the limited 
+        capacity of the shuttles.
+      </p>
     </div>
 
     <h4><strong>Hudson Valley College Suites Shuttles</strong></h4>
@@ -52,37 +77,18 @@
 
     <h4><strong>CDTA Express Route</strong></h4>
     <p>An express route will be offerred Monday to Friday 7:00am - 7:00pm aboard two RPI student only CDTA buses.</p>
-    <p>Bus route will be City Station &rarr; Ricketts &rarr; East Campus &rarr; City Station.</p>
+    <p>
+      Bus route will be Student Union &rarr; Houston Field House &rarr; 15th & Peoples &rarr; Ricketts &rarr; Blitman Bus Stop &rarr; Ricketts &rarr; Student Union.
+      A more in depth schedule for the CDTA route can be found <a href="/static/CDTA Express Pamphlet.pdf">here</a>.
+    </p>
     <p>Occupancy will be limited to 26 riders, masks and RPI IDs are required.</p>
     <p>Please note that these buses will <strong>NOT</strong> be tracked by Shuttle Tracker!</p>
-
-    <h4><strong>Schedule Changes</strong></h4>
-    <p>There will be no set schedule, or "paper schedule" this semester.</p>
-
-    <div id="text">
-    <p>The hours of operation for Shuttles this semester is as follows:
-      <br>
-      <br><strong>On Campus:</strong>
-      <br>7am - 12am (Weekdays)
-      <br>9am - 12am (Saturday)
-      <br>9am - 8pm (Sunday)
-      <br><strong>College Suites:</strong>
-      <br>7am - 7pm (All Week)
-      <br><strong>CDTA Express</strong>
-      <br>7am - 7pm (Weekdays)
-    </p>
-    <p>Weekend times for On Campus shuttles are subject to change due to Safe Ride scheduling. This page will be updated as necessary.</p>
-    <p>Please note that this information can also be viewed on Shuttle Tracker's <a href="/schedules">/schedules</a> page.</p>
-    </div>
-
 
     <h3>FAQ</h3>
     <p>
       We are working to clarify certain elements of the shuttle system with the Department of Parking and Transportation, and will update 
       this document as more information becomes available. Some of these questions include:
       <br>How many Shuttles will be running on each route?
-      <br>How were the removed stops chosen?
-      <br>What will the availability of on call Shuttles be?
       <br>More details about weekend Shuttle Schedule/Safe Ride
     </p>
 
