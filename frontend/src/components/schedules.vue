@@ -12,7 +12,8 @@
               <div class="caption">
                 <p v-for="line in link.caption" v-bind:key="line">{{ line }}</p>
               </div>
-              <a target="_blank" rel="noopener noreferrer" v-bind:href="link.url">View PDF</a>
+              <div style="color: var(--color-primary)">No paper schedules this semester</div>
+              <!-- <a target="_blank" rel="noopener noreferrer" v-bind:href="link.url">View PDF</a> -->
             </div>
           </div>
           
@@ -29,26 +30,32 @@ export default Vue.extend({
     return {
       links: [
         {
-          url: 'https://shuttles.rpi.edu/static/Weekday.pdf',
+          // url: 'https://shuttles.rpi.edu/static/Weekday.pdf',
           name: 'Weekday Routes',
           caption: [
-            'North, South, and New West Routes',
-            'Monday–Friday 7am – 11pm',
+            'North and West Routes',
+            'Monday–Friday 7am – 12am',
+            'Saturday 9am – 12am',
+            'Sunday 9am – 8pm',
+            '⠀ ',
+            'Hudson Valley College Suites Shuttles',
+            'Monday – Friday 7am – 7pm',
+            '⠀',
+            'CDTA Express Route',
+            'Monday–Friday 7am – 7pm',
           ],
           color: 'green',
         },
         {
-          url: 'https://shuttles.rpi.edu/static/Weekend.pdf',
+          // url: 'https://shuttles.rpi.edu/static/Weekend.pdf',
           name: 'Weekend Routes',
           caption: [
-            'West and East Routes',
-            'Saturday–Sunday 9:30am – 5pm',
+            'North and West Routes',
+            'Saturday 9am – 12am',
+            'Sunday 9am – 8pm',
             '⠀ ',
-            'Weekend Express Route',
-            'Saturday–Sunday 4:30pm – 8pm',
-            '⠀',
-            'Late Night Route',
-            'Friday–Saturday 8pm – 4am',
+            'Hudson Valley College Suites Shuttles',
+            'Saturday–Sunday 7am – 7pm',
           ],
           color: 'red',
         },
