@@ -19,8 +19,8 @@
     <p>The hours of operation for Shuttles this semester are as follows:</p>
     <p id="schedules">
       <strong>On Campus:</strong>
-      <br>7am - 12am (Weekdays)
-      <br>9am - 12am (Saturday)
+      <br>7am - 11:45pm (Weekdays)
+      <br>9am - 11:45pm (Saturday)
       <br>9am - 8pm (Sunday)
       <br><strong>College Suites:</strong>
       <br>7am - 7pm (All Week)
