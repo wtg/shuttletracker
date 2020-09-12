@@ -71,10 +71,7 @@
       Hudson Valley College Suites and Campus.
     </p>
     <p>The shuttle will stop at the front door of College Suites and travel to the Student Union.</p>
-    <p>
-      These two shuttles will be tracked by Shuttle Tracker, but the route they run on will <strong>not</strong> be displayed on 
-      the Shuttle Tracker per the request of Parking and Transportation.
-    </p>
+    <p>Please note that these buses will <strong>NOT</strong> be tracked by Shuttle Tracker!</p>
 
     <h4><strong>CDTA Express Route</strong></h4>
     <p>An express route will be offerred Monday to Friday 7:00am - 7:00pm aboard two RPI student only CDTA buses.</p>
