@@ -67,6 +67,20 @@ func NewConfig(v *viper.Viper) *Config {
 	return cfg
 }
 
+func BackupConfig(v *viper.Viper) *Config {
+	cfg := &Config{
+		SpoofUpdates:  false,
+		SpoofInterval: "10s",
+	}
+	if v.IsSet("spoof.spoofupdates") {
+		cfg.SpoofUpdates = v.GetBool("spoof.spoofupdates")
+	}
+	if v.IsSet("spoof.spoofinterval") {
+		cfg.SpoofInterval = v.GetString("spoof.spoofinterval")
+	}
+	return cfg
+}
+
 // Run spoofer forever.
 func (s *Spoofer) Run() {
 	if s.SpoofUpdates {
