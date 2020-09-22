@@ -30,6 +30,11 @@ export default class Vehicle {
     public tracker_id: number;
     public location: Location | null;
     private hideTimer: number | null = null;
+    private pointIndex: number | null = null;
+    private endPointIndex: number | null = null;
+    private destinationLat: number;
+    private destinationLng: number;
+    private totalTransitionDistance: number;
 
     constructor(id: number, name: string, created: Date, updated: Date, enabled: boolean, trackerID: number) {
         this.id = id;
@@ -56,6 +61,10 @@ export default class Vehicle {
         this.lastUpdate = new Date();
         this.tracker_id = trackerID;
         this.location = null;
+        (this.marker as any).on('moveend', this.continueMoving, this);
+        this.destinationLat = 0;
+        this.destinationLng = 0;
+        this.totalTransitionDistance = 0;
     }
 
     public getMessage(): string {
@@ -121,14 +130,132 @@ export default class Vehicle {
             popupAnchor: [0, 0],   // point from which the popup should open relative to the iconAnchor
         }));
         this.marker.bindPopup(this.getMessage());
-
+        console.log('Setting route for ' + this.id);
+        console.log('Afer setting route: ' + this.Route);
     }
 
     public setLatLng(lat: number, lng: number) {
-        this.lat = lat;
-        this.lng = lng;
-        (this.marker as any).slideTo([this.lat, this.lng], { duration: 1000, keepAtCenter: false });
-        // this.marker.setLatLng([this.lat, this.lng]);
+        if (this.lat === 0 || this.lng === 0) {
+            this.lat = lat;
+            this.lng = lng;
+            this.marker.setLatLng(L.latLng(lat, lng));
+            return;
+        }
+        console.log('Starting: ' + this.id);
+        this.destinationLat = lat;
+        this.destinationLng = lng;
+        if (this.pointIndex === null) {
+            this.updateClosestStartingPoint();
+        }
+        this.updateClosestDestinationPoint();
+        console.log('Just set closest points: ' + this.id + ' route: ' + this.Route + ' route id: ' + this.RouteID + ' point index: ' + this.pointIndex + ' end point index: ' + this.endPointIndex);
+        if (this.Route !== undefined && this.pointIndex !== null) {
+            this.continueMoving();
+        }
+        // this.lat = lat;
+        // this.lng = lng;
+        // (this.marker as any).slideTo([this.lat, this.lng], { duration: 1000, keepAtCenter: false });
+    }
+
+    public continueMoving() {
+        console.log('Continuing: ' + this.id + ' route: ' + this.Route + ' route id: ' + this.RouteID + ' point index: ' + this.pointIndex);
+        if (this.Route !== undefined && this.pointIndex !== null && this.endPointIndex !== null) {
+            if (this.pointIndex < this.endPointIndex) {
+                const point = this.Route.points[this.pointIndex];
+                this.lat = point.latitude;
+                this.lng = point.longitude;
+                this.pointIndex++;
+                if (this.pointIndex >= this.Route.points.length) {
+                    this.pointIndex = 0;
+                }
+            } else {
+                this.lat = this.destinationLat;
+                this.lng = this.destinationLng;
+                this.endPointIndex = null;
+            }
+            console.log('this.lat, this.lng: ' + this.lat + ', ' + this.lng);
+            console.log('marker latlng: ' + this.marker.getLatLng());
+            const transitionDistance = this.marker.getLatLng().distanceTo(L.latLng(this.lat, this.lng));
+            const transitionRatio = transitionDistance / this.totalTransitionDistance;
+            const transitionTime = Math.round(transitionRatio * 5000); // 5 s (5000 ms) for the total transition
+            console.log('transition time: ' + transitionTime + ' / ' + transitionDistance + ' = ' + transitionRatio + ' * 5000 = ' + transitionTime);
+            const newAngle = this.angleBetween(this.marker.getLatLng().lat, this.marker.getLatLng().lng, this.lat, this.lng);
+            console.log('new angle: ' + newAngle);
+            this.marker.setRotationAngle(newAngle);
+            (this.marker as any).slideTo([this.lat, this.lng], { duration: transitionTime, keepAtCenter: false });
+        }
+    }
+
+    public updateClosestStartingPoint() {
+        console.log('updating closest starting point: id: ' + this.id + ' route: ' + this.Route + ' route id: ' + this.RouteID);
+        if (this.Route !== undefined) {
+            // Find closest point index to the vehicle's current position
+            let minDistance = -1.0;
+            for (let i = 0; i < this.Route.points.length; i++) {
+                const distance = this.marker.getLatLng().distanceTo(L.latLng(this.Route.points[i].latitude, this.Route.points[i].longitude));
+                if (distance < minDistance || minDistance < 0) {
+                    minDistance = distance;
+                    this.pointIndex = i;
+                }
+            }
+        }
+    }
+
+    public updateClosestDestinationPoint() {
+        console.log('updating closest destination point id: ' + this.id + ' route: ' + this.Route + ' route id: ' + this.RouteID);
+        if (this.Route !== undefined) {
+            if (this.pointIndex !== null) {
+                this.totalTransitionDistance = 0.0;
+                let currentPointIndex = this.pointIndex;
+                let nextPointIndex = this.pointIndex + 1;
+                if (nextPointIndex >= this.Route.points.length) {
+                    nextPointIndex = 0;
+                }
+                let distanceToNextPoint = this.marker.getLatLng().distanceTo(L.latLng(this.Route.points[currentPointIndex].latitude, this.Route.points[currentPointIndex].longitude));
+                while (distanceToNextPoint < L.latLng(this.Route.points[currentPointIndex].latitude, this.Route.points[currentPointIndex].longitude).distanceTo(L.latLng(this.destinationLat, this.destinationLng))) {
+                    console.log('Vehicle ' + this.id + ': ' + distanceToNextPoint + ' < ' + L.latLng(this.Route.points[currentPointIndex].latitude, this.Route.points[currentPointIndex].longitude).distanceTo(L.latLng(this.destinationLat, this.destinationLng)));
+                    this.totalTransitionDistance += distanceToNextPoint;
+                    currentPointIndex = nextPointIndex;
+                    nextPointIndex++;
+                    if (nextPointIndex >= this.Route.points.length) {
+                        nextPointIndex = 0;
+                    }
+                    distanceToNextPoint = L.latLng(this.Route.points[currentPointIndex].latitude, this.Route.points[currentPointIndex].longitude).distanceTo(L.latLng(this.Route.points[nextPointIndex].latitude, this.Route.points[nextPointIndex].longitude));
+                    if (currentPointIndex === this.pointIndex) { // We've wrapped around to the original point
+                        this.totalTransitionDistance = 0.0;
+                        break;
+                    }
+                }
+                this.endPointIndex = currentPointIndex;
+                this.totalTransitionDistance += L.latLng(this.Route.points[this.endPointIndex].latitude, this.Route.points[this.endPointIndex].longitude).distanceTo(L.latLng(this.destinationLat, this.destinationLng));
+            }
+        }
+    }
+
+    public angleBetween(lat1: number, lng1: number, lat2: number, lng2: number) {
+        const radLat1 = this.toRadians(lat1);
+        const radLng1 = this.toRadians(lng1);
+        const radLat2 = this.toRadians(lat2);
+        const radLng2 = this.toRadians(lng2);
+
+        const deltaLongitude = (radLng2 - radLng1);
+        const y = Math.sin(deltaLongitude) * Math.cos(radLat2);
+        const x = Math.cos(radLat1) * Math.sin(radLat2) - Math.sin(radLat1) * Math.cos(radLat2) * Math.cos(deltaLongitude);
+
+        let brng = Math.atan2(y, x);
+        brng = this.toDegrees(brng);
+        brng = (brng + 360) % 360;
+        brng = 360 - brng; // count degrees counter-clockwise - remove to make clockwise
+
+        return brng;
+    }
+
+    public toDegrees(angle: number) {
+        return angle * (180 / Math.PI);
+    }
+
+    public toRadians(angle: number) {
+        return angle * (Math.PI / 180);
     }
 
     public removeFromMap(map: L.Map) {
