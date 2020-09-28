@@ -8,6 +8,9 @@ import Vehicle from '@/structures/vehicle';
 import Location from '@/structures/location';
 import * as L from 'leaflet';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
+import ETA from './structures/eta';
+import {DarkTheme} from '@/structures/theme';
+
 
 Vue.use(Vuex);
 const InfoService = new InfoServiceProvider();
@@ -26,11 +29,16 @@ const store: StoreOptions<StoreState> = {
     etas: [],
     adminMessage: undefined,
     online: true,
+    /** Current time, with minute accuracy. */
+    // Having the current time stored in the Vue state makes it a reactive variable. Data, computed, and watch variables
+    // that use this value will automatically update as the time changes.
+    now: new Date(),
     settings: {
-      busButtonEnabled: false,
+      busButtonEnabled: true,
       etasEnabled: false,
       fusionPositionEnabled: true,
       busButtonChoice: '🚌',
+      darkThemeMode: 'off',
     },
     geolocationDenied: false,
     fusionConnected: undefined,
@@ -39,6 +47,9 @@ const store: StoreOptions<StoreState> = {
     setOnline(state, online: boolean) {
       state.online = online;
     },
+    updateTime(state) {
+      state.now = new Date();
+    },
     setRoutes(state, routes: Route[]) {
       state.Routes = routes;
 
@@ -46,7 +57,7 @@ const store: StoreOptions<StoreState> = {
       state.Vehicles.forEach((vehicle: Vehicle) => {
         for (const route of state.Routes) {
           if (vehicle.location !== null && vehicle.location.routeID === route.id) {
-            vehicle.setRoute(route);
+            vehicle.setRoute(route,  DarkTheme.isDarkThemeVisible(state));
             break;
           }
         }
@@ -62,7 +73,7 @@ const store: StoreOptions<StoreState> = {
       state.Vehicles.forEach((vehicle: Vehicle) => {
         state.Routes.forEach((route: Route) => {
           if (vehicle.RouteID === route.id) {
-            vehicle.setRoute(route);
+            vehicle.setRoute(route, DarkTheme.isDarkThemeVisible(state));
             return;
           }
         });
@@ -75,12 +86,12 @@ const store: StoreOptions<StoreState> = {
           if (location.routeID) {
             for (const route of state.Routes) {
               if (route.id === location.routeID) {
-                vehicle.setRoute(route);
+                vehicle.setRoute(route, DarkTheme.isDarkThemeVisible(state));
                 break;
               }
             }
           } else {
-            vehicle.setRoute(undefined);
+            vehicle.setRoute(undefined, DarkTheme.isDarkThemeVisible(state));
           }
           vehicle.setLocation(location);
           break;
@@ -100,7 +111,7 @@ const store: StoreOptions<StoreState> = {
         }
       }
       if (etas) {
-        localStorage.setItem('etas', JSON.stringify(etas));
+        localStorage.setItem(String(vehicleID), JSON.stringify(etas));
       }
       // store new ETAs
       for (const eta of etas) {
@@ -120,6 +131,10 @@ const store: StoreOptions<StoreState> = {
     },
     setSettingsBusButtonChoice(state, value: string) {
       state.settings.busButtonChoice = value;
+      localStorage.setItem('st_settings', JSON.stringify(state.settings));
+    },
+    setSettingsDarkThemeMode(state, darkThemeId: string) {
+      state.settings.darkThemeMode = darkThemeId;
       localStorage.setItem('st_settings', JSON.stringify(state.settings));
     },
     setSettingsETAsEnabled(state, value: boolean) {
@@ -253,8 +268,15 @@ const store: StoreOptions<StoreState> = {
     grabAdminMesssage({ commit }) {
       InfoService.GrabAdminMessage().then((ret: AdminMessageUpdate) => commit('addAdminMessage', ret));
     },
+    startTimeUpdater(context) {
+      setInterval(() => {
+        context.commit('updateTime');
+      }, 1000 * 60 /* 1 minute */);
+    },
   },
 
 };
 
-export default new Vuex.Store(store);
+const exportedStore = new Vuex.Store(store);
+exportedStore.dispatch('startTimeUpdater'); // Called here to ensure it's only called once.
+export default exportedStore;

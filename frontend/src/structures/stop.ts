@@ -1,15 +1,29 @@
 import * as L from 'leaflet';
 import Route from '@/structures/route';
+import {StoreState} from '@/StoreState';
+import {DarkTheme} from '@/structures/theme';
 
 /**
- * SVG used for representing a stop on the map and in the legend
+ * SVGs used for representing a stop on the map and in the legend
  */
-export const StopSVG = require('@/assets/circle.svg') as string;
+export const StopSVGLight = require('@/assets/circle.svg') as string;
+export const StopSVGDark = require('@/assets/circle.svg') as string;
 
 /**
  * Stop represents a single stop on a route
  */
 export class Stop {
+
+    public static createMarkerIconForCurrentTheme(state: StoreState): L.Icon {
+        return L.icon({
+            iconUrl: DarkTheme.isDarkThemeVisible(state) ? StopSVGDark : StopSVGLight,
+            iconSize: [12, 12], // size of the icon
+            iconAnchor: [6, 6], // point of the icon which will correspond to marker's location
+            shadowAnchor: [6, 6], // the same for the shadow
+            popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
+        });
+    }
+
     public id: number;
     public name: string;
     public description: string;
@@ -18,7 +32,7 @@ export class Stop {
     public created: string;
     public updated: string;
     public routesOn: Route[];
-    public marker: L.Marker;
+    public marker: L.Marker | null;
 
     constructor(id: number, name: string, description: string,
                 lat: number, lng: number, created: string, updated: string) {
@@ -30,25 +44,26 @@ export class Stop {
         this.created = created;
         this.updated = updated;
         this.routesOn = [];
-        this.marker = L.marker([this.latitude, this.longitude], {
-            icon: L.icon({
-                iconUrl: StopSVG,
-                iconSize: [12, 12], // size of the icon
-                iconAnchor: [6, 6], // point of the icon which will correspond to marker's location
-                shadowAnchor: [6, 6], // the same for the shadow
-                popupAnchor: [0, 0], // point from which the popup should open relative to the iconAnchor
-            }),
-        });
+        this.marker = null;
     }
 
     public getMessage(): string {
         if (this.routesOn.length > 0) {
             return this.name +
                 ` is on route${this.routesOn.length > 1 ? 's' : ''} `
-                + this.routesOn.map((route: Route) => `<i>${route.name}</i>`).join(', ');
+                + this.routesOn.filter((route: Route) => route.shouldShow()).map((route: Route) => `<i>${route.name}</i>`).join(', ');
         } else {
             return this.name;
         }
+    }
+
+    public getOrCreateMarker(state: StoreState): L.Marker {
+        if (this.marker === null) {
+            this.marker = L.marker([this.latitude, this.longitude], {
+                icon: Stop.createMarkerIconForCurrentTheme(state),
+            });
+        }
+        return this.marker;
     }
 
     public addRoute(route: Route): void {

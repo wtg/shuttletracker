@@ -14,6 +14,7 @@ import (
 
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
+	"github.com/wtg/shuttletracker/spoofer"
 )
 
 // Updater handles periodically grabbing the latest vehicle location data from iTrak.
@@ -26,6 +27,7 @@ type Updater struct {
 	lastDataFeedResponse *shuttletracker.DataFeedResponse
 	sm                   *sync.Mutex
 	subscribers          []func(*shuttletracker.Location)
+	spoof                *spoofer.Spoofer
 }
 
 type Config struct {
@@ -34,13 +36,14 @@ type Config struct {
 }
 
 // New creates an Updater.
-func New(cfg Config, ms shuttletracker.ModelService) (*Updater, error) {
+func New(cfg Config, ms shuttletracker.ModelService, spoof *spoofer.Spoofer) (*Updater, error) {
 	updater := &Updater{
 		cfg:         cfg,
 		ms:          ms,
 		mutex:       &sync.Mutex{},
 		sm:          &sync.Mutex{},
 		subscribers: []func(*shuttletracker.Location){},
+		spoof:       spoof,
 	}
 
 	interval, err := time.ParseDuration(cfg.UpdateInterval)
@@ -69,22 +72,31 @@ func NewConfig(v *viper.Viper) *Config {
 
 // Run updater forever.
 func (u *Updater) Run() {
-	log.Debug("Updater started.")
-	ticker := time.Tick(u.updateInterval)
+	// Only run updater if we are not in spoof updates mode
+	if !u.spoof.SpoofUpdates {
+		log.Debug("Updater started.")
+		ticker := time.Tick(u.updateInterval)
 
-	// Do one initial update.
-	u.update()
-
-	for range ticker {
+		// Do one initial update.
 		u.update()
+
+		// Call update() every updateInterval.
+		for range ticker {
+			u.update()
+		}
 	}
 }
 
 // Subscribe allows callers to provide a function that is called after Updater parses a new Location.
 func (u *Updater) Subscribe(f func(*shuttletracker.Location)) {
-	u.sm.Lock()
-	u.subscribers = append(u.subscribers, f)
-	u.sm.Unlock()
+	// Reroute subscribers to Spoofer instead if spoof updates mode is on
+	if u.spoof.SpoofUpdates {
+		u.spoof.Subscribe(f)
+	} else {
+		u.sm.Lock()
+		u.subscribers = append(u.subscribers, f)
+		u.sm.Unlock()
+	}
 }
 
 func (u *Updater) notifySubscribers(loc *shuttletracker.Location) {

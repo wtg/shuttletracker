@@ -1,7 +1,8 @@
 <template>
   <div class="parent">
     <div class="titleBar">
-      <img src="~../assets/icon.svg">
+      <img id = "icon" src="~../assets/icon.svg">
+      <router-link to="/faq"><img id = "q-mark" src="~../assets/q-mark.svg"></router-link>
       <transition name="pop">
         <div class="reconnecting" v-if="reconnecting">
           <span class="fas fa-circle-notch fa-spin"></span> Reconnecting...
@@ -24,19 +25,22 @@ import Vue from 'vue';
 import InfoService from '../structures/serviceproviders/info.service';
 import Vehicle from '../structures/vehicle';
 import Route from '../structures/route';
-import { Stop, StopSVG } from '../structures/stop';
-import ETA from '@/structures/eta';
+import {Stop, StopSVGLight, StopSVGDark} from '../structures/stop';
+import ETA from '../structures/eta';
 import messagebox from './adminmessage.vue';
 import * as L from 'leaflet';
+import '../../lib/L.TileLayer.NoGap';
 import { setTimeout, setInterval } from 'timers';
 import getMarkerString from '../structures/leaflet/rotatedMarker';
 import { Position } from 'geojson';
-import Fusion from '@/fusion';
+import Fusion from '../fusion';
 import UserLocationService from '@/structures/userlocation.service';
 import BusButton from '@/components/busbutton.vue';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 import ETAMessage from '@/components/etaMessage.vue';
+import {DarkTheme} from '@/structures/theme';
 
+const tinycolor = require('tinycolor2');
 const UserSVG = require('@/assets/user.svg') as string;
 
 export default Vue.extend({
@@ -48,6 +52,7 @@ export default Vue.extend({
       stops: [],
       ready: false,
       Map: undefined,
+      mapTileLayer: undefined,
       existingRouteLayers: [],
       userShuttleidCount: 0,
       initialized: false,
@@ -61,6 +66,7 @@ export default Vue.extend({
         stops: Stop[];
         ready: boolean;
         Map: L.Map | undefined; // Leaflets types are not always useful
+        mapTileLayer: L.TileLayer | undefined,
         existingRouteLayers: L.Polyline[];
         initialized: boolean;
         legend: L.Control;
@@ -77,7 +83,6 @@ export default Vue.extend({
     Promise.all([this.$store.dispatch('grabStops'), this.$store.dispatch('grabRoutes')]);
     this.$store.dispatch('grabVehicles');
     this.$store.dispatch('grabAdminMesssage');
-
     this.$nextTick(() => {
       this.ready = true;
       this.Map = L.map('mymap', {
@@ -90,14 +95,17 @@ export default Vue.extend({
           prefix: '',
         }),
       );
-      L.tileLayer(
-        'https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png',
+      this.mapTileLayer = L.tileLayer(
+        // https://wiki.openstreetmap.org/wiki/Tile_servers
+        this.mapTileLayerURL,
         {
           attribution:
-            'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
-            'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. ' +
-            'Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under ' +
-            '<a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
+            'Map tiles: <a href="http://stamen.com">Stamen Design</a>, ' +
+            '(<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>), ' +
+            '<a href="https://carto.com/">Carto</a> ' +
+            '(<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>) ' +
+            'Data: <a href="http://openstreetmap.org">OpenStreetMap</a> ' +
+            '(<a href="http://www.openstreetmap.org/copyright">ODbL</a>)',
           maxZoom: 17,
           minZoom: 14,
         },
@@ -141,6 +149,42 @@ export default Vue.extend({
     reconnecting(): boolean {
       return this.$store.state.fusionConnected === false;
     },
+    mapTileLayerURL(): string {
+      return DarkTheme.isDarkThemeVisible(this.$store.state)
+        ? 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png'
+        : 'https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png';
+    },
+    stopIcon(): L.Icon {
+      return Stop.createMarkerIconForCurrentTheme(this.$store.state);
+    },
+    darkThemeEnabled(): boolean {
+      return DarkTheme.isDarkThemeVisible(this.$store.state);
+    },
+  },
+  watch: {
+    mapTileLayerURL: {
+      handler(newValue: string) {
+        if (this.mapTileLayer !== undefined) {
+          this.mapTileLayer.setUrl(newValue);
+        }
+      },
+      immediate: true,
+    },
+    stopIcon: {
+      handler(newValue: L.Icon) {
+        this.$store.state.Stops.forEach((stop: Stop) => {
+          stop.getOrCreateMarker(this.$store.state).setIcon(newValue);
+        });
+        this.updateLegend();
+      },
+      immediate: true,
+    },
+    darkThemeEnabled: {
+      handler(newValue: boolean) {
+        this.renderRoutes();
+        this.updateLegend();
+      },
+    },
   },
   methods: {
     spawn() {
@@ -154,13 +198,20 @@ export default Vue.extend({
     },
     updateLegend() {
       this.legend.onAdd = (map: L.Map) => {
+        const overlay = L.DomUtil.create('div', 'overlay-theme');
         const div = L.DomUtil.create('div', 'info legend');
         let legendstring = '';
         this.$store.state.Routes.forEach((route: Route) => {
           if (route.shouldShow()) {
+            let markerColor = route.color;
+            if (DarkTheme.isDarkThemeVisible(this.$store.state)) {
+              const darkColor = tinycolor(route.color);
+              darkColor.darken(15);
+              markerColor = darkColor.toString();
+            }
             legendstring +=
               `<li><img class="legend-icon" src=` +
-              getMarkerString(route.color) +
+              getMarkerString(markerColor) +
               `
 			      width="12" height="12"> ` +
               route.name;
@@ -176,12 +227,13 @@ export default Vue.extend({
           </li>` +
           legendstring +
           `<li><img class="legend-icon" src="` +
-          StopSVG +
+          this.stopIcon.options.iconUrl +
           `" width="12" height="12"> Shuttle Stop
 
           </li>
-				</ul>`;
-        return div;
+        </ul>`;
+        overlay.appendChild(div);
+        return overlay;
       };
       if (this.Map !== undefined) {
         this.legend.addTo(this.Map);
@@ -208,8 +260,21 @@ export default Vue.extend({
       this.existingRouteLayers = new Array<L.Polyline>();
       this.routePolyLines().forEach((line: L.Polyline) => {
         if (this.Map !== undefined) {
-          this.Map.addLayer(line);
-          this.existingRouteLayers.push(line);
+          console.log(line.options.color);
+          if (DarkTheme.isDarkThemeVisible(this.$store.state)) {
+            // mute color
+            const darkColor = tinycolor(line.options.color);
+            darkColor.darken(15);
+            const newPolyLine = new L.Polyline(line.getLatLngs() as [], {color: line.options.color});
+            newPolyLine.options.color = darkColor.toString();
+            console.log(newPolyLine.options.color);
+            this.Map.addLayer(newPolyLine);
+            this.existingRouteLayers.push(newPolyLine);
+            return;
+          } else {
+            this.Map.addLayer(line);
+            this.existingRouteLayers.push(line);
+          }
         }
       });
     },
@@ -217,10 +282,10 @@ export default Vue.extend({
       this.$store.state.Stops.forEach((stop: Stop) => {
         if (this.Map !== undefined) {
             if (stop.shouldShow()) {
-                stop.marker.bindPopup(stop.getMessage());
-                stop.marker.addTo(this.Map);
+                stop.getOrCreateMarker(this.$store.state).bindPopup(stop.getMessage());
+                stop.getOrCreateMarker(this.$store.state).addTo(this.Map);
             } else {
-                stop.marker.removeFrom(this.Map);
+                stop.getOrCreateMarker(this.$store.state).removeFrom(this.Map);
             }
         }
       });
@@ -365,6 +430,8 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
+@import "@/assets/vars.scss";
+
 .parent {
   padding: 0px;
   margin: 0px;
@@ -372,6 +439,7 @@ export default Vue.extend({
   position: relative;
   display: flex;
   flex-direction: column;
+  background: var(--color-bg-normal);
 }
 
 input, label{
@@ -396,10 +464,9 @@ input, label{
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  border-bottom: 0.5px solid #eee;
-  box-shadow: 0 -3px 8px 0 #ddd;
+  box-shadow: 0 -3px 8px 0 var(--color-bg-least);
   user-select: none;
-  background: white;
+  background: var(--color-bg-normal);
   z-index: 1;
   padding: 0 6px;
 
@@ -407,15 +474,24 @@ input, label{
     flex: 0 1 auto;
     height: 70%;
     position: absolute;
-    left: 50%;
     transform: translateX(-50%);
   }
+
+  img#icon {
+    left: 50%;
+  }
+
+  img#q-mark {
+    right: 2px;
+    top: 5px;
+  }
+
 
   div.reconnecting {
     flex: 0 1 auto;
     margin-left: auto;
-    background: linear-gradient(0deg, rgb(250, 250, 250), rgb(240, 240, 240));
-    border: 0.5px solid #eee;
+    background: linear-gradient(0deg, var(--color-bg-less), var(--color-bg-least));
+    border: 0.5px solid var(--color-bg-less);
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 13px;
@@ -453,9 +529,11 @@ input, label{
 }
 
 .info.legend {
-  box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
+  box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14),
+              0 3px 14px 2px rgba(0, 0, 0, 0.12),
+              0 5px 5px -3px rgba(0, 0, 0, 0.2);
   border-radius: 5px;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: var(--color-legend-color);
   padding: 5px;
   bottom: 25px;
   align-content: right;
@@ -468,10 +546,16 @@ input, label{
   }
 }
 
+.overlay-theme {
+  background-color: rgba(var(--color-bg-normal-rgb), 1);
+  bottom: 25px;
+  border-radius: 5px;
+}
+
 .info.toggle {
-    box-shadow: rgba(0, 0, 0, 0.8) 0px 1px 1px;
+    box-shadow: rgba(var(--color-fg-strong-rgb), 0.8) 0px 1px 1px;
     border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(var(--color-bg-normal-rgb), 1);
     padding: 10px;
     top: 5px;
 
@@ -482,8 +566,8 @@ input, label{
     }
 }
 .button {
-    background: #ee2222;
-    color: white;
+    background: var(--color-primary);
+    color: var(--color-bg-normal);
     float: right;
     border-radius: 1px;
     padding: 0.35em;
@@ -521,7 +605,20 @@ input, label{
   border: none !important;
   width: 20px !important;
   height: 20px !important;
+}
 
+.leaflet-container {
+  background: var(--color-tile-background);
+}
+
+.leaflet-container .leaflet-control-attribution {
+  color: var(--color-fg-light);
+  background-color: rgba(var(--color-bg-normal-rgb), 0.7);
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--color-leaflet-background);
+  color: var(--color-leaflet-color);
 }
 
 #busbutton{
@@ -529,5 +626,8 @@ input, label{
   right: 25px;
   bottom: 35px;
   z-index: 2000;
+  -webkit-tap-highlight-color: none;
+
 }
+
 </style>

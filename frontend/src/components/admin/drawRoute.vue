@@ -131,7 +131,7 @@ export default Vue.extend({
         width: 100%;
         height: 500px;
     }
-    
+
     .leaflet-bar {
         display: none !important;
     }

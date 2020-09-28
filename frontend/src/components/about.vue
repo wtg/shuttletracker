@@ -1,7 +1,7 @@
 <template>
   <div class="parent content">
-    <h2>About Shuttle Tracker</h2>
-    <p>
+    <h2>Privacy Policy</h2>
+    <!-- <p>
       Shuttle Tracker is
       <a href="https://github.com/wtg/shuttletracker">open source</a> and maintained by the
       <a href="https://webtech.union.rpi.edu">Web Technologies Group</a> of the Rensselaer Union Student Senate for the benefit of the student body.
@@ -19,9 +19,9 @@
       <a
         href="mailto:webtech@union.lists.rpi.edu"
       >webtech@union.lists.rpi.edu</a> for more information.
-    </p>
+    </p> -->
 
-    <h3>Privacy policy</h3>
+    <!-- <h3>Privacy policy</h3> -->
     <p>
       Shuttle Tracker is operated by the
       <a

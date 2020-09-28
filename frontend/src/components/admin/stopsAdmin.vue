@@ -8,6 +8,7 @@
                     <th><abbr title="Desc">Description</abbr></th>
                     <th><abbr title="Lat.">Latitude</abbr></th>
                     <th><abbr title="Lng.">Longitude</abbr></th>
+                    <!-- <th><abbr title="Routes">Routes</abbr></th> -->
                     <th><abbr title="Enabled">Enabled</abbr></th>
                     <th></th>
                     <th></th>
@@ -18,7 +19,7 @@
                     <th>{{stop.description}}</th>
                     <th>{{stop.latitude.toFixed(3)}}</th>
                     <th>{{stop.longitude.toFixed(3)}}</th>
-                    <th></th>
+                    <!-- <th>{{stop.routesOn}}</th> -->
                     <th></th>
                     <th></th>
                 </tr>

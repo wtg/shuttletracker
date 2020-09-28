@@ -9,6 +9,7 @@ import (
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/postgres"
 	"github.com/wtg/shuttletracker/smooth"
+	"github.com/wtg/shuttletracker/spoofer"
 	"github.com/wtg/shuttletracker/updater"
 )
 
@@ -18,6 +19,7 @@ type Config struct {
 	API                   *api.Config
 	Log                   *log.Config
 	Postgres              *postgres.Config
+	Spoofer               *spoofer.Config
 	SmoothTrackingManager *smooth.Config
 }
 
@@ -33,6 +35,7 @@ func New() (*Config, error) {
 
 	cfg.API = api.NewConfig(v)
 	cfg.Updater = updater.NewConfig(v)
+	cfg.Spoofer = spoofer.NewConfig(v)
 	cfg.Log = log.NewConfig(v)
 
 	pgCfg, err := postgres.NewConfig(v)
@@ -53,6 +56,9 @@ func New() (*Config, error) {
 		return nil, err
 	}
 
+	// I have no idea why, but this config needs to be reset after reading the file
+	cfg.Spoofer = spoofer.BackupConfig(v)
+
 	// Special case for setting log level after reading config
 	log.SetLevel(cfg.Log.Level)
 	log.Debugf("All settings: %+v", v.AllSettings())
@@ -60,6 +66,7 @@ func New() (*Config, error) {
 	log.Debugf("Updater configuration: %+v", cfg.Updater)
 	log.Debugf("Log configuration: %+v", cfg.Log)
 	log.Debugf("Postgres configuration: %+v", cfg.Postgres)
+	log.Debugf("Spoofer configuration: %+v", cfg.Spoofer)
 	log.Debugf("Smooth tracking configuration: %+v", cfg.SmoothTrackingManager)
 
 	return cfg, nil

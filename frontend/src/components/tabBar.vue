@@ -22,20 +22,15 @@
         Settings
       </span>
     </router-link>
-    <router-link tag="li" to="/changes">
-      <span>
-        <span class="fas fa-exclamation"></span>
-        Route Changes
-      </span>
-    </router-link>
     <div class="version">
       <div class="demo version-section">
         <a href="https://github.com/wtg/shuttletracker" class="github-corner">
           <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 750 700" style="position: absolute; bottom: 0; border: 0; right: 0;">
             <g>
-              <image stroke="null" xlink:href="../../public/githublogo.png" id="svg_2" height="477.99998" width="636.00002" y="2.00001" x="2"/>
+              <image stroke="null" v-if="!darkThemeEnabled" xlink:href="../../public/githublogo.png" id="svg_2" height="477.99998" width="636.00002" y="2.00001" x="2"/>
+              <image stroke="null" v-if="darkThemeEnabled" xlink:href="../../public/dark-githublogo.png" id="svg_2" height="477.99998" width="636.00002" y="2.00001" x="2"/>
             </g>
-          </svg>          
+          </svg>
         </a>
       </div>
     </div>
@@ -46,11 +41,15 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import {DarkTheme} from '@/structures/theme';
 
 export default Vue.extend({
   computed: {
     etasEnabled(): boolean {
       return this.$store.state.settings.etasEnabled;
+    },
+    darkThemeEnabled(): boolean {
+      return DarkTheme.isDarkThemeVisible(this.$store.state);
     },
   },
 });
@@ -60,7 +59,7 @@ export default Vue.extend({
 @import "@/assets/vars.scss";
 ul {
   display: flex;
-  height: 50px;
+  height: 40px;
   position: fixed;
   bottom: 0;
   display: flex;
@@ -69,11 +68,11 @@ ul {
   justify-content: center;
   align-items: center;
   width: 100%;
-  border-top: 0.5px solid #eee;
-  box-shadow: 0 3px 8px 0 #ddd;
+  // border-top: 0.5px solid var(--color-bg-less);
+  box-shadow: 0 3px 8px 0 var(--color-bg-least);
   font-size: 13px;
   user-select: none;
-  background: white;
+  background: var(--color-bg-normal);
   text-align: center;
 }
 li {
@@ -82,14 +81,14 @@ li {
   height: 100%;
   padding: 5px 15px;
   margin: 0 5px;
-  border-top: 1px solid rgba(0, 0, 0, 0);
+  border-top: 1px solid rgba(var(--color-fg-strong-rgb), 0);
   position: relative;
   top: -0.5px;
   display: flex;
   align-items: center;
 }
 .router-link-exact-active {
-  border-top: 1px solid $primary;
-  color: $primary;
+  border-top: 1px solid var(--color-primary);
+  color: var(--color-primary);
 }
 </style>
