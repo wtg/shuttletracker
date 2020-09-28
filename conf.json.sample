@@ -17,5 +17,5 @@
   "Smooth": {
     "PredictUpdates": false,
     "PredictionInterval": "1s"
-  },
+  }
 }

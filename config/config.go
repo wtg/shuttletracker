@@ -41,6 +41,8 @@ func New() (*Config, error) {
 	}
 	cfg.Postgres = pgCfg
 
+	cfg.SmoothTrackingManager = smooth.NewConfig(v)
+
 	v.SetConfigName("conf")
 	v.AddConfigPath(".")
 	if err := v.ReadInConfig(); err != nil {
