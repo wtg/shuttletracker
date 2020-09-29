@@ -11,6 +11,7 @@ type Prediction struct {
 	VehicleID int64
 	Point     shuttletracker.Point
 	Index     int
+	Angle     float64
 }
 
 const earthRadius = 6371000.0 // meters
@@ -23,6 +24,10 @@ func toRadians(n float64) float64 {
 	return n * math.Pi / 180
 }
 
+func toDegrees(angle float64) float64 {
+	return angle * 180 / math.Pi
+}
+
 func DistanceBetween(p1, p2 shuttletracker.Point) float64 {
 	lat1Rad := toRadians(p1.Latitude)
 	lon1Rad := toRadians(p1.Longitude)
@@ -33,6 +38,24 @@ func DistanceBetween(p1, p2 shuttletracker.Point) float64 {
 		haversine(lat2Rad-lat1Rad)+
 			math.Cos(lat1Rad)*math.Cos(lat2Rad)*
 				haversine(lon2Rad-lon1Rad)))
+}
+
+func AngleBetween(p1, p2 shuttletracker.Point) float64 {
+	radLat1 := toRadians(p1.Latitude)
+	radLng1 := toRadians(p1.Longitude)
+	radLat2 := toRadians(p2.Latitude)
+	radLng2 := toRadians(p2.Longitude)
+
+	deltaLongitude := (radLng2 - radLng1)
+	y := math.Sin(deltaLongitude) * math.Cos(radLat2)
+	x := math.Cos(radLat1)*math.Sin(radLat2) - math.Sin(radLat1)*math.Cos(radLat2)*math.Cos(deltaLongitude)
+
+	brng := math.Atan2(y, x)
+	brng = toDegrees(brng)
+	brng = math.Mod(brng+360, 360)
+	brng = 360 - brng // Convert to counter-clockwise
+
+	return brng
 }
 
 // Returns the index of the closest point on the route to the given latitude and longitude coordinates
@@ -65,6 +88,7 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 	// Iterate over each point in the route in order, summing the distance between each point,
 	// and stop when the predicted distance has elapsed
 	elapsedDistance := 0.0
+	angle := 0.0
 	for elapsedDistance < predictedDistance {
 		prevIndex := index
 		index++
@@ -72,6 +96,7 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 			index = 0
 		}
 		elapsedDistance += DistanceBetween(route.Points[prevIndex], route.Points[index])
+		angle = AngleBetween(route.Points[prevIndex], route.Points[index])
 	}
-	return Prediction{VehicleID: vehicle.ID, Point: route.Points[index], Index: index}
+	return Prediction{VehicleID: vehicle.ID, Point: route.Points[index], Index: index, Angle: angle}
 }
