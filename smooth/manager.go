@@ -108,7 +108,7 @@ func (stm *SmoothTrackingManager) predictVehiclePosition(vehicleID int64) {
 		TrackerID: update.TrackerID,
 		Latitude:  prediction.Point.Latitude,
 		Longitude: prediction.Point.Longitude,
-		Heading:   update.Heading,
+		Heading:   prediction.Angle,
 		Speed:     update.Speed,
 		Time:      time.Now(),
 		RouteID:   &route.ID,
