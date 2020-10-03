@@ -20,6 +20,8 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
+var validBusButtonEmoji = [...]string{"🚐", "🚌", "🚗", "🚓", "🚜"};
+
 // Messages from clients must be in this envelope. Depending on Type, fusionManager
 // unmarshals Message into the associated type of struct. fusionManager also uses
 // this struct to send messages to clients.
@@ -311,7 +313,12 @@ func (fm *fusionManager) processMessage(cm clientMessage) {
 		fm.handleMsgPosition(fp)
 	case fusionBusButton:
 		fbb := cm.msg.(fusionBusButton)
-		fm.handleMsgBusButton(fbb)
+		for _, emoji := range validBusButtonEmoji {
+				if emoji == fbb.Emoji {
+						fm.handleMsgBusButton(fbb)
+						return
+				}
+		}
 	default:
 		// This is an error since it means that an unhandled message type was sent to
 		// the channel, probably by handleClient. This shouldn't happen, so please fix
