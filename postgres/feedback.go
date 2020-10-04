@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS forms (
 	topic text,
 	message text,
 	created timestamp with time zone NOT NULL DEFAULT now(),
-	read bool NOT NULL,
+	read bool NOT NULL
 );`
 	_, err := fs.db.Exec(schema)
 	return err
