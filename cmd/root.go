@@ -13,6 +13,7 @@ import (
 	"github.com/wtg/shuttletracker/eta"
 	"github.com/wtg/shuttletracker/log"
 	"github.com/wtg/shuttletracker/postgres"
+	"github.com/wtg/shuttletracker/spoofer"
 	"github.com/wtg/shuttletracker/updater"
 )
 
@@ -46,11 +47,19 @@ var rootCmd = &cobra.Command{
 		// User service
 		var us shuttletracker.UserService = pg
 
-		// Feedback service
+		// User service
 		var fdb shuttletracker.FeedbackService = pg
 
+		// Make spoofer
+		spoofer, err := spoofer.New(*cfg.Spoofer, ms)
+		if err != nil {
+			log.WithError(err).Error("Could not create spoofer.")
+			return
+		}
+		runner.Add(spoofer)
+
 		// Make shuttle position updater
-		updater, err := updater.New(*cfg.Updater, ms)
+		updater, err := updater.New(*cfg.Updater, ms, spoofer)
 		if err != nil {
 			log.WithError(err).Error("Could not create updater.")
 			return

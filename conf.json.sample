@@ -13,5 +13,9 @@
   },
   "Log": {
     "Level": "debug"
+  },
+  "Spoof": {
+    "SpoofUpdates": false,
+    "SpoofInterval": "10s"
   }
 }

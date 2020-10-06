@@ -1,70 +1,110 @@
 <template>
   <div class="parent content">
-    <h2>Spring 2020 Route Changes</h2>
-    <h3>The Changes</h3>
-    <p>Starting January 2020 the current East and West route system will be changed to include three routes: North, South, and West. An image of the new routes is shown below. The new routes can additionally be viewed on the Tracker by toggling them in the <a href="/settings">/settings</a> page.</p>
+    <h2>Important Notes and Changes for Fall 2020</h2>
+    <h3>What's New</h3>
+    <p>
+      Given the current events, there have been some substantial changes made to the Shuttle routes and the Shuttle system to help keep Covid-19 in check. 
+      This page serves to detail the changes that have been made this semester along with general question both answered and unanswered by Parking & Transporation. 
+      If you have any additional questions, feel free to contact FSC Chair Cait Bennett (<a href="mailto:bennec6@rpi.edu">bennec6@rpi.edu</a>) or 
+      WTG Chair Sean Heffernan (<a href="mailto:heffes2@rpi.edu">heffes2@rpi.edu</a>)
+    </p>
 
-    <p>All Shuttle hours will remain the same. These route changes will be occurring only apply for Weekdays, the current East and West routes will remain on Weekends.</p>
+    <h4><strong>Schedule Changes</strong></h4>
+    <p>There will be no set schedule, or "paper schedule" this semester.</p>
 
-    <p>The overall goal of these changes was to reduce shuttle loop time, remove underutilized stops, and add stops where there is current demand.</p>
+    <p>There will be no on call Shuttle this Fall. Alternatives include Safe Ride, which runs from 7pm - 12am this Fall 
+      (<a href="https://info.rpi.edu/safe-ride" target="_blank">Safe Ride Info</a>).</p>
 
-    <p><strong>Note</strong>: These changes were updated on 12/23/2019. West route will now travel down Congress (instead of College Ave), and stops have been added at Winslow (5), West Hall (6), and Georgian Ct (13).</p>
-
-    <img src="https://i.imgur.com/kQfvzxn.png"/>
-    <br>
     <div id="text">
-    <p><strong>West Route</strong>
-        <br>
-        <br>1. CBIS stop added by crosswalk
-        <br>2. Polytech stop moved to northwest corner of intersection of 15th St and Congress St (Polytech Transfer)
-        <br>3. The City Station stop moved across the street to City Station East by the parking garage entrance
-        <br>4. Blitman Commons stop is moving to the bus shelter on 6th Ave
-        <br>5. Winslow stop added at north side of building facing parking lot
-        <br>6. West Hall stop added in front of West Hall lot
-        <br>7. Troy stop moved to the east end of Ricketts building (Ricketts Transfer)
-        <br>
+    <p>The hours of operation for Shuttles this semester are as follows:</p>
+    <p id="schedules">
+      <strong>On Campus:</strong>
+      <br>7am - 11:45pm (Weekdays)
+      <br>9am - 11:45pm (Saturday)
+      <br>9am - 8pm (Sunday)
+      <br><strong>College Suites:</strong>
+      <br>7am - 7pm (All Week)
+      <br><strong>CDTA Express</strong>
+      <br>7am - 7pm (Weekdays)
     </p>
-    <p><strong>North Route</strong>
-        <br>
-        <br>8. All stops along Sage Ave are being merged to in front of E-Complex
-        <br>9. 9th St and Sage Ave will stop on 9th St
-        <br>10. Alumni House stop is moving across the street to in front of the Alumni House
-        <br>11. Beman Park stop added at 15th St and Jacob St
-        <br>12. Colonie stop moved to directly in front of Colonie A on street
-        <br>13. Stop on Georgian Ct added
-        <br>14. Brinsmade Terrace, Sunset Terrace 1, and Sunset Terrace 2 are unchanged
-        <br>15. E Lot stop is moving to the intersection of Cook Dr and Sunset Terrace
-        <br>16. B Lot stop added by bus shelter
-        <br>
-    </p>
-    <p><strong>South Route</strong>
-        <br>
-        <br>17. B Lot stop added by bus shelter
-        <br>18. LXA stop is moving to the southwest corner of the intersection of Cook Dr and Sunset Terrace
-        <br>19. Tibbits Ave stop is moving to intersection of Tibbits Ave and Orchard Ave
-        <br>20. Polytech stop added in front of Muza
-        <br>21. 15th St and College St stop added in front of Fire House</p>
+    <p>Weekend times for On Campus shuttles are subject to change due to Safe Ride scheduling. This page will be updated as necessary.</p>
+    <p>Please note that this information can also be viewed on Shuttle Tracker's <a href="/schedules">/schedules</a> page.</p>
     </div>
 
-    <h3>Credit</h3>
-    <p>These changes were designed and proposed by the Facilities and Services Committee of the Student Senate in collaboration with Parking and Transportation. Thank you to all members of FSC for their work over the past several months and to Parking and Transportation for being extremely receptive to feedback and very willing to make these changes.</p>
+    <h4><strong>COVID Precautions</strong></h4>
+    <p>
+      <strong>Students and drivers will be required to wear masks at all times and must show RPI ID prior to boarding.</strong>
+    </p>
+    <p>
+      Capacity of the Shuttles are capped at 9 students. Plexi barriers have been installed between each row in the Shuttle
+    </p>
+    <p>
+      Shuttle Drivers will be provided with PPE.
+    </p>
+      
+
+    <h4><strong>Important Route Changes</strong></h4>
+    <p>There will only be two Shuttle routes this semester: North and West, which will be reflected on the Shuttle Tracker.</p>
+    <div id="text">
+      <p>The following stops have been removed from North Route:
+        <br>1. 9th/Sage
+        <br>2. 13th/Peoples
+        <br>3. Georgian
+        <br>4. LXA
+      </p>
+      <p>The following stops have been removed from West Route:
+        <br>1. CBIS
+        <br>2. 15th/College
+        <br>3. Winslow
+        <br>4. West Hall
+      </p>
+      <p>
+        According to the Department of Parking & Transportation, these stops were removed because of limitations on CDTA busses, the 
+        unknown and dynamic quantity of off-campus students and to maximize effiency of vehicles and rider density (given the limited 
+        capacity of the shuttles).
+      </p>
+    </div>
+
+    <h4><strong>Hudson Valley College Suites Shuttles</strong></h4>
+    <p>
+      To ease transportation for students living at College Suites in Hudson Valley, two temporary shuttles will be running back and forth between 
+      Hudson Valley College Suites and Campus.
+    </p>
+    <p>The shuttle will stop at the front door of College Suites and travel to the Student Union.</p>
+    <p>Please note that these buses will <strong>NOT</strong> be tracked by Shuttle Tracker!</p>
+
+    <h4><strong>CDTA Express Route</strong></h4>
+    <p>An express route will be offerred Monday to Friday 7:00am - 7:00pm aboard two RPI student only CDTA buses.</p>
+    <p>
+      Bus route will be Student Union &rarr; Houston Field House &rarr; 15th & Peoples &rarr; Ricketts &rarr; Blitman Bus Stop &rarr; Ricketts &rarr; Student Union.
+      A more in depth schedule for the CDTA route can be found <a href="../../../static/F20_CDTA_Express_Schedule.pdf">here</a>.
+    </p>
+    <p>Occupancy will be limited to 26 riders, masks and RPI IDs are required.</p>
+    <p>Please note that these buses will <strong>NOT</strong> be tracked by Shuttle Tracker!</p>
+
+    <h3>FAQ</h3>
+    <p>
+      We are working to clarify certain elements of the shuttle system with the Department of Parking and Transportation, and will update 
+      this document as more information becomes available. Some of these questions include:
+      <br>How many Shuttles will be running on each route?
+      <br>More details about weekend Shuttle Schedule/Safe Ride
+    </p>
+
+    <p>
+      As always, if you have any questions, feel free to contact FSC Chair Cait Bennett (<a href="mailto:bennec6@rpi.edu">bennec6@rpi.edu</a>) 
+      or WTG Chair Sean Heffernan (<a href="mailto:heffes2@rpi.edu">heffes2@rpi.edu</a>)
+    </p>
+
+    
+    <p class="u">Student Senate</p>
+    <p>
+      Cait Bennett, Facilities and Services Chair <br>
+      Sean Heffernan, Web Technologies Group Chair<br>
+    </p>
     <p class="u">Parking and Transportation</p>
+    <p>
       Michael Ramella, Director of Parking and Transportation and Auxiliary Services<br>
       Brent Shako, Operations Manager
-    </p>
-    <p class="u">Facilities and Services Committee</p>
-    <p>
-      Nick Dybas, Facilities and Services Chair <br>
-      Izzy Dashiell, Transportation Subcommittee Chair<br>
-      Evan Lazaro, Web Technologies Group Chair<br>
-      Tejas Narayan<br>
-      Colleen Corrigan<br>
-      Iris Erlanger<br>
-      Cait Bennett<br>
-      Neha Keshan<br>
-      Noah Cohen<br>
-      Gretchen Forbush<br>
-      Jakob Waryas<br>
     </p>
 
   </div>
@@ -95,5 +135,8 @@ img{
   max-width: 60em;
   margin-left:auto;
   margin-right:auto;
+}
+#schedules {
+  text-align: center;
 }
 </style>
