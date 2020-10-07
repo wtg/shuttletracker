@@ -19,7 +19,7 @@
     "SpoofInterval": "10s"
   },
   "Smooth": {
-    "PredictUpdates": false,
+    "PredictUpdates": true,
     "PredictionInterval": "1s"
   }
 }

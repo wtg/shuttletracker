@@ -21,6 +21,7 @@ type SmoothTrackingManager struct {
 	vehicleIDs         []int64
 	sm                 *sync.Mutex
 	subscribers        []func(Prediction)
+	stopIDS            []int64
 }
 
 type Config struct {

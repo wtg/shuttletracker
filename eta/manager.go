@@ -96,7 +96,7 @@ func (em *ETAManager) calculateVehicleETAs(vehicleID int64) (*shuttletracker.Veh
 		return nil, err
 	}
 
-	lastDepartureTrack, err := em.getLastDepartureTrack(vehicle, route)
+	lastDepartureTrack, err := em.GetLastDepartureTrack(vehicle, route)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func (em *ETAManager) calculateVehicleETAs(vehicleID int64) (*shuttletracker.Veh
 	}
 
 	// find index of stop zone on the route the vehicle is nearest to
-	locIndices, err := em.determineNearestStopIndicesAlongRoute(lastDepartureTrack, route)
+	locIndices, err := em.DetermineNearestStopIndicesAlongRoute(lastDepartureTrack, route)
 	if err != nil {
 		return nil, err
 	}
@@ -473,7 +473,7 @@ func (em *ETAManager) findRouteLoops(route *shuttletracker.Route) ([][]*shuttlet
 }
 
 // WARNING: this assumes that the initial stop only occurs on a route _once_!
-func (em *ETAManager) getLastDepartureTrack(vehicle *shuttletracker.Vehicle, route *shuttletracker.Route) ([]*shuttletracker.Location, error) {
+func (em *ETAManager) GetLastDepartureTrack(vehicle *shuttletracker.Vehicle, route *shuttletracker.Route) ([]*shuttletracker.Location, error) {
 	since := time.Now().Add(time.Minute * -30)
 	locs, err := em.ms.LocationsSince(vehicle.ID, since)
 	if err != nil {
@@ -626,7 +626,7 @@ func (em *ETAManager) stopsVisitedInOrder(route *shuttletracker.Route, locs []*s
 	return true, nil
 }
 
-func (em *ETAManager) determineNearestStopIndicesAlongRoute(track []*shuttletracker.Location, route *shuttletracker.Route) ([]int, error) {
+func (em *ETAManager) DetermineNearestStopIndicesAlongRoute(track []*shuttletracker.Location, route *shuttletracker.Route) ([]int, error) {
 	if len(track) < 1 {
 		return []int{}, nil
 	}

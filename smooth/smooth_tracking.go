@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/wtg/shuttletracker"
+	eta "/Users/tearls/Documents/shuttletracker/eta"
 )
 
 type Prediction struct {
@@ -72,6 +73,8 @@ func ClosestPointTo(latitude, longitude float64, route *shuttletracker.Route) in
 	return index
 }
 
+
+
 // Naive algorithm to predict the position a shuttle is at, given the last update received
 // Returns the index of the point the shuttle would be at on its route
 // TODO: More factors this algorithm should consider: shuttle's proximity to a stop, whether
@@ -84,6 +87,29 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 	// the distance the shuttle is predicted to have travelled
 	secondsSinceUpdate := time.Since(lastUpdate.Time).Seconds()
 	predictedDistance := secondsSinceUpdate * lastUpdate.Speed
+	
+	// if we are within the radius of a stop.
+	
+	lastDepartureTrack, err1 := eta.GetLastDepartureTrack(vehicle, route);
+
+	locIndices, err2 := eta.DetermineNearestStopIndicesAlongRoute(lastDepartureTrack, route)
+	
+	/*if err1 == nil || err2 == nil { 
+
+	}
+	else {
+		closeToStop = false
+	}
+	*/
+
+
+	//func (em *ETAManager) findStopZoneIndices(route *shuttletracker.Route, locs []*shuttletracker.Location) ([]int, error) {
+		//find out if our current location is near a stop zone
+		// Make sure we are heading toward it
+		//if it is, then we modify 
+	
+	// so we'd modify lastUpdate.Speed depending if we were close to a stop, given index
+	// the multiplier on speed depends on how close we are to a stop
 
 	// Iterate over each point in the route in order, summing the distance between each point,
 	// and stop when the predicted distance has elapsed
