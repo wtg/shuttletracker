@@ -46,7 +46,7 @@ func (fs *FeedbackService) Form(id int64) (*shuttletracker.Form, error) {
 func (fs *FeedbackService) Forms() ([]*shuttletracker.Form, error) {
 	forms := []*shuttletracker.Form{}
 	query := "SELECT f.id, f.topic, f.created, f.message, f.read" +
-		" FROM forms s;"
+		" FROM forms f;"
 	rows, err := fs.db.Query(query)
 	if err != nil {
 		return nil, err
