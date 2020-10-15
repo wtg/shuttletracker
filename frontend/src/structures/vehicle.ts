@@ -4,6 +4,7 @@ import Location from '@/structures/location';
 import getMarkerString from '@/structures/leaflet/rotatedMarker';
 import getCardinalDirection from '@/structures/cardinalDirection';
 import 'leaflet-rotatedmarker';
+import 'leaflet.marker.slideto';
 
 // vehicles are hidden when their most recent location update becomes this old
 const tinycolor = require('tinycolor2');
@@ -157,9 +158,9 @@ export default class Vehicle {
         if (this.Route !== undefined && this.pointIndex !== null) {
             this.continueMoving();
         }
-        // this.lat = lat;
-        // this.lng = lng;
-        // (this.marker as any).slideTo([this.lat, this.lng], { duration: 1000, keepAtCenter: false });
+        /*this.lat = lat;
+        this.lng = lng;
+        (this.marker as any).slideTo([this.lat, this.lng], { duration: 1000, keepAtCenter: false });*/
     }
 
     public continueMoving() {
@@ -178,16 +179,18 @@ export default class Vehicle {
                 this.lng = this.destinationLng;
                 this.endPointIndex = null;
             }
-            console.log('this.lat, this.lng: ' + this.lat + ', ' + this.lng);
-            console.log('marker latlng: ' + this.marker.getLatLng());
-            const transitionDistance = this.marker.getLatLng().distanceTo(L.latLng(this.lat, this.lng));
-            const transitionRatio = transitionDistance / this.totalTransitionDistance;
-            const transitionTime = Math.round(transitionRatio * 5000); // 5 s (5000 ms) for the total transition
-            console.log('transition time: ' + transitionTime + ' / ' + transitionDistance + ' = ' + transitionRatio + ' * 5000 = ' + transitionTime);
-            const newAngle = this.angleBetween(this.marker.getLatLng().lat, this.marker.getLatLng().lng, this.lat, this.lng);
-            console.log('new angle: ' + newAngle);
-            this.marker.setRotationAngle(newAngle);
-            (this.marker as any).slideTo([this.lat, this.lng], { duration: transitionTime, keepAtCenter: false });
+            if (!this.marker.getLatLng().equals(L.latLng(this.lat, this.lng))) {
+                console.log('this.lat, this.lng: ' + this.lat + ', ' + this.lng);
+                console.log('marker latlng: ' + this.marker.getLatLng());
+                const transitionDistance = this.marker.getLatLng().distanceTo(L.latLng(this.lat, this.lng));
+                const transitionRatio = transitionDistance / this.totalTransitionDistance;
+                const transitionTime = Math.round(transitionRatio * 5000); // 5 s (5000 ms) for the total transition
+                console.log('transition time: ' + transitionTime + ' / ' + transitionDistance + ' = ' + transitionRatio + ' * 5000 = ' + transitionTime);
+                const newAngle = this.angleBetween(this.marker.getLatLng().lat, this.marker.getLatLng().lng, this.lat, this.lng);
+                console.log('new angle: ' + newAngle);
+                this.marker.setRotationAngle(newAngle);
+                (this.marker as any).slideTo([this.lat, this.lng], { duration: transitionTime, keepAtCenter: false });
+            }
         }
     }
 
