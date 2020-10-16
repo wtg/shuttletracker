@@ -81,6 +81,7 @@ func (stm *SmoothTrackingManager) predict() {
 		wg.Add(1)
 		go func(id int64) {
 			stm.predictVehiclePosition(id)
+			wg.Done()
 		}(id)
 	}
 	wg.Wait()
