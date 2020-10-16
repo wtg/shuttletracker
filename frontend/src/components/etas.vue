@@ -22,12 +22,12 @@
                 <template v-for="(eta) in etas">
                     <tr v-for="(info, i) in eta" v-bind:key="`${i}-${info.stopID}`">
                         <td> 
-                            <font style="color:" + this.colors.get(info.routeID)> &#9830; </font> {{ info.vehicleID }}
+                            <font style="color:" + info.color> &#9830; </font> {{ info.vehicleID }}
                         </td>
-                        <td>{{ this.stops.get(info.stopID) }}</td>
+                        <td>{{ info.stopName }}</td>
                         <td>{{ info.eta }}</td>
                         <td>{{ info.arriving }}</td>
-                        <td>{{ this.posts.get(info.routeID) }}</td>
+                        <td>{{ info.routeName }}</td>
                     </tr>
                 </template>
             </tbody>
@@ -45,7 +45,7 @@ import axios from 'axios';
 export default Vue.extend({
     data() {
         return {
-            posts: new Map(),
+            routes: new Map(),
             colors: new Map(),
             stops: new Map(),
          };
@@ -60,12 +60,11 @@ export default Vue.extend({
                     dictionary.set(x.id, x.name);
                     dictionary2.set(x.id, x.color);
                 });
-                console.log(dictionary);
-                this.posts = dictionary;
-                console.log(this.posts.get(21));
-                console.log(dictionary2);
+
+                this.routes = dictionary;
                 this.colors = dictionary2;
-                console.log(this.colors.get(21));
+                console.log(this.routes);
+                console.log(this.colors);
 
                 // this.posts = response.data;
                 // console.log(this.posts);
@@ -79,9 +78,9 @@ export default Vue.extend({
                 response.data.forEach((x: any) => {
                     dictionary.set(x.id, x.name);
                 });
-                console.log(dictionary);
                 this.stops = dictionary;
-                console.log(this.stops.get(21));
+                console.log(this.stops);
+                // console.log(this.stops.get(21));
                 // this.posts = response.data;
                 // console.log(this.posts);
                 // console.log(this.posts[0].name);
@@ -121,7 +120,10 @@ export default Vue.extend({
                                 arriving: eta.arriving,
                                 vehicleID: eta.vehicleID,
                                 stopID: eta.stopID,
+                                stopName: this.stops.get(eta.stopID),
                                 routeID: eta.routeID,
+                                routeName: this.routes.get(eta.routeID),
+                                routeColor: this.colors.get(eta.routeID),
                             };
                             if (elapsed >= 0) {
                                 ret.push(e);
