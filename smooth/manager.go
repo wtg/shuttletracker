@@ -17,25 +17,31 @@ type SmoothTrackingManager struct {
 	predictions        map[int64]*Prediction
 	predictionInterval time.Duration
 	predictUpdates     bool
+	debugMode 		   bool
 	updates            map[int64]*shuttletracker.Location
 	vehicleIDs         []int64
 	sm                 *sync.Mutex
 	subscribers        []func(Prediction)
+	averageDifference  float64
+	numDifferences     int
 }
 
 type Config struct {
 	PredictionInterval string
 	PredictUpdates     bool
+	DebugMode		   bool
 }
 
 func NewConfig(v *viper.Viper) *Config {
 	cfg := &Config{
 		PredictUpdates:     true,
 		PredictionInterval: "1s",
+		DebugMode: 			true,
 	}
 
 	v.SetDefault("smooth.predictupdates", cfg.PredictUpdates)
 	v.SetDefault("smooth.predictioninterval", cfg.PredictionInterval)
+	v.SetDefault("smooth.debugmode", cfg.DebugMode)
 
 	return cfg
 }
@@ -57,6 +63,7 @@ func NewManager(cfg Config, ms shuttletracker.ModelService, updater *updater.Upd
 	}
 	stm.predictionInterval = interval
 	stm.predictUpdates = cfg.PredictUpdates
+	stm.debugMode = cfg.DebugMode
 
 	// Subscribe to new Locations with Updater
 	updater.Subscribe(stm.locationSubscriber)
@@ -160,10 +167,14 @@ func (stm *SmoothTrackingManager) locationSubscriber(loc *shuttletracker.Locatio
 		stm.vehicleIDs[len(stm.vehicleIDs)-1] = 0
 		stm.vehicleIDs = stm.vehicleIDs[:len(stm.vehicleIDs)-1]
 	}
-
+	
 	stm.sm.Lock()
 	prediction, exists := stm.predictions[*loc.VehicleID]
 	stm.sm.Unlock()
+
+	if ! exists {
+		log.Debugf("THERE IS NO PRIOR UPDATE TO BASE ON. DELETED?")
+	}
 
 	// Output comparison between predicted and actual position
 	if exists {
@@ -173,5 +184,13 @@ func (stm *SmoothTrackingManager) locationSubscriber(loc *shuttletracker.Locatio
 		log.Debugf("Predicted: %d, (%f, %f)", prediction.Index, prediction.Point.Latitude, prediction.Point.Longitude)
 		log.Debugf("Actual: %d, (%f, %f)", index, loc.Latitude, loc.Longitude)
 		log.Debugf("Difference: %d points or %f meters", diffIndex, diffDistance)
+	
+		// add statistics code to calculate stats
+		if stm.debugMode {
+			stm.numDifferences += 1
+			stm.averageDifference = stm.averageDifference + (diffDistance - stm.averageDifference) / float64(stm.numDifferences)
+			log.Debugf("Average Difference is %f", stm.averageDifference)
+			log.Debugf("Number of Differences is %d", stm.numDifferences)
+		}
 	}
 }
