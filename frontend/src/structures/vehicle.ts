@@ -147,15 +147,17 @@ export default class Vehicle {
             this.marker.setLatLng(L.latLng(lat, lng));
             return;
         }
-        console.log('Starting: ' + this.id);
+        console.log(this.id + ': Starting');
         this.destinationLat = lat;
         this.destinationLng = lng;
         if (this.pointIndex === null) {
             this.updateClosestStartingPoint();
         }
         this.updateClosestDestinationPoint();
-        console.log('Just set closest points: ' + this.id + ' route: ' + this.Route + ' route id: ' + this.RouteID + ' point index: ' + this.pointIndex + ' end point index: ' + this.endPointIndex);
-        if (this.Route !== undefined && this.pointIndex !== null) {
+        console.log(this.id + ': Destination lat/lng: ' + lat + ' ' + lng);
+        console.log(this.id + ': Start point index: ' + this.pointIndex);
+        console.log(this.id + ': End point index: ' + this.endPointIndex);
+        if (this.Route !== undefined && this.pointIndex !== null  && this.endPointIndex !== null) {
             this.continueMoving();
         }
         /*this.lat = lat;
@@ -164,9 +166,9 @@ export default class Vehicle {
     }
 
     public continueMoving() {
-        console.log('Continuing: ' + this.id + ' route: ' + this.Route + ' route id: ' + this.RouteID + ' point index: ' + this.pointIndex);
+        console.log(this.id + ': Continuing: pointIndex: ' + this.pointIndex);
         if (this.Route !== undefined && this.pointIndex !== null && this.endPointIndex !== null) {
-            if (this.pointIndex < this.endPointIndex) {
+            if (this.pointIndex !== this.endPointIndex) {
                 const point = this.Route.points[this.pointIndex];
                 this.lat = point.latitude;
                 this.lng = point.longitude;
@@ -180,22 +182,24 @@ export default class Vehicle {
                 this.endPointIndex = null;
             }
             if (!this.marker.getLatLng().equals(L.latLng(this.lat, this.lng))) {
-                console.log('this.lat, this.lng: ' + this.lat + ', ' + this.lng);
-                console.log('marker latlng: ' + this.marker.getLatLng());
                 const transitionDistance = this.marker.getLatLng().distanceTo(L.latLng(this.lat, this.lng));
                 const transitionRatio = transitionDistance / this.totalTransitionDistance;
                 const transitionTime = Math.round(transitionRatio * 5000); // 5 s (5000 ms) for the total transition
-                console.log('transition time: ' + transitionTime + ' / ' + transitionDistance + ' = ' + transitionRatio + ' * 5000 = ' + transitionTime);
+                // console.log('transition time: ' + transitionTime + ' / ' + transitionDistance + ' = ' + transitionRatio + ' * 5000 = ' + transitionTime);
                 const newAngle = this.angleBetween(this.marker.getLatLng().lat, this.marker.getLatLng().lng, this.lat, this.lng);
-                console.log('new angle: ' + newAngle);
+                // console.log('new angle: ' + newAngle);
                 this.marker.setRotationAngle(newAngle);
+                console.log(this.id + ': Moving to ' + this.lat + ' ' + this.lng);
                 (this.marker as any).slideTo([this.lat, this.lng], { duration: transitionTime, keepAtCenter: false });
+            } else {
+                this.continueMoving();
             }
+        } else {
+            console.log(this.id + ': Stopping at ' + this.marker.getLatLng().lat + ' ' + this.marker.getLatLng().lng);
         }
     }
 
     public updateClosestStartingPoint() {
-        console.log('updating closest starting point: id: ' + this.id + ' route: ' + this.Route + ' route id: ' + this.RouteID);
         if (this.Route !== undefined) {
             // Find closest point index to the vehicle's current position
             let minDistance = -1.0;
@@ -210,7 +214,6 @@ export default class Vehicle {
     }
 
     public updateClosestDestinationPoint() {
-        console.log('updating closest destination point id: ' + this.id + ' route: ' + this.Route + ' route id: ' + this.RouteID);
         if (this.Route !== undefined) {
             if (this.pointIndex !== null) {
                 this.totalTransitionDistance = 0.0;
@@ -221,7 +224,6 @@ export default class Vehicle {
                 }
                 let distanceToNextPoint = this.marker.getLatLng().distanceTo(L.latLng(this.Route.points[currentPointIndex].latitude, this.Route.points[currentPointIndex].longitude));
                 while (distanceToNextPoint < L.latLng(this.Route.points[currentPointIndex].latitude, this.Route.points[currentPointIndex].longitude).distanceTo(L.latLng(this.destinationLat, this.destinationLng))) {
-                    console.log('Vehicle ' + this.id + ': ' + distanceToNextPoint + ' < ' + L.latLng(this.Route.points[currentPointIndex].latitude, this.Route.points[currentPointIndex].longitude).distanceTo(L.latLng(this.destinationLat, this.destinationLng)));
                     this.totalTransitionDistance += distanceToNextPoint;
                     currentPointIndex = nextPointIndex;
                     nextPointIndex++;
