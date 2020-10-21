@@ -36,6 +36,7 @@ export default class Vehicle {
     private destinationLat: number;
     private destinationLng: number;
     private totalTransitionDistance: number;
+    private finalHeading: number;
 
     constructor(id: number, name: string, created: Date, updated: Date, enabled: boolean, trackerID: number) {
         this.id = id;
@@ -66,6 +67,7 @@ export default class Vehicle {
         this.destinationLat = 0;
         this.destinationLng = 0;
         this.totalTransitionDistance = 0;
+        this.finalHeading = 0;
     }
 
     public getMessage(): string {
@@ -109,6 +111,7 @@ export default class Vehicle {
     public setHeading(heading: number) {
         this.marker.setRotationAngle(heading - 45);
         this.marker.bindPopup(this.getMessage());
+        this.finalHeading = heading - 45;
     }
 
     public setRoute(r: Route | undefined, darkEnabled: boolean) {
@@ -188,13 +191,14 @@ export default class Vehicle {
                 // console.log('transition time: ' + transitionTime + ' / ' + transitionDistance + ' = ' + transitionRatio + ' * 5000 = ' + transitionTime);
                 const newAngle = this.angleBetween(this.marker.getLatLng().lat, this.marker.getLatLng().lng, this.lat, this.lng);
                 // console.log('new angle: ' + newAngle);
-                this.marker.setRotationAngle(newAngle);
+                this.marker.setRotationAngle(newAngle - 45);
                 console.log(this.id + ': Moving to ' + this.lat + ' ' + this.lng);
                 (this.marker as any).slideTo([this.lat, this.lng], { duration: transitionTime, keepAtCenter: false });
             } else {
                 this.continueMoving();
             }
         } else {
+            this.marker.setRotationAngle(this.finalHeading);
             console.log(this.id + ': Stopping at ' + this.marker.getLatLng().lat + ' ' + this.marker.getLatLng().lng);
         }
     }
@@ -255,7 +259,7 @@ export default class Vehicle {
         let brng = Math.atan2(y, x);
         brng = this.toDegrees(brng);
         brng = (brng + 360) % 360;
-        brng = 360 - brng; // count degrees counter-clockwise - remove to make clockwise
+        // brng = 360 - brng; // count degrees counter-clockwise - remove to make clockwise
 
         return brng;
     }
