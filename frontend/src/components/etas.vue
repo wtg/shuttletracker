@@ -63,12 +63,8 @@ export default Vue.extend({
 
                 this.routes = dictionary;
                 this.colors = dictionary2;
-                console.log(this.routes);
-                console.log(this.colors);
-
-                // this.posts = response.data;
-                // console.log(this.posts);
-                // console.log(this.posts[0].name);
+                // console.log(this.routes);
+                // console.log(this.colors);
             })
             .catch((error) => console.log(error));
         axios
@@ -79,11 +75,7 @@ export default Vue.extend({
                     dictionary.set(x.id, x.name);
                 });
                 this.stops = dictionary;
-                console.log(this.stops);
-                // console.log(this.stops.get(21));
-                // this.posts = response.data;
-                // console.log(this.posts);
-                // console.log(this.posts[0].name);
+                // console.log(this.stops);
             })
             .catch((error) => console.log(error));
     },
