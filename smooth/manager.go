@@ -191,5 +191,9 @@ func (stm *SmoothTrackingManager) locationSubscriber(loc *shuttletracker.Locatio
 		}
 	}
 
-	
+	if stm.debugMode {
+		log.Debugf("Current number of predictions so far is %d", stm.numDifferences)
+		log.Debugf("Average Difference is %f", stm.averageDifference)
+		log.Debugf("Number of Differences is %d", stm.numDifferences)
+	}
 }
