@@ -73,8 +73,7 @@ func ClosestPointTo(latitude, longitude float64, route *shuttletracker.Route) in
 }
 
 //Returns the index of the closest stop (from ms.Stops()) to the given latitude and longitude coordinates
-func ClosestStop(latitude, longitude float64, route *shuttletracker.Route, ms shuttletracker.ModelService) int {
-	currentIndex := ClosestPointTo(latitude, longitude , route ) 
+func ClosestStop(currentIndex int, route *shuttletracker.Route, ms shuttletracker.ModelService) int {
 	minDistance := math.MaxFloat64
 	minDistanceStopIndex := 0
 	i := 0
@@ -100,6 +99,8 @@ func ClosestStop(latitude, longitude float64, route *shuttletracker.Route, ms sh
 	}
 	return  minDistanceStopIndex
 }
+
+//distance between stop and current location
 
 // Naive algorithm to predict the position a shuttle is at, given the last update received
 // Returns the index of the point the shuttle would be at on its route
