@@ -191,7 +191,7 @@ export default class Vehicle {
                 // console.log('transition time: ' + transitionTime + ' / ' + transitionDistance + ' = ' + transitionRatio + ' * 5000 = ' + transitionTime);
                 const newAngle = this.angleBetween(this.marker.getLatLng().lat, this.marker.getLatLng().lng, this.lat, this.lng);
                 // console.log('new angle: ' + newAngle);
-                this.marker.setRotationAngle(newAngle - 45);
+                this.marker.setRotationAngle(newAngle);
                 console.log(this.id + ': Moving to ' + this.lat + ' ' + this.lng);
                 (this.marker as any).slideTo([this.lat, this.lng], { duration: transitionTime, keepAtCenter: false });
             } else {
@@ -259,9 +259,8 @@ export default class Vehicle {
         let brng = Math.atan2(y, x);
         brng = this.toDegrees(brng);
         brng = (brng + 360) % 360;
-        // brng = 360 - brng; // count degrees counter-clockwise - remove to make clockwise
 
-        return brng;
+        return brng - 45;
     }
 
     public toDegrees(angle: number) {
