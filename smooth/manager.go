@@ -176,5 +176,15 @@ func (stm *SmoothTrackingManager) locationSubscriber(loc *shuttletracker.Locatio
 		log.Debugf("Predicted: %d, (%f, %f)", prediction.Index, prediction.Point.Latitude, prediction.Point.Longitude)
 		log.Debugf("Actual: %d, (%f, %f)", index, loc.Latitude, loc.Longitude)
 		log.Debugf("Difference: %d points or %f meters", diffIndex, diffDistance)
+
+		// add statistics code to calculate stats
+		if stm.debugMode {
+			stm.numDifferences += 1
+			stm.averageDifference = stm.averageDifference + (diffDistance - stm.averageDifference) / float64(stm.numDifferences)
+			log.Debugf("Average Difference is %f", stm.averageDifference)
+			log.Debugf("Number of Differences is %d", stm.numDifferences)
+		}
 	}
+
+	
 }
