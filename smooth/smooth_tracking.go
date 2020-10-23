@@ -99,6 +99,24 @@ func ClosestStop(currentIndex int, route *shuttletracker.Route, ms shuttletracke
 	}
 	return  minDistanceStopIndex
 }
+// based on the current position of the shuttler tracker, return true if it is moving toward the stop location and return false if it is moving away from the stop location
+func HeadingTowardTowardOrLeavingStop(currentIndex int, stopIndex int,  route *shuttletracker.Route,  ms shuttletracker.ModelService) bool {
+	stops, _ := ms.Stops()
+	stopRouteIndex := ClosestPointTo( stops[stopIndex].Latitude, stops[stopIndex].Longitude, route)
+	//what to do if they are the same
+	if (currentIndex <= stopRouteIndex) {
+		if (stopRouteIndex - currentIndex < len(route.Points)/2 ) {
+			return true
+		}
+
+	}
+	if (currentIndex > stopRouteIndex) {
+		if (currentIndex - stopRouteIndex > len(route.Points)/2 ) {
+			return true
+		}
+	}
+	return false
+}
 
 //distance between stop and current location
 
