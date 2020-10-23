@@ -89,6 +89,8 @@ func (stm *SmoothTrackingManager) predict() {
 
 // Use the prediction algorithm to make a prediction of this vehicle's current location, create a new location, and send to handleNewPrediction for further processing
 func (stm *SmoothTrackingManager) predictVehiclePosition(vehicleID int64) {
+	log.Debugf("\n\n\n\n\n\nHERE\n\n\n\n\n");
+	
 	vehicle, err := stm.ms.Vehicle(vehicleID)
 	if err != nil {
 		log.WithError(err).Errorf("Cannot get vehicle %d for prediction", vehicleID)
