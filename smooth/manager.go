@@ -17,20 +17,25 @@ type SmoothTrackingManager struct {
 	predictions        map[int64]*Prediction
 	predictionInterval time.Duration
 	predictUpdates     bool
+	debugMode          bool
 	updates            map[int64]*shuttletracker.Location
 	vehicleIDs         []int64
 	sm                 *sync.Mutex
 	subscribers        []func(Prediction)
+	numDifferences     int
+	averageDifference  float64
 }
 
 type Config struct {
 	PredictionInterval string
 	PredictUpdates     bool
+	DebugMode          bool
 }
 
 func NewConfig(v *viper.Viper) *Config {
 	cfg := &Config{
 		PredictUpdates:     true,
+		DebugMode:          true,
 		PredictionInterval: "1s",
 	}
 
