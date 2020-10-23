@@ -143,6 +143,12 @@ export default class Vehicle {
 
     }
 
+    public setLatLngImmediate(lat: number, lng: number) {
+        this.lat = lat;
+        this.lng = lng;
+        this.marker.setLatLng([this.lat, this.lng]);
+    }
+
     public setLatLng(lat: number, lng: number) {
         if (this.lat === 0 || this.lng === 0) {
             this.lat = lat;
@@ -163,9 +169,6 @@ export default class Vehicle {
         if (this.Route !== undefined && this.pointIndex !== null  && this.endPointIndex !== null) {
             this.continueMoving();
         }
-        /*this.lat = lat;
-        this.lng = lng;
-        (this.marker as any).slideTo([this.lat, this.lng], { duration: 1000, keepAtCenter: false });*/
     }
 
     public continueMoving() {
