@@ -36,6 +36,7 @@ func NewConfig(v *viper.Viper) *Config {
 
 	v.SetDefault("smooth.predictupdates", cfg.PredictUpdates)
 	v.SetDefault("smooth.predictioninterval", cfg.PredictionInterval)
+	v.SetDefault("smooth.debugmode", cfg.DebugMode)
 
 	return cfg
 }
@@ -57,6 +58,7 @@ func NewManager(cfg Config, ms shuttletracker.ModelService, updater *updater.Upd
 	}
 	stm.predictionInterval = interval
 	stm.predictUpdates = cfg.PredictUpdates
+	stm.debugMode = cfg.DebugMode
 
 	// Subscribe to new Locations with Updater
 	updater.Subscribe(stm.locationSubscriber)
@@ -88,9 +90,7 @@ func (stm *SmoothTrackingManager) predict() {
 }
 
 // Use the prediction algorithm to make a prediction of this vehicle's current location, create a new location, and send to handleNewPrediction for further processing
-func (stm *SmoothTrackingManager) predictVehiclePosition(vehicleID int64) {
-	log.Debugf("\n\n\n\n\n\nHERE\n\n\n\n\n");
-	
+func (stm *SmoothTrackingManager) predictVehiclePosition(vehicleID int64) {	
 	vehicle, err := stm.ms.Vehicle(vehicleID)
 	if err != nil {
 		log.WithError(err).Errorf("Cannot get vehicle %d for prediction", vehicleID)
