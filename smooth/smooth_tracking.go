@@ -53,9 +53,8 @@ func AngleBetween(p1, p2 shuttletracker.Point) float64 {
 	brng := math.Atan2(y, x)
 	brng = toDegrees(brng)
 	brng = math.Mod(brng+360, 360)
-	brng = 360 - brng // Convert to counter-clockwise
 
-	return brng
+	return brng - 45
 }
 
 // Returns the index of the closest point on the route to the given latitude and longitude coordinates
