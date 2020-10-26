@@ -30,6 +30,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import FeedbackMessageUpdate from '../structures/feedbackMessageUpdate';
+import AdminServiceProvider from '../structures/serviceproviders/admin.service';
 export default Vue.extend({
   // what does this do?
   data() {

@@ -3,6 +3,7 @@ import Vehicle from '@/structures/vehicle';
 import { Stop } from '@/structures/stop';
 import ETA from '@/structures/eta';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
+import FeedbackMessageUpdate from '@/structures/feedbackMessageUpdate';
 
 // Define types for the vuex state store
 export interface StoreState {
@@ -11,6 +12,7 @@ export interface StoreState {
     Stops: Stop[];
     etas: ETA[];
     adminMessage: AdminMessageUpdate | undefined;
+    feedbackMessage: FeedbackMessageUpdate | undefined;
     online: boolean;
     now: Date;
     settings: {

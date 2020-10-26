@@ -130,11 +130,11 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		r.Group(func(r chi.Router) {
 			r.Use(cli.casauth)
 			r.Post("/create", api.FeedbackEditHandler) // create
+			r.Post("/createAdmin", api.Feedback)
 			r.Post("/edit", api.FeedbackEditHandler)
 			r.Delete("/", api.FeedbackDeleteHandler)
 		})
 	})
-
 	// Fusion
 	r.Mount("/fusion", api.fm.router(cli.casauth))
 

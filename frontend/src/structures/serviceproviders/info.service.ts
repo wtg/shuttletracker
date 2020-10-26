@@ -95,6 +95,16 @@ export default class InfoServiceProvider {
         });
     }
 
+    public GrabFeedbackMessage(): Promise<AdminMessageUpdate> {
+        return fetch(Resources.BasePath + 'forms').then((data) => data.json()).then((ret) => {
+            return new AdminMessageUpdate(ret.message, Boolean(ret.enabled), new Date(ret.created), new Date(ret.updated), ret.link);
+        }).catch(() => {
+            return new AdminMessageUpdate('', false, new Date(), new Date(), '');
+
+        });
+    }
+
+
     public GrabMapboxKey(): Promise<string> {
         return fetch(Resources.BasePath + 'getKey/').then((data) => data.json()).then((data: string) => {
             return data;

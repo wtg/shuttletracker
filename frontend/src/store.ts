@@ -8,9 +8,9 @@ import Vehicle from '@/structures/vehicle';
 import Location from '@/structures/location';
 import * as L from 'leaflet';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
+import FeedbackMessageUpdate from '@/structures/feedbackMessageUpdate';
 import ETA from './structures/eta';
 import {DarkTheme} from '@/structures/theme';
-
 
 Vue.use(Vuex);
 const InfoService = new InfoServiceProvider();
@@ -28,6 +28,7 @@ const store: StoreOptions<StoreState> = {
     Vehicles: [],
     etas: [],
     adminMessage: undefined,
+    feedbackMessage: undefined,
     online: true,
     /** Current time, with minute accuracy. */
     // Having the current time stored in the Vue state makes it a reactive variable. Data, computed, and watch variables
@@ -100,6 +101,9 @@ const store: StoreOptions<StoreState> = {
     },
     addAdminMessage(state, message: AdminMessageUpdate) {
       state.adminMessage = message;
+    },
+    addFeedbackMessage(state, message: FeedbackMessageUpdate) {
+      state.feedbackMessage = message;
     },
     updateETAs(state, { vehicleID, etas }) {
       // remove this vehicle's ETAs and any ETA that has expired
@@ -274,7 +278,6 @@ const store: StoreOptions<StoreState> = {
       }, 1000 * 60 /* 1 minute */);
     },
   },
-
 };
 
 const exportedStore = new Vuex.Store(store);
