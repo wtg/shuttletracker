@@ -22,7 +22,7 @@
                 <template v-for="(eta) in etas">
                     <tr v-for="(info, i) in eta" v-bind:key="`${i}-${info.stopID}`">
                         <td> 
-                            <font style="color:" + info.color> &#9830; </font> {{ info.vehicleID }}
+                            <font style="color: "> &#9830; </font> {{ info.vehicleID }}
                         </td>
                         <td>{{ info.stopName }}</td>
                         <td>{{ info.eta }}</td>
@@ -151,6 +151,11 @@ export default Vue.extend({
             //   return 0;
             // });
         },
+    },
+    methods: {
+      getRouteColor(routeID: string) {
+        return this.colors.get(routeID);
+      },
     },
 
 });
