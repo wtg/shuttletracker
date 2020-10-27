@@ -90,6 +90,20 @@ export default Vue.extend({
                     const ret = [];
                     if (localETA.length) {
                         for (const eta of localETA) {
+
+                            /*Example of eta:
+                            {
+                              stopID: 10
+                              vehicleID: 3,
+                              routeID: 24,
+                              eta: "2020-10-27T21:09:09.826Z",
+                              arriving: true}
+
+                              (All times are in UTC)
+
+                            */
+
+
                             const now = new Date();
                             const from = new Date(eta.eta);
                             const minuteMs = 60 * 1000;
