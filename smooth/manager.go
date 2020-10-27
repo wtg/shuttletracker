@@ -95,7 +95,7 @@ func (stm *SmoothTrackingManager) predict() {
 }
 
 // Use the prediction algorithm to make a prediction of this vehicle's current location, create a new location, and send to handleNewPrediction for further processing
-func (stm *SmoothTrackingManager) predictVehiclePosition(vehicleID int64) {	
+func (stm *SmoothTrackingManager) predictVehiclePosition(vehicleID int64) {
 	vehicle, err := stm.ms.Vehicle(vehicleID)
 	if err != nil {
 		log.WithError(err).Errorf("Cannot get vehicle %d for prediction", vehicleID)
@@ -175,25 +175,18 @@ func (stm *SmoothTrackingManager) locationSubscriber(loc *shuttletracker.Locatio
 
 	// Output comparison between predicted and actual position
 	if exists {
-		diffIndex := int64(math.Abs(float64(prediction.Index - index)))
-		diffDistance := DistanceBetween(prediction.Point, shuttletracker.Point{Latitude: loc.Latitude, Longitude: loc.Longitude})
-		log.Debugf("UPDATED VEHICLE %d", *loc.VehicleID)
-		log.Debugf("Predicted: %d, (%f, %f)", prediction.Index, prediction.Point.Latitude, prediction.Point.Longitude)
-		log.Debugf("Actual: %d, (%f, %f)", index, loc.Latitude, loc.Longitude)
-		log.Debugf("Difference: %d points or %f meters", diffIndex, diffDistance)
-
-		// add statistics code to calculate stats
 		if stm.debugMode {
-			stm.numDifferences += 1
-			stm.averageDifference = stm.averageDifference + (diffDistance - stm.averageDifference) / float64(stm.numDifferences)
-			log.Debugf("Average Difference is %f", stm.averageDifference)
-			log.Debugf("Number of Differences is %d", stm.numDifferences)
-		}
-	}
+			diffIndex := int64(math.Abs(float64(prediction.Index - index)))
+			diffDistance := DistanceBetween(prediction.Point, shuttletracker.Point{Latitude: loc.Latitude, Longitude: loc.Longitude})
+			log.Debugf("UPDATED VEHICLE %d", *loc.VehicleID)
+			log.Debugf("Predicted: %d, (%f, %f)", prediction.Index, prediction.Point.Latitude, prediction.Point.Longitude)
+			log.Debugf("Actual: %d, (%f, %f)", index, loc.Latitude, loc.Longitude)
+			log.Debugf("Difference: %d points or %f meters", diffIndex, diffDistance)
 
-	if stm.debugMode {
-		log.Debugf("Current number of predictions so far is %d", stm.numDifferences)
-		log.Debugf("Average Difference is %f", stm.averageDifference)
-		log.Debugf("Number of Differences is %d", stm.numDifferences)
+			stm.numDifferences += 1
+			stm.averageDifference = stm.averageDifference + (diffDistance-stm.averageDifference)/float64(stm.numDifferences)
+			log.Debugf("Average difference: %f meters", stm.averageDifference)
+			log.Debugf("Sample size: %d", stm.numDifferences)
+		}
 	}
 }
