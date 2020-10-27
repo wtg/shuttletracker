@@ -20,6 +20,7 @@
   },
   "Smooth": {
     "PredictUpdates": false,
-    "PredictionInterval": "1s"
+    "PredictionInterval": "1s",
+    "DebugMode": false
   }
 }
