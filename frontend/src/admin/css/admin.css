@@ -5,9 +5,8 @@ html, body {
   margin: 0px;
   padding: 0px;
   font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-
+  overflow-y: hidden;
 }
-
 
 .route-description-box{
   padding: 10px;

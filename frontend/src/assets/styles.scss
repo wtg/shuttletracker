@@ -11,4 +11,29 @@ body {
   right: 0;
   top: 0;
   width: 100%;
+  overflow-y: hidden !important;
+  background: var(--color-bg);
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: var(--color-scrollbar-bg);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--color-scrollbar);
+  border-radius: 10px;
+
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-fg-normal);
 }

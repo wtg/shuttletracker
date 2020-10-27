@@ -1,24 +1,22 @@
 <template>
   <div class="parent">
     <h1 class="title">Schedules</h1>
-    <p class="subtitle">
-      Official shuttle schedules from the Parking and Transportation office.
-    </p>
-    <hr>
+    <h2 class="subtitle">Official shuttle schedules from the Parking and Transportation office.<hr></h2>
     <div class="columns">
       <div class="column" v-for="link in links" v-bind:key="link.url">
-        <div class="card" style= "min-width: 300px">
-          <header class="card-header">
-            <p class="card-header-title">
-              {{ link.name }}
-            </p>
-          </header>
-          <div class="card-content">
-            <div class="caption">
-              <p v-for="line in link.caption" v-bind:key="line">{{ line }}</p>
+        <div class="dimmed">
+          <div class="box">
+            <strong class="link-header">{{ link.name }}</strong>
+            <hr>
+            <div class="box-section">
+              <div class="caption">
+                <p v-for="line in link.caption" v-bind:key="line">{{ line }}</p>
+              </div>
+              <div style="color: var(--color-primary)">No paper schedules this semester</div>
+              <!-- <a target="_blank" rel="noopener noreferrer" v-bind:href="link.url">View PDF</a> -->
             </div>
-            <a target="_blank" rel="noopener noreferrer" v-bind:href="link.url">View PDF</a>
           </div>
+          
         </div>
       </div>
         <div class="column">
@@ -101,27 +99,31 @@ export default Vue.extend({
     return {
       links: [
         {
-          url: 'https://shuttles.rpi.edu/static/Weekday.pdf',
+          // url: 'https://shuttles.rpi.edu/static/Weekday.pdf',
           name: 'Weekday Routes',
           caption: [
-                    'North, South, and New West Routes',
-                    'Monday–Friday 7am – 11pm',
-                    ],
+            'North and West Routes',
+            'Monday–Friday 7am – 11:45pm',
+            '⠀ ',
+            'Hudson Valley College Suites Shuttles',
+            'Monday – Friday 7am – 7pm',
+            '⠀',
+            'CDTA Express Route',
+            'Monday–Friday 7am – 7pm',
+          ],
           color: 'green',
         },
         {
-          url: 'https://shuttles.rpi.edu/static/Weekend.pdf',
+          // url: 'https://shuttles.rpi.edu/static/Weekend.pdf',
           name: 'Weekend Routes',
           caption: [
-                    'West and East Routes',
-                    'Saturday–Sunday 9:30am – 5pm',
-                    '⠀',
-                    'Weekend Express Route',
-                    'Saturday–Sunday 4:30pm – 8pm',
-                    '⠀',
-                    'Late Night Route',
-                    'Friday–Saturday 8pm – 4am',
-                  ],
+            'North and West Routes',
+            'Saturday 9am – 11:45pm',
+            'Sunday 9am – 8pm',
+            '⠀ ',
+            'Hudson Valley College Suites Shuttles',
+            'Saturday–Sunday 7am – 7pm',
+          ],
           color: 'red',
         },
       ],
@@ -238,5 +240,16 @@ window.addEventListener('storage', () => {
 .caption {
   margin-bottom: 1em;
 }
+.link-header {
+  margin-left: 1em;
+}
+.box-section {
+  margin-left: 1em;
+}
+
+hr {
+  margin: 1rem 0;
+}
+
 </style>
 
