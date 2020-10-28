@@ -35,13 +35,33 @@ type Config struct {
 func NewConfig(v *viper.Viper) *Config {
 	cfg := &Config{
 		PredictUpdates:     true,
-		DebugMode:          true,
 		PredictionInterval: "1s",
+		DebugMode:          true,
 	}
 
 	v.SetDefault("smooth.predictupdates", cfg.PredictUpdates)
 	v.SetDefault("smooth.predictioninterval", cfg.PredictionInterval)
 	v.SetDefault("smooth.debugmode", cfg.DebugMode)
+
+	return cfg
+}
+
+func BackupConfig(v *viper.Viper) *Config {
+	cfg := &Config{
+		PredictUpdates:     true,
+		PredictionInterval: "1s",
+		DebugMode:          true,
+	}
+
+	if v.IsSet("smooth.predictupdates") {
+		cfg.PredictUpdates = v.GetBool("smooth.predictupdates")
+	}
+	if v.IsSet("smooth.predictioninterval") {
+		cfg.PredictionInterval = v.GetString("smooth.predictioninterval")
+	}
+	if v.IsSet("smooth.debugmode") {
+		cfg.DebugMode = v.GetBool("smooth.debugmode")
+	}
 
 	return cfg
 }
