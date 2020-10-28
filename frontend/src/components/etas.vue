@@ -7,7 +7,7 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Vehicles</th>
+                    <th>Vehicle</th>
                     <th>Stop</th>
                     <th>ETA</th>
                     <th>Arriving</th>
@@ -22,12 +22,12 @@
                 <template v-for="(eta) in etas">
                     <tr v-for="(info, i) in eta" v-bind:key="`${i}-${info.stopID}`">
                         <td> 
-                            <font style="color: "> &#9830; </font> {{ info.vehicleID }}
+                            {{ info.vehicleID }}
                         </td>
                         <td>{{ info.stopName }}</td>
                         <td>{{ info.eta }}</td>
                         <td>{{ info.arriving }}</td>
-                        <td>{{ info.routeName }}</td>
+                        <td><div :style="{ color: info.routeColor, display: inline}"> &#9830; </div> {{ info.routeName }}</td>
                     </tr>
                 </template>
             </tbody>
@@ -85,6 +85,8 @@ export default Vue.extend({
             const etaArray = [];
             for (let i = 0; i < 18; i++) {
                 const etaString = localStorage.getItem(String(i + 1));
+                //const testString = '[{"stopID": 10, "vehicleID": 3, "routeID": 22, "eta": "2020-10-28T01:09:09.826Z", "arriving": true}]';
+                // console.log(JSON.parse(testString));
                 if (etaString) {
                     const localETA = JSON.parse(etaString);
                     const ret = [];
@@ -152,12 +154,6 @@ export default Vue.extend({
             // });
         },
     },
-    methods: {
-      getRouteColor(routeID: string) {
-        return this.colors.get(routeID);
-      },
-    },
-
 });
 
 window.addEventListener('storage', () => {
