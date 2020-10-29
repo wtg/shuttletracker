@@ -61,33 +61,15 @@ export default class AdminServiceProvider {
     }
 
     // FEEDBACK - needs to be confirmed
-    
     public static CreateForm(form: Form): Promise<Response> {
-        return fetch('/forms/create', {
+        return fetch('/forms', {
             method: 'POST',
             body: JSON.stringify(form.asJSON()),
         });
     }
-    // 
-
-    public static EditForm(form: Form): Promise<Response> {
-        return fetch('/forms/edit', {
-            method: 'POST',
-            body: JSON.stringify(form.asJSON()),
-        });
-    }
-
     public static DeleteForm(form: Form): Promise<Response> {
         return fetch('/forms?id=' + String(form.id), {
             method: 'DELETE',
         });
     }
-
-    public static SetFeedbackMessage(message: FeedbackMessageUpdate): Promise<Response> {
-        return fetch('/feedbackMessage', {
-            method: 'POST',
-            body: JSON.stringify(message),
-        });
-    }
-
 }

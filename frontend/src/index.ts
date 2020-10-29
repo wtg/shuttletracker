@@ -9,7 +9,6 @@ import etas from '@/components/etas.vue';
 import changes from '@/components/changes.vue';
 import feedback from '@/components/feedback.vue';
 import Resources from '@/resources';
-import feedback from '@/components/feedback.vue';
 
 Vue.use(Router);
 

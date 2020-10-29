@@ -25,24 +25,20 @@ CREATE TABLE IF NOT EXISTS forms (
 }
 
 // Form returns a Form by its ID.
-func (fs *FeedbackService) Form(id int64) (*shuttletracker.Form, error) {
-	f := &shuttletracker.Form{
-		ID: id,
-	}
-
-	statement := "SELECT f.created, f.topic, f.message, f.read" +
+func (fs *FeedbackService) GetForm(id int64) (*shuttletracker.Form, error) {
+	statement := "SELECT f.message, f.created, f.admin" +
 		" FROM forms f WHERE id = $1;"
+	f := &shuttletracker.Form{ ID: id }
 	row := fs.db.QueryRow(statement, id)
-	err := row.Scan(&f.Created, &f.Topic, &f.Message, &f.Read)
+	err := row.Scan(&f.Message, &f.Created, &f.Admin)
 	if err == sql.ErrNoRows {
 		return nil, shuttletracker.ErrFormNotFound
 	}
-
 	return f, err
 }
 
 // Forms returns all Forms.
-func (fs *FeedbackService) Forms() ([]*shuttletracker.Form, error) {
+func (fs *FeedbackService) GetForms() ([]*shuttletracker.Form, error) {
 	forms := []*shuttletracker.Form{}
 	query := "SELECT f.id, f.message, f.created, f.admin" +
 		" FROM forms f;"
@@ -76,7 +72,6 @@ func (fs *FeedbackService) DeleteForm(id int64) error {
 	if err != nil {
 		return err
 	}
-
 	n, err := result.RowsAffected()
 	if err != nil {
 		return err
@@ -84,6 +79,5 @@ func (fs *FeedbackService) DeleteForm(id int64) error {
 	if n == 0 {
 		return shuttletracker.ErrFormNotFound
 	}
-
 	return nil
 }

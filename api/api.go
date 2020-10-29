@@ -99,11 +99,16 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		})
 	})
 
-	// r.Route("/feedback", func(r chi.Router) {
-	// 	r.Get("/", api.)
+	// Feedback
+	r.Route("/forms", func(r chi.Router) {
+		r.Post("/", api.FeedbackCreateHandler)
+		r.Group(func(r chi.Router) {
+			r.Use(cli.casauth)
+			r.Get("/", api.FeedbackHandler)
+			r.Delete("/", api.FeedbackDeleteHandler)
+		})
+	})
 
-	// })
-	
 	// Routes
 	r.Route("/routes", func(r chi.Router) {
 		r.Get("/", api.RoutesHandler)
@@ -126,17 +131,6 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 			r.Use(cli.casauth)
 			r.Post("/create", api.StopsCreateHandler)
 			r.Delete("/", api.StopsDeleteHandler)
-		})
-	})
-
-	// Feedback
-	r.Route("/forms", func(r chi.Router) {
-		r.Get("/", api.FeedbackHandler)
-		r.Group(func(r chi.Router) {
-			r.Use(cli.casauth)
-			r.Post("/create", api.FeedbackEditHandler) // create
-			r.Post("/edit", api.FeedbackEditHandler)
-			r.Delete("/", api.FeedbackDeleteHandler)
 		})
 	})
 
