@@ -6,4 +6,5 @@ type ModelService struct {
 	RouteService
 	StopService
 	LocationService
+	FeedbackService
 }

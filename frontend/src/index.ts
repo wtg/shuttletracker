@@ -56,5 +56,10 @@ export default new Router({
       name: 'changes',
       component: changes,
     },
+    {
+      path: '/feedback',
+      name: 'feedback',
+      component: feedback,
+    },
   ],
 });

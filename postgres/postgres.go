@@ -20,6 +20,7 @@ type Postgres struct {
 	LocationService
 	MessageService
 	UserService
+	FeedbackService
 }
 
 // Config contains database connection information.
@@ -64,6 +65,10 @@ func New(cfg Config) (*Postgres, error) {
 		return nil, err
 	}
 	err = pg.UserService.initializeSchema(db)
+	if err != nil {
+		return nil, err
+	}
+	err = pg.FeedbackService.initializeSchema(db)
 	if err != nil {
 		return nil, err
 	}
