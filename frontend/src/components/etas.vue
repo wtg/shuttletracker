@@ -85,7 +85,7 @@ export default Vue.extend({
             const etaArray = [];
             for (let i = 0; i < 18; i++) {
                 const etaString = localStorage.getItem(String(i + 1));
-                //const testString = '[{"stopID": 10, "vehicleID": 3, "routeID": 22, "eta": "2020-10-28T01:09:09.826Z", "arriving": true}]';
+                // const testString = '[{"stopID": 10, "vehicleID": 3, "routeID": 22, "eta": "2020-10-28T01:09:09.826Z", "arriving": true}]';
                 // console.log(JSON.parse(testString));
                 if (etaString) {
                     const localETA = JSON.parse(etaString);
