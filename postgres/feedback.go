@@ -16,10 +16,9 @@ func (fs *FeedbackService) initializeSchema(db *sql.DB) error {
 	schema := `
 CREATE TABLE IF NOT EXISTS forms (
 	id serial PRIMARY KEY,
-	topic text,
 	message text,
 	created timestamp with time zone NOT NULL DEFAULT now(),
-	read bool NOT NULL
+	admin bool DEFAULT false
 );`
 	_, err := fs.db.Exec(schema)
 	return err
@@ -45,15 +44,15 @@ func (fs *FeedbackService) Form(id int64) (*shuttletracker.Form, error) {
 // Forms returns all Forms.
 func (fs *FeedbackService) Forms() ([]*shuttletracker.Form, error) {
 	forms := []*shuttletracker.Form{}
-	query := "SELECT f.id, f.topic, f.created, f.message, f.read" +
-		" FROM forms s;"
+	query := "SELECT f.id, f.message, f.created, f.admin" +
+		" FROM forms f;"
 	rows, err := fs.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
 	for rows.Next() {
 		f := &shuttletracker.Form{}
-		err := rows.Scan(&f.ID, &f.Topic, &f.Created, &f.Message, &f.Read)
+		err := rows.Scan(&f.ID, &f.Message, &f.Created, &f.Admin)
 		if err != nil {
 			return nil, err
 		}
@@ -62,37 +61,12 @@ func (fs *FeedbackService) Forms() ([]*shuttletracker.Form, error) {
 	return forms, nil
 }
 
-// not sure if properly made
-// EditForm updates read status of the form
-func (fs *FeedbackService) EditForm(form *shuttletracker.Form) error {
-	tx, err := fs.db.Begin()
-	if err != nil {
-		return err
-	}
-	// We can't really do anything if rolling back a transaction fails.
-	// nolint: errcheck
-	defer tx.Rollback()
-
-	// change read status
-	statement := "UPDATE forms SET read = $1" +
-		" WHERE id = $2 RETURNING read;"
-	row := tx.QueryRow(statement, form.Read, form.ID)
-	// not sure if able to scan like this;
-	// wanted to return a true/false to show it was successfully set
-	err = row.Scan(&form.Read)
-	if err != nil {
-		return err
-	}
-	return tx.Commit()
-}
-
 // CreateForm creates a Form.
-func (fs *FeedbackService) CreateForm(id int64) error {
-	statement := "INSERT INTO forms (topic, message) VALUES" +
-		" ($1, $2) RETURNING id, created, read;"
-	f := &shuttletracker.Form{}
-	row := fs.db.QueryRow(statement, f.Topic, f.Message)
-	return row.Scan(&f.ID, &f.Created, &f.Read)
+func (fs *FeedbackService) CreateForm(form *shuttletracker.Form) error {
+	statement := "INSERT INTO forms (message, created, admin) VALUES" +
+		" ($1, now(), $2) RETURNING id, message, created;"
+	row := fs.db.QueryRow(statement, form.Message, form.Admin)
+	return row.Scan(&form.ID, &form.Message, &form.Created)
 }
 
 // DeleteForm deletes a Form.
