@@ -99,6 +99,11 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		})
 	})
 
+	// r.Route("/feedback", func(r chi.Router) {
+	// 	r.Get("/", api.)
+
+	// })
+	
 	// Routes
 	r.Route("/routes", func(r chi.Router) {
 		r.Get("/", api.RoutesHandler)

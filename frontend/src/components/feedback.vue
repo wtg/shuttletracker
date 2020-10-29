@@ -22,21 +22,14 @@
     </div>
 </template>
 
-
 <script lang="ts">
 import Vue from 'vue';
-import FeedbackMessageUpdate from '@/structures/feedbackMessageUpdate';
 export default Vue.extend({
-    // what does this do?
+    name: 'feedback',
     data() {
         return {
             hide: false,
         };
-    },
-    computed: {
-        message(): FeedbackMessageUpdate {
-            return this.$store.state.feedbackMessage;
-        },
     },
 });
 </script>
