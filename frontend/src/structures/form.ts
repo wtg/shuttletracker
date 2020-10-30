@@ -1,8 +1,7 @@
 export interface FeedbackInterface {
     id: number;
-    topic: string;
     message: string;
-    enabled: boolean;
+    admin: boolean;
 }
 
 /**
@@ -10,34 +9,39 @@ export interface FeedbackInterface {
  */
 export default class Form {
     public id: number;
-    public topic: string;
     public message: string;
-    public read: boolean;
+    public created: Date;
+    public admin: boolean;
 
-    constructor(id: number, topic: string, message: string, read: boolean) {
+    constructor(id: number, message: string, created: Date, admin: boolean) {
         this.id = id;
-        this.topic = topic;
         this.message = message;
-        this.read = read;
+        this.created = created;
+        this.admin = admin;
     }
 
-    // returns feedback message and marks the form as read
+    // returns form id
+    public getID(): number {
+        return this.id;
+    }
+
+    // returns feedback message
     public getMessage(): string {
-        this.read = true;
         return this.message;
     }
 
-    // sets form to unread if needed to
-    public unread() {
-        this.read = false;
+    public when(): Date {
+        return this.created;
     }
 
-    public asJSON(): { id: number; topic: string; message: string; read: boolean } {
+    public isAdmin(): boolean {
+        return this.admin;
+    }
+
+    public asJSON(): { message: string; admin: boolean } {
         return {
-            id: this.id,
-            topic: String(this.topic),
             message: String(this.message),
-            read: this.read,
+            admin: this.admin,
         };
     }
 

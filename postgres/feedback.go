@@ -24,6 +24,19 @@ CREATE TABLE IF NOT EXISTS forms (
 	return err
 }
 
+// Form returns a Form if its admin field is true
+func (fs *FeedbackService) GetAdminForm() (*shuttletracker.Form, error) {
+	statement := "SELECT f.id, f.message, f.created" +
+		" FROM forms f WHERE admin = true;"
+	f := &shuttletracker.Form{}
+	row := fs.db.QueryRow(statement)
+	err := row.Scan(&f.ID, &f.Message, &f.Created)
+	if err == sql.ErrNoRows {
+		return nil, shuttletracker.ErrFormNotFound
+	}
+	return f, err
+}
+
 // Form returns a Form by its ID.
 func (fs *FeedbackService) GetForm(id int64) (*shuttletracker.Form, error) {
 	statement := "SELECT f.message, f.created, f.admin" +

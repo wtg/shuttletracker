@@ -104,6 +104,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		r.Post("/", api.FeedbackCreateHandler)
 		r.Group(func(r chi.Router) {
 			r.Use(cli.casauth)
+			r.Get("/admin", api.FeedbackAdminHandler)
 			r.Get("/", api.FeedbackHandler)
 			r.Delete("/", api.FeedbackDeleteHandler)
 		})

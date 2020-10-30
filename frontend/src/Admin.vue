@@ -29,6 +29,7 @@
           </router-link>
           <router-link to="/admin/feedback" class="navbar-item">
             Feedback
+          </router-link>
         </div>         
 
         <div class="navbar-end">

@@ -8,6 +8,16 @@ import (
 	"github.com/wtg/shuttletracker"
 )
 
+// FeedbackAdminHandler gets the feedback message with admin=true
+func (api *API) FeedbackAdminHandler(w http.ResponseWriter, r *http.Request) {
+	form, err := api.fdb.GetAdminForm()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	WriteJSON(w, form)
+}
+
 // FeedbackHandler finds all forms in the database
 func (api *API) FeedbackHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.URL.Query().Get("id"), 10, 64)

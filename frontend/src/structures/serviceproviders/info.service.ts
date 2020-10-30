@@ -2,6 +2,7 @@ import Vehicle from '../vehicle';
 import Route from '../route';
 import { Stop } from '../stop';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
+import FeedbackMessageUpdate from '@/structures/feedbackMessageUpdate';
 import routeScheduleInterval from '../routeScheduleInterval';
 import Resources from '@/resources';
 /**
@@ -91,6 +92,15 @@ export default class InfoServiceProvider {
             return new AdminMessageUpdate(ret.message, Boolean(ret.enabled), new Date(ret.created), new Date(ret.updated), ret.link);
         }).catch(() => {
             return new AdminMessageUpdate('', false, new Date(), new Date(), '');
+
+        });
+    }
+
+    public GrabFeedbackMessage(): Promise<FeedbackMessageUpdate> {
+        return fetch(Resources.BasePath + 'feedbackMessage').then((data) => data.json()).then((ret) => {
+            return new FeedbackMessageUpdate(ret.message, Boolean(ret.admin));
+        }).catch(() => {
+            return new FeedbackMessageUpdate('', false);
 
         });
     }

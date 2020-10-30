@@ -15,6 +15,7 @@ type Form struct {
 
 // FeedbackService is an interface for interacting with Feedback.
 type FeedbackService interface {
+	GetAdminForm() (*Form, error)
 	GetForm(id int64) (*Form, error)
 	GetForms() ([]*Form, error)
 	CreateForm(form *Form) error

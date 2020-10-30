@@ -67,8 +67,8 @@ export default class AdminServiceProvider {
             body: JSON.stringify(form.asJSON()),
         });
     }
-    public static DeleteForm(form: Form): Promise<Response> {
-        return fetch('/forms?id=' + String(form.id), {
+    public static DeleteForm(id: number): Promise<Response> {
+        return fetch('/forms?id=' + String(id), {
             method: 'DELETE',
         });
     }
