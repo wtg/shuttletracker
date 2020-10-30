@@ -1,40 +1,48 @@
 <template>
-<div class="parent">
-    <h1 class="title">ETAs</h1>
-    <hr>
+    <div class="parent">
+        <h1 v-if="!isIntegrated" class="title">ETAs</h1>
+        <hr v-if="!isIntegrated">
 
-    <div class="container">
-        <table class="table">
-            <thead>
+        <div :class="isMobile ? '' : 'container'">
+            <table class="table">
+                <thead>
                 <tr>
-                    <th>Vehicle</th>
-                    <th>Stop</th>
+                    <th>Route ID</th>
+                    <th v-show="!isMobile">Vehicle</th>
+                    <th v-show="!isMobile">Stop</th>
                     <th>ETA</th>
                     <th>Arriving</th>
-                    <th>Route ID</th>
                 </tr>
-            </thead>
-            <tbody>
+                </thead>
+                <tbody>
                 <tr v-if="!etas.length">
-                    <td colspan="3"> No ETAS Currently Calculated </td>
+                    <td colspan="3"> No ETAS Currently Calculated</td>
                 </tr>
-                    
-                <template v-for="(eta) in etas">
-                    <tr v-for="(info, i) in eta" v-bind:key="`${i}-${info.stopID}`">
-                        <td> 
-                            {{ info.vehicleID }}
+
+                <template v-for="(eta, i) in etas"><!-- :key="`${i}-${eta.stopID}`"-->
+                    <tr @click="selection=i" class="table-row"
+                        :class="[i % 2 === 1 ? 'stressed' : '']">
+                        <td>
+                            <div :style="{ color: eta.routeColor, display: 'inline'}"> &#9830;</div>
+                            {{ eta.routeName }}
                         </td>
-                        <td>{{ info.stopName }}</td>
-                        <td>{{ info.eta }}</td>
-                        <td>{{ info.arriving }}</td>
-                        <td><div :style="{ color: info.routeColor, display: inline}"> &#9830; </div> {{ info.routeName }}</td>
+                        <td v-show="!isMobile">{{ eta.vehicleID }}</td>
+                        <td v-show="!isMobile">{{ eta.stopName }}</td>
+                        <td>{{ eta.eta }}</td>
+                        <td>{{ eta.arriving }}</td>
+                    </tr>
+                    <tr :class="selection === i && isMobile ? 'extension-row-active' : ''" class="extension-row">
+                        <td colspan="2">Stop: {{ eta.stopName }}</td>
+                        <td>
+                            V.ID: {{ eta.vehicleID }}
+                        </td>
                     </tr>
                 </template>
-            </tbody>
-        </table>
-    </div>
+                </tbody>
+            </table>
+        </div>
 
-</div>
+    </div>
 </template>
 
 <script lang="ts">
@@ -43,12 +51,20 @@ import ETA from '@/structures/eta';
 import axios from 'axios';
 
 export default Vue.extend({
+    props: {
+        isIntegrated: {
+            type: Boolean,
+            default: false,
+        },
+    },
     data() {
         return {
             routes: new Map(),
             colors: new Map(),
             stops: new Map(),
-         };
+            selection: -1,
+            isMobile: window.innerWidth < 768 || this.isIntegrated,
+        };
     },
     mounted() {
         axios
@@ -78,6 +94,12 @@ export default Vue.extend({
                 // console.log(this.stops);
             })
             .catch((error) => console.log(error));
+        // localStorage.clear();
+        for (let i = 0; i < 10; i++) {
+            const testString = [{stopID: 10, vehicleID: 3, routeID: 22, eta: Date.now() + 35000 * i, arriving: true}];
+            localStorage.setItem(String(i), JSON.stringify(testString));
+        }
+        window.addEventListener('resize', this.resize);
     },
     computed: {
         etas(): any[] {
@@ -86,10 +108,10 @@ export default Vue.extend({
             for (let i = 0; i < 18; i++) {
                 const etaString = localStorage.getItem(String(i + 1));
                 // const testString = '[{"stopID": 10, "vehicleID": 3, "routeID": 22, "eta": "2020-10-28T01:09:09.826Z", "arriving": true}]';
-                // console.log(JSON.parse(testString));
+                // console.log('abcd');
                 if (etaString) {
                     const localETA = JSON.parse(etaString);
-                    const ret = [];
+                    // const ret = [];
                     if (localETA.length) {
                         for (const eta of localETA) {
 
@@ -105,12 +127,11 @@ export default Vue.extend({
 
                             */
 
-
                             const now = new Date();
                             const from = new Date(eta.eta);
                             const minuteMs = 60 * 1000;
                             const elapsed = from.getTime() - now.getTime();
-
+                            // console.log(elapsed);
                             let etaMinutes = `A while`;
                             // cap display at 15 min
                             if (elapsed < minuteMs * 15) {
@@ -134,10 +155,11 @@ export default Vue.extend({
                                 routeColor: this.colors.get(eta.routeID),
                             };
                             if (elapsed >= 0) {
-                                ret.push(e);
+                                // ret.push(e);
+                                etaArray.push(e);
                             }
                         }
-                        etaArray.push(ret);
+                        // etaArray.push(ret);
                     }
                 }
 
@@ -154,6 +176,11 @@ export default Vue.extend({
             // });
         },
     },
+    methods: {
+        resize(e: any): any {
+            this.isMobile = e.target.innerWidth < 768 || this.isIntegrated;
+        },
+    },
 });
 
 window.addEventListener('storage', () => {
@@ -162,11 +189,42 @@ window.addEventListener('storage', () => {
 </script>
 
 <style lang="scss" scoped>
+* {
+    white-space: nowrap;
+}
 .parent {
     padding: 20px;
 }
-
+.container {
+    width: 100%;
+    transition: 200ms ease-in-out;
+}
 .caption {
     margin-bottom: 1em;
+}
+.table {
+    position: relative;
+    width: 100%;
+}
+
+.table-row.stressed {
+    background-color: #f8f8f8;
+}
+
+.table-row {
+    &:hover {
+        background: #eee;
+        cursor: pointer;
+    }
+    &-selected {
+        row-span: 2;
+        //height: 100px;
+    }
+}
+.extension-row {
+    display: none;
+    &-active {
+        display: table-row;
+    }
 }
 </style>
