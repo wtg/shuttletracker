@@ -2,8 +2,10 @@ package postgres
 
 import (
 	"database/sql"
+	"strconv"
 
 	"github.com/wtg/shuttletracker"
+	"github.com/wtg/shuttletracker/log"
 )
 
 // FeedbackService is an implementation of shuttletracker.FeedbackService.
@@ -26,11 +28,11 @@ CREATE TABLE IF NOT EXISTS forms (
 
 // Form returns a Form if its admin field is true
 func (fs *FeedbackService) GetAdminForm() (*shuttletracker.Form, error) {
-	statement := "SELECT f.id, f.message, f.created" +
+	statement := "SELECT f.id, f.message, f.created, f.admin" +
 		" FROM forms f WHERE admin = true;"
 	f := &shuttletracker.Form{}
 	row := fs.db.QueryRow(statement)
-	err := row.Scan(&f.ID, &f.Message, &f.Created)
+	err := row.Scan(&f.ID, &f.Message, &f.Created, &f.Admin)
 	if err == sql.ErrNoRows {
 		return nil, shuttletracker.ErrFormNotFound
 	}
@@ -72,6 +74,17 @@ func (fs *FeedbackService) GetForms() ([]*shuttletracker.Form, error) {
 
 // CreateForm creates a Form.
 func (fs *FeedbackService) CreateForm(form *shuttletracker.Form) error {
+	if form.Admin == true {
+		result, err := fs.db.Exec("DELETE FROM forms WHERE admin = true;")
+		if err != nil {
+			return err
+		}
+		n, err := result.RowsAffected()
+		if err != nil {
+			return err
+		}
+		log.Debugf(strconv.FormatInt(n, 10) + " stale admin feedback message(s) were successfully deleted")
+	}
 	statement := "INSERT INTO forms (message, created, admin) VALUES" +
 		" ($1, now(), $2) RETURNING id, message, created;"
 	row := fs.db.QueryRow(statement, form.Message, form.Admin)

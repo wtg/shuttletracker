@@ -97,7 +97,7 @@ export default class InfoServiceProvider {
     }
 
     public GrabFeedbackMessage(): Promise<FeedbackMessageUpdate> {
-        return fetch(Resources.BasePath + 'feedbackMessage').then((data) => data.json()).then((ret) => {
+        return fetch(Resources.BasePath + 'forms/admin').then((data) => data.json()).then((ret) => {
             return new FeedbackMessageUpdate(ret.message, Boolean(ret.admin));
         }).catch(() => {
             return new FeedbackMessageUpdate('', false);
