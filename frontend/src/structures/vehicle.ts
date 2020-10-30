@@ -170,8 +170,10 @@ export default class Vehicle {
         console.log(this.id + ': Destination lat/lng: ' + lat + ' ' + lng);
         console.log(this.id + ': Start point index: ' + this.pointIndex);
         console.log(this.id + ': End point index: ' + this.endPointIndex);
-        if (this.Route !== undefined && this.pointIndex !== null  && this.endPointIndex !== null) {
+        if (this.Route !== undefined && this.pointIndex !== null  && this.endPointIndex !== null && this.marker.getLatLng().distanceTo(L.latLng(this.Route.points[this.pointIndex].latitude, this.Route.points[this.pointIndex].longitude)) < 100) {
             this.continueMoving();
+        } else { // Skip the animation if the shuttle has no route, no closest/destination point, or is over 100 meters away from the route
+            this.setLatLngImmediate(lat, lng);
         }
     }
 
