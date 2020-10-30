@@ -101,10 +101,11 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 		elapsedDistance += DistanceBetween(route.Points[prevIndex], route.Points[index])
 		angle = AngleBetween(route.Points[prevIndex], route.Points[index])
 
-		changeInAngle := math.Abs(angle - prevAngle)
-		if changeInAngle > 40 {
-			log.Debugf("Angles change update is %f", changeInAngle)
-		}
+		changeInAngle := math.Abs(math.Mod(angle, 360.0) - math.Mod(prevAngle, 360.0))
+
+		log.Debugf("PrevAngle is %f", math.Mod(prevAngle, 360.0))
+		log.Debugf("Angle is %f", math.Mod(angle, 360.0))
+		log.Debugf("Angles change update is %f", changeInAngle)
 	}
 
 	return Prediction{VehicleID: vehicle.ID, Point: route.Points[index], Index: index, Angle: angle}
