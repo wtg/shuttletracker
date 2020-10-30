@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/wtg/shuttletracker"
+	"github.com/wtg/shuttletracker/log"
 )
 
 type Prediction struct {
@@ -89,7 +90,9 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 	// and stop when the predicted distance has elapsed
 	elapsedDistance := 0.0
 	angle := 0.0
+	prevAngle := 0.0
 	for elapsedDistance < predictedDistance {
+		prevAngle = angle
 		prevIndex := index
 		index++
 		if index >= len(route.Points) {
@@ -97,6 +100,12 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 		}
 		elapsedDistance += DistanceBetween(route.Points[prevIndex], route.Points[index])
 		angle = AngleBetween(route.Points[prevIndex], route.Points[index])
+
+		changeInAngle := math.Abs(angle - prevAngle)
+		if changeInAngle > 40 {
+			log.Debugf("Angles change update is %f", changeInAngle)
+		}
 	}
+
 	return Prediction{VehicleID: vehicle.ID, Point: route.Points[index], Index: index, Angle: angle}
 }
