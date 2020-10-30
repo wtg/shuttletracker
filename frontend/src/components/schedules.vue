@@ -12,7 +12,7 @@
               <div class="caption">
                 <p v-for="line in link.caption" v-bind:key="line">{{ line }}</p>
               </div>
-              <div style="color: var(--color-primary)">No paper schedules this semester</div>
+              <div :style="{color: 'var(--color-primary)'}">No paper schedules this semester</div>
               <!-- <a target="_blank" rel="noopener noreferrer" v-bind:href="link.url">View PDF</a> -->
             </div>
           </div>
@@ -27,7 +27,7 @@
             </p>
           </header>
             <div class="card-content">
-                <table class="table">
+                <!--<table class="table">
                   <thead>
                       <tr>
                           <th>Vehicles</th>
@@ -82,7 +82,8 @@
                           </tr>
                       </template>
                     </tbody>
-                </table>
+                </table>-->
+                <etas :is-integrated="true"></etas>
              </div>
         </div>
       </div>
@@ -92,9 +93,12 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import ETA from '@/structures/eta';
+import Etas from '@/components/etas.vue';
 import axios from 'axios';
 export default Vue.extend({
+    components: {
+        Etas,
+    },
   data() {
     return {
       links: [
