@@ -159,3 +159,5 @@ host    replication     all             127.0.0.1/32            md5 #scram-sha-2
 host    replication     all             ::1/128                 md5 #scram-sha-256
 ```
 it should make `scram-sha-256` the default way for verify connections.
+Also, if you are trying to recover a dump file to a database, the following command should be used:
+`pg_restore -c -U [your username] -d shuttletracker [your dump file name]`
