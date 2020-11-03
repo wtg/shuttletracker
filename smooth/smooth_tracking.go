@@ -91,9 +91,11 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 	elapsedDistance := 0.0
 	angle := 0.0
 	prevAngle := 0.0
+	prevDistance := 0.0
 	for elapsedDistance < predictedDistance {
 		prevAngle = angle
 		prevIndex := index
+		prevDistance = elapsedDistance
 		index++
 		if index >= len(route.Points) {
 			index = 0
@@ -103,29 +105,12 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 
 		changeInAngle := math.Abs(math.Mod(angle, 360.0) - math.Mod(prevAngle, 360.0))
 
-		if changeInAngle > 50 {
-			log.Debugf("PrevAngle is %f", math.Mod(prevAngle, 360.0))
-			log.Debugf("Angle is %f", math.Mod(angle, 360.0))
-			log.Debugf("Angles change update is %f for vehicle: %d", changeInAngle, vehicle.ID)
+		if changeInAngle > 50 && changeInAngle < 100 {
+			log.Debugf("Predicting a sharp turn...")
+			log.Debugf("Change in angle is %f for vehicle %d", changeInAngle, vehicle.ID)
+			log.Debugf("Current Speed is %f for vehicle %d", lastUpdate.Speed, vehicle.ID)
+			log.Debugf("Change in distance is %f", elapsedDistance-prevDistance)
 		}
-
-		/*  For some reason Angle ends up becoming 0 every other iteration...
-		DEBU[0031] PrevAngle is 0.000000                         file=smooth_tracking.go line=107 package=smooth
-		DEBU[0031] Angle is 271.670941                           file=smooth_tracking.go line=108 package=smooth
-		DEBU[0031] Angles change update is 271.670941 for vehicle: 4  file=smooth_tracking.go line=109 package=smooth
-		DEBU[0031] PrevAngle is 270.000005                       file=smooth_tracking.go line=107 package=smooth
-		DEBU[0031] Angle is 0.000000                             file=smooth_tracking.go line=108 package=smooth
-		DEBU[0031] Angles change update is 270.000005 for vehicle: 4  file=smooth_tracking.go line=109 package=smooth
-		DEBU[0031] PrevAngle is 0.000000                         file=smooth_tracking.go line=107 package=smooth
-		DEBU[0031] Angle is 259.826909                           file=smooth_tracking.go line=108 package=smooth
-		DEBU[0031] Angles change update is 259.826909 for vehicle: 4  file=smooth_tracking.go line=109 package=smooth
-		DEBU[0031] PrevAngle is 262.612982                       file=smooth_tracking.go line=107 package=smooth
-		DEBU[0031] Angle is 0.000000                             file=smooth_tracking.go line=108 package=smooth
-		DEBU[0031] Angles change update is 262.612982 for vehicle: 4  file=smooth_tracking.go line=109 package=smooth
-		DEBU[0031] PrevAngle is 0.000000                         file=smooth_tracking.go line=107 package=smooth
-		DEBU[0031] Angle is 270.000000                           file=smooth_tracking.go line=108 package=smooth
-		DEBU[0031] Angles change update is 270.000000 for vehicle: 4  file=smooth_tracking.go line=109 package=smooth
-		*/
 	}
 
 	return Prediction{VehicleID: vehicle.ID, Point: route.Points[index], Index: index, Angle: angle}
