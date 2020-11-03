@@ -104,7 +104,7 @@ func (stm *SmoothTrackingManager) predictVehiclePosition(vehicleID int64) {
 	if err != nil {
 		log.WithError(err).Errorf("Cannot get route for vehicle %d to base prediction on", vehicleID)
 	}
-	prediction := NaivePredictPosition(vehicle, update, route)
+	prediction := NaivePredictPosition(vehicle, update, route, stm.ms)
 	newUpdate := &shuttletracker.Location{
 		TrackerID: update.TrackerID,
 		Latitude:  prediction.Point.Latitude,
