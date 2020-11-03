@@ -118,15 +118,33 @@ func HeadingTowardTowardOrLeavingStop(currentIndex int, stopIndex int,  route *s
 	return false
 }
 
+func DistanceToStopAlongRoute(currentindex int, stopindex int) float64 {
+	elapsedDistance := 0.0
+	index := currentindex
+	for index != stopindex{
+		prevIndex := index
+		index++
+		if index >= len(route.Points) {
+			index = 0
+		}
+		elapsedDistance += DistanceBetween(route.Points[prevIndex], route.Points[index])
+	}
+	return elapsedDistance
+}
+
 //distance between stop and current location
 
 // Naive algorithm to predict the position a shuttle is at, given the last update received
 // Returns the index of the point the shuttle would be at on its route
 // TODO: More factors this algorithm should consider: shuttle's proximity to a stop, whether
 // the shuttle is going around a sharp turn, etc.
-func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletracker.Location, route *shuttletracker.Route) Prediction {
+func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletracker.Location, route *shuttletracker.Route, ms shuttletracker.ModelService) Prediction {
 	// Find the index of the closest point to this shuttle's last known location
 	index := ClosestPointTo(lastUpdate.Latitude, lastUpdate.Longitude, route)
+	stopIndex := ClosestStop(index, route,  ms)
+	headingToward := HeadingTowardTowardOrLeavingStop(index, stopIndex,  route,  ms)
+	stops, _ := ms.Stops()
+	distanceToStop :=  DistanceToStopAlongRoute(index, stopindex) 
 
 	// Find the amount of time that has passed since the last update was received, and given that,
 	// the distance the shuttle is predicted to have travelled
