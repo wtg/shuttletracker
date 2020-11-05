@@ -5,6 +5,7 @@ import getMarkerString from '@/structures/leaflet/rotatedMarker';
 import getCardinalDirection from '@/structures/cardinalDirection';
 import 'leaflet-rotatedmarker';
 import 'leaflet.marker.slideto';
+import store from '@/store';
 
 // vehicles are hidden when their most recent location update becomes this old
 const tinycolor = require('tinycolor2');
@@ -160,19 +161,23 @@ export default class Vehicle {
             this.marker.setLatLng(L.latLng(lat, lng));
             return;
         }
-        console.log(this.id + ': Starting');
-        this.destinationLat = lat;
-        this.destinationLng = lng;
-        if (this.pointIndex === null) {
-            this.updateClosestStartingPoint();
-        }
-        this.updateClosestDestinationPoint();
-        console.log(this.id + ': Destination lat/lng: ' + lat + ' ' + lng);
-        console.log(this.id + ': Start point index: ' + this.pointIndex);
-        console.log(this.id + ': End point index: ' + this.endPointIndex);
-        if (this.Route !== undefined && this.pointIndex !== null  && this.endPointIndex !== null && this.marker.getLatLng().distanceTo(L.latLng(this.Route.points[this.pointIndex].latitude, this.Route.points[this.pointIndex].longitude)) < 100) {
-            this.continueMoving();
-        } else { // Skip the animation if the shuttle has no route, no closest/destination point, or is over 100 meters away from the route
+        if (store.state.settings.shuttleSlideEnabled) {
+            console.log(this.id + ': Starting');
+            this.destinationLat = lat;
+            this.destinationLng = lng;
+            if (this.pointIndex === null) {
+                this.updateClosestStartingPoint();
+            }
+            this.updateClosestDestinationPoint();
+            console.log(this.id + ': Destination lat/lng: ' + lat + ' ' + lng);
+            console.log(this.id + ': Start point index: ' + this.pointIndex);
+            console.log(this.id + ': End point index: ' + this.endPointIndex);
+            if (this.Route !== undefined && this.pointIndex !== null  && this.endPointIndex !== null && this.marker.getLatLng().distanceTo(L.latLng(this.Route.points[this.pointIndex].latitude, this.Route.points[this.pointIndex].longitude)) < 100) {
+                this.continueMoving();
+            } else { // Skip the animation if the shuttle has no route, no closest/destination point, or is over 100 meters away from the route
+                this.setLatLngImmediate(lat, lng);
+            }
+        } else {
             this.setLatLngImmediate(lat, lng);
         }
     }
