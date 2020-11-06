@@ -118,19 +118,7 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 			// 25, 20, 15, 10-12, or 6-8 MPH
 			// Assuming 6-8 mph is the turning zone (hard to verify with updates being spotty)
 
-			// Concern
-			// Thing is what if a prediction is made and then it doesn't reflect
-			// because the angle doesn't isn't large until it actually already starts the turn and slowed down...
-
-			// Also if the last update's speed is used to calculate the distance to be travelled, it
-			// means that we can change the distance we need to accumulate before the loop ends
-			// but not directly change the speed...
-			// I guess we'll add a certain amount of elapsedDistance
-
-			// Say lastUpdate.Speed = 15 mph, and assuming turn is detected and lasts for 2 seconds
-			// at 8 MPH, we add 7mph * 2 secs = 6.26 meters, so we add 6.26 meters to elapsedDistance
-			// Hard to measure it's impacts unless we run for the entire route as the avg error is
-			// 600-700 meters... The error is so large because updates are so rare...
+			// Change # 1 - Resulted in Avg Difference dropping from 600-700 to 460 meters
 			elapsedDistance += (lastUpdate.Speed - 3.575) * 2 // 8 mph in meters and 2 for # of seconds
 		}
 	}
