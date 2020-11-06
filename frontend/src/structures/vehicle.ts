@@ -112,9 +112,12 @@ export default class Vehicle {
     }
 
     public setHeading(heading: number) {
-        this.marker.setRotationAngle(heading - 45);
-        this.marker.bindPopup(this.getMessage());
-        this.destinationHeading = heading - 45;
+        if (!store.state.settings.shuttleSlideEnabled) {
+            this.marker.setRotationAngle(heading - 45);
+            this.marker.bindPopup(this.getMessage());
+        } else {
+            this.destinationHeading = heading - 45;
+        }
     }
 
     public setRoute(r: Route | undefined, darkEnabled: boolean) {
@@ -162,16 +165,12 @@ export default class Vehicle {
             return;
         }
         if (store.state.settings.shuttleSlideEnabled) {
-            console.log(this.id + ': Starting');
             this.destinationLat = lat;
             this.destinationLng = lng;
             if (this.pointIndex === null) {
                 this.updateClosestStartingPoint();
             }
             this.updateClosestDestinationPoint();
-            console.log(this.id + ': Destination lat/lng: ' + lat + ' ' + lng);
-            console.log(this.id + ': Start point index: ' + this.pointIndex);
-            console.log(this.id + ': End point index: ' + this.endPointIndex);
             if (this.Route !== undefined && this.pointIndex !== null  && this.endPointIndex !== null && this.marker.getLatLng().distanceTo(L.latLng(this.Route.points[this.pointIndex].latitude, this.Route.points[this.pointIndex].longitude)) < 100) {
                 if (this.pointIndex !== this.endPointIndex) {
                     this.pointIndex++;
@@ -182,6 +181,8 @@ export default class Vehicle {
                 this.continueMoving();
             } else { // Skip the animation if the shuttle has no route, no closest/destination point, or is over 100 meters away from the route
                 this.setLatLngImmediate(lat, lng);
+                this.pointIndex = null;
+                this.endPointIndex = null;
             }
         } else {
             this.setLatLngImmediate(lat, lng);
@@ -191,7 +192,6 @@ export default class Vehicle {
     // Called when one segment of the sliding animation has completed to begin sliding the shuttle to either
     // the next segment or destination point
     public continueMoving() {
-        console.log(this.id + ': Continuing: pointIndex: ' + this.pointIndex);
         if (this.Route !== undefined && this.pointIndex !== null && this.endPointIndex !== null) {
             const origPointIndex = this.pointIndex;
             if (this.pointIndex !== this.endPointIndex) {
@@ -218,7 +218,6 @@ export default class Vehicle {
                 const newAngle = this.angleBetween(this.marker.getLatLng().lat, this.marker.getLatLng().lng, this.Route.points[origPointIndex].latitude, this.Route.points[origPointIndex].longitude);
                 this.marker.setRotationAngle(newAngle);
                 // Begin the next segment
-                console.log(this.id + ': Moving to ' + this.lat + ' ' + this.lng);
                 (this.marker as any).slideTo([this.lat, this.lng], { duration: transitionTime, keepAtCenter: false });
             } else {
                 this.continueMoving();
@@ -226,7 +225,6 @@ export default class Vehicle {
         } else {
             // Animation has completed
             this.marker.setRotationAngle(this.destinationHeading);
-            console.log(this.id + ': Stopping at ' + this.marker.getLatLng().lat + ' ' + this.marker.getLatLng().lng);
         }
     }
 
