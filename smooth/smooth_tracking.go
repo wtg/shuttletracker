@@ -104,12 +104,23 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 		angle = AngleBetween(route.Points[prevIndex], route.Points[index])
 
 		changeInAngle := math.Abs(math.Mod(angle, 360.0) - math.Mod(prevAngle, 360.0))
+		changeInDistance := elapsedDistance - prevDistance
 
-		if changeInAngle > 50 && changeInAngle < 100 {
+		if changeInAngle > 50 && changeInAngle < 100 && changeInDistance > 1 { // sharp turn and distance traveled
 			log.Debugf("Predicting a sharp turn...")
 			log.Debugf("Change in angle is %f for vehicle %d", changeInAngle, vehicle.ID)
 			log.Debugf("Current Speed is %f for vehicle %d", lastUpdate.Speed, vehicle.ID)
-			log.Debugf("Change in distance is %f", elapsedDistance-prevDistance)
+			log.Debugf("Change in distance is %f", changeInDistance)
+
+			// Plan is to drop speed to 6-8 mph when a sharp turn is detected
+			// Avg Error is 600-700 meters without this change
+			// Running the webapp 3 times found the shuttle speeds to predominantly be
+			// 25, 20, 15, 10-12, or 6-8 MPH
+			// Assuming 6-8 mph is the turning zone (hard to verify with updates being spotty)
+
+			// Concern
+			// Thing is what if a prediction is made and then it doesn't reflect
+			// because the angle doesn't isn't large until it actually already starts the turn and slowed down...
 		}
 	}
 
