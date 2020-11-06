@@ -173,6 +173,12 @@ export default class Vehicle {
             console.log(this.id + ': Start point index: ' + this.pointIndex);
             console.log(this.id + ': End point index: ' + this.endPointIndex);
             if (this.Route !== undefined && this.pointIndex !== null  && this.endPointIndex !== null && this.marker.getLatLng().distanceTo(L.latLng(this.Route.points[this.pointIndex].latitude, this.Route.points[this.pointIndex].longitude)) < 100) {
+                if (this.pointIndex !== this.endPointIndex) {
+                    this.pointIndex++;
+                    if (this.pointIndex >= this.Route.points.length) {
+                        this.pointIndex = 0;
+                    }
+                }
                 this.continueMoving();
             } else { // Skip the animation if the shuttle has no route, no closest/destination point, or is over 100 meters away from the route
                 this.setLatLngImmediate(lat, lng);
@@ -187,6 +193,7 @@ export default class Vehicle {
     public continueMoving() {
         console.log(this.id + ': Continuing: pointIndex: ' + this.pointIndex);
         if (this.Route !== undefined && this.pointIndex !== null && this.endPointIndex !== null) {
+            const origPointIndex = this.pointIndex;
             if (this.pointIndex !== this.endPointIndex) {
                 // Shuttle can transition to a route point closer to the destination point
                 const point = this.Route.points[this.pointIndex];
@@ -206,9 +213,9 @@ export default class Vehicle {
                 // Calculate the time this segment should take, proportional to the distance to be travelled
                 const transitionDistance = this.marker.getLatLng().distanceTo(L.latLng(this.lat, this.lng));
                 const transitionRatio = transitionDistance / this.totalTransitionDistance;
-                const transitionTime = Math.round(transitionRatio * 5000); // 5 s (5000 ms) for the total transition
+                const transitionTime = Math.round(transitionRatio * 3000); // 3 s (3000 ms) for the total transition
                 // Update shuttle's rotation based on the angle between route points
-                const newAngle = this.angleBetween(this.marker.getLatLng().lat, this.marker.getLatLng().lng, this.lat, this.lng);
+                const newAngle = this.angleBetween(this.marker.getLatLng().lat, this.marker.getLatLng().lng, this.Route.points[origPointIndex].latitude, this.Route.points[origPointIndex].longitude);
                 this.marker.setRotationAngle(newAngle);
                 // Begin the next segment
                 console.log(this.id + ': Moving to ' + this.lat + ' ' + this.lng);
