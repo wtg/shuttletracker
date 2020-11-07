@@ -118,7 +118,7 @@ func HeadingTowardTowardOrLeavingStop(currentIndex int, stopIndex int,  route *s
 	return false
 }
 
-func DistanceToStopAlongRoute(currentindex int, stopindex int) float64 {
+func DistanceToPointAlongRoute(currentindex int, stopindex int, route *shuttletracker.Route) float64 {
 	elapsedDistance := 0.0
 	index := currentindex
 	for index != stopindex{
@@ -130,6 +130,10 @@ func DistanceToStopAlongRoute(currentindex int, stopindex int) float64 {
 		elapsedDistance += DistanceBetween(route.Points[prevIndex], route.Points[index])
 	}
 	return elapsedDistance
+}
+func acceleration(velocity float64, distance float64) float64 {
+	return - math.Pow(velocity, 2) / (2.0 * distance)
+
 }
 
 //distance between stop and current location
@@ -143,14 +147,19 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 	index := ClosestPointTo(lastUpdate.Latitude, lastUpdate.Longitude, route)
 	stopIndex := ClosestStop(index, route,  ms)
 	headingToward := HeadingTowardTowardOrLeavingStop(index, stopIndex,  route,  ms)
-	stops, _ := ms.Stops()
-	distanceToStop :=  DistanceToStopAlongRoute(index, stopindex) 
+	distanceToStop :=  DistanceToPointAlongRoute(index, stopIndex, route) //meters
 
 	// Find the amount of time that has passed since the last update was received, and given that,
 	// the distance the shuttle is predicted to have travelled
 	secondsSinceUpdate := time.Since(lastUpdate.Time).Seconds()
 	predictedDistance := secondsSinceUpdate * lastUpdate.Speed
 
+	
+	//if close and approaching a stop:
+	if headingToward && distanceToStop < 30 {
+		a := acceleration(lastUpdate.Speed, distanceToStop)
+		predictedDistance = lastUpdate.Speed * secondsSinceUpdate + (.5)*a*math.Pow(secondsSinceUpdate, 2)
+	}
 	// Iterate over each point in the route in order, summing the distance between each point,
 	// and stop when the predicted distance has elapsed
 	elapsedDistance := 0.0
