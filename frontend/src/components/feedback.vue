@@ -1,24 +1,21 @@
 <template>
-    <div class = "parent content">
-        <h2>Feedback</h2>
+    <div class="parent">
+        <h1 class="title">Feedback<hr></h1>
+        <h2>
+            Thank you for using Shuttletracker, we value your feedback!<br>
+        </h2>
         <div v-if="this.adminMessage !== undefined" >
             <div style="width: 100%;float:left;" v-html="this.adminMessage"></div>
         </div>
-        <!-- <p>
-            <br>We'd love to hear back from you!
-            <br>If you have any comments, suggestions, or concerns, submit them down below and they'll be sent directly to us.
-        </p> -->
         <div>
-            <td style="padding-top: 5px;">
-            <textarea 
+            <textarea
+                class="form"
                 v-model="feedbackMessage"
-                placeholder="beep beep I'm a sheep . . ." 
-                rows = "8" cols = "127">
+                placeholder="beep beep I'm a sheep . . ." >
             </textarea>
             <br>
             <button @click="save" class="submit" type="submit" form="feedback" value="Submit"
             id="submit">Submit</button>
-            </td>
         </div>
         <div v-if="fail" class="notification is-danger">
             <p>Failed to submit form.</p>
@@ -89,10 +86,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .parent{
-    padding: 50px;
-    p {
-        margin: .10em;
-    }
+    padding: 20px;
 }
 .submit{
     &:hover {
@@ -108,8 +102,11 @@ export default Vue.extend({
     margin-top: .5em;
     transition: all 0.35s;
 }
-
-h2 {
-    margin-bottom:.1em;
+.form{ 
+    border-radius: 8px;
+    border: 2px red;
+    width: 50%;
+    height: 40%;
 }
+
 </style>
