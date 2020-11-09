@@ -258,16 +258,17 @@ export default Vue.extend({
         }
       });
       this.existingRouteLayers = new Array<L.Polyline>();
+      let tempWeight = 9;
       this.routePolyLines().forEach((line: L.Polyline) => {
         if (this.Map !== undefined) {
-          console.log(line.options.color);
+          line.options.weight = tempWeight;
+          tempWeight -= Number(9 / this.routePolyLines().length);
           if (DarkTheme.isDarkThemeVisible(this.$store.state)) {
             // mute color
             const darkColor = tinycolor(line.options.color);
             darkColor.darken(15);
-            const newPolyLine = new L.Polyline(line.getLatLngs() as [], {color: line.options.color});
+            const newPolyLine = new L.Polyline(line.getLatLngs() as [], {color: line.options.color, weight: line.options.weight});
             newPolyLine.options.color = darkColor.toString();
-            console.log(newPolyLine.options.color);
             this.Map.addLayer(newPolyLine);
             this.existingRouteLayers.push(newPolyLine);
             return;
