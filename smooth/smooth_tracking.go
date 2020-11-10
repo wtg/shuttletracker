@@ -98,5 +98,15 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 		elapsedDistance += DistanceBetween(route.Points[prevIndex], route.Points[index])
 		angle = AngleBetween(route.Points[prevIndex], route.Points[index])
 	}
+
+	// Stops -
+	// Current idea is to build this based on the having a prediction every second
+	// When the angle is less than 10 degrees
+	// and speed begins decelerating
+	// predict deceleration by a set amount...
+	// the amount should be lastUpdate.speed / distance to light...
+	// How to get location of the lights
+	// When coming off a light, predict acceleration to speed before deceleration began
+
 	return Prediction{VehicleID: vehicle.ID, Point: route.Points[index], Index: index, Angle: angle}
 }
