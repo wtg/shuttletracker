@@ -109,14 +109,6 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 			// Change # 1 - Resulted in Avg Difference dropping from 600-700 to 460 meters
 			elapsedDistance += (lastUpdate.Speed - 3.575) * 2 // 8 mph in meters and 2 for # of seconds
 		}
-
-		// Stops -
-		// Using stop ids and the route, I can calculate how far the shuttle is to the next stop on the route
-		// and set it so that when it is close to the stops, we update
-		// the distance
-		// I'll have to see how long red lights last and if we can
-		// get the average wait time at a stop
-		// For lights, we'll have to do way more testing.
 	}
 
 	return Prediction{VehicleID: vehicle.ID, Point: route.Points[index], Index: index, Angle: angle}
