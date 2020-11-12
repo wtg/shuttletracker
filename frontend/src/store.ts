@@ -39,7 +39,7 @@ const store: StoreOptions<StoreState> = {
       fusionPositionEnabled: true,
       busButtonChoice: '🚌',
       darkThemeMode: 'off',
-      shuttleSlideEnabled: true,
+      shuttleSlideEnabled: false,
     },
     geolocationDenied: false,
     fusionConnected: undefined,
