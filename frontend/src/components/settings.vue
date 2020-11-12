@@ -98,6 +98,19 @@
             </div>
           </td>
         </tr>
+        <tr>
+          <td class="route_format">
+            <p class="setting_title">Shuttle slide</p>
+            <p class="help">Slide shuttles smoothly to their destinations.</p>
+          </td>
+          <td height="80">
+            <div class="switches">
+              <div class="switch_direction">
+                <b-switch class="internal_switch" v-model="shuttleSlideEnabled"></b-switch>
+              </div>
+            </div>
+          </td>
+        </tr>
       </tbody>
     </table>
 
@@ -182,6 +195,14 @@ export default Vue.extend({
     },
     darkThemeAllModes(): DarkThemeMode[] {
       return DarkThemeMode.allModes();
+    },
+    shuttleSlideEnabled: {
+      get(): boolean {
+        return this.$store.state.settings.shuttleSlideEnabled;
+      },
+      set(value: boolean) {
+        this.$store.commit('setSettingsShuttleSlideEnabled', value);
+      },
     },
     fusionPositionEnabled: {
       get(): boolean {

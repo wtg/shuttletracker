@@ -39,6 +39,7 @@ const store: StoreOptions<StoreState> = {
       fusionPositionEnabled: true,
       busButtonChoice: '🚌',
       darkThemeMode: 'off',
+      shuttleSlideEnabled: false,
     },
     geolocationDenied: false,
     fusionConnected: undefined,
@@ -135,6 +136,10 @@ const store: StoreOptions<StoreState> = {
     },
     setSettingsDarkThemeMode(state, darkThemeId: string) {
       state.settings.darkThemeMode = darkThemeId;
+      localStorage.setItem('st_settings', JSON.stringify(state.settings));
+    },
+    setSettingsShuttleSlideEnabled(state, value: boolean) {
+      state.settings.shuttleSlideEnabled = value;
       localStorage.setItem('st_settings', JSON.stringify(state.settings));
     },
     setSettingsETAsEnabled(state, value: boolean) {
