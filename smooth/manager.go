@@ -35,8 +35,8 @@ type Config struct {
 func NewConfig(v *viper.Viper) *Config {
 	cfg := &Config{
 		PredictUpdates:     true,
-		PredictionInterval: "1s",
 		DebugMode:          true,
+		PredictionInterval: "1s",
 	}
 
 	v.SetDefault("smooth.predictupdates", cfg.PredictUpdates)
