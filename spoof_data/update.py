@@ -3,7 +3,7 @@ import os
 while True:
     # Get the name of the next file to update
     print('Input filename ("quit" or newline to quit):')
-    filename = raw_input('> ')
+    filename = input('> ')
 
     # Check for exit condition
     if len(filename) == 0 or filename == 'quit':
@@ -16,15 +16,15 @@ while True:
     
     # Get vehicle ID to insert into the file
     print('Input vehicle ID:')
-    vehicleID = raw_input('> ')
+    vehicleID = input('> ')
 
     # Get route ID to insert
     print('Input route ID:')
-    routeID = raw_input('> ')
+    routeID = input('> ')
 
     # Get tracker ID to insert
     print('Input tracker ID:')
-    trackerID = raw_input('> ')
+    trackerID = input('> ')
 
     # Extract data from file
     f = open(filename, 'r')
