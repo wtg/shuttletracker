@@ -99,7 +99,7 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 			index = 0
 		}
 		elapsedDistance += DistanceBetween(route.Points[prevIndex], route.Points[index])
-		angle = AngleBetween(route.Points[prevIndex], route.Points[index])
+		angle = AngleBetween(route.Points[prevIndex], route.Points[index]) + 45
 
 		changeInAngle := math.Abs(math.Mod(angle, 360.0) - math.Mod(prevAngle, 360.0))
 		changeInDistance := elapsedDistance - prevDistance
