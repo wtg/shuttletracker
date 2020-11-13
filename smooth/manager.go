@@ -37,13 +37,12 @@ func NewConfig(v *viper.Viper) *Config {
 		PredictUpdates:     true,
 		DebugMode:          true,
 		PredictionInterval: "1s",
-		DebugMode:          true,
 	}
 
 	v.SetDefault("smooth.predictupdates", cfg.PredictUpdates)
 	v.SetDefault("smooth.predictioninterval", cfg.PredictionInterval)
 	v.SetDefault("smooth.debugmode", cfg.DebugMode)
-  
+
 	return cfg
 }
 
@@ -116,7 +115,7 @@ func (stm *SmoothTrackingManager) predict() {
 }
 
 // Use the prediction algorithm to make a prediction of this vehicle's current location, create a new location, and send to handleNewPrediction for further processing
-func (stm *SmoothTrackingManager) predictVehiclePosition(vehicleID int64) {	
+func (stm *SmoothTrackingManager) predictVehiclePosition(vehicleID int64) {
 	vehicle, err := stm.ms.Vehicle(vehicleID)
 	if err != nil {
 		log.WithError(err).Errorf("Cannot get vehicle %d for prediction", vehicleID)
@@ -196,13 +195,6 @@ func (stm *SmoothTrackingManager) locationSubscriber(loc *shuttletracker.Locatio
 
 	// Output comparison between predicted and actual position
 	if exists {
-		diffIndex := int64(math.Abs(float64(prediction.Index - index)))
-		diffDistance := DistanceBetween(prediction.Point, shuttletracker.Point{Latitude: loc.Latitude, Longitude: loc.Longitude})
-		log.Debugf("UPDATED VEHICLE %d", *loc.VehicleID)
-		log.Debugf("Predicted: %d, (%f, %f)", prediction.Index, prediction.Point.Latitude, prediction.Point.Longitude)
-		log.Debugf("Actual: %d, (%f, %f)", index, loc.Latitude, loc.Longitude)
-		log.Debugf("Difference: %d points or %f meters", diffIndex, diffDistance)
-
 		if stm.debugMode {
 			diffIndex := int64(math.Abs(float64(prediction.Index - index)))
 			diffDistance := DistanceBetween(prediction.Point, shuttletracker.Point{Latitude: loc.Latitude, Longitude: loc.Longitude})
