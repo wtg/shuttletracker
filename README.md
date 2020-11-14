@@ -139,3 +139,25 @@ naraya5
 16. Add yourself as an administrator by using `shuttletracker.exe admins --add RCS_ID`, replacing `RCS_ID` with your RCS ID. See the "Administrators" section above for more information.  
 17. Visit http://localhost:8080/ to view the tracking application and http://localhost:8080/admin to view the administration panel.  
 18. Copy the information from [vehicles](https://shuttles.rpi.edu/vehicles), [routes](https://shuttles.rpi.edu/routes), and [stops](https://shuttles.rpi.edu/stops) into the admin panel if you want to mimic the current shuttle tracker site.  
+
+#### note: POSTGRESQL version 13
+If you are working with POSTGRESQL 13, make sure in the data folder of POSTGRESQL the `pg_hba.conf` look exactly like this
+```config
+local   all             postgres                                trust #scram-sha-256
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# "local" is for Unix domain socket connections only
+local   all             all                                     trust #scram-sha-256
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            trust #scram-sha-256
+# IPv6 local connections:
+host    all             all             ::1/128                 trust #scram-sha-256
+# Allow replication connections from localhost, by a user with the
+# replication privilege.
+local   replication     all                                     peer #scram-sha-256
+host    replication     all             127.0.0.1/32            md5 #scram-sha-256
+host    replication     all             ::1/128                 md5 #scram-sha-256
+```
+it should make `scram-sha-256` the default way for verify connections.
+Also, if you are trying to recover a dump file to a database, the following command should be used:
+`pg_restore -c -U [your username] -d shuttletracker [your dump file name]`
