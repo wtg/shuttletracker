@@ -56,8 +56,9 @@ func New() (*Config, error) {
 		return nil, err
 	}
 
-	// I have no idea why, but this config needs to be reset after reading the file
+	// I have no idea why, but these configs needs to be reset after reading the file
 	cfg.Spoofer = spoofer.BackupConfig(v)
+	cfg.SmoothTrackingManager = smooth.BackupConfig(v)
 
 	// Special case for setting log level after reading config
 	log.SetLevel(cfg.Log.Level)
