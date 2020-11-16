@@ -2,12 +2,6 @@
     <div class="parent">
         <h1 class="title">Feedback</h1>
         <h2 class="subtitle">All responses are greatly appreciated!<hr></h2>
-        <div id="fail-n" class="hidden notification is-danger">
-            <p>Failed to submit form.</p>
-        </div>
-        <div id="success-n" class="hidden notification is-success">
-            <p>Feedback sent!</p>
-        </div>
         <div id="body">
         <div id="feedback-area">
             <div v-if="this.adminMessage !== undefined" >
@@ -17,13 +11,12 @@
                 id="form"
                 v-model="feedbackMessage"
                 placeholder="Type your response here..." 
-                rows="12"
-                cols="80">
+                maxlength="512">
             </textarea>
             <br>
             <button @click="save" class="submit" type="submit" form="feedback" value="Submit"
-            id="submit"><b>Submit</b></button>
-        </div>
+                id="submit"><b>Submit</b></button>
+            </div>
         </div>
     </div>
 </template>
@@ -64,29 +57,20 @@ export default Vue.extend({
     methods: {
         save() {
             const myMessage = new Form(-1, this.feedbackMessage, new Date(), false);
-            let success = document.getElementById("success-n");
-            let fail = document.getElementById("fail-n");
+            const btn = document.getElementById('submit');
+            (<HTMLButtonElement>btn)!.disabled = true;
+            btn!.classList.add("no-hover");
             AdminServiceProvider.CreateForm(myMessage).then((resp) => {
                 if (resp.ok) {
-                    success.classList.remove("hidden")
-                    success.classList.add("visible")
-                    setTimeout(() => {
-                        success.classList.remove("visible")
-                        success.classList.add("hidden")
-                    },2000);
+                    btn!.style.backgroundColor = "#23d160";
+                    btn!.innerHTML = "<b>Feedback sent!</b>";
                 } else {
-                    fail.classList.add("visible")
-                    setTimeout(() => {
-                        fail.classList.remove("visible")
-                        fail.classList.add("hidden")
-                    },2000);
+                    btn!.style.backgroundColor = "#ff3860";
+                    btn!.innerHTML = "<b>Request failed.</b>";
                 }
             }).catch(() => {
-                fail.classList.add("visible")
-                    setTimeout(() => {
-                        fail.classList.remove("visible")
-                        fail.classList.add("hidden")
-                    },2000);
+                btn!.style.backgroundColor = "#ff3860";
+                btn!.innerHTML = "<b>Timed out.</b>";
             });
         },
         getAdminMessage() {
@@ -108,7 +92,7 @@ export default Vue.extend({
 6 cols textarea on mobile
 padding between submit and bottom row - mobile
 Replace submit button with feedback sent
-Add dark mode support
+Add dark mode
 */
 
 .parent{
@@ -130,12 +114,12 @@ Add dark mode support
     margin-top: 1em;
     margin-bottom: 0.25em;
     width:  100%;
-    height: 100%;
+    height: 16em; 
     padding: 5px;
     resize: none;
 }
 .submit{
-     &:hover {
+     &:not(.no-hover):hover {
         cursor: pointer;
         transition: all .8s ease;
         background-color: var(--color-primary);
@@ -166,42 +150,30 @@ Add dark mode support
     color: white;
     background-color: var(--color-primary);
     height:40px;
-    width:100px;
+    width:115px;
     border: none;
     border-radius: 8px;
     margin-top: .5em;
     transition: all 0.35s;
     margin-left: calc(50% - 50px);
 }
-.notification{
-    top: 2px;
-    right: 2px;
-    position: fixed;
-}
-.visible{
-    visibility: visible;
-    opacity: 1;
-    transition: opacity 0s;
-}
-.hidden{
-    visibility: hidden;
-    opacity: 0;
-    transition: visibility 0s 1s, opacity 1s ease-out;
-}
+
 @media only screen and (max-width: 1024px) {
     #feedback-area{ 
         margin-bottom: 0.5em;
         width: 95%;
     }
-    #form{
-        padding-bottom: 6em;
-    }
 }
-@media only screen and (max-width: 400px) {
+@media only screen and (max-width: 420px) {
+    #form{
+        margin-top: 0.75em;
+    }
     #feedback-area{
         margin-bottom: 0.5em;
-        width: 95%;
-    }   
+    }
+    #admin-msg{
+        font-size: 1.2em; 
+    }
 }
 @media only screen and (max-height: 700px) {
     #feedback-area {
