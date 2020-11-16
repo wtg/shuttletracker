@@ -203,4 +203,24 @@ Add dark mode
         padding-bottom: 4em;
     }
 }
+
+@media only screen and (min-height: 700px) and (max-height: 800px) {
+    #form {
+        height: 19em; 
+    }
+}
+
+@media only screen and (min-height: 800px) and (max-height: 1000px) {
+    #form {
+        height: 25em; 
+    }
+}
+
+@media only screen and (max-height: 450px) {
+    #admin-msg {
+        font-size: 1.2em;    
+    }
+}
+
+
 </style>
