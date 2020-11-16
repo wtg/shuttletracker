@@ -108,16 +108,6 @@ export default Vue.extend({
 <style lang="scss" scoped>
 @import "@/assets/vars.scss";
 
-/*
-1.955em - desktop question font
-1.2em - mobile phone question font
-0.5em - between the q and the tbox - mobile
-6 cols textarea on mobile
-padding between submit and bottom row - mobile
-Replace submit button with feedback sent
-Add dark mode
-*/
-
 .parent{
     padding: 20px;
 }
@@ -204,6 +194,12 @@ Add dark mode
     }
 }
 
+@media only screen and (max-height: 450px) {
+    #admin-msg {
+        font-size: 1.2em;    
+    }
+}
+
 @media only screen and (min-height: 700px) and (max-height: 800px) {
     #form {
         height: 19em; 
@@ -215,12 +211,4 @@ Add dark mode
         height: 25em; 
     }
 }
-
-@media only screen and (max-height: 450px) {
-    #admin-msg {
-        font-size: 1.2em;    
-    }
-}
-
-
 </style>
