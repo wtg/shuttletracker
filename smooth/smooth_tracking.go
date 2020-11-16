@@ -89,11 +89,9 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 	elapsedDistance := 0.0
 	angle := 0.0
 	prevAngle := 0.0
-	prevDistance := 0.0
 	for elapsedDistance < predictedDistance {
 		prevAngle = angle
 		prevIndex := index
-		prevDistance = elapsedDistance
 		index++
 		if index >= len(route.Points) {
 			index = 0
@@ -102,11 +100,9 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 		angle = AngleBetween(route.Points[prevIndex], route.Points[index]) + 45
 
 		changeInAngle := math.Abs(math.Mod(angle, 360.0) - math.Mod(prevAngle, 360.0))
-		changeInDistance := elapsedDistance - prevDistance
 
-		if changeInAngle > 50 && changeInAngle < 100 && changeInDistance > 1 && lastUpdate.Speed > 3.6 { // sharp turn and distance traveled
-			// Change # 1 - Resulted in Avg Difference dropping from 600-700 to 460 meters
-			elapsedDistance += (lastUpdate.Speed - 3.575) * 2 // 8 mph in meters and 2 for # of seconds
+		if changeInAngle > 45 && changeInAngle < 315 && lastUpdate.Speed > 3.6 {
+			predictedDistance -= (lastUpdate.Speed - 3.575) * 2
 		}
 	}
 
