@@ -30,11 +30,6 @@ import Form from '@/structures/form';
 import { setTimeout } from 'timers';
 import {DarkTheme} from '@/structures/theme';
 
-// const tinycolor = require('tinycolor2');
-
-// const darkColor = tinycolor(line.options.color);
-// darkColor.darken(15);
-
 const sp = new InfoServiceProvider();
 
 export default Vue.extend({
@@ -58,7 +53,8 @@ export default Vue.extend({
         const c_wrap  = document.createElement('div');
         const count   = document.createElement('span');
         c_wrap!.style.position = 'relative';
-        c_wrap!.style.bottom = '2.10em';
+        c_wrap!.style.right = '0.78em';
+        c_wrap!.style.bottom = '2.1em';
         c_wrap!.style.color = '#8a8a8a';
         c_wrap!.style.cssFloat = 'right';
 
@@ -66,7 +62,6 @@ export default Vue.extend({
         wrapper!.appendChild(c_wrap);
 
         function _set() {
-            c_wrap!.style.right = '0.5em';
             count!.innerHTML = (512 - (text as HTMLTextAreaElement).value.length || 0).toString();
             if ((text as HTMLTextAreaElement).value.length === 512) {
                 const oldColor = count!.style.color;
@@ -194,6 +189,7 @@ Add dark mode
 @media only screen and (max-width: 420px) {
     #form{
         margin-top: 0.75em;
+        padding-right: 2.28em;
     }
     #feedback-area{
         margin-bottom: 0.5em;
