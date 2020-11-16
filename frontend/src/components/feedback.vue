@@ -53,24 +53,52 @@ export default Vue.extend({
     },
     mounted() {
         this.getAdminMessage();
+        const wrapper = document.getElementById('feedback-area');
+        const text = document.getElementById('form');
+        const c_wrap  = document.createElement('div');
+        const count   = document.createElement('span');
+        c_wrap!.style.position = 'relative';
+        c_wrap!.style.bottom = '2.10em';
+        c_wrap!.style.color = '#8a8a8a';
+        c_wrap!.style.cssFloat = 'right';
+
+        c_wrap!.appendChild(count);
+        wrapper!.appendChild(c_wrap);
+
+        function _set() {
+            c_wrap!.style.right = '0.5em';
+            count!.innerHTML = (512 - (text as HTMLTextAreaElement).value.length || 0).toString();
+            if ((text as HTMLTextAreaElement).value.length === 512) {
+                const oldColor = count!.style.color;
+                count!.style.color = 'var(--color-primary)';
+                setTimeout(() => {
+                    count!.style.color = oldColor;
+                }, 150);
+            }
+        }
+
+        text!.addEventListener('input', _set);
+        _set.call(text);
     },
     methods: {
         save() {
             const myMessage = new Form(-1, this.feedbackMessage, new Date(), false);
+            const text = document.getElementById('form');
             const btn = document.getElementById('submit');
-            (<HTMLButtonElement>btn)!.disabled = true;
-            btn!.classList.add("no-hover");
+            (btn as HTMLButtonElement)!.disabled = true;
+            (text as HTMLTextAreaElement)!.disabled = true;
+            btn!.classList.add('no-hover');
             AdminServiceProvider.CreateForm(myMessage).then((resp) => {
                 if (resp.ok) {
-                    btn!.style.backgroundColor = "#23d160";
-                    btn!.innerHTML = "<b>Feedback sent!</b>";
+                    btn!.style.backgroundColor = '#23d160';
+                    btn!.innerHTML = '<b>Feedback sent!</b>';
                 } else {
-                    btn!.style.backgroundColor = "#ff3860";
-                    btn!.innerHTML = "<b>Request failed.</b>";
+                    btn!.style.backgroundColor = '#ff3860';
+                    btn!.innerHTML = '<b>Request failed.</b>';
                 }
             }).catch(() => {
-                btn!.style.backgroundColor = "#ff3860";
-                btn!.innerHTML = "<b>Timed out.</b>";
+                btn!.style.backgroundColor = '#ff3860';
+                btn!.innerHTML = '<b>Timed out.</b>';
             });
         },
         getAdminMessage() {
@@ -102,7 +130,6 @@ Add dark mode
     font-size: 1.955em;
 }
 #feedback-area{
-    display: block;
     margin-left: auto;
     margin-right: auto;
     width: 50%;
