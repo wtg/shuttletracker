@@ -76,6 +76,33 @@ func ClosestPointTo(latitude, longitude float64, route *shuttletracker.Route) in
 // TODO: More factors this algorithm should consider: shuttle's proximity to a stop, whether
 // the shuttle is going around a sharp turn, etc.
 func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletracker.Location, route *shuttletracker.Route) Prediction {
+	// Dictionary of hard-coded light stops and intersections
+
+	numLights := 22
+	m := make(map[int64][]float64)
+	m[1] = []float64{42.730775, -73.677216}
+	m[2] = []float64{42.732904, -73.682553}
+	m[3] = []float64{42.733140, -73.683505}
+	m[4] = []float64{42.733779, -73.683293}
+	m[5] = []float64{42.733708, -73.685683}
+	m[6] = []float64{42.732102, -73.686238}
+	m[7] = []float64{42.729597, -73.686808}
+	m[8] = []float64{42.728325, -73.687088}
+	m[9] = []float64{42.727317, -73.687340}
+	m[10] = []float64{42.722734, -73.679778}
+	m[11] = []float64{42.726857, -73.678091}
+	m[12] = []float64{42.733992, -73.682248}
+	m[13] = []float64{42.732400, -73.671711}
+	m[14] = []float64{42.736453, -73.670587}
+	m[15] = []float64{42.737615, -73.670265}
+	m[16] = []float64{42.738269, -73.670081}
+	m[17] = []float64{42.737730, -73.666570}
+	m[18] = []float64{42.735967, -73.667075}
+	m[19] = []float64{42.730862, -73.667257}
+	m[20] = []float64{42.726621, -73.666819}
+	m[21] = []float64{42.724851, -73.673798}
+	m[22] = []float64{42.729077, -73.672603}
+
 	// Find the index of the closest point to this shuttle's last known location
 	index := ClosestPointTo(lastUpdate.Latitude, lastUpdate.Longitude, route)
 
@@ -104,8 +131,7 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 		changeInAngle := math.Abs(math.Mod(angle, 360.0) - math.Mod(prevAngle, 360.0))
 		changeInDistance := elapsedDistance - prevDistance
 
-		if changeInAngle > 50 && changeInAngle < 100 && changeInDistance > 1 && lastUpdate.Speed > 3.6 { // sharp turn and distance traveled
-			// Change # 1 - Resulted in Avg Difference dropping from 600-700 to 460 meters
+		if changeInAngle > 50 && changeInAngle < 100 && changeInDistance > 1 && lastUpdate.Speed > 3.6 {
 			elapsedDistance += (lastUpdate.Speed - 3.575) * 2 // 8 mph in meters and 2 for # of seconds
 		}
 	}
