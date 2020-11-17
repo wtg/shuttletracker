@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/wtg/shuttletracker"
+	"github.com/wtg/shuttletracker/log"
 )
 
 type Prediction struct {
@@ -78,7 +79,6 @@ func ClosestPointTo(latitude, longitude float64, route *shuttletracker.Route) in
 func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletracker.Location, route *shuttletracker.Route) Prediction {
 	// Dictionary of hard-coded light stops and intersections
 
-	numLights := 22
 	m := make(map[int64][]float64)
 	m[1] = []float64{42.730775, -73.677216}
 	m[2] = []float64{42.732904, -73.682553}
@@ -133,6 +133,23 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 
 		if changeInAngle > 50 && changeInAngle < 100 && changeInDistance > 1 && lastUpdate.Speed > 3.6 {
 			elapsedDistance += (lastUpdate.Speed - 3.575) * 2 // 8 mph in meters and 2 for # of seconds
+		} else {
+			for key, element := range m {
+				log.Debugf("Id: %d => %f, %f", key, element[0], element[1])
+				/*
+					Current Idea:
+						0 = (lastUpdate.speed)^2 + 2 (a) (dist from lastUpdate location to stop light)
+						=> Gets a
+						0 = (newSpeed)^2 + 2(a)(currentDistance from stop light)
+						=> gets newSpeed
+						Initial Distance - current distance = (newSpeed + lastUpdate.Speed / 2) * t
+						=> gets time
+						Now add to elapsedDistance the difference between lastUpdate.Speed and the newSpeed
+						multiplied by time
+
+					Double Check
+				*/
+			}
 		}
 	}
 
