@@ -192,13 +192,23 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 	//vehicle must be moving
 
 	if (approachingDistance < 15) {
-		a = acceleration(lastUpdate.Speed, 0,  approachingDistance )
-		predictedDistance =  predictedDistance + (.5)*a*math.Pow(secondsSinceUpdate, 2)
+		a = acceleration(speed, 0,  approachingDistance )
+		velocity := speed + a*secondsSinceUpdate
+		if velocity <= 0 {
+			predictedDistance  = approachingDistance 
+		} else {
+			predictedDistance =  predictedDistance + (.5)*a*math.Pow(secondsSinceUpdate, 2)
+		}
+		
 	} else if DepartedDistance <= 50 && lastUpdate.Speed >= 2.5 && lastUpdate.Speed < 11.11 {
 		a = 1.44
+		predictedDistance =  predictedDistance + (.5)*a*math.Pow(secondsSinceUpdate, 2)
 	} else {
 		a = 0.0
 	}
+
+
+	
 	log.Info("Acceleration \t", a)
 
 	expecteddistance := secondsSinceUpdate * speed 
