@@ -105,7 +105,7 @@ func ClosestApproachingStop(currentIndex int, route *shuttletracker.Route, ms sh
 }
 
 //Returns the index in ms.Stops() of the closest stop up ahead on the route (from ms.Stops()) to the given latitude and longitude coordinates
-func ClosestDepartingStop(currentIndex int, route *shuttletracker.Route, ms shuttletracker.ModelService) int{
+func ClosestDepartedStop(currentIndex int, route *shuttletracker.Route, ms shuttletracker.ModelService) int{
 	minDistance := math.MaxFloat64
 	minDistanceStopIndex := 0
 	i := 0
@@ -121,7 +121,6 @@ func ClosestDepartingStop(currentIndex int, route *shuttletracker.Route, ms shut
 			if (route.StopIDs[i] == stops[j].ID) {
 				stopindex := ClosestPointTo(stops[j].Latitude, stops[j].Longitude, route)
 				dist := DistanceToPointAlongRoute( stopindex , currentIndex,  route)
-				//dist := DistanceBetween(shuttletracker.Point{Latitude: stops[j].Latitude, Longitude: stops[j].Longitude} ,route.Points[currentIndex] ) 
 				if dist < minDistance {
 					minDistance = dist
 					minDistanceStopIndex = j
@@ -132,7 +131,7 @@ func ClosestDepartingStop(currentIndex int, route *shuttletracker.Route, ms shut
 		}
 		i += 1
 	}
-	log.Info("Min distance Departing      "  , minDistance)
+	log.Info("Min distance Departed      "  , minDistance)
 	return  minDistanceStopIndex
 }
 
@@ -154,7 +153,6 @@ func acceleration(velocity, finalVelocity float64, distance float64) float64 {
 	return (math.Pow(finalVelocity, 2) - math.Pow(velocity, 2))  / (2.0 * distance)
 }
 
-
 // Naive algorithm to predict the position a shuttle is at, given the last update received
 // Returns the index of the point the shuttle would be at on its route
 // TODO: More factors this algorithm should consider: shuttle's proximity to a stop, whether
@@ -166,35 +164,52 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 	index := ClosestPointTo(lastUpdate.Latitude, lastUpdate.Longitude, route)
 
 	approachingStopIndex := ClosestApproachingStop(index, route,  ms)
-	departingStopIndex :=  ClosestDepartingStop(index, route, ms)
+	DepartedStopIndex :=  ClosestDepartedStop(index, route, ms)
 	approachingStopIndex  = ClosestPointTo( stops[approachingStopIndex].Latitude, stops[approachingStopIndex].Longitude, route)
-	departingStopIndex  =  ClosestPointTo(stops[departingStopIndex].Latitude, stops[departingStopIndex].Longitude, route)
-
-
-	//log.Info("approaching stop     ", approachingStopIndex)
-	//log.Info("Departing stop       ", departingStopIndex)
+	DepartedStopIndex  =  ClosestPointTo(stops[DepartedStopIndex].Latitude, stops[DepartedStopIndex].Longitude, route)
 
 	approachingDistance  :=  DistanceToPointAlongRoute(index, approachingStopIndex, route) //meters
-	departingDistance :=  DistanceToPointAlongRoute(departingStopIndex, index, route) //meters
+	DepartedDistance :=  DistanceToPointAlongRoute(DepartedStopIndex, index, route) //meters
 	
 	log.Info("approaching stop distance     ", approachingDistance)
-	log.Info("Departing stop  distance      ", departingDistance)
+	log.Info("Departed stop  distance      ", DepartedDistance)
 	
 	// Find the amount of time that has passed since the last update was received, and given that,
 	// the distance the shuttle is predicted to have travelled
+	speed := lastUpdate.Speed
 	secondsSinceUpdate := time.Since(lastUpdate.Time).Seconds()
-	predictedDistance := secondsSinceUpdate * lastUpdate.Speed
+	predictedDistance := secondsSinceUpdate * speed
+	//acceleration of shuttle
+	a := 0.0
+	//gradually slow the shuttle down if it is approaching a stop
 
-/*
-	//if close and approaching a stop:
-	if headingToward && distanceToStop < 15 {
-		a := -1 * acceleration(lastUpdate.Speed, 0,  distanceToStop)
-		predictedDistance = predictedDistance + (.5)*a*math.Pow(secondsSinceUpdate, 2)
+	//for speeding up after a stop,
+	// assume an acceleration of 1.44 meters per sec^2 and a max speed of 11.11 meters per second  (40 kilometers per hour/ 25 miles per hour )
+	// giving us about 8 seconds of acceleration time
+	// takes about 50 meters to reach max speed.
+	// Assume that after 50 meters, shuttle speed isn't dictated by acceleration from the stop
+	//gradually speed the shuttle up if it is leaving a stop
+	//vehicle must be moving
+
+	if (approachingDistance < 15) {
+		a = acceleration(lastUpdate.Speed, 0,  approachingDistance )
+		predictedDistance =  predictedDistance + (.5)*a*math.Pow(secondsSinceUpdate, 2)
+	} else if DepartedDistance <= 50 && lastUpdate.Speed >= 2.5 && lastUpdate.Speed < 11.11 {
+		a = 1.44
+	} else {
+		a = 0.0
 	}
-	
+	log.Info("Acceleration \t", a)
+
+	expecteddistance := secondsSinceUpdate * speed 
+	  
+	log.Info("Seconds since last update \t", secondsSinceUpdate)
+	log.Info("Expected distance \t", expecteddistance)
+	log.Info("new predicted distance \t", predictedDistance)
+
+
 	// Iterate over each point in the route in order, summing the distance between each point,
 	// and stop when the predicted distance has elapsed
-	*/
 	elapsedDistance := 0.0
 	angle := 0.0
 	for elapsedDistance < predictedDistance {
