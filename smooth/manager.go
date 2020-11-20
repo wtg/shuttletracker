@@ -96,6 +96,7 @@ func (stm *SmoothTrackingManager) Run() {
 	if stm.predictUpdates {
 		ticker := time.Tick(stm.predictionInterval)
 		for range ticker {
+			log.Info("MAKING A PREDICTION")
 			stm.predict()
 		}
 	}
@@ -131,6 +132,7 @@ func (stm *SmoothTrackingManager) predictVehiclePosition(vehicleID int64) {
 	if err != nil {
 		log.WithError(err).Errorf("Cannot get route for vehicle %d to base prediction on", vehicleID)
 	}
+	
 	prediction := NaivePredictPosition(vehicle, update, route, stm.ms)
 	newUpdate := &shuttletracker.Location{
 		TrackerID: update.TrackerID,
