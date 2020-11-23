@@ -2,10 +2,12 @@
     <div class="parent">
         <h1 class="title">Feedback</h1>
         <h2 class="subtitle">All responses are greatly appreciated!<hr></h2>
-        <div id="body">
         <div id="feedback-area">
             <div v-if="this.adminMessage !== undefined" >
                 <b><div id="admin-msg" style="width: 100%;float:left;" v-html="this.adminMessage"></div></b>
+            </div>
+            <div id="thank-you" style="display:none">
+                <p>Your submission has been recorded anonymously. Thank you for helping us improve Shuttle Tracker!</p>
             </div>
             <textarea
                 id="form"
@@ -16,7 +18,6 @@
             <br>
             <button @click="save" class="submit" type="submit" form="feedback" value="Submit"
                 id="submit"><b>Submit</b></button>
-            </div>
         </div>
     </div>
 </template>
@@ -52,6 +53,7 @@ export default Vue.extend({
         const text = document.getElementById('form');
         const c_wrap  = document.createElement('div');
         const count   = document.createElement('span');
+        c_wrap.id = 'char-count';
         c_wrap!.style.position = 'relative';
         c_wrap!.style.right = '0.78em';
         c_wrap!.style.bottom = '2.1em';
@@ -78,22 +80,19 @@ export default Vue.extend({
     methods: {
         save() {
             const myMessage = new Form(-1, this.feedbackMessage, new Date(), false);
-            const text = document.getElementById('form');
-            const btn = document.getElementById('submit');
-            (btn as HTMLButtonElement)!.disabled = true;
-            (text as HTMLTextAreaElement)!.disabled = true;
-            btn!.classList.add('no-hover');
             AdminServiceProvider.CreateForm(myMessage).then((resp) => {
                 if (resp.ok) {
-                    btn!.style.backgroundColor = '#23d160';
-                    btn!.innerHTML = '<b>Feedback sent!</b>';
+                    document.getElementById('char-count')!.style.display = 'none';
+                    document.getElementById('admin-msg')!.style.display = 'none';
+                    document.getElementById('form')!.style.display = 'none';
+                    document.getElementById('submit')!.style.display = 'none';
+                    (document.getElementById('submit') as HTMLButtonElement)!.disabled = true;
+                    document.getElementById('thank-you')!.style.display = 'block';
                 } else {
-                    btn!.style.backgroundColor = '#ff3860';
-                    btn!.innerHTML = '<b>Request failed.</b>';
+                    
                 }
             }).catch(() => {
-                btn!.style.backgroundColor = '#ff3860';
-                btn!.innerHTML = '<b>Timed out.</b>';
+                
             });
         },
         getAdminMessage() {
@@ -111,6 +110,9 @@ export default Vue.extend({
 .parent{
     padding: 20px;
 }
+.subtitle{
+    margin-bottom: 0 !important;
+}
 #admin-msg{
     font-size: 1.955em;
 }
@@ -118,6 +120,10 @@ export default Vue.extend({
     margin-left: auto;
     margin-right: auto;
     width: 50%;
+}
+#thank-you{
+    font-size:1.05em;
+    margin-top: 10%;
 }
 #form{ 
     border-radius: 8px;
@@ -161,8 +167,8 @@ export default Vue.extend({
               0 3px 5px -1px rgba(0, 0, 0, 0.20);
     color: white;
     background-color: var(--color-primary);
-    height:40px;
-    width:115px;
+    height: 40px;
+    width: 100px;
     border: none;
     border-radius: 8px;
     margin-top: .5em;
