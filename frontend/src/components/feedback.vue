@@ -3,6 +3,12 @@
         <h1 class="title">Feedback</h1>
         <h2 class="subtitle">All responses are greatly appreciated!<hr></h2>
         <div id="feedback-area">
+            <div id="fail-n" class="hidden notification is-danger">
+                <p><b>Request failed!</b></p>
+            </div>
+            <div id="fail-n-len" class="hidden notification is-danger">
+                <p><b>Please enter more than 8 characters!</b></p>
+            </div>
             <div v-if="this.adminMessage !== undefined" >
                 <b><div id="admin-msg" style="width: 100%;float:left;" v-html="this.adminMessage"></div></b>
             </div>
@@ -80,19 +86,46 @@ export default Vue.extend({
     methods: {
         save() {
             const myMessage = new Form(-1, this.feedbackMessage, new Date(), false);
+            const fail = document.getElementById('fail-n')!;
+            const failLen = document.getElementById('fail-n-len')!;
             AdminServiceProvider.CreateForm(myMessage).then((resp) => {
                 if (resp.ok) {
-                    document.getElementById('char-count')!.style.display = 'none';
-                    document.getElementById('admin-msg')!.style.display = 'none';
-                    document.getElementById('form')!.style.display = 'none';
-                    document.getElementById('submit')!.style.display = 'none';
-                    (document.getElementById('submit') as HTMLButtonElement)!.disabled = true;
-                    document.getElementById('thank-you')!.style.display = 'block';
+                    if (this.feedbackMessage.length <= 8) {
+                        if (window.getComputedStyle(failLen, null).opacity === '0') {
+                            failLen.classList.remove('hidden');
+                            failLen.classList.add('visible');
+                            setTimeout(() => {
+                                failLen.classList.remove('visible');
+                                failLen.classList.add('hidden');
+                            }, 2000);
+                        }
+                    } else {
+                        document.getElementById('char-count')!.style.display = 'none';
+                        document.getElementById('admin-msg')!.style.display = 'none';
+                        document.getElementById('form')!.style.display = 'none';
+                        document.getElementById('submit')!.style.display = 'none';
+                        (document.getElementById('submit') as HTMLButtonElement)!.disabled = true;
+                        document.getElementById('thank-you')!.style.display = 'block';
+                    }
                 } else {
-                    
+                    if (window.getComputedStyle(fail, null).opacity === '0') {
+                        fail.classList.remove('hidden');
+                        fail.classList.add('visible');
+                        setTimeout(() => {
+                            fail.classList.remove('visible');
+                            fail.classList.add('hidden');
+                        }, 2000);
+                    }
                 }
             }).catch(() => {
-                
+                if (window.getComputedStyle(fail, null).opacity === '0') {
+                    fail.classList.remove('hidden');
+                    fail.classList.add('visible');
+                    setTimeout(() => {
+                        fail.classList.remove('visible');
+                        fail.classList.add('hidden');
+                    }, 2000);
+                }
             });
         },
         getAdminMessage() {
@@ -174,6 +207,32 @@ export default Vue.extend({
     margin-top: .5em;
     transition: all 0.35s;
     margin-left: calc(50% - 50px);
+    font-size: 0.8em;
+}
+.notification{
+    position: fixed;
+    padding: 1em 1.4em;
+    left: 50%;
+    bottom: 1.5em;
+    transform: translateX(-50%);
+    font-size: 0.9em;
+}
+.visible{
+    visibility: visible;
+    opacity: 1;
+    animation: mymove 0.5s ease-out forwards, opacity 0.5s;
+    transition: opacity 0s;
+}
+.hidden{
+    visibility: hidden;
+    opacity: 0; 
+    transition: visibility 0s 0.5s, opacity 0.5s ease-out;
+}
+
+@keyframes mymove
+{ 
+  from { bottom: 0;}
+  to { bottom: 1.5em;}
 }
 
 @media only screen and (max-width: 1024px) {
