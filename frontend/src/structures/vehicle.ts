@@ -112,7 +112,7 @@ export default class Vehicle {
     }
 
     public setHeading(heading: number) {
-        if (!store.state.settings.shuttleSlideEnabled) {
+        if (!store.state.settings.shuttleSlideEnabled || this.pointIndex == null || this.endPointIndex == null) {
             this.marker.setRotationAngle(heading - 45);
             this.marker.bindPopup(this.getMessage());
         } else {
