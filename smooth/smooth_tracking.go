@@ -79,29 +79,29 @@ func ClosestPointTo(latitude, longitude float64, route *shuttletracker.Route) in
 func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletracker.Location, route *shuttletracker.Route) Prediction {
 	// Dictionary of hard-coded light stops and intersections
 
-	m := make(map[int64][]float64)
-	m[1] = []float64{42.730775, -73.677216}
-	m[2] = []float64{42.732904, -73.682553}
-	m[3] = []float64{42.733140, -73.683505}
-	m[4] = []float64{42.733779, -73.683293}
-	m[5] = []float64{42.733708, -73.685683}
-	m[6] = []float64{42.732102, -73.686238}
-	m[7] = []float64{42.729597, -73.686808}
-	m[8] = []float64{42.728325, -73.687088}
-	m[9] = []float64{42.727317, -73.687340}
-	m[10] = []float64{42.722734, -73.679778}
-	m[11] = []float64{42.726857, -73.678091}
-	m[12] = []float64{42.733992, -73.682248}
-	m[13] = []float64{42.732400, -73.671711}
-	m[14] = []float64{42.736453, -73.670587}
-	m[15] = []float64{42.737615, -73.670265}
-	m[16] = []float64{42.738269, -73.670081}
-	m[17] = []float64{42.737730, -73.666570}
-	m[18] = []float64{42.735967, -73.667075}
-	m[19] = []float64{42.730862, -73.667257}
-	m[20] = []float64{42.726621, -73.666819}
-	m[21] = []float64{42.724851, -73.673798}
-	m[22] = []float64{42.729077, -73.672603}
+	m := make(map[int64]shuttletracker.Point)
+	m[1] = shuttletracker.Point{Latitude: 42.730775, Longitude: -73.677216}
+	m[2] = shuttletracker.Point{Latitude: 42.732904, Longitude: -73.682553}
+	m[3] = shuttletracker.Point{Latitude: 42.733140, Longitude: -73.683505}
+	m[4] = shuttletracker.Point{Latitude: 42.733779, Longitude: -73.683293}
+	m[5] = shuttletracker.Point{Latitude: 42.733708, Longitude: -73.685683}
+	m[6] = shuttletracker.Point{Latitude: 42.732102, Longitude: -73.686238}
+	m[7] = shuttletracker.Point{Latitude: 42.729597, Longitude: -73.686808}
+	m[8] = shuttletracker.Point{Latitude: 42.728325, Longitude: -73.687088}
+	m[9] = shuttletracker.Point{Latitude: 42.727317, Longitude: -73.687340}
+	m[10] = shuttletracker.Point{Latitude: 42.722734, Longitude: -73.679778}
+	m[11] = shuttletracker.Point{Latitude: 42.726857, Longitude: -73.678091}
+	m[12] = shuttletracker.Point{Latitude: 42.733992, Longitude: -73.682248}
+	m[13] = shuttletracker.Point{Latitude: 42.732400, Longitude: -73.671711}
+	m[14] = shuttletracker.Point{Latitude: 42.736453, Longitude: -73.670587}
+	m[15] = shuttletracker.Point{Latitude: 42.737615, Longitude: -73.670265}
+	m[16] = shuttletracker.Point{Latitude: 42.738269, Longitude: -73.670081}
+	m[17] = shuttletracker.Point{Latitude: 42.737730, Longitude: -73.666570}
+	m[18] = shuttletracker.Point{Latitude: 42.735967, Longitude: -73.667075}
+	m[19] = shuttletracker.Point{Latitude: 42.730862, Longitude: -73.667257}
+	m[20] = shuttletracker.Point{Latitude: 42.726621, Longitude: -73.666819}
+	m[21] = shuttletracker.Point{Latitude: 42.724851, Longitude: -73.673798}
+	m[22] = shuttletracker.Point{Latitude: 42.729077, Longitude: -73.672603}
 
 	// Find the index of the closest point to this shuttle's last known location
 	index := ClosestPointTo(lastUpdate.Latitude, lastUpdate.Longitude, route)
@@ -135,20 +135,30 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 			elapsedDistance += (lastUpdate.Speed - 3.575) * 2 // 8 mph in meters and 2 for # of seconds
 		} else {
 			for key, element := range m {
-				log.Debugf("Id: %d => %f, %f", key, element[0], element[1])
-				/*
-					Current Idea:
-						0 = (lastUpdate.speed)^2 + 2 (a) (dist from lastUpdate location to stop light)
-						=> Gets a
-						0 = (newSpeed)^2 + 2(a)(currentDistance from stop light)
-						=> gets newSpeed
-						Initial Distance - current distance = (newSpeed + lastUpdate.Speed / 2) * t
-						=> gets time
-						Now add to elapsedDistance the difference between lastUpdate.Speed and the newSpeed
-						multiplied by time
+				// First, detect if we're close enough to a stop light or intersection
+				p := shuttletracker.Point{Latitude: lastUpdate.Latitude, Longitude: lastUpdate.Longitude}
+				distanceToLight := DistanceBetween(p, element)
+				if distanceToLight < 10 {
+					log.Debugf("Detected a stop light or intersection # %d", key)
 
-					Double Check
-				*/
+					// get the original acceleration
+					acceleration := 0.0
+					acceleration = lastUpdate.Speed * lastUpdate.Speed * (-1.0)
+					acceleration = acceleration / (2.0 * distanceToLight)
+
+					// get the new speed at current point
+					newSpeed := 2 * acceleration * DistanceBetween(route.Points[index], element)
+					newSpeed = math.Sqrt(newSpeed)
+
+					// get the time transpired from original point
+					timeTranspired := distanceToLight - DistanceBetween(route.Points[index], element)
+					timeTranspired = timeTranspired / ((newSpeed + lastUpdate.Speed) / 2)
+
+					// Now update elapsedDistance
+					elapsedDistance += (newSpeed - lastUpdate.Speed) * timeTranspired
+					log.Debugf("Added %f to elapsedDistance", (newSpeed-lastUpdate.Speed)*timeTranspired)
+				}
+
 			}
 		}
 	}
