@@ -96,7 +96,6 @@ func (stm *SmoothTrackingManager) Run() {
 	if stm.predictUpdates {
 		ticker := time.Tick(stm.predictionInterval)
 		for range ticker {
-			log.Info("MAKING A PREDICTION")
 			stm.predict()
 		}
 	}

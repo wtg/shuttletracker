@@ -100,7 +100,6 @@ func ClosestApproachingStop(currentIndex int, route *shuttletracker.Route, ms sh
 		}
 		i += 1
 	}
-	log.Info("Min distance Approaching      " , minDistance)
 	return  minDistanceStopIndex
 }
 
@@ -131,7 +130,6 @@ func ClosestDepartedStop(currentIndex int, route *shuttletracker.Route, ms shutt
 		}
 		i += 1
 	}
-	log.Info("Min distance Departed      "  , minDistance)
 	return  minDistanceStopIndex
 }
 
@@ -159,7 +157,6 @@ func acceleration(velocity, finalVelocity float64, distance float64) float64 {
 // the shuttle is going around a sharp turn, etc.
 func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletracker.Location, route *shuttletracker.Route, ms shuttletracker.ModelService) Prediction {
 	// Find the index of the closest point to this shuttle's last known location
-	log.Info("In NAIVEPREDICTPOSITION \n")
 	stops,_ := ms.Stops()
 	index := ClosestPointTo(lastUpdate.Latitude, lastUpdate.Longitude, route)
 
@@ -171,8 +168,6 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 	approachingDistance  :=  DistanceToPointAlongRoute(index, approachingStopIndex, route) //meters
 	DepartedDistance :=  DistanceToPointAlongRoute(DepartedStopIndex, index, route) //meters
 	
-	log.Info("approaching stop distance     ", approachingDistance)
-	log.Info("Departed stop  distance      ", DepartedDistance)
 	
 	// Find the amount of time that has passed since the last update was received, and given that,
 	// the distance the shuttle is predicted to have travelled
@@ -213,16 +208,8 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 	}
 
 
-	
-	log.Info("Acceleration \t", a)
-
 	expecteddistance := secondsSinceUpdate * speed 
 	  
-	log.Info("Seconds since last update \t", secondsSinceUpdate)
-	log.Info("Expected distance \t", expecteddistance)
-	log.Info("new predicted distance \t", predictedDistance)
-
-
 	// Iterate over each point in the route in order, summing the distance between each point,
 	// and stop when the predicted distance has elapsed
 	elapsedDistance := 0.0
