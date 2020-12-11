@@ -164,28 +164,16 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 	DepartedStopIndex :=  ClosestDepartedStop(index, route, ms)
 	approachingStopIndex  = ClosestPointTo( stops[approachingStopIndex].Latitude, stops[approachingStopIndex].Longitude, route)
 	DepartedStopIndex  =  ClosestPointTo(stops[DepartedStopIndex].Latitude, stops[DepartedStopIndex].Longitude, route)
-
 	approachingDistance  :=  DistanceToPointAlongRoute(index, approachingStopIndex, route) //meters
 	DepartedDistance :=  DistanceToPointAlongRoute(DepartedStopIndex, index, route) //meters
-	
 	
 	// Find the amount of time that has passed since the last update was received, and given that,
 	// the distance the shuttle is predicted to have travelled
 	speed := lastUpdate.Speed
 	secondsSinceUpdate := time.Since(lastUpdate.Time).Seconds()
 	predictedDistance := secondsSinceUpdate * speed
-	//acceleration of shuttle
-	a := 0.0
-	//gradually slow the shuttle down if it is approaching a stop
-
-	//for speeding up after a stop,
-	// assume an acceleration of 1.44 meters per sec^2 and a max speed of 11.11 meters per second  (40 kilometers per hour/ 25 miles per hour )
-	// giving us about 8 seconds of acceleration time
-	// takes about 50 meters to reach max speed.
-	// Assume that after 50 meters, shuttle speed isn't dictated by acceleration from the stop
-	//gradually speed the shuttle up if it is leaving a stop
-	//vehicle must be moving
-
+	var a float64
+	// Gradually slow down shuttle if it's approaching a stop (within 15 meters) 
 	if (approachingDistance < 15) {
 		a = acceleration(speed, 0,  approachingDistance )
 		velocity := speed + a*secondsSinceUpdate
@@ -194,10 +182,13 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 		} else {
 			predictedDistance =  predictedDistance + (.5)*a*math.Pow(secondsSinceUpdate, 2)
 		}
-		
-	} else if DepartedDistance <= 50 && lastUpdate.Speed >= 2.5 && speed < 11.11 {
-		a = 1.44
+	// Gradually speed up shuttle if departing a stop (within 50 meters)
+	// Assume a max shuttle speed of 11.11 meters per second  (40 kmh / 25 miles mph )
+	// Assume of min speed of 3.5 meters per second (12.6 kmh / 7.8 mph) for acceleration
+	} else if DepartedDistance <= 50 && lastUpdate.Speed >= 3.5 && speed < 11.11 { 
+		a = 1.44 // assume an acceleration of 1.44 meters per sec^2 
 		velocity := speed + a*secondsSinceUpdate
+		//assume that a shuttle coasts at the max speed once reached
 		if velocity >= 11.11 {
 			accelerationTime := (11.11 - speed) / a
 			constantSpeedTime := secondsSinceUpdate - accelerationTime
@@ -206,10 +197,6 @@ func NaivePredictPosition(vehicle *shuttletracker.Vehicle, lastUpdate *shuttletr
 	} else {
 		a = 0.0
 	}
-
-
-	expecteddistance := secondsSinceUpdate * speed 
-	  
 	// Iterate over each point in the route in order, summing the distance between each point,
 	// and stop when the predicted distance has elapsed
 	elapsedDistance := 0.0
