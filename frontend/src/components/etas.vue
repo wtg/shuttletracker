@@ -1,5 +1,5 @@
 <template>
-  <div class="parent">
+  <div :class="!isIntegrated ? 'parent' : ''">
     <h1 v-if="!isIntegrated" class="title">ETAs</h1>
     <hr v-if="!isIntegrated">
 
@@ -80,7 +80,7 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
-  },
+},
   data() {
     return {
       routes: new Map(),
@@ -157,15 +157,20 @@ export default Vue.extend({
               const elapsed = from.getTime() - now.getTime();
               // console.log(elapsed);
               let etaMinutes = `A while`;
+              let buf = '';
               // cap display at 15 min
               if (elapsed < minuteMs * 15) {
                 if (Math.round(elapsed / minuteMs) === 0) {
-                  etaMinutes = `Less than a minute`;
+                  etaMinutes = !this.isMobile ? `Less than a minute` : `<1 min`;
+                  buf = '';
                 } else if (Math.round(elapsed / minuteMs) === 1) {
-                  etaMinutes = `${Math.round(elapsed / minuteMs)} minute`;
+                  etaMinutes = `${Math.round(elapsed / minuteMs)}`;
+                  buf = !this.isMobile ? ' minute' : ' min';
                 } else {
-                  etaMinutes = `${Math.round(elapsed / minuteMs)} minutes`;
+                  etaMinutes = `${Math.round(elapsed / minuteMs)}`;
+                  buf = !this.isMobile ? ' minutes' : ' mins';
                 }
+                etaMinutes += buf;
               }
 
               const e = {
@@ -273,7 +278,7 @@ window.addEventListener('storage', () => {
   padding-left: 10px;
 }
 .modifiable-cell {
-  //transition: 0.2s ease-in-out;
+  padding-left: 10px;
 }
 @keyframes collapse {
   0% {margin-top: 0; opacity: 1}
