@@ -6,7 +6,7 @@ We present to you a set of guidelines for contributing to Shuttle Tracker, hoste
 
 ## Communication
 
-ShuttleTracker uses Mattermost for communication. Join the Shuttle Tracker channel on https://chat.rcos.io. ShuttleTracker also uses Discord, our server can be found [here](https://discord.gg/CeNyCtg).
+Shuttle Tracker uses Discord for communication. You can join the Shuttle Tracker server [here](https://discord.gg/fwsgDEmg78).
 
 ## Code of Conduct
 
