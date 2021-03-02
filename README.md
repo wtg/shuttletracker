@@ -6,7 +6,7 @@ Looking to contribute? Please review our [Contribution Guidelines](CONTRIBUTING.
 
 More project documentation can be found on the [Repository Wiki](https://github.com/wtg/shuttletracker/wiki).
 
-If you encounter issues setting up, check the [Troubleshooting Guide](troubleshoot.txt) for potential solutions
+If you encounter issues setting up, check the [Common Installation Problems](https://github.com/wtg/shuttletracker/wiki/Common-Installation-Problems) for potential solutions.
 
 ## Setting up (Linux / WSL)
 
