@@ -60,6 +60,7 @@ func New(cfg Config, ms shuttletracker.ModelService, spoof *spoofer.Spoofer) (*U
 	return updater, nil
 }
 
+// Creates a new config object with the values from the config file.
 func NewConfig(v *viper.Viper) *Config {
 	cfg := &Config{
 		UpdateInterval: "10s",
@@ -87,7 +88,7 @@ func (u *Updater) Run() {
 	}
 }
 
-// Subscribe allows callers to provide a function that is called after Updater parses a new Location.
+// Subscribe allows callers to provide a function that is called whenever Updater parses a new Location.
 func (u *Updater) Subscribe(f func(*shuttletracker.Location)) {
 	// Reroute subscribers to Spoofer instead if spoof updates mode is on
 	if u.spoof.SpoofUpdates {
@@ -99,6 +100,7 @@ func (u *Updater) Subscribe(f func(*shuttletracker.Location)) {
 	}
 }
 
+// Notifies all subscribers that Updater has parsed a new Location.
 func (u *Updater) notifySubscribers(loc *shuttletracker.Location) {
 	u.sm.Lock()
 	for _, sub := range u.subscribers {
@@ -171,6 +173,7 @@ func (u *Updater) update() {
 	}
 }
 
+// Parses vehicle data from iTrak, creates a Location from it, and notifies subscribers.
 // nolint: gocyclo
 func (u *Updater) handleVehicleData(vehicleData string) {
 	match := u.dataRegexp.FindAllStringSubmatch(vehicleData, -1)[0]
@@ -336,6 +339,7 @@ func (u *Updater) GuessRouteForVehicle(vehicle *shuttletracker.Vehicle) (route *
 	return route, err
 }
 
+// Parses time and date strings from iTrak and returns as a Time object.
 func itrakTimeDate(itrakTime, itrakDate string) (time.Time, error) {
 	// Add leading zeros to the time value if they're missing. time.Parse expects this.
 	if len(itrakTime) < 11 {

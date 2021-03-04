@@ -57,6 +57,7 @@ func New(cfg Config, ms shuttletracker.ModelService) (*Spoofer, error) {
 	return spoofer, nil
 }
 
+// Creates a new config object from the values in the config file.
 func NewConfig(v *viper.Viper) *Config {
 	cfg := &Config{
 		SpoofUpdates:  false,
@@ -67,6 +68,9 @@ func NewConfig(v *viper.Viper) *Config {
 	return cfg
 }
 
+// Don't know why, but this needs to be called after NewConfig is called in order to
+// actually read the values from the config file. Otherwise, they fallback to the
+// default values.
 func BackupConfig(v *viper.Viper) *Config {
 	cfg := &Config{
 		SpoofUpdates:  false,
@@ -113,6 +117,7 @@ func (s *Spoofer) parseUpdates() {
 		return
 	}
 	for _, f := range files {
+		// Parse this file only if it is a JSON file
 		extensionIndex := strings.LastIndex(f.Name(), ".")
 		if !f.IsDir() && extensionIndex > -1 && f.Name()[extensionIndex+1:] == "json" {
 			vehiclefile, err := os.Open(wd + "/spoof_data/" + f.Name())
@@ -150,14 +155,15 @@ func (s *Spoofer) spoof() {
 		update.Created = time.Now()
 		update.Time = time.Now()
 		update.ID = s.updateID
+		// Create a spoofed location with this data and notify subscribers
 		if err := s.ms.CreateLocation(&update); err != nil {
 			log.WithError(err).Errorf("Could not create spoofed location for vehicle %d", vehicleID)
 			return
 		}
 		log.Debugf("Spoofed location for vehicle %d", vehicleID)
-
 		s.notifySubscribers(&update)
 
+		// Update the next spoof index for this vehicle
 		s.spoofIndexes[vehicleID] += 1
 		if s.spoofIndexes[vehicleID] >= len(updates) {
 			s.spoofIndexes[vehicleID] = 0
