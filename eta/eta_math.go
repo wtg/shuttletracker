@@ -23,6 +23,7 @@ func toRadians(n float64) float64 {
 	return n * math.Pi / 180
 }
 
+// Uses the Haversine formula to calculate the distance between two points.
 func distanceBetween(p1, p2 shuttletracker.Point) float64 {
 	lat1Rad := toRadians(p1.Latitude)
 	lon1Rad := toRadians(p1.Longitude)
@@ -35,6 +36,7 @@ func distanceBetween(p1, p2 shuttletracker.Point) float64 {
 				haversine(lon2Rad-lon1Rad)))
 }
 
+// Calculates the total distance one loop over the route covers.
 func calculateRouteDistance(route *shuttletracker.Route) float64 {
 	totalDistance := 0.0
 	for i, p1 := range route.Points {
@@ -53,6 +55,7 @@ type locationDistance struct {
 	index int
 }
 
+// Calculates the total distance between the all the locations.
 func calculateDistance(lds []locationDistance) float64 {
 	total := 0.0
 	if len(lds) < 2 {
@@ -97,8 +100,8 @@ func findClosestLine(point shuttletracker.Point, route *shuttletracker.Route) (p
 	return
 }
 
-// for each location, return the index of the provided point which it is closest to.
-// this can be used e.g. to figure out the order in which a track traverses a list of stops.
+// For each location, return the index of the provided point which it is closest to.
+// This can be used to figure out the order in which a track traverses a list of stops.
 func findMinimumDistanceIndices(points []shuttletracker.Point, locs []*shuttletracker.Location) []int {
 	indices := make([]int, len(locs))
 	for i, loc := range locs {
@@ -117,7 +120,7 @@ func findMinimumDistanceIndices(points []shuttletracker.Point, locs []*shuttletr
 	return indices
 }
 
-// lat/lon. returns bearing in degrees
+// Returns the bearing between the points, in degrees.
 func findInitialBearing(p1, p2 shuttletracker.Point) float64 {
 	lat1Rad := toRadians(p1.Latitude)
 	lon1Rad := toRadians(p1.Longitude)
@@ -130,7 +133,7 @@ func findInitialBearing(p1, p2 shuttletracker.Point) float64 {
 	return math.Atan2(y, x) / (math.Pi / 180)
 }
 
-// cross-track distance. see http://www.movable-type.co.uk/scripts/latlong.html
+// Cross-track distance. See http://www.movable-type.co.uk/scripts/latlong.html
 // Sign of returned value indicates which side of route the point is on.
 func crossTrackDistance(p shuttletracker.Point, route *shuttletracker.Route) float64 {
 	// first find two points that define the line

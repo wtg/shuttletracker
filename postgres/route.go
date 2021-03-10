@@ -100,12 +100,11 @@ $$ LANGUAGE sql;
 	return err
 }
 
-// TODO: document this
 type scanPoints struct {
 	points []shuttletracker.Point
 }
 
-// TODO: document this
+// Scan parses the points in the database.
 func (p *scanPoints) Scan(src interface{}) error {
 	if src == nil {
 		p.points = []shuttletracker.Point{}
@@ -251,7 +250,6 @@ func (rs *RouteService) Route(id int64) (*shuttletracker.Route, error) {
 	return r, nil
 }
 
-// TODO: document this
 type valuePoints []shuttletracker.Point
 
 // TODO: document this

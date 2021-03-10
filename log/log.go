@@ -32,6 +32,7 @@ func NewConfig(v *viper.Viper) *Config {
 	return cfg
 }
 
+// Sets the log level for this logger.
 func SetLevel(level string) {
 	parsed, err := logrus.ParseLevel(level)
 	if err != nil {

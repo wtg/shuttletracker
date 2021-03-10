@@ -108,6 +108,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		})
 	})
 
+	// ETAs
 	r.Route("/eta", func(r chi.Router) {
 		r.Get("/", api.ETAHandler)
 	})
@@ -157,6 +158,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 	return &api, nil
 }
 
+// NewConfig creates a new config object with the values from the API section of the config file.
 func NewConfig(v *viper.Viper) *Config {
 	cfg := &Config{
 		ListenURL:    "0.0.0.0:8080",
@@ -168,6 +170,7 @@ func NewConfig(v *viper.Viper) *Config {
 	return cfg
 }
 
+// Run starts the listener on the configured URL and handles requests on incoming connections.
 func (api *API) Run() {
 	if err := http.ListenAndServe(api.cfg.ListenURL, api.handler); err != nil {
 		log.WithError(err).Error("Unable to serve.")
@@ -190,7 +193,7 @@ func (api *API) AdminHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "static/admin.html")
 }
 
-//KeyHandler sends Mapbox api key to authenticated user
+// KeyHandler sends the Mapbox API key to an authenticated user.
 func (api *API) KeyHandler(w http.ResponseWriter, r *http.Request) {
 	err := WriteJSON(w, api.cfg.MapboxAPIKey)
 	if err != nil {

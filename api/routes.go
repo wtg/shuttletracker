@@ -9,6 +9,7 @@ import (
 	"github.com/wtg/shuttletracker/log"
 )
 
+// ETAHandler finds all the current ETAs
 func (api *API) ETAHandler(w http.ResponseWriter, r *http.Request) {
 	etas := api.etaManager.CurrentETAs()
 	err := WriteJSON(w, etas)
@@ -56,7 +57,7 @@ func (api *API) RoutesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// RoutesDeleteHandler deletes a route from database
+// RoutesDeleteHandler deletes a route from the database
 func (api *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.URL.Query().Get("id"), 10, 64)
 	if err != nil {
@@ -74,7 +75,7 @@ func (api *API) RoutesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// RoutesEditHandler Only handles editing enabled flag for now
+// RoutesEditHandler only handles editing enabled flag for now
 func (api *API) RoutesEditHandler(w http.ResponseWriter, r *http.Request) {
 	route := &shuttletracker.Route{}
 	err := json.NewDecoder(r.Body).Decode(route)
@@ -118,6 +119,7 @@ func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, stop)
 }
 
+// StopsDeleteHandler deletes a stop from the database
 func (api *API) StopsDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.URL.Query().Get("id"), 10, 64)
 	if err != nil {

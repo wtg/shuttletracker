@@ -39,6 +39,7 @@ func (api *API) VehiclesCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// VehiclesEditHandler edits a vehicle.
 func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
 	vehicle := &shuttletracker.Vehicle{}
 	err := json.NewDecoder(r.Body).Decode(vehicle)
@@ -70,6 +71,7 @@ func (api *API) VehiclesEditHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// VehiclesDeleteHandler deletes a vehicle.
 func (api *API) VehiclesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.URL.Query().Get("id"), 10, 64)
 	if err != nil {
@@ -117,7 +119,7 @@ func (api *API) UpdatesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // HistoryHandler returns the last 30 days worth of updates for all enabled vehicles
-func (api *API) HistoryHandler(w http.ResponseWriter, r *http.Request){
+func (api *API) HistoryHandler(w http.ResponseWriter, r *http.Request) {
 	vehicles, err := api.ms.EnabledVehicles()
 	if err != nil {
 		log.WithError(err).Error("Unable to get enabled vehicles")
@@ -129,7 +131,7 @@ func (api *API) HistoryHandler(w http.ResponseWriter, r *http.Request){
 	for _, vehicle := range vehicles {
 		since := time.Now().Add(time.Minute * -43200)
 		vehicleUpdates, err := api.ms.LocationsSince(vehicle.ID, since)
-		if err != nil{
+		if err != nil {
 			log.WithError(err).Error("Unable to get last vehicle update.")
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -140,11 +142,9 @@ func (api *API) HistoryHandler(w http.ResponseWriter, r *http.Request){
 	}
 
 	writerErr := WriteJSON(w, history)
-	//Errcheck complaining 
-	if writerErr != nil{
+	//Errcheck complaining
+	if writerErr != nil {
 		http.Error(w, writerErr.Error(), http.StatusInternalServerError)
 	}
-	
-
 
 }
