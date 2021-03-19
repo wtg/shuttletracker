@@ -18,6 +18,7 @@ func (fs *FeedbackService) initializeSchema(db *sql.DB) error {
 	schema := `
 CREATE TABLE IF NOT EXISTS forms (
 	id serial PRIMARY KEY,
+	prompt text,
 	message text,
 	created timestamp with time zone NOT NULL DEFAULT now(),
 	admin bool DEFAULT false
@@ -55,8 +56,8 @@ func (fs *FeedbackService) GetForm(id int64) (*shuttletracker.Form, error) {
 // Forms returns all Forms.
 func (fs *FeedbackService) GetForms() ([]*shuttletracker.Form, error) {
 	forms := []*shuttletracker.Form{}
-	query := "SELECT f.id, f.message, f.created, f.admin" +
-		" FROM forms f;"
+	query := "SELECT f.prompt, f.id, f.message, f.created, f.admin" +
+		" FROM forms f GROUP BY f.prompt;"
 	rows, err := fs.db.Query(query)
 	if err != nil {
 		return nil, err
