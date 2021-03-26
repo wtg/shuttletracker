@@ -56,6 +56,7 @@ func (fs *FeedbackService) GetForm(id int64) (*shuttletracker.Form, error) {
 // Forms returns all Forms.
 func (fs *FeedbackService) GetForms() ([]*shuttletracker.Form, error) {
 	forms := []*shuttletracker.Form{}
+	// Add GROUP BY f.prompt to sort the table with
 	query := "SELECT f.prompt, f.id, f.message, f.created, f.admin" +
 		" FROM forms f GROUP BY f.prompt;"
 	rows, err := fs.db.Query(query)
@@ -86,9 +87,11 @@ func (fs *FeedbackService) CreateForm(form *shuttletracker.Form) error {
 		}
 		log.Debugf(strconv.FormatInt(n, 10) + " stale admin feedback message(s) were successfully deleted")
 	}
-	statement := "INSERT INTO forms (message, created, admin) VALUES" +
-		" ($1, now(), $2) RETURNING id, message, created;"
-	row := fs.db.QueryRow(statement, form.Message, form.Admin)
+	// Add prompt when inserting value to the table
+	statement := "INSERT INTO forms (prompt, message, created, admin) VALUES" +
+		" ($1, $2, now(), $3) RETURNING id, message, created;"
+	// Use GetAdminForm function to get the current prompt visible to user
+	row := fs.db.QueryRow(statement, GetAdminForm().Message, form.Message, form.Admin)
 	return row.Scan(&form.ID, &form.Message, &form.Created)
 }
 
