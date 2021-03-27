@@ -23,6 +23,7 @@ type StopService interface {
 	Stop(id int64) (*Stop, error)
 	Stops() ([]*Stop, error)
 	CreateStop(stop *Stop) error
+	CreateStopWithID(stop *Stop) error
 	DeleteStop(id int64) error
 }
 
