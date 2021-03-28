@@ -109,7 +109,12 @@ func (api *API) StopsCreateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = api.ms.CreateStop(stop)
+
+	if stop.ID < 0 {
+		err = api.ms.CreateStop(stop)
+	} else {
+		err = api.ms.CreateStopWithID(stop)
+	}
 	if err != nil {
 		log.WithError(err).Error("unable to create stop")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
