@@ -28,16 +28,13 @@ CREATE TABLE IF NOT EXISTS forms (
 }
 
 // Form returns a Form if its admin field is true
-func (fs *FeedbackService) GetAdminForm() (*shuttletracker.Form, error) {
+func (fs *FeedbackService) GetAdminForm() (*shuttletracker.Form) {
 	statement := "SELECT f.id, f.message, f.created, f.admin" +
 		" FROM forms f WHERE admin = true;"
 	f := &shuttletracker.Form{}
 	row := fs.db.QueryRow(statement)
-	err := row.Scan(&f.ID, &f.Message, &f.Created, &f.Admin)
-	if err == sql.ErrNoRows {
-		return nil, shuttletracker.ErrFormNotFound
-	}
-	return f, err
+	row.Scan(&f.ID, &f.Message, &f.Created, &f.Admin)
+	return f
 }
 
 // Form returns a Form by its ID.
@@ -91,7 +88,9 @@ func (fs *FeedbackService) CreateForm(form *shuttletracker.Form) error {
 	statement := "INSERT INTO forms (prompt, message, created, admin) VALUES" +
 		" ($1, $2, now(), $3) RETURNING id, message, created;"
 	// Use GetAdminForm function to get the current prompt visible to user
-	row := fs.db.QueryRow(statement, GetAdminForm().Message, form.Message, form.Admin)
+	msg := fs.GetAdminForm()
+
+	row := fs.db.QueryRow(statement, msg.Message, form.Message, form.Admin)
 	return row.Scan(&form.ID, &form.Message, &form.Created)
 }
 
