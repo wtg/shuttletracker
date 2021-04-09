@@ -10,6 +10,14 @@
                 <th></th>
                 <th></th>
                 </tr>
+                <tr v-for="form in forms" :key="form.id">
+                    <th>{{form.id}}</th>
+                    <th>{{form.message}}</th>
+                    <th>{{form.created}}</th>
+                    <th>{{form.admin}}</th>
+                    <th></th>
+                    <th></th>
+                </tr>
             </thead>
             <tbody>
                 <tr>
@@ -48,3 +56,15 @@
         </table>
     </div>
 </template>
+<script lang="ts">
+import Vue from 'vue';
+import { Stop } from '@/structures/form';
+export default Vue.extend({
+    name: 'form',
+    computed: {
+        form(): form[] {
+            return this.$form.state;
+        },
+    },
+});
+</script>
