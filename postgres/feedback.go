@@ -74,6 +74,7 @@ func (fs *FeedbackService) GetForms() ([]*shuttletracker.Form, error) {
 // CreateForm creates a Form.
 func (fs *FeedbackService) CreateForm(form *shuttletracker.Form) error {
 	if form.Admin == true {
+		fmt.Println("admin is true!!!!!")
 		result, err := fs.db.Exec("DELETE FROM forms WHERE admin = true;")
 		if err != nil {
 			return err
@@ -88,9 +89,11 @@ func (fs *FeedbackService) CreateForm(form *shuttletracker.Form) error {
 	statement := "INSERT INTO forms (prompt, message, created, admin) VALUES" +
 		" ($1, $2, now(), $3) RETURNING id, message, created;"
 	// Use GetAdminForm function to get the current prompt visible to user
+	fmt.Println("111111!")
 	msg := fs.GetAdminForm()
-
+	fmt.Println("22222!")
 	row := fs.db.QueryRow(statement, msg.Message, form.Message, form.Admin)
+	fmt.Println("33333!")
 	return row.Scan(&form.ID, &form.Message, &form.Created)
 }
 
