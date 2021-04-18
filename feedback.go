@@ -10,7 +10,7 @@ type Form struct {
 	ID      int64     `json:"id"`
 	Message string    `json:"message"`
 	Created time.Time `json:"created"`
-	Admin	bool	  `json:"admin"`
+	Admin	bool	  `json:"admin_shuttletracker"`
 }
 
 // FeedbackService is an interface for interacting with Feedback.
