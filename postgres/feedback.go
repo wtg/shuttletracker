@@ -3,6 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"strconv"
+
 	"github.com/wtg/shuttletracker"
 	"github.com/wtg/shuttletracker/log"
 )
@@ -27,7 +28,7 @@ CREATE TABLE IF NOT EXISTS forms (
 }
 
 // Form returns a Form if its admin field is true
-func (fs *FeedbackService) GetAdminForm() (*shuttletracker.Form) {
+func (fs *FeedbackService) GetAdminForm() *shuttletracker.Form {
 	statement := "SELECT f.id, f.message, f.created, f.admin" +
 		" FROM forms f WHERE admin = true;"
 	f := &shuttletracker.Form{}
@@ -40,7 +41,7 @@ func (fs *FeedbackService) GetAdminForm() (*shuttletracker.Form) {
 func (fs *FeedbackService) GetForm(id int64) (*shuttletracker.Form, error) {
 	statement := "SELECT f.message, f.created, f.admin" +
 		" FROM forms f WHERE id = $1;"
-	f := &shuttletracker.Form{ ID: id }
+	f := &shuttletracker.Form{ID: id}
 	row := fs.db.QueryRow(statement, id)
 	err := row.Scan(&f.Message, &f.Created, &f.Admin)
 	if err == sql.ErrNoRows {

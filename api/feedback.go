@@ -11,7 +11,6 @@ import (
 // FeedbackAdminHandler gets the feedback message with admin=true
 func (api *API) FeedbackAdminHandler(w http.ResponseWriter, r *http.Request) {
 	form := api.fdb.GetAdminForm()
-
 	WriteJSON(w, form)
 }
 
