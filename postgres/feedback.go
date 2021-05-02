@@ -18,6 +18,7 @@ func (fs *FeedbackService) initializeSchema(db *sql.DB) error {
 	schema := `
 CREATE TABLE IF NOT EXISTS forms (
 	id serial PRIMARY KEY,
+	prompt text,
 	message text,
 	created timestamp with time zone NOT NULL DEFAULT now(),
 	admin bool DEFAULT false
@@ -27,23 +28,20 @@ CREATE TABLE IF NOT EXISTS forms (
 }
 
 // Form returns a Form if its admin field is true
-func (fs *FeedbackService) GetAdminForm() (*shuttletracker.Form, error) {
+func (fs *FeedbackService) GetAdminForm() *shuttletracker.Form {
 	statement := "SELECT f.id, f.message, f.created, f.admin" +
 		" FROM forms f WHERE admin = true;"
 	f := &shuttletracker.Form{}
 	row := fs.db.QueryRow(statement)
-	err := row.Scan(&f.ID, &f.Message, &f.Created, &f.Admin)
-	if err == sql.ErrNoRows {
-		return nil, shuttletracker.ErrFormNotFound
-	}
-	return f, err
+	row.Scan(&f.ID, &f.Message, &f.Created, &f.Admin)
+	return f
 }
 
 // Form returns a Form by its ID.
 func (fs *FeedbackService) GetForm(id int64) (*shuttletracker.Form, error) {
 	statement := "SELECT f.message, f.created, f.admin" +
 		" FROM forms f WHERE id = $1;"
-	f := &shuttletracker.Form{ ID: id }
+	f := &shuttletracker.Form{ID: id}
 	row := fs.db.QueryRow(statement, id)
 	err := row.Scan(&f.Message, &f.Created, &f.Admin)
 	if err == sql.ErrNoRows {
@@ -55,8 +53,9 @@ func (fs *FeedbackService) GetForm(id int64) (*shuttletracker.Form, error) {
 // Forms returns all Forms.
 func (fs *FeedbackService) GetForms() ([]*shuttletracker.Form, error) {
 	forms := []*shuttletracker.Form{}
-	query := "SELECT f.id, f.message, f.created, f.admin" +
-		" FROM forms f;"
+	// Add GROUP BY f.prompt to sort the table with
+	query := "SELECT f.prompt, f.id, f.message, f.created, f.admin" +
+		" FROM forms f GROUP BY f.prompt;"
 	rows, err := fs.db.Query(query)
 	if err != nil {
 		return nil, err
@@ -85,9 +84,12 @@ func (fs *FeedbackService) CreateForm(form *shuttletracker.Form) error {
 		}
 		log.Debugf(strconv.FormatInt(n, 10) + " stale admin feedback message(s) were successfully deleted")
 	}
-	statement := "INSERT INTO forms (message, created, admin) VALUES" +
-		" ($1, now(), $2) RETURNING id, message, created;"
-	row := fs.db.QueryRow(statement, form.Message, form.Admin)
+	// Add prompt when inserting value to the table
+	statement := "INSERT INTO forms (prompt, message, created, admin) VALUES" +
+		" ($1, $2, now(), $3) RETURNING id, message, created;"
+	// Use GetAdminForm function to get the current prompt visible to user
+	msg := fs.GetAdminForm()
+	row := fs.db.QueryRow(statement, msg.Message, form.Message, form.Admin)
 	return row.Scan(&form.ID, &form.Message, &form.Created)
 }
 
