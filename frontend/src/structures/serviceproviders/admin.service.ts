@@ -60,7 +60,6 @@ export default class AdminServiceProvider {
         });
     }
 
-    // FEEDBACK - needs to be confirmed
     public static CreateForm(form: Form): Promise<Response> {
         return fetch('/forms', {
             method: 'POST',

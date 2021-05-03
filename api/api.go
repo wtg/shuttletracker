@@ -59,7 +59,7 @@ func New(cfg Config, ms shuttletracker.ModelService, msg shuttletracker.MessageS
 		updater:    updater,
 		fm:         fm,
 		etaManager: etaManager,
-		fdb:        fdb, //feedback - need to make feedback api first
+		fdb:        fdb,
 	}
 
 	r := chi.NewRouter()
