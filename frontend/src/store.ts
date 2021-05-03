@@ -9,6 +9,7 @@ import Location from '@/structures/location';
 import * as L from 'leaflet';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 import ETA from './structures/eta';
+import Form from '@/structures/form';
 import {DarkTheme} from '@/structures/theme';
 
 
@@ -27,6 +28,7 @@ const store: StoreOptions<StoreState> = {
     Stops: [],
     Vehicles: [],
     etas: [],
+    Forms: [],
     adminMessage: undefined,
     online: true,
     /** Current time, with minute accuracy. */
@@ -79,6 +81,9 @@ const store: StoreOptions<StoreState> = {
           }
         });
       });
+    },
+    setForms(state, forms: Form[]) {
+      state.Forms = forms;
     },
     updateVehicleLocation(state, location: Location) {
       // find vehicle
@@ -253,6 +258,9 @@ const store: StoreOptions<StoreState> = {
     getVehicles(state: StoreState): Vehicle[] {
       return state.Vehicles;
     },
+    getForms(state: StoreState): Form[] {
+      return state.Forms;
+    },
   },
   actions: {
     grabRoutes({ commit }) {
@@ -267,6 +275,11 @@ const store: StoreOptions<StoreState> = {
     },
     grabVehicles({ commit }) {
       InfoService.GrabVehicles().then((ret: Vehicle[]) => commit('setVehicles', ret)).catch(() => {
+        commit('setOnline', false);
+      });
+    },
+    grabForms({ commit}) {
+      InfoService.GrabForms().then((ret: Form[]) => commit('setForms', ret)).catch(() => {
         commit('setOnline', false);
       });
     },

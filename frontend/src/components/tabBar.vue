@@ -16,6 +16,12 @@
     <!-- <router-link v-if="etasEnabled" tag="li" to="/etas">
       ETAs
     </router-link> -->
+    <router-link tag="li" to="/feedback">
+      <span>
+        <span class="fas fa-comment"></span>
+        Feedback
+      </span>
+    </router-link>
     <router-link tag="li" to="/settings">
       <span>
         <span class="fas fa-cog"></span>

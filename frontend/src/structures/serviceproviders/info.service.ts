@@ -1,7 +1,9 @@
 import Vehicle from '../vehicle';
 import Route from '../route';
 import { Stop } from '../stop';
+import Form from '../form';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
+import FeedbackMessageUpdate from '@/structures/feedbackMessageUpdate';
 import routeScheduleInterval from '../routeScheduleInterval';
 import Resources from '@/resources';
 /**
@@ -86,11 +88,36 @@ export default class InfoServiceProvider {
         });
     }
 
+    public GrabForms(): Promise<Form[]> {
+        return fetch(Resources.BasePath + 'forms').then((data) => data.json()).then((data) => {
+            const ret = new Array<Form>();
+            data.forEach((element: {
+                id: number,
+                message: string,
+                prompt: string,
+                created: Date,
+                admin: boolean,
+            }) => {
+                ret.push(new Form(element.id, element.message, element.prompt, element.created, element.admin));
+            });
+            return ret;
+        });
+    }
+
     public GrabAdminMessage(): Promise<AdminMessageUpdate> {
         return fetch(Resources.BasePath + 'adminMessage').then((data) => data.json()).then((ret) => {
             return new AdminMessageUpdate(ret.message, Boolean(ret.enabled), new Date(ret.created), new Date(ret.updated), ret.link);
         }).catch(() => {
             return new AdminMessageUpdate('', false, new Date(), new Date(), '');
+
+        });
+    }
+
+    public GrabFeedbackMessage(): Promise<FeedbackMessageUpdate> {
+        return fetch(Resources.BasePath + 'forms/admin').then((data) => data.json()).then((ret) => {
+            return new FeedbackMessageUpdate(ret.message, Boolean(ret.admin));
+        }).catch(() => {
+            return new FeedbackMessageUpdate('', false);
 
         });
     }

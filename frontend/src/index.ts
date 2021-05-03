@@ -7,6 +7,7 @@ import schedules from '@/components/schedules.vue';
 import settings from '@/components/settings.vue';
 import etas from '@/components/etas.vue';
 import changes from '@/components/changes.vue';
+import feedback from '@/components/feedback.vue';
 import Resources from '@/resources';
 
 Vue.use(Router);
@@ -24,6 +25,11 @@ export default new Router({
       path: '/about',
       name: 'about',
       component: about,
+    },
+    {
+      path: '/feedback',
+      name: 'feedback',
+      component: feedback,
     },
     {
       path: '/faq',
@@ -49,6 +55,11 @@ export default new Router({
       path: '/changes',
       name: 'changes',
       component: changes,
+    },
+    {
+      path: '/feedback',
+      name: 'feedback',
+      component: feedback,
     },
   ],
 });

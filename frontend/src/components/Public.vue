@@ -38,6 +38,8 @@ import UserLocationService from '@/structures/userlocation.service';
 import BusButton from '@/components/busbutton.vue';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 import ETAMessage from '@/components/etaMessage.vue';
+import Form from '../structures/form';
+import FeedbackMessageUpdate from '@/structures/feedbackMessageUpdate';
 import {DarkTheme} from '@/structures/theme';
 
 const tinycolor = require('tinycolor2');

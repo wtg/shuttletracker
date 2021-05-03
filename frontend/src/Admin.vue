@@ -27,6 +27,9 @@
           <router-link to="/admin/messages" class="navbar-item">
             Messages
           </router-link>
+          <router-link to="/admin/feedback" class="navbar-item">
+            Feedback
+          </router-link>
         </div>         
 
         <div class="navbar-end">
@@ -66,6 +69,7 @@ export default Vue.extend({
     this.$store.dispatch('grabRoutes');
     this.$store.dispatch('grabVehicles');
     this.$store.dispatch('grabStops');
+    this.$store.dispatch('grabForms');
   },
 });
 </script>

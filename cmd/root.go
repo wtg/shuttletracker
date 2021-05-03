@@ -47,6 +47,9 @@ var rootCmd = &cobra.Command{
 		// User service
 		var us shuttletracker.UserService = pg
 
+		// User service
+		var fdb shuttletracker.FeedbackService = pg
+
 		// Make spoofer
 		spoofer, err := spoofer.New(*cfg.Spoofer, ms)
 		if err != nil {
@@ -71,7 +74,7 @@ var rootCmd = &cobra.Command{
 		runner.Add(etaManager)
 
 		// Make API server
-		api, err := api.New(*cfg.API, ms, msg, us, updater, etaManager)
+		api, err := api.New(*cfg.API, ms, msg, us, updater, etaManager, fdb)
 		if err != nil {
 			log.WithError(err).Error("Could not create API server.")
 			return
