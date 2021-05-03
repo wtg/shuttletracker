@@ -29,21 +29,21 @@ CREATE TABLE IF NOT EXISTS forms (
 
 // Form returns a Form if its admin field is true
 func (fs *FeedbackService) GetAdminForm() *shuttletracker.Form {
-	statement := "SELECT f.id, f.message, f.created, f.admin" +
+	statement := "SELECT f.id, f.message, f.prompt, f.created, f.admin" +
 		" FROM forms f WHERE admin = true;"
 	f := &shuttletracker.Form{}
 	row := fs.db.QueryRow(statement)
-	row.Scan(&f.ID, &f.Message, &f.Created, &f.Admin)
+	row.Scan(&f.ID, &f.Message, &f.Prompt, &f.Created, &f.Admin)
 	return f
 }
 
 // Form returns a Form by its ID.
 func (fs *FeedbackService) GetForm(id int64) (*shuttletracker.Form, error) {
-	statement := "SELECT f.message, f.created, f.admin" +
+	statement := "SELECT f.message, f.prompt, f.created, f.admin" +
 		" FROM forms f WHERE id = $1;"
 	f := &shuttletracker.Form{ID: id}
 	row := fs.db.QueryRow(statement, id)
-	err := row.Scan(&f.Message, &f.Created, &f.Admin)
+	err := row.Scan(&f.Message, &f.Prompt, &f.Created, &f.Admin)
 	if err == sql.ErrNoRows {
 		return nil, shuttletracker.ErrFormNotFound
 	}
@@ -54,15 +54,15 @@ func (fs *FeedbackService) GetForm(id int64) (*shuttletracker.Form, error) {
 func (fs *FeedbackService) GetForms() ([]*shuttletracker.Form, error) {
 	forms := []*shuttletracker.Form{}
 	// Add GROUP BY f.prompt to sort the table with
-	query := "SELECT f.prompt, f.id, f.message, f.created, f.admin" +
-		" FROM forms f GROUP BY f.prompt;"
+	query := "SELECT f.id, f.message, f.prompt, f.created, f.admin" +
+		" FROM forms f GROUP BY f.id, f.prompt;"
 	rows, err := fs.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
 	for rows.Next() {
 		f := &shuttletracker.Form{}
-		err := rows.Scan(&f.ID, &f.Message, &f.Created, &f.Admin)
+		err := rows.Scan(&f.ID, &f.Message, &f.Prompt, &f.Created, &f.Admin)
 		if err != nil {
 			return nil, err
 		}
@@ -86,11 +86,11 @@ func (fs *FeedbackService) CreateForm(form *shuttletracker.Form) error {
 	}
 	// Add prompt when inserting value to the table
 	statement := "INSERT INTO forms (prompt, message, created, admin) VALUES" +
-		" ($1, $2, now(), $3) RETURNING id, message, created;"
+		" ($1, $2, now(), $3) RETURNING id, message, prompt, created;"
 	// Use GetAdminForm function to get the current prompt visible to user
 	msg := fs.GetAdminForm()
 	row := fs.db.QueryRow(statement, msg.Message, form.Message, form.Admin)
-	return row.Scan(&form.ID, &form.Message, &form.Created)
+	return row.Scan(&form.ID, &form.Message, &form.Prompt, &form.Created)
 }
 
 // DeleteForm deletes a Form.

@@ -9,13 +9,14 @@ import (
 type Form struct {
 	ID      int64     `json:"id"`
 	Message string    `json:"message"`
+	Prompt  string    `json:"prompt"`
 	Created time.Time `json:"created"`
-	Admin	bool	  `json:"admin"`
+	Admin   bool      `json:"admin"`
 }
 
 // FeedbackService is an interface for interacting with Feedback.
 type FeedbackService interface {
-	GetAdminForm() (*Form)
+	GetAdminForm() *Form
 	GetForm(id int64) (*Form, error)
 	GetForms() ([]*Form, error)
 	CreateForm(form *Form) error
