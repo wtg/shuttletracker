@@ -69,6 +69,7 @@ export default Vue.extend({
     this.$store.dispatch('grabRoutes');
     this.$store.dispatch('grabVehicles');
     this.$store.dispatch('grabStops');
+    this.$store.dispatch('grabForms');
   },
 });
 </script>

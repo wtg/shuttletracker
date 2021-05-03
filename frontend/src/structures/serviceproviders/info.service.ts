@@ -1,6 +1,7 @@
 import Vehicle from '../vehicle';
 import Route from '../route';
 import { Stop } from '../stop';
+import Form from '../form';
 import AdminMessageUpdate from '@/structures/adminMessageUpdate';
 import FeedbackMessageUpdate from '@/structures/feedbackMessageUpdate';
 import routeScheduleInterval from '../routeScheduleInterval';
@@ -82,6 +83,21 @@ export default class InfoServiceProvider {
             }) => {
                 ret.push(new Stop(element.id, element.name, element.description, Number(element.latitude),
                     Number(element.longitude), element.created, element.updated));
+            });
+            return ret;
+        });
+    }
+
+    public GrabForms(): Promise<Form[]> {
+        return fetch(Resources.BasePath + 'forms').then((data) => data.json()).then((data) => {
+            const ret = new Array<Form>();
+            data.forEach((element: {
+                id: number,
+                message: string,
+                created: Date,
+                admin: boolean,
+            }) => {
+                ret.push(new Form(element.id, element.message, element.created, element.admin));
             });
             return ret;
         });
