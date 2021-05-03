@@ -94,10 +94,11 @@ export default class InfoServiceProvider {
             data.forEach((element: {
                 id: number,
                 message: string,
+                prompt: string,
                 created: Date,
                 admin: boolean,
             }) => {
-                ret.push(new Form(element.id, element.message, element.created, element.admin));
+                ret.push(new Form(element.id, element.message, element.prompt, element.created, element.admin));
             });
             return ret;
         });

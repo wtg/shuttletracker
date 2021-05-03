@@ -1,5 +1,28 @@
 <template>
     <div style="margin-top: 50px;" class="container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th><abbr title="ID">ID</abbr></th>
+                    <th><abbr title="Message">Message</abbr></th>
+                    <th><abbr title="Prompt">Prompt</abbr></th>
+                    <th><abbr title="Created">Created</abbr></th>
+                    <th><abbr title="Admin">Admin</abbr></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                <tr v-for="form in forms" :key="form.id">
+                    <th>{{form.id}}</th>
+                    <th>{{form.message}}</th>
+                    <th>{{form.prompt}}</th>
+                    <th>{{form.created}}</th>
+                    <th>{{form.admin}}</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+
         <p class="has-text-weight-bold">Current Message: "{{currentMessage}}"</p> 
         <div style="margin-top: 15px; margin-bottom: 15px;">
             <div class="field has-addons">
@@ -36,6 +59,12 @@ import { setTimeout } from 'timers';
 const sp = new InfoServiceProvider();
 
 export default Vue.extend({
+    name: 'forms',
+    computed: {
+        forms(): Form[] {
+            return this.$store.state.Forms;
+        },
+    },
     data() {
         return {
             currentMessage: '',
@@ -54,7 +83,7 @@ export default Vue.extend({
     },
     methods: {
         save() {
-            const myMessage = new Form(-1, this.newMessage, new Date(), true);
+            const myMessage = new Form(-1, this.newMessage, '', new Date(), true);
             AdminServiceProvider.CreateForm(myMessage).then((resp) => {
                 if (resp.ok) {
                     this.success = true;

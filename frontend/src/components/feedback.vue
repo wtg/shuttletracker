@@ -85,7 +85,7 @@ export default Vue.extend({
     },
     methods: {
         save() {
-            const myMessage = new Form(-1, this.feedbackMessage, new Date(), false);
+            const myMessage = new Form(-1, this.feedbackMessage, '', new Date(), false);
             const fail = document.getElementById('fail-n')!;
             const failLen = document.getElementById('fail-n-len')!;
             AdminServiceProvider.CreateForm(myMessage).then((resp) => {

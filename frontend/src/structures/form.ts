@@ -10,12 +10,14 @@ export interface FeedbackInterface {
 export default class Form {
     public id: number;
     public message: string;
+    public prompt: string;
     public created: Date;
     public admin: boolean;
 
-    constructor(id: number, message: string, created: Date, admin: boolean) {
+    constructor(id: number, message: string, prompt: string, created: Date, admin: boolean) {
         this.id = id;
         this.message = message;
+        this.prompt = prompt;
         this.created = created;
         this.admin = admin;
     }
@@ -28,6 +30,11 @@ export default class Form {
     // returns feedback message
     public getMessage(): string {
         return this.message;
+    }
+
+    // returns the prompt at the time this feedback was given
+    public getPrompt(): string {
+        return this.prompt;
     }
 
     public when(): Date {
