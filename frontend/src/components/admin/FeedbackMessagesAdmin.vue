@@ -5,6 +5,7 @@
                 <tr>
                     <th><abbr title="ID">ID</abbr></th>
                     <th><abbr title="Message">Message</abbr></th>
+                    <th><abbr title="Prompt">Prompt</abbr></th>
                     <th><abbr title="Created">Created</abbr></th>
                     <th><abbr title="Admin">Admin</abbr></th>
                     <th></th>
@@ -13,6 +14,7 @@
                 <tr v-for="form in forms" :key="form.id">
                     <th>{{form.id}}</th>
                     <th>{{form.message}}</th>
+                    <th>{{form.prompt}}</th>
                     <th>{{form.created}}</th>
                     <th>{{form.admin}}</th>
                     <th></th>
@@ -81,7 +83,7 @@ export default Vue.extend({
     },
     methods: {
         save() {
-            const myMessage = new Form(-1, this.newMessage, new Date(), true);
+            const myMessage = new Form(-1, this.newMessage, '', new Date(), true);
             AdminServiceProvider.CreateForm(myMessage).then((resp) => {
                 if (resp.ok) {
                     this.success = true;
