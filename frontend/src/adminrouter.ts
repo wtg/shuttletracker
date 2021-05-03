@@ -10,7 +10,6 @@ import vehicleEditing from '@/components/admin/vehicleEditing.vue';
 import vehicleOverview from '@/components/admin/vehicleOverview.vue';
 import messagesAdmin from '@/components/admin/MessagesAdmin.vue';
 import feedbackAdmin from '@/components/admin/FeedbackMessagesAdmin.vue';
-import 1 from '@/components/admin/1.vue';
 
 Vue.use(Router);
 
@@ -84,11 +83,6 @@ export default new Router({
         name: 'new vehicle',
         component: vehicleEditing,
         props: {creation: true},
-      },
-      {
-        path: '/admin/1',
-        name: '1',
-        component: 1,
       },
     ],
   });
