@@ -35,6 +35,13 @@ func (ss *StopService) CreateStop(stop *shuttletracker.Stop) error {
 	return row.Scan(&stop.ID, &stop.Created, &stop.Updated)
 }
 
+func (ss *StopService) CreateStopWithID(stop *shuttletracker.Stop) error {
+	statement := "INSERT INTO stops (id, name, description, latitude, longitude) VALUES" +
+		" ($1, $2, $3, $4, $5) RETURNING id, created, updated;"
+	row := ss.db.QueryRow(statement, stop.ID, stop.Name, stop.Description, stop.Latitude, stop.Longitude)
+	return row.Scan(&stop.ID, &stop.Created, &stop.Updated)
+}
+
 // Stop returns a Stop by its ID.
 func (ss *StopService) Stop(id int64) (*shuttletracker.Stop, error) {
 	s := &shuttletracker.Stop{

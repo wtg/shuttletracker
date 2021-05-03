@@ -89,9 +89,9 @@ export class Stop {
     }
 
     public asJSON(): {
-        name: string; description: string; latitude: number; longitude: number } {
+        id: number, name: string; description: string; latitude: number; longitude: number } {
         return {
-            // id: this.id,
+            id: this.id,
             name: this.name,
             description: this.description,
             latitude: Number(this.latitude),

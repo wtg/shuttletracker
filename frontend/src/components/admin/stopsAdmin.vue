@@ -25,7 +25,6 @@
                 </tr>
             </thead>
             <tbody>
-
                 <tr>
                     <th></th>
                     <th></th>
@@ -34,7 +33,20 @@
                     <th></th>
                     <th><button @click="$router.push('/admin/stops/-1/new')" class="button is-success">New</button></th>
                 </tr>
-
+                <div class="file">
+                  <label class="file-label">
+                    <input class="file-input" type="file" name="import" @change="handleFileUpload">
+                    <span class="file-cta">
+                      <span class="file-icon">
+                        <img src="./../../assets/upload-icon.svg"></i>
+                      </span>
+                      <span class="file-label">
+                        Choose a file…
+                      </span>
+                    </span>
+                  </label>
+                  <button v-on:click="addImportedStops()" class="button is-success">Submit</button>
+                </div>
             </tbody>
         </table>
     </div>
@@ -42,6 +54,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Stop } from '@/structures/stop';
+import AdminServiceProvider from '@/structures/serviceproviders/admin.service';
 export default Vue.extend({
     name: 'stops',
 
@@ -50,6 +63,60 @@ export default Vue.extend({
             return this.$store.state.Stops;
         },
     },
+    data() {
+        return{
+            file: null,
+        } as {
+            file: any,
+        };
+    },
+    mounted() {
+        this.$store.dispatch('grabStops');
+    },
+    methods: {
+        addImportedStops() {
+          const reader = new FileReader();
+          let json = null;
+          // Capture file information
+          reader.onload = ((theFile) => {
+            return (e: any) => {
+              try {
+                json = JSON.parse(e.target.result);
+                // If JSON.parse does not return a usable value, throw an Error
+                if (json.length === undefined || json.length === 0) {
+                  throw new Error('Improper JSON formatting');
+                }
+                for (let i = 0; i < json.length; i++) {
+                    const obj = json[i];
+                    // Create a new Stop object using the data in obj
+                    const newStop = new Stop(obj.id, obj.name, obj.description, obj.latitude, obj.longitude, obj.created, obj.updated);
+                    // If creating the new Stop failed, the JSON file was not formatted correctly. Throw an Error
+                    if (!newStop) {
+                      throw new Error('Improper JSON formatting');
+                    }
+                    // Create the stop in the database
+                    AdminServiceProvider.NewStop(newStop).then(() => {
+                            this.$store.dispatch('grabStops');
+                    });
+                }
+              } catch (e) {
+                // If we get a SyntaxError, we have received a Non-JSON file. Replace the error to reflect this.
+                if (e instanceof SyntaxError) {
+                  e = new Error('Non-JSON file submitted');
+                }
+                // Display the Error to the user, and log it in the console
+                alert(e);
+                console.log(e);
+              }
+            };
+          })(this.file);
+          reader.readAsText(this.file);
+        },
 
+        // Gets the user-submitted file and stores it
+        handleFileUpload(event: any) {
+          this.file = event.target.files[0];
+        },
+    },
 });
 </script>
