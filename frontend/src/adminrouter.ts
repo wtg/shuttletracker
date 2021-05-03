@@ -9,7 +9,7 @@ import stopsEditing from '@/components/admin/stopsEditing.vue';
 import vehicleEditing from '@/components/admin/vehicleEditing.vue';
 import vehicleOverview from '@/components/admin/vehicleOverview.vue';
 import messagesAdmin from '@/components/admin/MessagesAdmin.vue';
-import feedbackAdmin from '@/components/admin/FeedbackMessagesAdmin.vue';
+import feedbackAdmin from '@/components/admin/feedbackAdmin.vue';
 
 Vue.use(Router);
 
