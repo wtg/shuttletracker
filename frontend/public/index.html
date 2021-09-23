@@ -9,7 +9,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="Find out where Rensselaer's shuttles are. View shuttle routes, stops, and schedules.">
     <title>Shuttle Tracker</title>
-    <meta http-equiv="refresh" content="0; url=https://shuttletracker.app">
+    <script>
+      const urlParams = new URLSearchParams(window.location.search)
+      if (urlParams.get("redirect") != "no") {
+        window.location.replace("https://shuttletracker.app")
+      }
+    </script>
   </head>
   <body>
     <noscript>
