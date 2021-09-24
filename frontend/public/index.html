@@ -11,7 +11,7 @@
     <title>Shuttle Tracker</title>
     <script>
       const urlParams = new URLSearchParams(window.location.search)
-      if (urlParams.get("redirect") != "no") {
+      if (urlParams.get("redirect") != "no" && window.location.hostname != "old.shuttletracker.app") {
         window.location.replace("https://shuttletracker.app")
       }
     </script>
